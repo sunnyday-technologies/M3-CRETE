@@ -1,0 +1,38 @@
+ OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+build/
+*.o
+*.elf
+*.hex
+*.bin
+
+# PlatformIO (if used for firmware)
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Node modules (if configurator uses npm)
+node_modules/
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+~*
+
+# Large CAD binary archives (track with Git LFS or share separately)
+# Uncomment these if you store CAD in a separate location:
+# *.step
+# *.stl
+# *.3mf
+# *.f3d
