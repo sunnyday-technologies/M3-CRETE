@@ -21,6 +21,10 @@ m3-crete/
 
 - [CEMFORGE](https://cemforge.ai) — AI-driven cementitious formulation optimization platform
 
+## Disclaimer
+
+M3-CRETE is provided as-is for educational and development purposes. Concrete 3D printing involves heavy machinery, cementitious materials, and electrical systems that pose safety risks. Users assume all responsibility for safe design, construction, and operation of any system built from these files. Sunnyday Technologies makes no warranties regarding fitness for any particular purpose and assumes no liability for injury, damage, or loss resulting from the use of these designs. Consult applicable local building codes, electrical codes, and safety regulations before construction or operation.
+
 ## License
 
 This project is licensed under the [CERN Open Hardware Licence Version 2 — Strongly Reciprocal (CERN-OHL-S-2.0)](LICENSE).
