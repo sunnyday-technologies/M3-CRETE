@@ -1,0 +1,827 @@
+A
+                        { name: 'CNC Aluminum 8mm (Local shop)', price: 95, supplier: 'Local CNC Shop', url: '' },
+                        { name: '3D Printed CF-Nylon Reinforced', price: 15, supplier: 'Self-Manufacture', url: '' },
+                        { name: 'Laser cut steel (SendCutSend)', price: 75, supplier: 'SendCutSend', url: 'https://sendcutsend.com' }
+                    ],
+                    notes: 'Ginger G1 style - print saves $160+',
+                    mfg: 'print'
+                }
+            ],
+            
+            'Quad Z-Axis System (Self-Tramming)': [
+                {
+                    name: 'NEMA23 Stepper Motor (Z-axis)',
+                    qty: 4,
+                    unit: 'motors',
+                    options: [
+                        { name: 'NEMA23 3Nm (StepperOnline)', price: 46, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'NEMA23 4.5Nm High Torque', price: 68, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'NEMA23 Closed-loop (optional)', price: 89, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' }
+                    ],
+                    notes: 'Four independent motors for auto-leveling',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'TR12x3 Lead Screw 1200mm',
+                    qty: 4,
+                    unit: 'screws',
+                    options: [
+                        { name: 'TR12x3 Standard (RobotDigg US)', price: 28, supplier: 'RobotDigg', url: 'https://www.robotdigg.com' },
+                        { name: 'TR12x3 Anti-backlash (Amazon)', price: 36, supplier: 'Amazon - US', url: 'https://amazon.com' },
+                        { name: 'SFU1204 Ball Screw (Dumpster CNC)', price: 72, supplier: 'Dumpster CNC', url: 'https://www.dumpstercnc.com' }
+                    ],
+                    notes: 'Full height Z-axis lead screws',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'TR12 Lead Screw Nut Block',
+                    qty: 4,
+                    unit: 'nut blocks',
+                    options: [
+                        { name: 'Brass anti-backlash nut (RobotDigg)', price: 14, supplier: 'RobotDigg', url: 'https://www.robotdigg.com' },
+                        { name: 'Delrin POM nut (Amazon)', price: 7, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: '3D Printed nut housing', price: 2, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Brass for precision, Delrin for cost',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Flexible Shaft Coupler 8mm-12mm',
+                    qty: 4,
+                    unit: 'couplers',
+                    options: [
+                        { name: 'Aluminum flex coupler (Amazon)', price: 7, supplier: 'Amazon - US', url: 'https://amazon.com' },
+                        { name: 'Oldham coupling (McMaster)', price: 12, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Helical beam (StepperOnline)', price: 9.50, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' }
+                    ],
+                    notes: 'Motor to lead screw connection',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Pillow Block Bearing FL001 (12mm)',
+                    qty: 8,
+                    unit: 'bearings',
+                    options: [
+                        { name: 'Sealed bearing block (McMaster)', price: 8.50, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Standard FL001 (Amazon)', price: 5.50, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: '3D Printed bearing housing', price: 1.20, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Top & bottom supports for each Z screw',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Z-Axis Motor Mounts',
+                    qty: 4,
+                    unit: 'mounts',
+                    options: [
+                        { name: 'CNC Aluminum mount', price: 25, supplier: 'Local CNC Shop', url: '' },
+                        { name: '3D Printed PETG/ABS', price: 2.50, supplier: 'Self-Manufacture', url: '' },
+                        { name: 'Laser cut steel (SendCutSend)', price: 18, supplier: 'SendCutSend', url: 'https://sendcutsend.com' }
+                    ],
+                    notes: 'Print saves $90 for all 4 mounts',
+                    mfg: 'print'
+                }
+            ],
+            
+            'Electronics & Control System': [
+                {
+                    name: 'BTT Kraken Mainboard',
+                    qty: 1,
+                    unit: 'board',
+                    options: [
+                        { name: 'BTT Kraken v1.0 (Filastruder)', price: 168, supplier: 'Filastruder', url: 'https://www.filastruder.com' },
+                        { name: 'BTT Kraken (Amazon US)', price: 175, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'BTT Octopus Pro (alt)', price: 89, supplier: 'Filastruder', url: 'https://www.filastruder.com' }
+                    ],
+                    notes: '8 stepper drivers - perfect for this build',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Raspberry Pi 5 (8GB RAM)',
+                    qty: 1,
+                    unit: 'computer',
+                    options: [
+                        { name: 'RPi 5 8GB (Adafruit)', price: 80, supplier: 'Adafruit', url: 'https://www.adafruit.com' },
+                        { name: 'RPi 5 8GB (CanaKit)', price: 85, supplier: 'Amazon - CanaKit', url: 'https://amazon.com' },
+                        { name: 'RPi 4 8GB (alt)', price: 55, supplier: 'Adafruit', url: 'https://www.adafruit.com' }
+                    ],
+                    notes: 'Runs Klipper firmware',
+                    mfg: 'buy'
+                },
+                {
+                    name: '7-inch Touchscreen Display',
+                    qty: 1,
+                    unit: 'display',
+                    options: [
+                        { name: 'Raspberry Pi 7" Official (Adafruit)', price: 75, supplier: 'Adafruit', url: 'https://www.adafruit.com' },
+                        { name: 'Waveshare 7" HDMI (Amazon)', price: 58, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Generic 7" capacitive (Amazon)', price: 45, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'User interface for printer control',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Power Supply 24V 600W',
+                    qty: 1,
+                    unit: 'PSU',
+                    options: [
+                        { name: 'MeanWell LRS-600-24 (Mouser)', price: 68, supplier: 'Mouser Electronics', url: 'https://mouser.com' },
+                        { name: 'MeanWell RSP-750-24 (Digi-Key)', price: 88, supplier: 'Digi-Key', url: 'https://digikey.com' },
+                        { name: 'Generic 24V 600W (Amazon)', price: 45, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'MeanWell for reliability, generic for budget',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Emergency Stop Button',
+                    qty: 1,
+                    unit: 'switch',
+                    options: [
+                        { name: 'Mushroom E-stop (McMaster)', price: 14, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Twist-release E-stop (Automation Direct)', price: 9.50, supplier: 'AutomationDirect', url: 'https://automationdirect.com' },
+                        { name: 'Panel mount E-stop (Amazon)', price: 7.50, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'Critical safety component',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Mechanical Endstop Switches',
+                    qty: 10,
+                    unit: 'switches',
+                    options: [
+                        { name: 'Omron micro switch (Digi-Key)', price: 3.20, supplier: 'Digi-Key', url: 'https://digikey.com' },
+                        { name: 'Generic endstop pack (Amazon)', price: 1.50, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Inductive sensor NPN (Amazon)', price: 6.50, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'X, Y, 4×Z homing + spares',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Wiring Kit & Cable Management',
+                    qty: 1,
+                    unit: 'kit',
+                    options: [
+                        { name: 'Complete wire kit (StepperOnline)', price: 75, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'DIY bulk wire (McMaster)', price: 45, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Premium sleeved (Amazon)', price: 85, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'Power cables, signal wires, cable chain',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Cable Drag Chain',
+                    qty: 6,
+                    unit: 'meters',
+                    options: [
+                        { name: '25mm cable chain (Amazon)', price: 8, supplier: 'Amazon - US', url: 'https://amazon.com' },
+                        { name: 'Heavy duty 35mm (McMaster)', price: 15, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: '3D Printed parametric chain', price: 1.50, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Protects cables during motion',
+                    mfg: 'buy'
+                }
+            ],
+            
+            'Concrete Extrusion System': [
+                {
+                    name: 'Progressive Cavity Pump',
+                    qty: 1,
+                    unit: 'pump',
+                    options: [
+                        { name: 'Moyno 500 EZStrip (Moyno - OH)', price: 950, supplier: 'Moyno (Ohio)', url: 'https://www.moyno.com' },
+                        { name: 'PC Pump 500ml/rev (Graco)', price: 650, supplier: 'Graco Industrial', url: 'https://graco.com' },
+                        { name: 'Peristaltic pump alt (Cole-Parmer)', price: 385, supplier: 'Cole-Parmer', url: 'https://coleparmer.com' }
+                    ],
+                    notes: 'Core extrusion component',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'NEMA23 Motor for Extruder',
+                    qty: 1,
+                    unit: 'motor',
+                    options: [
+                        { name: 'NEMA23 4.5Nm (StepperOnline)', price: 68, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'NEMA23 Geared 10:1 (Automation Direct)', price: 125, supplier: 'AutomationDirect', url: 'https://automationdirect.com' },
+                        { name: 'NEMA23 3Nm standard', price: 46, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' }
+                    ],
+                    notes: 'Drives the pump - needs high torque',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Material Hopper 20-Liter',
+                    qty: 1,
+                    unit: 'hopper',
+                    options: [
+                        { name: 'Stainless steel hopper (McMaster)', price: 95, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'HDPE funnel 5-gal (US Plastic)', price: 42, supplier: 'US Plastic Corp', url: 'https://usplastic.com' },
+                        { name: '3D Printed PETG hopper', price: 18, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Material reservoir - PETG food-safe',
+                    mfg: 'print'
+                },
+                {
+                    name: 'Concrete Nozzle Assembly',
+                    qty: 1,
+                    unit: 'assembly',
+                    options: [
+                        { name: 'Custom machined brass (Local shop)', price: 55, supplier: 'Local Machine Shop', url: '' },
+                        { name: 'Stainless steel nozzle', price: 75, supplier: 'Local Machine Shop', url: '' },
+                        { name: 'Replaceable tip design', price: 65, supplier: 'SendCutSend', url: 'https://sendcutsend.com' }
+                    ],
+                    notes: 'Critical for print quality',
+                    mfg: 'cnc'
+                },
+                {
+                    name: 'Tubing & Quick Fittings',
+                    qty: 1,
+                    unit: 'kit',
+                    options: [
+                        { name: 'Complete tube kit (McMaster)', price: 55, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Food-grade hose set (US Plastic)', price: 35, supplier: 'US Plastic Corp', url: 'https://usplastic.com' },
+                        { name: 'Reinforced concrete hose (Grainger)', price: 75, supplier: 'Grainger', url: 'https://grainger.com' }
+                    ],
+                    notes: 'Pump to nozzle material flow',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Extruder Mounting Bracket',
+                    qty: 1,
+                    unit: 'bracket',
+                    options: [
+                        { name: 'CNC Aluminum plate', price: 45, supplier: 'Local CNC Shop', url: '' },
+                        { name: '3D Printed reinforced', price: 8, supplier: 'Self-Manufacture', url: '' },
+                        { name: 'Laser cut steel', price: 35, supplier: 'SendCutSend', url: 'https://sendcutsend.com' }
+                    ],
+                    notes: 'Mounts pump to carriage',
+                    mfg: 'print'
+                }
+            ],
+            
+            'Fasteners & Hardware': [
+                {
+                    name: 'M6 Socket Head Cap Screws',
+                    qty: 1,
+                    unit: '500pc kit',
+                    options: [
+                        { name: 'Assortment 500pc (McMaster)', price: 38, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Basic set 500pc (Amazon)', price: 22, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Stainless kit 500pc (Bolt Depot)', price: 52, supplier: 'Bolt Depot', url: 'https://boltdepot.com' }
+                    ],
+                    notes: 'Primary structural fasteners',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'M5 Socket Head Cap Screws',
+                    qty: 1,
+                    unit: '500pc kit',
+                    options: [
+                        { name: 'Assortment 500pc (McMaster)', price: 32, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Basic set 500pc (Amazon)', price: 18, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Stainless kit 500pc (Bolt Depot)', price: 45, supplier: 'Bolt Depot', url: 'https://boltdepot.com' }
+                    ],
+                    notes: 'Secondary mounting hardware',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'M3 Socket Head Cap Screws',
+                    qty: 1,
+                    unit: '500pc kit',
+                    options: [
+                        { name: 'Assortment 500pc (McMaster)', price: 28, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Basic set 500pc (Amazon)', price: 15, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Electronics kit (Digi-Key)', price: 32, supplier: 'Digi-Key', url: 'https://digikey.com' }
+                    ],
+                    notes: 'Electronics mounting and small parts',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Washers & Lock Washers Assorted',
+                    qty: 1,
+                    unit: 'kit',
+                    options: [
+                        { name: 'Complete M3-M8 kit (McMaster)', price: 28, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Basic washer set (Amazon)', price: 15, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Nord-Lock washers (Grainger)', price: 55, supplier: 'Grainger', url: 'https://grainger.com' }
+                    ],
+                    notes: 'Prevent loosening from vibration',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Heat-Set Inserts M3/M5',
+                    qty: 1,
+                    unit: '200pc kit',
+                    options: [
+                        { name: 'Brass insert kit (McMaster)', price: 35, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Economy inserts (Amazon)', price: 18, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Premium knurled (CNC Kitchen)', price: 42, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'Essential for 3D printed parts',
+                    mfg: 'buy'
+                }
+            ],
+            
+            'Optional Upgrades': [
+                {
+                    name: 'Polycarbonate Enclosure Panels',
+                    qty: 1,
+                    unit: 'set',
+                    options: [
+                        { name: 'Clear polycarbonate sheets (TAP Plastics)', price: 220, supplier: 'TAP Plastics', url: 'https://tapplastics.com' },
+                        { name: 'Corrugated plastic (US Plastic)', price: 85, supplier: 'US Plastic Corp', url: 'https://usplastic.com' },
+                        { name: 'None - open frame', price: 0, supplier: 'N/A', url: '' }
+                    ],
+                    notes: 'Dust containment for indoor use',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'LED Work Lighting',
+                    qty: 1,
+                    unit: 'kit',
+                    options: [
+                        { name: '24V LED strip 5m (Amazon)', price: 28, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'RGB LED strip (Amazon)', price: 38, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'None', price: 0, supplier: 'N/A', url: '' }
+                    ],
+                    notes: 'Work area illumination',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Camera Module for Monitoring',
+                    qty: 1,
+                    unit: 'camera',
+                    options: [
+                        { name: 'RPi Camera v3 (Adafruit)', price: 35, supplier: 'Adafruit', url: 'https://www.adafruit.com' },
+                        { name: 'USB Webcam 1080p (Amazon)', price: 45, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'None', price: 0, supplier: 'N/A', url: '' }
+                    ],
+                    notes: 'Remote print monitoring',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'HEPA Air Filtration',
+                    qty: 1,
+                    unit: 'system',
+                    options: [
+                        { name: 'HEPA filter box (Grainger)', price: 95, supplier: 'Grainger', url: 'https://grainger.com' },
+                        { name: 'DIY filter + fan (Amazon)', price: 42, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'None', price: 0, supplier: 'N/A', url: '' }
+                    ],
+                    notes: 'Concrete dust particle capture',
+                    mfg: 'buy'
+                }
+            ]
+        };
+
+        let selectedComponents = {};
+
+        function initializeBOM() {
+            const bomSection = document.getElementById('bomSection');
+            
+            Object.keys(bomData).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'category-header';
+                categoryHeader.innerHTML = `
+                    <h3>${category}</h3>
+                    <span class="category-total" id="total-${category.replace(/\s+/g, '-').replace(/&/g, 'and')}">$0.00</span>
+                `;
+                
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'items';
+                
+                bomData[category].forEach((item, index) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'bom-item';
+                    
+                    const itemId = `${category}-${index}`;
+                    selectedComponents[itemId] = {
+                        category: category,
+                        name: item.name,
+                        qty: item.qty,
+                        unit: item.unit,
+                        selectedOption: 0,
+                        price: item.options[0].price,
+                        mfg: item.mfg,
+                        supplier: item.options[0].supplier,
+                        url: item.options[0].url
+                    };
+                    
+                    const mfgBadgeClass = item.mfg === 'print' ? 'badge-print' : 
+                                         item.mfg === 'cnc' ? 'badge-cnc' : 'badge-buy';
+                    const mfgBadgeText = item.mfg === 'print' ? '3D Print' : 
+                                        item.mfg === 'cnc' ? 'CNC/Cut' : 'Purchase';
+                    
+                    itemDiv.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-notes">${item.notes}</div>
+                            <span class="manufacturing-badge ${mfgBadgeClass}">${mfgBadgeText}</span>
+                        </div>
+                        <div>
+                            <select id="select-${itemId}" onchange="updateSelection('${itemId}', this.value)">
+                                ${item.options.map((opt, i) => `
+                                    <option value="${i}">${opt.name} - $${opt.price}</option>
+                                `).join('')}
+                            </select>
+                            <a href="${item.options[0].url}" target="_blank" class="supplier-link" id="link-${itemId}">
+                                ${item.options[0].supplier}
+                            </a>
+                        </div>
+                        <input type="number" min="1" value="${item.qty}" 
+                               onchange="updateQuantity('${itemId}', this.value)"
+                               style="text-align: center;">
+                        <div class="item-cost" id="cost-${itemId}">$${(item.qty * item.options[0].price).toFixed(2)}</div>
+                    `;
+                    
+                    itemsDiv.appendChild(itemDiv);
+                });
+                
+                categoryDiv.appendChild(categoryHeader);
+                categoryDiv.appendChild(itemsDiv);
+                bomSection.appendChild(categoryDiv);
+            });
+            
+            updateSummary();
+            drawPrinter();
+        }
+
+        function updateSelection(itemId, optionIndex) {
+            const category = selectedComponents[itemId].category;
+            const itemIndex = parseInt(itemId.split('-').pop());
+            const item = bomData[category][itemIndex];
+            
+            selectedComponents[itemId].selectedOption = parseInt(optionIndex);
+            selectedComponents[itemId].price = item.options[optionIndex].price;
+            selectedComponents[itemId].supplier = item.options[optionIndex].supplier;
+            selectedComponents[itemId].url = item.options[optionIndex].url;
+            
+            // Update supplier link
+            const link = document.getElementById(`link-${itemId}`);
+            link.href = item.options[optionIndex].url;
+            link.textContent = item.options[optionIndex].supplier;
+            
+            updateItemCost(itemId);
+            updateSummary();
+        }
+
+        function updateQuantity(itemId, qty) {
+            selectedComponents[itemId].qty = parseInt(qty);
+            updateItemCost(itemId);
+            updateSummary();
+        }
+
+        function updateItemCost(itemId) {
+            const comp = selectedComponents[itemId];
+            const totalCost = comp.qty * comp.price;
+            document.getElementById(`cost-${itemId}`).textContent = `$${totalCost.toFixed(2)}`;
+        }
+
+        function updateSummary() {
+            const breakdown = {};
+            const mfgBreakdown = { print: 0, cnc: 0, buy: 0 };
+            let grandTotal = 0;
+            
+            Object.keys(selectedComponents).forEach(itemId => {
+                const comp = selectedComponents[itemId];
+                const itemTotal = comp.qty * comp.price;
+                
+                if (!breakdown[comp.category]) {
+                    breakdown[comp.category] = 0;
+                }
+                breakdown[comp.category] += itemTotal;
+                grandTotal += itemTotal;
+                
+                // Manufacturing breakdown
+                mfgBreakdown[comp.mfg] += itemTotal;
+            });
+            
+            // Update category totals
+            Object.keys(breakdown).forEach(category => {
+                const elem = document.getElementById(`total-${category.replace(/\s+/g, '-').replace(/&/g, 'and')}`);
+                if (elem) {
+                    elem.textContent = `$${breakdown[category].toFixed(2)}`;
+                }
+            });
+            
+            // Update cost breakdown
+            const breakdownDiv = document.getElementById('costBreakdown');
+            breakdownDiv.innerHTML = Object.keys(breakdown)
+                .map(cat => `
+                    <div class="cost-row">
+                        <span class="cost-label">${cat}</span>
+                        <span class="cost-value">$${breakdown[cat].toFixed(2)}</span>
+                    </div>
+                `).join('');
+            
+            // Manufacturing breakdown
+            const mfgDiv = document.getElementById('mfgBreakdown');
+            const printSavings = calculatePrintSavings();
+            mfgDiv.innerHTML = `
+                <div class="cost-row">
+                    <span class="cost-label">🛒 Purchase</span>
+                    <span class="cost-value">$${mfgBreakdown.buy.toFixed(2)}</span>
+                </div>
+                <div class="cost-row">
+                    <span class="cost-label">🖨️ 3D Printed</span>
+                    <span class="cost-value">$${mfgBreakdown.print.toFixed(2)}
+                        ${printSavings > 0 ? `<span class="savings-badge">-$${printSavings.toFixed(0)}</span>` : ''}
+                    </span>
+                </div>
+                <div class="cost-row">
+                    <span class="cost-label">🔧 CNC/Fabricated</span>
+                    <span class="cost-value">$${mfgBreakdown.cnc.toFixed(2)}</span>
+                </div>
+            `;
+            
+            // Update total
+            document.getElementById('totalCost').textContent = `$${grandTotal.toFixed(2)}`;
+        }
+
+        function calculatePrintSavings() {
+            // Estimate savings from 3D printing vs buying/CNC
+            // Based on typical 3D printed parts vs alternatives
+            let savings = 0;
+            
+            Object.keys(selectedComponents).forEach(itemId => {
+                const comp = selectedComponents[itemId];
+                if (comp.mfg === 'print') {
+                    // Rough estimate: printed parts save 70-90% vs alternatives
+                    const category = comp.category;
+                    const itemIndex = parseInt(itemId.split('-').pop());
+                    const item = bomData[category][itemIndex];
+                    
+                    if (item.options.length > 1) {
+                        const maxPrice = Math.max(...item.options.map(o => o.price));
+                        savings += (maxPrice - comp.price) * comp.qty;
+                    }
+                }
+            });
+            
+            return savings;
+        }
+
+        function drawPrinter() {
+            const canvas = document.getElementById('printerCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // Clear canvas with light background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Isometric projection parameters
+            const scale = 0.18;
+            const centerX = w * 0.5;
+            const centerY = h * 0.55;
+            
+            // Helper function for isometric projection
+            function iso(x, y, z) {
+                return {
+                    x: centerX + (x - y) * Math.cos(Math.PI / 6) * scale,
+                    y: centerY + (x + y) * Math.sin(Math.PI / 6) * scale - z * scale
+                };
+            }
+            
+            // Draw frame extrusions (4040 aluminum)
+            ctx.strokeStyle = '#34495e';
+            ctx.lineWidth = 4;
+            
+            // Base frame
+            const baseCorners = [
+                iso(0, 0, 0),
+                iso(1200, 0, 0),
+                iso(1200, 1000, 0),
+                iso(0, 1000, 0)
+            ];
+            
+            ctx.beginPath();
+            ctx.moveTo(baseCorners[0].x, baseCorners[0].y);
+            for (let i = 1; i < baseCorners.length; i++) {
+                ctx.lineTo(baseCorners[i].x, baseCorners[i].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Top frame
+            const topCorners = [
+                iso(0, 0, 1000),
+                iso(1200, 0, 1000),
+                iso(1200, 1000, 1000),
+                iso(0, 1000, 1000)
+            ];
+            
+            ctx.beginPath();
+            ctx.moveTo(topCorners[0].x, topCorners[0].y);
+            for (let i = 1; i < topCorners.length; i++) {
+                ctx.lineTo(topCorners[i].x, topCorners[i].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Vertical frame members
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(baseCorners[i].x, baseCorners[i].y);
+                ctx.lineTo(topCorners[i].x, topCorners[i].y);
+                ctx.stroke();
+            }
+            
+            // Draw Z-axis lead screws (quad configuration)
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            
+            const zPositions = [
+                [100, 100], [1100, 100], [1100, 900], [100, 900]
+            ];
+            
+            zPositions.forEach(([x, y]) => {
+                const bottom = iso(x, y, 0);
+                const top = iso(x, y, 1000);
+                ctx.beginPath();
+                ctx.moveTo(bottom.x, bottom.y);
+                ctx.lineTo(top.x, top.y);
+                ctx.stroke();
+                
+                // Draw spiral pattern on lead screw
+                ctx.strokeStyle = '#2980b9';
+                ctx.lineWidth = 1;
+                for (let z = 0; z < 1000; z += 40) {
+                    const p1 = iso(x - 5, y, z);
+                    const p2 = iso(x + 5, y, z + 20);
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 3;
+            });
+            
+            // Draw Y-axis gantry rails (dual)
+            ctx.strokeStyle = '#9b59b6';
+            ctx.lineWidth = 5;
+            
+            const gantryY1 = iso(0, 0, 600);
+            const gantryY2 = iso(1200, 0, 600);
+            ctx.beginPath();
+            ctx.moveTo(gantryY1.x, gantryY1.y);
+            ctx.lineTo(gantryY2.x, gantryY2.y);
+            ctx.stroke();
+            
+            const gantryY3 = iso(0, 1000, 600);
+            const gantryY4 = iso(1200, 1000, 600);
+            ctx.beginPath();
+            ctx.moveTo(gantryY3.x, gantryY3.y);
+            ctx.lineTo(gantryY4.x, gantryY4.y);
+            ctx.stroke();
+            
+            // Draw X-axis gantry
+            ctx.strokeStyle = '#9b59b6';
+            ctx.lineWidth = 5;
+            const xGantry1 = iso(600, 0, 600);
+            const xGantry2 = iso(600, 1000, 600);
+            ctx.beginPath();
+            ctx.moveTo(xGantry1.x, xGantry1.y);
+            ctx.lineTo(xGantry2.x, xGantry2.y);
+            ctx.stroke();
+            
+            // Draw GT2 belts (simplified)
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            // X belt
+            const xBelt1 = iso(600, 50, 620);
+            const xBelt2 = iso(600, 950, 620);
+            ctx.beginPath();
+            ctx.moveTo(xBelt1.x, xBelt1.y);
+            ctx.lineTo(xBelt2.x, xBelt2.y);
+            ctx.stroke();
+            
+            // Y belts (dual)
+            const yBelt1a = iso(50, 500, 620);
+            const yBelt1b = iso(1150, 500, 620);
+            ctx.beginPath();
+            ctx.moveTo(yBelt1a.x, yBelt1a.y);
+            ctx.lineTo(yBelt1b.x, yBelt1b.y);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+            
+            // Draw pulleys and wheels
+            ctx.fillStyle = '#f39c12';
+            
+            // Pulleys at corners
+            const pulleyPositions = [
+                [100, 100, 620], [1100, 100, 620],
+                [100, 900, 620], [1100, 900, 620]
+            ];
+            
+            pulleyPositions.forEach(([x, y, z]) => {
+                const p = iso(x, y, z);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // V-groove wheels on carriage
+            const wheelPositions = [
+                [580, 450, 610], [620, 450, 610],
+                [580, 550, 610], [620, 550, 610]
+            ];
+            
+            wheelPositions.forEach(([x, y, z]) => {
+                const p = iso(x, y, z);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Draw extruder head
+            ctx.fillStyle = '#27ae60';
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 3;
+            
+            const extruderTop = iso(600, 500, 550);
+            const extruderBottom = iso(600, 500, 450);
+            
+            // Extruder body (simplified)
+            ctx.beginPath();
+            ctx.arc(extruderTop.x, extruderTop.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(extruderTop.x, extruderTop.y);
+            ctx.lineTo(extruderBottom.x, extruderBottom.y);
+            ctx.stroke();
+            
+            // Nozzle
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(extruderBottom.x, extruderBottom.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Add dimension annotations
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 11px Arial';
+            ctx.textAlign = 'center';
+            
+            const dim1 = iso(600, -80, 0);
+            ctx.fillText('1200mm (X)', dim1.x, dim1.y);
+            
+            const dim2 = iso(1280, 500, 0);
+            ctx.fillText('1000mm (Y)', dim2.x, dim2.y);
+            
+            const dim3 = iso(-100, 0, 500);
+            ctx.fillText('1000mm (Z)', dim3.x, dim3.y);
+            
+            // Add component labels
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#7f8c8d';
+            
+            const label1 = iso(100, 100, 1050);
+            ctx.fillText('4× Z Lead Screws', label1.x, label1.y);
+        }
+
+        function exportBOM() {
+            let csv = 'Category,Item,Quantity,Unit,Selected Option,Supplier,Unit Price,Total Cost,Manufacturing,URL\n';
+            
+            Object.keys(bomData).forEach(category => {
+                bomData[category].forEach((item, index) => {
+                    const itemId = `${category}-${index}`;
+                    const comp = selectedComponents[itemId];
+                    const selectedOpt = item.options[comp.selectedOption];
+                    const totalCost = comp.qty * comp.price;
+                    
+                    csv += `"${category}","${item.name}",${comp.qty},"${comp.unit}","${selectedOpt.name}","${comp.supplier}",$${comp.price},$${totalCost.toFixed(2)},"${comp.mfg}","${comp.url}"\n`;
+                });
+            });
+            
+            // Calculate totals
+            const grandTotal = Object.keys(selectedComponents).reduce((sum, itemId) => {
+                const comp = selectedComponents[itemId];
+                return sum + (comp.qty * comp.price);
+            }, 0);
+            
+            const printSavings = calculatePrintSavings();
+            
+            csv += `\n"Total Cost:",,,,,$${grandTotal.toFixed(2)}\n`;
+            csv += `"Estimated Savings from 3D Printing:",,,,,$${printSavings.toFixed(2)}\n`;
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'concrete_printer_bom_us_sources.csv';
+            a.click();
+        }
+
+        // Initialize on load
+        window.onload = initializeBOM;
+    </script>
+</body>
+</html>
