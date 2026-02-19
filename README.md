@@ -16,6 +16,11 @@ m3-crete/
 ├── docs/            — Build guides, calibration, specifications
 └── images/          — Photos and diagrams
 ```
+## Firmware
+
+Firmware configurations are maintained in a separate repository:
+
+https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE
 
 ## Related Projects
 
