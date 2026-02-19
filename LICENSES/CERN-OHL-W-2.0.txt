@@ -1,4 +1,4 @@
-CERN Open Hardware Licence Version 2 - Strongly Reciprocal
+CERN Open Hardware Licence Version 2 - Weakly Reciprocal
 
 
 Preamble
@@ -8,10 +8,10 @@ hardware designers and to provide a legal tool which supports the
 freedom to use, study, modify, share and distribute hardware designs
 and products based on those designs. Version 2 of the CERN Open
 Hardware Licence comes in three variants: CERN-OHL-P (permissive); and
-two reciprocal licences: CERN-OHL-W (weakly reciprocal) and this
-licence, CERN-OHL-S (strongly reciprocal).
+two reciprocal licences: this licence, CERN-OHL-W (weakly reciprocal)
+and CERN-OHL-S (strongly reciprocal).
 
-The CERN-OHL-S is copyright CERN 2020. Anyone is welcome to use it, in
+The CERN-OHL-W is copyright CERN 2020. Anyone is welcome to use it, in
 unmodified form only.
 
 Use of this Licence does not imply any endorsement by CERN of any
@@ -21,19 +21,19 @@ their development.
 
 1 Definitions
 
-  1.1 'Licence' means this CERN-OHL-S.
+  1.1 'Licence' means this CERN-OHL-W.
 
   1.2 'Compatible Licence' means
 
        a) any earlier version of the CERN Open Hardware licence, or
 
-       b) any version of the CERN-OHL-S, or
+       b) any version of the CERN-OHL-S or the CERN-OHL-W, or
 
        c) any licence which permits You to treat the Source to which
-          it applies as licensed under CERN-OHL-S provided that on
-          Conveyance of any such Source, or any associated Product You
-          treat the Source in question as being licensed under
-          CERN-OHL-S.
+          it applies as licensed under CERN-OHL-S or CERN-OHL-W
+          provided that on Conveyance of any such Source, or any
+          associated Product You treat the Source in question as being
+          licensed under CERN-OHL-S or CERN-OHL-W as appropriate.
 
   1.3 'Source' means information such as design materials or digital
       code which can be applied to Make or test a Product or to
@@ -61,16 +61,25 @@ their development.
           it is first Conveyed, to You and any other prospective
           licensees
 
-            i) as a physical part with sufficient rights and
-               information (including any configuration and
-               programming files and information about its
-               characteristics and interfaces) to enable it either to
-               be Made itself, or to be sourced and used to Make the
-               Product; or
-           ii) as part of the normal distribution of a tool used to
-               design or Make the Product.
+           i) with sufficient rights and information (including any
+              configuration and programming files and information
+              about its characteristics and interfaces) to enable it
+              either to be Made itself, or to be sourced and used to
+              Make the Product; or
+          ii) as part of the normal distribution of a tool used to
+              design or Make the Product.
 
-  1.8 'Complete Source' means the set of all Source necessary to Make
+  1.8 'External Material' means anything (including Source) which:
+
+       a) is only combined with Covered Source in such a way that it
+          interfaces with the Covered Source using a documented
+          interface which is described in the Covered Source; and
+
+       b) is not a derivative of or contains Covered Source, or, if it
+          is, it is solely to the extent necessary to facilitate such
+          interfacing.
+
+  1.9 'Complete Source' means the set of all Source necessary to Make
       a Product, in the preferred form for making modifications,
       including necessary installation and interfacing information
       both for the Product, and for any included Available Components.
@@ -84,25 +93,25 @@ their development.
       enable a recipient to Make or source and use the Available
       Component to Make the Product.
 
-  1.9 'Source Location' means a location where a Licensor has placed
+ 1.10 'Source Location' means a location where a Licensor has placed
       Covered Source, and which that Licensor reasonably believes will
       remain easily accessible for at least three years for anyone to
       obtain a digital copy.
 
- 1.10 'Notice' means copyright, acknowledgement and trademark notices,
+ 1.11 'Notice' means copyright, acknowledgement and trademark notices,
       Source Location references, modification notices (subsection
       3.3(b)) and all notices that refer to this Licence and to the
       disclaimer of warranties that are included in the Covered
       Source.
 
- 1.11 'Licensee' or 'You' means any person exercising rights under
+ 1.12 'Licensee' or 'You' means any person exercising rights under
       this Licence.
 
- 1.12 'Licensor' means a natural or legal person who creates or
+ 1.13 'Licensor' means a natural or legal person who creates or
       modifies Covered Source. A person may be a Licensee and a
       Licensor at the same time.
 
- 1.13 'Convey' means to communicate to the public or distribute.
+ 1.14 'Convey' means to communicate to the public or distribute.
 
 
 2 Applicability
@@ -137,9 +146,6 @@ their development.
       You may only delete Notices if they are no longer applicable to
       the corresponding Covered Source as modified by You and You may
       add additional Notices applicable to Your modifications.
-      Including Covered Source in a larger work is modifying the
-      Covered Source, and the larger work becomes modified Covered
-      Source.
 
   3.3 You may Convey modified Covered Source (with the effect that You
       shall also become a Licensor) provided that You:
@@ -159,20 +165,31 @@ their development.
           8.3, a later version, if permitted by the licence of the
           original Covered Source). Such modified Covered Source must
           be licensed as a whole, but excluding Available Components
-          contained in it, which remain licensed under their own
-          applicable licences.
+          contained in it or External Material to which it is
+          interfaced, which remain licensed under their own applicable
+          licences.
 
 
 4 Making and Conveying Products
 
-You may Make Products, and/or Convey them, provided that You either
-provide each recipient with a copy of the Complete Source or ensure
-that each recipient is notified of the Source Location of the Complete
-Source. That Complete Source is Covered Source, and You must
-accordingly satisfy Your obligations set out in subsection 3.3. If
-specified in a Notice, the Product must visibly and securely display
-the Source Location on it or its packaging or documentation in the
-manner specified in that Notice.
+  4.1 You may Make Products, and/or Convey them, provided that You
+      either provide each recipient with a copy of the Complete Source
+      or ensure that each recipient is notified of the Source Location
+      of the Complete Source. That Complete Source includes Covered
+      Source and You must accordingly satisfy Your obligations set out
+      in subsection 3.3. If specified in a Notice, the Product must
+      visibly and securely display the Source Location on it or its
+      packaging or documentation in the manner specified in that
+      Notice.
+
+  4.2 Where You Convey a Product which incorporates External Material,
+      the Complete Source for that Product which You are required to
+      provide under subsection 4.1 need not include any Source for the
+      External Material.
+
+  4.3 You may license Products under terms of Your choice, provided
+      that such terms do not restrict or attempt to restrict any
+      recipients' rights under this Licence to the Covered Source.
 
 
 5 Research and Development
@@ -269,6 +286,11 @@ subsection 3.2.
       version of the CERN-OHL or any later version in which case You
       may apply this or any later version of CERN-OHL with the same
       variant identifier published by CERN.
+
+      You may treat Covered Source licensed under CERN-OHL-W as
+      licensed under CERN-OHL-S if and only if all Available
+      Components referenced in the Covered Source comply with the
+      corresponding definition of Available Component for CERN-OHL-S.
 
   8.4 This Licence shall terminate with immediate effect if You fail
       to comply with any of its terms and conditions.
