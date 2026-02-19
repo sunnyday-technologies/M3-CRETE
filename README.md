@@ -27,7 +27,13 @@ M3-CRETE is provided as-is for educational and development purposes. Concrete 3D
 
 ## License
 
-This project is licensed under the [CERN Open Hardware Licence Version 2 — Strongly Reciprocal (CERN-OHL-S-2.0)](LICENSE).
+This project is licensed under the CERN Open Hardware Licence Version 2 – Weakly Reciprocal (CERN-OHL-W-2.0).
+
+You may use, modify, and distribute this design under the terms of that license.
+Modifications to files covered by CERN-OHL-W must be made available under the same license.
+
+This project includes no warranty of any kind. Use at your own risk.
+
 
 ## Contact
 
