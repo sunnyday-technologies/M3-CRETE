@@ -449,7 +449,23 @@
       formulation platform.
     </p>
   </section>
+.hero-image {
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 0 3rem 3rem;
+}
 
+.hero-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
+}
+<section class="hero-image">
+  <img src="images/M3-CRETE_render.png" alt="M3-Crete Printer Render" />
+</section>
   <!-- SPEC STRIP -->
   <div class="spec-strip">
     <div class="spec-item">
@@ -506,8 +522,7 @@
         platform are built to work together.
       </p>
     </div>
-    <img src="/images/M3-CRETE_render.png" alt="3M-Crete Printer Render" />
-    <div class="content-block">
+      <div class="content-block">
       <div class="block-num">// 04</div>
       <div class="block-title">Get Involved</div>
       <p class="block-body">
