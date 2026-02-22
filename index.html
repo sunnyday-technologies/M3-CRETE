@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M3-CRETE | Open-Source Concrete 3D Printer</title>
+  <meta name="description" content="M3-CRETE is an open-source concrete 3D printer designed for sub-1m³ builds on a standard US pallet. Developed by Sunnyday Technologies." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:       #060d14;
+      --charcoal:    #0b1824;
+      --graphite:    #0f2035;
+      --border:      #1a3350;
+      --mid:         #2a4d6e;
+      --muted:       #6a8faa;
+      --light:       #c2d4e0;
+      --white:       #f0f4f7;
+      --accent:      #97D700;
+      --accent-dim:  #5c8400;
+      --brand-blue:  #013A73;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      background-image: linear-gradient(160deg, #011f3f 0%, #060d14 60%);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* — noise texture overlay — */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    /* — HEADER — */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .logo-mark {
+      font-family: 'Russo One', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding-left: 0.75rem;
+      border-left: 1px solid var(--border);
+    }
+
+    nav a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    /* — HERO — */
+    .hero {
+      position: relative;
+      z-index: 10;
+      padding: 8rem 3rem 6rem;
+      max-width: 1100px;
+    }
+
+    .hero-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hero-label::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: var(--accent-dim);
+    }
+
+    h1 {
+      font-family: 'Russo One', sans-serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      line-height: 0.92;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 2.5rem;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--light);
+      max-width: 560px;
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 3.5rem;
+    }
+
+    /* — SPEC STRIP — */
+    .spec-strip {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 0 3rem;
+      overflow: hidden;
+    }
+
+    .spec-item {
+      flex: 1;
+      padding: 1.5rem 2rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .spec-item:last-child { border-right: none; }
+
+    .spec-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .spec-value {
+      font-family: 'Russo One', sans-serif;
+      font-size: 1.6rem;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    .spec-unit {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-left: 0.3rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* — MAIN CONTENT — */
+    .content {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 5rem 3rem;
+      border: 1px solid var(--border);
+    }
+
+    .content-block {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .content-block:last-child { border-right: none; }
+
+    .block-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--accent-dim);
+      letter-spacing: 0.3em;
+      margin-bottom: 1.5rem;
+    }
+
+    .block-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .block-body {
+      font-size: 0.9rem;
+      color: var(--light);
+      line-height: 1.75;
+      font-weight: 300;
+      font-family: 'Raleway', sans-serif;
+    }
+
+    /* — CTA — */
+    .cta-section {
+      position: relative;
+      z-index: 10;
+      margin: 0 3rem 6rem;
+      padding: 3.5rem;
+      border: 1px solid var(--border);
+      background: #0b1e33;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .cta-text h2 {
+      font-family: 'Russo One', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .cta-text p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.75rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--brand-blue);
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background: #aae800;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--light);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* github icon */
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* — FOOTER — */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-left a {
+      color: var(--accent-dim);
+      text-decoration: none;
+    }
+
+    .footer-left a:hover { color: var(--accent); }
+
+    .footer-right {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* — DECORATIVE GRID LINES — */
+    .grid-line {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .gl-1 { left: 25%; }
+    .gl-2 { left: 50%; }
+    .gl-3 { left: 75%; }
+
+    /* — ANIMATIONS — */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-label  { animation: fadeUp 0.6s ease both; animation-delay: 0.1s; }
+    h1           { animation: fadeUp 0.7s ease both; animation-delay: 0.2s; }
+    .hero-desc   { animation: fadeUp 0.7s ease both; animation-delay: 0.35s; }
+    .spec-strip  { animation: fadeUp 0.7s ease both; animation-delay: 0.45s; }
+    .content     { animation: fadeUp 0.7s ease both; animation-delay: 0.55s; }
+    .cta-section { animation: fadeUp 0.7s ease both; animation-delay: 0.65s; }
+
+    /* — RESPONSIVE — */
+    @media (max-width: 768px) {
+      header { padding: 1.25rem 1.5rem; }
+      .logo-sub { display: none; }
+
+      .hero { padding: 5rem 1.5rem 4rem; }
+
+      .spec-strip {
+        margin: 0 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .spec-item {
+        flex: 1 1 45%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+        margin: 3rem 1.5rem;
+      }
+
+      .content-block {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 2rem 1.5rem;
+      }
+
+      .content-block:last-child { border-bottom: none; }
+
+      .cta-section {
+        flex-direction: column;
+        margin: 0 1.5rem 4rem;
+        padding: 2rem 1.5rem;
+        align-items: flex-start;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+      .gl-1, .gl-2, .gl-3 { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- decorative vertical rules -->
+  <div class="grid-line gl-1"></div>
+  <div class="grid-line gl-2"></div>
+  <div class="grid-line gl-3"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <span class="logo-mark">M3-CRETE</span>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav>
+      <a href="https://sunn3d.com" target="_blank" rel="noopener">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label">Open-Source Hardware // Additive Construction</div>
+    <h1>Concrete.<br/><span>Printed.</span><br/>Open.</h1>
+    <p class="hero-desc">
+      M3-CRETE is an open-source concrete 3D printer engineered for sub-1m³ builds
+      on a standard US pallet. Modular, mobile, and designed for field deployment —
+      developed by Sunnyday Technologies as a companion to the CEMFORGE™ AI
+      formulation platform.
+    </p>
+  </section>
+
+  <!-- SPEC STRIP -->
+  <div class="spec-strip">
+    <div class="spec-item">
+      <div class="spec-label">Build Volume</div>
+      <div class="spec-value">&lt;1<span class="spec-unit">m³</span></div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">Form Factor</div>
+      <div class="spec-value">Pallet<span class="spec-unit">48×40 in</span></div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">Architecture</div>
+      <div class="spec-value">CoreXY<span class="spec-unit">Gantry</span></div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">License</div>
+      <div class="spec-value">Open<span class="spec-unit">Source</span></div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">Status</div>
+      <div class="spec-value">Dev<span class="spec-unit">Active</span></div>
+    </div>
+  </div>
+
+  <!-- CONTENT BLOCKS -->
+  <div class="content">
+    <div class="content-block">
+      <div class="block-num">// 01</div>
+      <div class="block-title">What It Is</div>
+      <p class="block-body">
+        A field-deployable, pallet-scale concrete 3D printer based on a scaled
+        CoreXY gantry architecture. Designed for robust performance in dusty
+        construction environments with a lightweight printhead (~1.5 kg) and
+        counterweighted material delivery. Target system cost under $5,000.
+      </p>
+    </div>
+    <div class="content-block">
+      <div class="block-num">// 02</div>
+      <div class="block-title">Why Open Source</div>
+      <p class="block-body">
+        The concrete 3D printing industry moves faster when hardware isn't a
+        barrier. M3-CRETE is released openly so researchers, universities, and
+        contractors can build, modify, and improve on a validated baseline —
+        while pairing with CEMFORGE™ for AI-optimized mix design.
+      </p>
+    </div>
+    <div class="content-block">
+      <div class="block-num">// 03</div>
+      <div class="block-title">CEMFORGE™ Integration</div>
+      <p class="block-body">
+        M3-CRETE is designed to run formulations generated by the CEMFORGE™
+        platform — 8,000+ AI-optimized cementitious composites achieving
+        R² 0.85–0.88 via XGBoost models. The hardware and formulation
+        platform are built to work together.
+      </p>
+    </div>
+    <div class="content-block">
+      <div class="block-num">// 04</div>
+      <div class="block-title">Get Involved</div>
+      <p class="block-body">
+        The project is in active development. Documentation, CAD files, BOM,
+        and build guides are published to the GitHub repository as they are
+        validated. Watch the repo for updates, or contact Sunnyday Technologies
+        directly for consulting or partnership inquiries.
+      </p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-text">
+      <h2>View the Repository</h2>
+      <p>CAD files · BOM · Build documentation · Firmware</p>
+    </div>
+    <div class="cta-buttons">
+      <a class="btn btn-primary" href="https://github.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+        </svg>
+        GitHub Repository
+      </a>
+      <a class="btn btn-secondary" href="https://sunn3d.com" target="_blank" rel="noopener">
+        Sunnyday Technologies →
+      </a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      © 2026 Sunnyday Technologies LLC &nbsp;·&nbsp;
+      <a href="https://sunn3d.com">sunn3d.com</a> &nbsp;·&nbsp;
+      <a href="https://cemforge.ai">cemforge.ai</a> &nbsp;·&nbsp;
+      <a href="/cdn-cgi/l/email-protection#b8d1d6ded7f8cbcdd6d68bdc96dbd7d5"><span class="__cf_email__" data-cfemail="c7aea9a1a887b4b2a9a9f4a3e9a4a8aa">[email&#160;protected]</span
