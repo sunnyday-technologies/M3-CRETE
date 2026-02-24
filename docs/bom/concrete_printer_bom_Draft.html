@@ -1,4 +1,663 @@
-A
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concrete 3D Printer BOM - US Sources (1200x1000x1000mm)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .specs {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .spec-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .spec-item label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6c757d;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .spec-item span {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 0;
+        }
+        
+        .bom-section {
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(100vh - 300px);
+        }
+        
+        .summary-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-left: 2px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        .category {
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-header h3 {
+            font-size: 16px;
+        }
+        
+        .category-total {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .items {
+            background: white;
+        }
+        
+        .bom-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 80px 100px;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .bom-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .item-notes {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        
+        .manufacturing-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        
+        .badge-print {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-cnc {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-buy {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        select, input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .item-cost {
+            font-weight: 600;
+            color: #28a745;
+            text-align: right;
+        }
+        
+        .supplier-link {
+            font-size: 11px;
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .supplier-link:hover {
+            text-decoration: underline;
+        }
+        
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .cost-breakdown {
+            margin-bottom: 15px;
+        }
+        
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .cost-row:last-child {
+            border-bottom: none;
+        }
+        
+        .cost-label {
+            color: #495057;
+        }
+        
+        .cost-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .savings-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .total-cost {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .total-cost-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .total-cost-value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        .export-btn {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .export-btn:hover {
+            background: #218838;
+        }
+        
+        .visualization {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .viz-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .legend {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: #495057;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-section {
+                position: static;
+                max-height: none;
+            }
+            
+            .bom-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ Concrete 3D Printer - Complete Bill of Materials</h1>
+            <p>bigFDM-Based Platform | Quad-Z Self-Tramming | Dual-Y High Speed | US Sourcing</p>
+        </header>
+        
+        <div class="specs">
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <label>Build Volume</label>
+                    <span>1200 × 1000 × 1000mm</span>
+                </div>
+                <div class="spec-item">
+                    <label>Motion System</label>
+                    <span>Belt + V-Groove (Dust Resistant)</span>
+                </div>
+                <div class="spec-item">
+                    <label>Z Configuration</label>
+                    <span>4× Independent (Auto-Tram)</span>
+                </div>
+                <div class="spec-item">
+                    <label>Controller</label>
+                    <span>BTT Kraken + RPi 5</span>
+                </div>
+                <div class="spec-item">
+                    <label>Motors</label>
+                    <span>NEMA23 Closed-Loop</span>
+                </div>
+                <div class="spec-item">
+                    <label>Sourcing</label>
+                    <span>100% US Suppliers</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="bom-section" id="bomSection"></div>
+            
+            <div class="summary-section">
+                <div class="summary-card">
+                    <h3>💰 Cost Summary</h3>
+                    <div class="cost-breakdown" id="costBreakdown"></div>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>🎯 Manufacturing Breakdown</h3>
+                    <div class="cost-breakdown" id="mfgBreakdown"></div>
+                </div>
+                
+                <div class="total-cost">
+                    <div class="total-cost-label">Total Estimated Cost</div>
+                    <div class="total-cost-value" id="totalCost">$0.00</div>
+                </div>
+                
+                <button class="export-btn" onclick="exportBOM()">📄 Export Complete BOM to CSV</button>
+                
+                <div class="visualization">
+                    <div class="viz-title">3D Printer Visualization</div>
+                    <canvas id="printerCanvas" width="400" height="400"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #34495e;"></div>
+                            <span>Aluminum Frame</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3498db;"></div>
+                            <span>Z Lead Screws (4×)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #e74c3c;"></div>
+                            <span>GT2 Belts</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f39c12;"></div>
+                            <span>Pulleys & Wheels</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #9b59b6;"></div>
+                            <span>Gantry System</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #27ae60;"></div>
+                            <span>Extrusion Head</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const bomData = {
+            'Frame & Structure - Aluminum Extrusions': [
+                {
+                    name: '4040 T-Slot Aluminum Extrusion',
+                    qty: 8,
+                    unit: '6ft lengths',
+                    options: [
+                        { name: '4040 Series 15 (8020.net)', price: 42, supplier: '8020.net', url: 'https://8020.net' },
+                        { name: '4040 T-slot (Tnutz)', price: 38, supplier: 'TNutz', url: 'https://www.tnutz.com' },
+                        { name: '4040 (MiSUMi USA)', price: 45, supplier: 'MiSUMi', url: 'https://us.misumi-ec.com' }
+                    ],
+                    notes: 'Main frame verticals and horizontals',
+                    mfg: 'buy'
+                },
+                {
+                    name: '4020 T-Slot Aluminum Extrusion',
+                    qty: 10,
+                    unit: '6ft lengths',
+                    options: [
+                        { name: '4020 Series 15 (8020.net)', price: 26, supplier: '8020.net', url: 'https://8020.net' },
+                        { name: '4020 T-slot (Tnutz)', price: 23, supplier: 'TNutz', url: 'https://www.tnutz.com' },
+                        { name: '4020 (MiSUMi USA)', price: 28, supplier: 'MiSUMi', url: 'https://us.misumi-ec.com' }
+                    ],
+                    notes: 'Cross bracing, gantry rails, and supports',
+                    mfg: 'buy'
+                },
+                {
+                    name: '2020 T-Slot Aluminum Extrusion',
+                    qty: 6,
+                    unit: '6ft lengths',
+                    options: [
+                        { name: '2020 Series 15 (8020.net)', price: 14, supplier: '8020.net', url: 'https://8020.net' },
+                        { name: '2020 T-slot (Tnutz)', price: 12, supplier: 'TNutz', url: 'https://www.tnutz.com' },
+                        { name: '2020 (Amazon - US seller)', price: 11, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'Carriage mounts and accessory rails',
+                    mfg: 'buy'
+                }
+            ],
+            
+            'Frame Hardware & Brackets': [
+                {
+                    name: 'Heavy Duty Corner Brackets',
+                    qty: 32,
+                    unit: 'pieces',
+                    options: [
+                        { name: 'Cast aluminum bracket (8020.net)', price: 7.50, supplier: '8020.net', url: 'https://8020.net' },
+                        { name: 'Steel L-bracket (McMaster)', price: 4.20, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: '3D Printed ABS/Nylon', price: 0.80, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Frame corner connections - printable saves $200+',
+                    mfg: 'print'
+                },
+                {
+                    name: 'T-Slot Drop-In Nuts M6',
+                    qty: 300,
+                    unit: 'per 100',
+                    options: [
+                        { name: 'Spring-loaded (8020.net)', price: 18, supplier: '8020.net', url: 'https://8020.net' },
+                        { name: 'Economy pack (TNutz)', price: 12, supplier: 'TNutz', url: 'https://www.tnutz.com' },
+                        { name: 'Standard (McMaster)', price: 15, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' }
+                    ],
+                    notes: 'Essential for all frame mounting',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Adjustable Leveling Feet M16',
+                    qty: 4,
+                    unit: 'pieces',
+                    options: [
+                        { name: 'Heavy duty 1000lb (McMaster)', price: 18, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Vibration dampening (Grainger)', price: 24, supplier: 'Grainger', url: 'https://grainger.com' },
+                        { name: 'Standard M16 (Amazon)', price: 12, supplier: 'Amazon', url: 'https://amazon.com' }
+                    ],
+                    notes: 'Critical for leveling on uneven floors',
+                    mfg: 'buy'
+                }
+            ],
+            
+            'X-Axis Motion System': [
+                {
+                    name: 'NEMA23 Closed-Loop Stepper (X-axis)',
+                    qty: 1,
+                    unit: 'motor',
+                    options: [
+                        { name: 'iHSV57 3Nm Closed-loop (StepperOnline)', price: 89, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'iHSV57 4.5Nm (StepperOnline)', price: 115, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'NEMA23 3Nm Standard (Automation Direct)', price: 52, supplier: 'AutomationDirect', url: 'https://automationdirect.com' }
+                    ],
+                    notes: 'Closed-loop prevents missed steps in X',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'GT2 Timing Belt 10mm (Reinforced)',
+                    qty: 10,
+                    unit: 'meters',
+                    options: [
+                        { name: 'Gates PowerGrip GT2 (McMaster)', price: 4.50, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Fiberglass core GT2 (Amazon)', price: 2.80, supplier: 'Amazon - US Stock', url: 'https://amazon.com' },
+                        { name: 'Standard rubber GT2 (StepperOnline)', price: 2.20, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' }
+                    ],
+                    notes: 'X-axis drive belt - buy extra for spares',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'GT2 Pulley 20-Tooth 8mm Bore',
+                    qty: 4,
+                    unit: 'pulleys',
+                    options: [
+                        { name: 'Aluminum 20T (StepperOnline)', price: 7.50, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'Steel 20T (McMaster)', price: 11, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: '3D Printed reinforced', price: 1.50, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Drive and idler pulleys - metal recommended',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'V-Groove Delrin Wheels',
+                    qty: 8,
+                    unit: 'wheels',
+                    options: [
+                        { name: 'Xtreme V-wheel (Amazon - US)', price: 5.50, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Delrin wheel kit (RobotDigg US)', price: 6.20, supplier: 'RobotDigg', url: 'https://www.robotdigg.com' },
+                        { name: 'Polycarbonate (MiSUMi)', price: 7.80, supplier: 'MiSUMi', url: 'https://us.misumi-ec.com' }
+                    ],
+                    notes: 'Dust-resistant, critical for concrete',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'X-Axis Carriage Plate Assembly',
+                    qty: 1,
+                    unit: 'assembly',
+                    options: [
+                        { name: 'CNC Aluminum 6061 6mm', price: 85, supplier: 'Local CNC Shop', url: '' },
+                        { name: '3D Printed Carbon Fiber Nylon', price: 12, supplier: 'Self-Manufacture', url: '' },
+                        { name: 'Water-jet cut steel', price: 65, supplier: 'SendCutSend', url: 'https://sendcutsend.com' }
+                    ],
+                    notes: 'Print saves $70+ with CF-Nylon/ABS',
+                    mfg: 'print'
+                }
+            ],
+            
+            'Dual Y-Axis Motion System': [
+                {
+                    name: 'NEMA23 Closed-Loop Stepper (Y-axis)',
+                    qty: 2,
+                    unit: 'motors',
+                    options: [
+                        { name: 'iHSV57 3Nm Closed-loop (StepperOnline)', price: 89, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'iHSV57 4.5Nm (StepperOnline)', price: 115, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'NEMA23 3Nm Standard (Automation Direct)', price: 52, supplier: 'AutomationDirect', url: 'https://automationdirect.com' }
+                    ],
+                    notes: 'Dual motors for speed, closed-loop recommended',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'GT2 Timing Belt 10mm (Reinforced)',
+                    qty: 12,
+                    unit: 'meters',
+                    options: [
+                        { name: 'Gates PowerGrip GT2 (McMaster)', price: 4.50, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: 'Fiberglass core GT2 (Amazon)', price: 2.80, supplier: 'Amazon - US Stock', url: 'https://amazon.com' },
+                        { name: 'Standard rubber GT2 (StepperOnline)', price: 2.20, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' }
+                    ],
+                    notes: 'Dual Y-axis belts - high load application',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'GT2 Pulley 20-Tooth 8mm Bore',
+                    qty: 8,
+                    unit: 'pulleys',
+                    options: [
+                        { name: 'Aluminum 20T (StepperOnline)', price: 7.50, supplier: 'StepperOnline US', url: 'https://www.omc-stepperonline.com' },
+                        { name: 'Steel 20T (McMaster)', price: 11, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' },
+                        { name: '3D Printed reinforced', price: 1.50, supplier: 'Self-Manufacture', url: '' }
+                    ],
+                    notes: 'Multiple pulleys needed for dual Y system',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'V-Groove Delrin Wheels',
+                    qty: 16,
+                    unit: 'wheels',
+                    options: [
+                        { name: 'Xtreme V-wheel (Amazon - US)', price: 5.50, supplier: 'Amazon', url: 'https://amazon.com' },
+                        { name: 'Delrin wheel kit (RobotDigg US)', price: 6.20, supplier: 'RobotDigg', url: 'https://www.robotdigg.com' },
+                        { name: 'Polycarbonate (MiSUMi)', price: 7.80, supplier: 'MiSUMi', url: 'https://us.misumi-ec.com' }
+                    ],
+                    notes: 'More wheels = better load distribution',
+                    mfg: 'buy'
+                },
+                {
+                    name: 'Y-Axis Gantry Plates',
+                    qty: 2,
+                    unit: 'plates',
+                    options: [
                         { name: 'CNC Aluminum 8mm (Local shop)', price: 95, supplier: 'Local CNC Shop', url: '' },
                         { name: '3D Printed CF-Nylon Reinforced', price: 15, supplier: 'Self-Manufacture', url: '' },
                         { name: 'Laser cut steel (SendCutSend)', price: 75, supplier: 'SendCutSend', url: 'https://sendcutsend.com' }
