@@ -1,6 +1,6 @@
 # M3-CRETE — Open-Source Concrete 3D Printer
 
-**A large-format gantry printer for cementitious extrusion at construction scale.**
+**A large-format cartesian printer built for cementitious material extrusion at scale.**
 
 M3-CRETE is an open-source hardware project for building a concrete 3D printer from standard, commercially available components. The system is purpose-built for layer-by-layer extrusion of cementitious materials — no heated beds, no proprietary toolchains, no vendor lock-in.
 
