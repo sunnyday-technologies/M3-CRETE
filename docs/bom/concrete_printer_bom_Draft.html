@@ -517,14 +517,14 @@
                 },
                 {
                     name: 'T-Slot Drop-In Nuts M6',
-                    qty: 300,
-                    unit: 'per 100',
+                    qty: 3,
+                    unit: 'packs of 100',
                     options: [
                         { name: 'Spring-loaded (8020.net)', price: 18, supplier: '8020.net', url: 'https://8020.net' },
                         { name: 'Economy pack (TNutz)', price: 12, supplier: 'TNutz', url: 'https://www.tnutz.com' },
                         { name: 'Standard (McMaster)', price: 15, supplier: 'McMaster-Carr', url: 'https://mcmaster.com' }
                     ],
-                    notes: 'Essential for all frame mounting',
+                    notes: '300 total - essential for all frame mounting',
                     mfg: 'buy'
                 },
                 {
@@ -1199,14 +1199,11 @@
         }
 
         function calculatePrintSavings() {
-            // Estimate savings from 3D printing vs buying/CNC
-            // Based on typical 3D printed parts vs alternatives
             let savings = 0;
             
             Object.keys(selectedComponents).forEach(itemId => {
                 const comp = selectedComponents[itemId];
                 if (comp.mfg === 'print') {
-                    // Rough estimate: printed parts save 70-90% vs alternatives
                     const category = comp.category;
                     const itemIndex = parseInt(itemId.split('-').pop());
                     const item = bomData[category][itemIndex];
@@ -1227,16 +1224,13 @@
             const w = canvas.width;
             const h = canvas.height;
             
-            // Clear canvas with light background
             ctx.fillStyle = '#f8f9fa';
             ctx.fillRect(0, 0, w, h);
             
-            // Isometric projection parameters
             const scale = 0.18;
             const centerX = w * 0.5;
             const centerY = h * 0.55;
             
-            // Helper function for isometric projection
             function iso(x, y, z) {
                 return {
                     x: centerX + (x - y) * Math.cos(Math.PI / 6) * scale,
@@ -1244,11 +1238,9 @@
                 };
             }
             
-            // Draw frame extrusions (4040 aluminum)
             ctx.strokeStyle = '#34495e';
             ctx.lineWidth = 4;
             
-            // Base frame
             const baseCorners = [
                 iso(0, 0, 0),
                 iso(1200, 0, 0),
@@ -1264,7 +1256,6 @@
             ctx.closePath();
             ctx.stroke();
             
-            // Top frame
             const topCorners = [
                 iso(0, 0, 1000),
                 iso(1200, 0, 1000),
@@ -1280,7 +1271,6 @@
             ctx.closePath();
             ctx.stroke();
             
-            // Vertical frame members
             for (let i = 0; i < 4; i++) {
                 ctx.beginPath();
                 ctx.moveTo(baseCorners[i].x, baseCorners[i].y);
@@ -1288,7 +1278,6 @@
                 ctx.stroke();
             }
             
-            // Draw Z-axis lead screws (quad configuration)
             ctx.strokeStyle = '#3498db';
             ctx.lineWidth = 3;
             
@@ -1304,7 +1293,6 @@
                 ctx.lineTo(top.x, top.y);
                 ctx.stroke();
                 
-                // Draw spiral pattern on lead screw
                 ctx.strokeStyle = '#2980b9';
                 ctx.lineWidth = 1;
                 for (let z = 0; z < 1000; z += 40) {
@@ -1319,7 +1307,6 @@
                 ctx.lineWidth = 3;
             });
             
-            // Draw Y-axis gantry rails (dual)
             ctx.strokeStyle = '#9b59b6';
             ctx.lineWidth = 5;
             
@@ -1337,7 +1324,6 @@
             ctx.lineTo(gantryY4.x, gantryY4.y);
             ctx.stroke();
             
-            // Draw X-axis gantry
             ctx.strokeStyle = '#9b59b6';
             ctx.lineWidth = 5;
             const xGantry1 = iso(600, 0, 600);
@@ -1347,12 +1333,10 @@
             ctx.lineTo(xGantry2.x, xGantry2.y);
             ctx.stroke();
             
-            // Draw GT2 belts (simplified)
             ctx.strokeStyle = '#e74c3c';
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
             
-            // X belt
             const xBelt1 = iso(600, 50, 620);
             const xBelt2 = iso(600, 950, 620);
             ctx.beginPath();
@@ -1360,7 +1344,6 @@
             ctx.lineTo(xBelt2.x, xBelt2.y);
             ctx.stroke();
             
-            // Y belts (dual)
             const yBelt1a = iso(50, 500, 620);
             const yBelt1b = iso(1150, 500, 620);
             ctx.beginPath();
@@ -1370,10 +1353,8 @@
             
             ctx.setLineDash([]);
             
-            // Draw pulleys and wheels
             ctx.fillStyle = '#f39c12';
             
-            // Pulleys at corners
             const pulleyPositions = [
                 [100, 100, 620], [1100, 100, 620],
                 [100, 900, 620], [1100, 900, 620]
@@ -1386,7 +1367,6 @@
                 ctx.fill();
             });
             
-            // V-groove wheels on carriage
             const wheelPositions = [
                 [580, 450, 610], [620, 450, 610],
                 [580, 550, 610], [620, 550, 610]
@@ -1399,7 +1379,6 @@
                 ctx.fill();
             });
             
-            // Draw extruder head
             ctx.fillStyle = '#27ae60';
             ctx.strokeStyle = '#27ae60';
             ctx.lineWidth = 3;
@@ -1407,7 +1386,6 @@
             const extruderTop = iso(600, 500, 550);
             const extruderBottom = iso(600, 500, 450);
             
-            // Extruder body (simplified)
             ctx.beginPath();
             ctx.arc(extruderTop.x, extruderTop.y, 8, 0, Math.PI * 2);
             ctx.fill();
@@ -1417,13 +1395,11 @@
             ctx.lineTo(extruderBottom.x, extruderBottom.y);
             ctx.stroke();
             
-            // Nozzle
             ctx.fillStyle = '#f39c12';
             ctx.beginPath();
             ctx.arc(extruderBottom.x, extruderBottom.y, 4, 0, Math.PI * 2);
             ctx.fill();
             
-            // Add dimension annotations
             ctx.fillStyle = '#2c3e50';
             ctx.font = 'bold 11px Arial';
             ctx.textAlign = 'center';
@@ -1437,7 +1413,6 @@
             const dim3 = iso(-100, 0, 500);
             ctx.fillText('1000mm (Z)', dim3.x, dim3.y);
             
-            // Add component labels
             ctx.font = '10px Arial';
             ctx.fillStyle = '#7f8c8d';
             
@@ -1459,7 +1434,6 @@
                 });
             });
             
-            // Calculate totals
             const grandTotal = Object.keys(selectedComponents).reduce((sum, itemId) => {
                 const comp = selectedComponents[itemId];
                 return sum + (comp.qty * comp.price);
@@ -1470,7 +1444,6 @@
             csv += `\n"Total Cost:",,,,,$${grandTotal.toFixed(2)}\n`;
             csv += `"Estimated Savings from 3D Printing:",,,,,$${printSavings.toFixed(2)}\n`;
             
-            // Download
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1479,7 +1452,6 @@
             a.click();
         }
 
-        // Initialize on load
         window.onload = initializeBOM;
     </script>
 </body>
