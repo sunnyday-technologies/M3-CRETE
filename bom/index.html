@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concrete 3D Printer — BOM Viewer</title>
+    <style>
+        /* ── Reset & Base ─────────────────────────────── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #060d14;
+            --surface: #0b1824;
+            --border: #1a3350;
+            --text: #f0f4f7;
+            --text-secondary: #6a8faa;
+            --accent: #97D700;
+            --accent-light: #ade033;
+            --accent-dim: #5c8400;
+            --brand-blue: #013A73;
+            --gradient: linear-gradient(135deg, #011f3f 0%, #0b1824 50%, #013A73 100%);
+            --badge-buy: rgba(151,215,0,0.12);
+            --badge-buy-text: #97D700;
+            --badge-print: rgba(255,167,38,0.12);
+            --badge-print-text: #ffa726;
+            --badge-cnc: rgba(66,165,245,0.12);
+            --badge-cnc-text: #42a5f5;
+            --pending-bg: rgba(255,204,2,0.08);
+            --pending-border: rgba(255,204,2,0.4);
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* ── Layout Shell ─────────────────────────────── */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        header {
+            background: var(--gradient);
+            color: white;
+            padding: 24px 0;
+            margin-bottom: 24px;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title h1 { font-size: 24px; font-weight: 700; }
+        .header-title p  { opacity: 0.85; font-size: 13px; margin-top: 4px; }
+
+        /* ── Auth Controls ────────────────────────────── */
+        .auth-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .auth-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .auth-btn:hover { background: rgba(255,255,255,0.25); }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .role-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-badge.maintainer { background: #ffcc02; color: #1a1d21; }
+        .role-badge.contributor { background: rgba(255,255,255,0.25); color: white; }
+
+        /* ── Specs Bar ────────────────────────────────── */
+        .specs-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .spec-chip {
+            background: var(--bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .spec-chip strong { color: var(--accent); margin-right: 4px; }
+
+        /* ── Toolbar ──────────────────────────────────── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .toolbar input[type="text"]:focus { border-color: var(--accent); }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: var(--bg); }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .btn-primary:hover { background: var(--accent-light); }
+        .btn-warn {
+            background: #d32f2f;
+            color: white;
+            border-color: #d32f2f;
+        }
+        .btn-warn:hover { background: #b71c1c; }
+        .btn-approve {
+            background: #2e7d32;
+            color: white;
+            border-color: #2e7d32;
+        }
+        .btn-approve:hover { background: #1b5e20; }
+
+        .queue-count {
+            background: #d32f2f;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 1px 7px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+
+        /* ── Stats Row ────────────────────────────────── */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: var(--shadow);
+        }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+        .stat-card .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        /* ── Supplier Summary Bar ─────────────────────── */
+        .supplier-summary {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .supplier-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .supplier-summary-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .supplier-clear {
+            font-size: 12px;
+            color: var(--accent);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 500;
+            display: none;
+            padding: 2px 8px;
+        }
+        .supplier-clear:hover { text-decoration: underline; }
+        .supplier-clear.visible { display: inline-block; }
+
+        .supplier-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .supplier-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .supplier-chip:hover {
+            border-color: var(--accent);
+            background: rgba(151,215,0,0.1);
+        }
+        .supplier-chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .supplier-chip .chip-count {
+            background: rgba(0,0,0,0.1);
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .supplier-chip.active .chip-count {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .supplier-filter-notice {
+            display: none;
+            background: rgba(151,215,0,0.08);
+            border: 1px solid rgba(151,215,0,0.2);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--accent);
+        }
+        .supplier-filter-notice.visible { display: flex; justify-content: space-between; align-items: center; }
+
+        /* ── Category Sections ────────────────────────── */
+        .category-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: var(--gradient);
+            color: white;
+            padding: 14px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .category-header:hover { opacity: 0.95; }
+        .category-header h2 { font-size: 15px; font-weight: 600; }
+
+        .category-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .category-count {
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .chevron {
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+        .category-section.collapsed .chevron { transform: rotate(-90deg); }
+        .category-section.collapsed .category-body { display: none; }
+
+        /* ── Part Rows ────────────────────────────────── */
+        .part-row {
+            border-bottom: 1px solid var(--border);
+        }
+        .part-row:last-child { border-bottom: none; }
+
+        .part-summary {
+            padding: 14px 20px;
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 16px;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .part-summary:hover { background: rgba(151,215,0,0.04); }
+
+        .part-name { font-weight: 600; font-size: 14px; }
+        .part-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .part-qty {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 80px;
+        }
+        .part-qty small { font-weight: 400; color: var(--text-secondary); display: block; font-size: 11px; }
+
+        .mfg-badge {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .mfg-buy   { background: var(--badge-buy);   color: var(--badge-buy-text); }
+        .mfg-print { background: var(--badge-print); color: var(--badge-print-text); }
+        .mfg-cnc   { background: var(--badge-cnc);   color: var(--badge-cnc-text); }
+
+        .supplier-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+            min-width: 70px;
+            text-align: right;
+        }
+
+        /* ── Supplier Detail Panel ────────────────────── */
+        .supplier-panel {
+            display: none;
+            background: rgba(0,0,0,0.15);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px 16px;
+        }
+        .part-row.expanded .supplier-panel { display: block; }
+
+        .supplier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .supplier-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+
+        .supplier-card.pending {
+            border-color: var(--pending-border);
+            background: var(--pending-bg);
+        }
+
+        .supplier-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .supplier-name { font-weight: 600; white-space: nowrap; }
+
+        .supplier-notes {
+            color: var(--text-secondary);
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .supplier-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .supplier-link:hover { text-decoration: underline; }
+
+        /* ── STEP File / CAD Indicator ───────────────── */
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #a78bfa;
+            background: rgba(167,139,250,0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+        .step-badge:hover {
+            background: rgba(167,139,250,0.2);
+            color: #c4b5fd;
+            text-decoration: none;
+        }
+        .step-badge svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        .part-cad-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #a78bfa;
+            background: rgba(167,139,250,0.12);
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .part-cad-indicator svg {
+            width: 10px;
+            height: 10px;
+            fill: currentColor;
+        }
+
+        /* ── CAD Library Panel ───────────────────────── */
+        .cad-library-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+        .cad-library-panel.visible { display: block; }
+
+        .cad-library-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cad-library-header h2 { font-size: 16px; }
+
+        .cad-library-body { padding: 16px 20px; }
+
+        .cad-category-group {
+            margin-bottom: 16px;
+        }
+        .cad-category-group h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cad-part-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            gap: 12px;
+        }
+        .cad-part-row:not(:last-child) {
+            border-bottom: 1px dashed var(--border);
+        }
+        .cad-part-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .cad-part-source {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .cad-source-link {
+            font-size: 11px;
+            color: #a78bfa;
+            background: rgba(167,139,250,0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .cad-source-link:hover {
+            background: rgba(167,139,250,0.2);
+        }
+
+        .cad-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .cad-stat {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .cad-stat strong {
+            color: #a78bfa;
+            font-size: 20px;
+        }
+
+        .pending-label {
+            font-size: 10px;
+            background: var(--pending-border);
+            color: #1a1d21;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .suggest-btn {
+            margin-top: 8px;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        /* ── Modal ────────────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { font-size: 16px; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+        }
+        .modal-close:hover { color: var(--text); }
+
+        .modal-body { padding: 20px; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus { border-color: var(--accent); }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 18px;
+        }
+
+        /* ── Moderation Queue ─────────────────────────── */
+        .mod-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+        .mod-panel.visible { display: block; }
+
+        .mod-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mod-header h2 { font-size: 16px; }
+
+        .mod-list { padding: 12px 20px; }
+
+        .mod-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .mod-item:last-child { border-bottom: none; }
+
+        .mod-item-info { flex: 1; min-width: 200px; }
+        .mod-item-info .mod-part { font-weight: 600; font-size: 13px; }
+        .mod-item-info .mod-supplier { font-size: 13px; margin-top: 2px; }
+        .mod-item-info .mod-meta { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+        .mod-actions { display: flex; gap: 6px; align-items: center; }
+        .mod-actions .btn { padding: 6px 12px; font-size: 12px; }
+
+        .mod-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ── Toast ────────────────────────────────────── */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: #323232;
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #2e7d32; }
+        .toast.error   { background: #d32f2f; }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        /* ── Loading State ────────────────────────────── */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 768px) {
+            .header-inner { flex-direction: column; text-align: center; }
+            .part-summary { grid-template-columns: 1fr; gap: 8px; }
+            .part-qty, .supplier-count { text-align: left; }
+            .stats-row { flex-direction: column; }
+            .supplier-card { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .mod-item { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="header-title">
+            <h1 id="projectTitle">BOM Viewer</h1>
+            <p id="projectSubtitle"></p>
+        </div>
+        <div class="auth-area" id="authArea">
+            <button class="auth-btn" onclick="signIn()">Sign in with GitHub</button>
+        </div>
+    </div>
+</header>
+
+<div class="app-container">
+    <div class="specs-bar" id="specsBar"></div>
+
+    <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Search parts or suppliers..." oninput="handleSearch()">
+        <button class="btn" onclick="exportCSV()">Export CSV</button>
+        <button class="btn" onclick="toggleCADLibrary()" id="cadLibraryBtn" style="display:none">
+            <svg style="width:14px;height:14px;fill:currentColor;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            CAD Library <span id="cadCount" style="background:var(--accent);color:white;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:4px"></span>
+        </button>
+        <button class="btn btn-primary" id="modQueueBtn" style="display:none" onclick="toggleModPanel()">
+            Moderation Queue <span class="queue-count" id="queueCount">0</span>
+        </button>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <div class="supplier-summary" id="supplierSummary">
+        <div class="supplier-summary-header">
+            <h3>Suppliers &amp; Purchase Orders</h3>
+            <button class="supplier-clear" id="supplierClearBtn" onclick="clearSupplierFilter()">Clear filter</button>
+        </div>
+        <div class="supplier-chips" id="supplierChips"></div>
+    </div>
+
+    <div class="supplier-filter-notice" id="supplierFilterNotice">
+        <span id="supplierFilterText"></span>
+        <button class="supplier-clear visible" onclick="clearSupplierFilter()">Show all</button>
+    </div>
+
+    <div class="mod-panel" id="modPanel">
+        <div class="mod-header">
+            <h2>Pending Supplier Submissions</h2>
+            <button class="modal-close" onclick="toggleModPanel()">&times;</button>
+        </div>
+        <div class="mod-list" id="modList"></div>
+    </div>
+
+    <div class="cad-library-panel" id="cadLibraryPanel">
+        <div class="cad-library-header">
+            <h2>
+                <svg style="width:18px;height:18px;fill:#a78bfa;vertical-align:-3px;margin-right:6px" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                CAD Library — STEP File Index
+            </h2>
+            <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn" onclick="exportCADManifest()" style="font-size:12px;padding:6px 12px">Export Manifest</button>
+                <button class="modal-close" onclick="toggleCADLibrary()">&times;</button>
+            </div>
+        </div>
+        <div class="cad-library-body" id="cadLibraryBody">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <div id="bomContent">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+    </div>
+</div>
+
+<!-- Suggest Supplier Modal -->
+<div class="modal-overlay" id="suggestModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Suggest a Supplier</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="suggestPartName" style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;"></p>
+            <div class="form-group">
+                <label for="fSupplier">Supplier Name *</label>
+                <input type="text" id="fSupplier" placeholder="e.g. McMaster-Carr" required>
+            </div>
+            <div class="form-group">
+                <label for="fUrl">Product URL</label>
+                <input type="url" id="fUrl" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label for="fNotes">Notes</label>
+                <textarea id="fNotes" placeholder="Part number, variant details, etc."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitSuggestion()">Submit for Review</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<!-- ── Scripts ─────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config.js"></script>
+<script>
+// ────────────────────────────────────────────────────
+// Application State
+// ────────────────────────────────────────────────────
+const App = {
+    sb: null,               // Supabase client
+    user: null,             // auth user
+    githubUsername: null,
+    githubToken: null,
+    isContributor: false,
+    isMaintainer: false,
+    parts: [],              // from DB
+    suppliersByPart: {},    // part_id -> [options]
+    pendingQueue: [],       // moderation queue
+    searchTerm: '',
+    activeSupplier: null,   // supplier filter
+    suggestPartId: null,    // for the modal
+};
+
+// ────────────────────────────────────────────────────
+// Initialization
+// ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+    // Render config-driven UI immediately
+    document.getElementById('projectTitle').textContent = BOM_CONFIG.PROJECT_TITLE;
+    document.getElementById('projectSubtitle').textContent = BOM_CONFIG.PROJECT_SUBTITLE;
+    renderSpecs();
+
+    // Init Supabase
+    App.sb = supabase.createClient(BOM_CONFIG.SUPABASE_URL, BOM_CONFIG.SUPABASE_ANON_KEY);
+
+    // Check session
+    const { data: { session } } = await App.sb.auth.getSession();
+    if (session) {
+        await handleSession(session);
+    }
+
+    // Listen for auth changes (handles redirect back from OAuth)
+    App.sb.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            await handleSession(session);
+            await loadBOM();
+            renderBOM();
+        } else if (event === 'SIGNED_OUT') {
+            resetAuth();
+            renderAuthArea();
+            await loadBOM();
+            renderBOM();
+        }
+    });
+
+    // Load & render
+    await loadBOM();
+    renderBOM();
+});
+
+// ────────────────────────────────────────────────────
+// Auth
+// ────────────────────────────────────────────────────
+async function signIn() {
+    await App.sb.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+            scopes: 'read:org',
+            redirectTo: window.location.origin + window.location.pathname
+        }
+    });
+}
+
+async function signOut() {
+    await App.sb.auth.signOut();
+}
+
+async function handleSession(session) {
+    App.user = session.user;
+    App.githubToken = session.provider_token;
+    App.githubUsername = session.user.user_metadata?.user_name
+        || session.user.user_metadata?.preferred_username
+        || null;
+
+    // Check maintainer status (server-side via Supabase)
+    const { data: maint } = await App.sb.from('maintainers')
+        .select('user_id')
+        .eq('user_id', App.user.id)
+        .maybeSingle();
+    App.isMaintainer = !!maint;
+
+    // Check contributor status (GitHub API)
+    App.isContributor = App.isMaintainer || await checkCollaborator();
+
+    renderAuthArea();
+
+    if (App.isMaintainer) {
+        await loadModerationQueue();
+    }
+}
+
+async function checkCollaborator() {
+    if (!App.githubToken || !App.githubUsername) return false;
+    try {
+        const resp = await fetch(
+            `https://api.github.com/repos/${BOM_CONFIG.GITHUB_REPO_OWNER}/${BOM_CONFIG.GITHUB_REPO_NAME}/collaborators/${App.githubUsername}`,
+            { headers: { Authorization: `token ${App.githubToken}` } }
+        );
+        return resp.status === 204;
+    } catch {
+        return false;
+    }
+}
+
+function resetAuth() {
+    App.user = null;
+    App.githubToken = null;
+    App.githubUsername = null;
+    App.isContributor = false;
+    App.isMaintainer = false;
+    App.pendingQueue = [];
+    document.getElementById('modQueueBtn').style.display = 'none';
+    document.getElementById('modPanel').classList.remove('visible');
+}
+
+function renderAuthArea() {
+    const area = document.getElementById('authArea');
+    if (!App.user) {
+        area.innerHTML = '<button class="auth-btn" onclick="signIn()">Sign in with GitHub</button>';
+        return;
+    }
+    const avatar = App.user.user_metadata?.avatar_url || '';
+    const name = App.githubUsername || 'User';
+    let roleBadge = '';
+    if (App.isMaintainer) roleBadge = '<span class="role-badge maintainer">Maintainer</span>';
+    else if (App.isContributor) roleBadge = '<span class="role-badge contributor">Contributor</span>';
+
+    area.innerHTML = `
+        <div class="user-info">
+            ${avatar ? `<img class="user-avatar" src="${escHtml(avatar)}" alt="">` : ''}
+            <span>${escHtml(name)}</span>
+            ${roleBadge}
+        </div>
+        <button class="auth-btn" onclick="signOut()">Sign out</button>
+    `;
+}
+
+// ────────────────────────────────────────────────────
+// Data Loading
+// ────────────────────────────────────────────────────
+async function loadBOM() {
+    const { data: parts, error: pErr } = await App.sb
+        .from('parts')
+        .select('*')
+        .order('category')
+        .order('sort_order');
+
+    if (pErr) {
+        console.error('Failed to load parts:', pErr);
+        showToast('Failed to load BOM data', 'error');
+        return;
+    }
+
+    const { data: options, error: oErr } = await App.sb
+        .from('supplier_options')
+        .select('*')
+        .order('created_at');
+
+    if (oErr) {
+        console.error('Failed to load suppliers:', oErr);
+    }
+
+    App.parts = parts || [];
+    App.suppliersByPart = {};
+    (options || []).forEach(opt => {
+        if (!App.suppliersByPart[opt.part_id]) App.suppliersByPart[opt.part_id] = [];
+        App.suppliersByPart[opt.part_id].push(opt);
+    });
+}
+
+async function loadModerationQueue() {
+    const { data } = await App.sb
+        .from('supplier_options')
+        .select('*, parts(name, category)')
+        .eq('approved', false)
+        .order('created_at', { ascending: true });
+
+    App.pendingQueue = data || [];
+
+    const btn = document.getElementById('modQueueBtn');
+    btn.style.display = App.isMaintainer ? '' : 'none';
+    document.getElementById('queueCount').textContent = App.pendingQueue.length;
+
+    renderModQueue();
+}
+
+// ────────────────────────────────────────────────────
+// Rendering — Specs
+// ────────────────────────────────────────────────────
+function renderSpecs() {
+    const bar = document.getElementById('specsBar');
+    bar.innerHTML = Object.entries(BOM_CONFIG.BUILD_SPECS)
+        .map(([k, v]) => `<div class="spec-chip"><strong>${escHtml(k)}:</strong> ${escHtml(v)}</div>`)
+        .join('');
+}
+
+// ────────────────────────────────────────────────────
+// Rendering — BOM
+// ────────────────────────────────────────────────────
+function renderBOM() {
+    const container = document.getElementById('bomContent');
+    if (!App.parts.length) {
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary)">No parts found. Check your Supabase connection and config.</p>';
+        return;
+    }
+
+    // Group by category using config order
+    const grouped = {};
+    App.parts.forEach(p => {
+        if (!grouped[p.category]) grouped[p.category] = [];
+        grouped[p.category].push(p);
+    });
+
+    const orderedCategories = BOM_CONFIG.CATEGORY_ORDER.filter(c => grouped[c]);
+    Object.keys(grouped).forEach(c => {
+        if (!orderedCategories.includes(c)) orderedCategories.push(c);
+    });
+
+    // Compute stats
+    let totalParts = 0;
+    const mfgCounts = { buy: 0, print: 0, cnc: 0 };
+    let totalSuppliers = 0;
+    let partsWithCAD = 0;
+    App.parts.forEach(p => {
+        totalParts++;
+        mfgCounts[p.mfg_type] = (mfgCounts[p.mfg_type] || 0) + 1;
+        const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved);
+        totalSuppliers += opts.length;
+        if (opts.some(o => o.step_url)) partsWithCAD++;
+    });
+
+    // Show/hide CAD Library button
+    const cadBtn = document.getElementById('cadLibraryBtn');
+    if (partsWithCAD > 0) {
+        cadBtn.style.display = '';
+        document.getElementById('cadCount').textContent = partsWithCAD;
+    }
+
+    document.getElementById('statsRow').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${totalParts}</div><div class="stat-label">Total Parts</div></div>
+        <div class="stat-card"><div class="stat-value">${totalSuppliers}</div><div class="stat-label">Supplier Options</div></div>
+        <div class="stat-card"><div class="stat-value">${mfgCounts.buy}</div><div class="stat-label">Purchase</div></div>
+        <div class="stat-card"><div class="stat-value">${mfgCounts.print}</div><div class="stat-label">3D Printable</div></div>
+        <div class="stat-card"><div class="stat-value">${mfgCounts.cnc}</div><div class="stat-label">CNC / Fabricated</div></div>
+        ${partsWithCAD > 0 ? `<div class="stat-card" style="border-color:rgba(167,139,250,0.3);cursor:pointer" onclick="toggleCADLibrary()"><div class="stat-value" style="color:#a78bfa">${partsWithCAD}</div><div class="stat-label">CAD Models Available</div></div>` : ''}
+    `;
+
+    // ── Supplier Summary ──────────────────────────────
+    renderSupplierSummary();
+
+    // ── Filter logic ──────────────────────────────────
+    const term = App.searchTerm.toLowerCase();
+    const activeSupplier = App.activeSupplier;
+
+    // Show/hide filter notice
+    const filterNotice = document.getElementById('supplierFilterNotice');
+    const filterText = document.getElementById('supplierFilterText');
+    if (activeSupplier) {
+        const supplierPartCount = getPartsForSupplier(activeSupplier).length;
+        filterText.innerHTML = `Showing <strong>${supplierPartCount} parts</strong> available from <strong>${escHtml(activeSupplier)}</strong>`;
+        filterNotice.classList.add('visible');
+    } else {
+        filterNotice.classList.remove('visible');
+    }
+
+    // Build category HTML
+    let html = '';
+
+    orderedCategories.forEach(cat => {
+        let parts = grouped[cat];
+
+        // Text search filter
+        if (term) parts = parts.filter(p => matchesSearch(p, term));
+
+        // Supplier filter
+        if (activeSupplier) parts = parts.filter(p => partHasSupplier(p, activeSupplier));
+
+        if (!parts.length) return;
+
+        html += `<div class="category-section" data-category="${escAttr(cat)}">`;
+        html += `<div class="category-header" onclick="toggleCategory(this)">
+            <h2>${escHtml(cat)}</h2>
+            <div class="category-meta">
+                <span class="category-count">${parts.length} part${parts.length !== 1 ? 's' : ''}</span>
+                <span class="chevron">&#9660;</span>
+            </div>
+        </div>`;
+        html += '<div class="category-body">';
+
+        parts.forEach(part => {
+            const options = App.suppliersByPart[part.id] || [];
+            const approved = options.filter(o => o.approved);
+            const pending = options.filter(o => !o.approved);
+            const mfgClass = 'mfg-' + part.mfg_type;
+            const mfgLabel = part.mfg_type === 'print' ? '3D Print' : part.mfg_type === 'cnc' ? 'CNC' : 'Purchase';
+
+            // Auto-expand parts when supplier filter active
+            const expanded = activeSupplier ? ' expanded' : '';
+
+            // Check if any supplier has a STEP file
+            const hasCAD = approved.some(o => o.step_url);
+            const cadBadge = hasCAD ? `<span class="part-cad-indicator">${stepIcon(10)} 3D</span>` : '';
+
+            html += `<div class="part-row${expanded}" data-part-id="${part.id}">`;
+            html += `<div class="part-summary" onclick="togglePart(this)">
+                <div>
+                    <div class="part-name">${escHtml(part.name)}${cadBadge}</div>
+                    <div class="part-desc">${escHtml(part.description || '')}</div>
+                </div>
+                <div class="part-qty">${part.qty}<small>${escHtml(part.unit)}</small></div>
+                <span class="mfg-badge ${mfgClass}">${mfgLabel}</span>
+                <div class="supplier-count">${approved.length} supplier${approved.length !== 1 ? 's' : ''}</div>
+            </div>`;
+
+            // Supplier panel
+            html += '<div class="supplier-panel"><div class="supplier-list">';
+
+            approved.forEach(opt => {
+                const isHighlighted = activeSupplier && normalizeSupplier(opt.supplier_name) === normalizeSupplier(activeSupplier);
+                const highlightClass = isHighlighted ? ' style="border-color:var(--accent);background:rgba(151,215,0,0.08);"' : '';
+                const stepBadge = opt.step_url
+                    ? `<a class="step-badge" href="${escAttr(opt.step_url)}" target="_blank" rel="noopener" title="STEP/3D model available">${stepIcon()} STEP</a>`
+                    : '';
+
+                html += `<div class="supplier-card"${highlightClass}>
+                    <div class="supplier-info">
+                        <span class="supplier-name">${escHtml(opt.supplier_name)}</span>
+                        ${stepBadge}
+                        <span class="supplier-notes">${escHtml(opt.notes || '')}</span>
+                    </div>
+                    ${opt.product_url
+                        ? `<a class="supplier-link" href="${escAttr(opt.product_url)}" target="_blank" rel="noopener">Visit &rarr;</a>`
+                        : '<span class="supplier-notes">No link</span>'}
+                </div>`;
+            });
+
+            // Show user's own pending submissions
+            if (App.user) {
+                pending.filter(o => o.submitted_by === App.user.id).forEach(opt => {
+                    html += `<div class="supplier-card pending">
+                        <div class="supplier-info">
+                            <span class="supplier-name">${escHtml(opt.supplier_name)}</span>
+                            <span class="supplier-notes">${escHtml(opt.notes || '')}</span>
+                            <span class="pending-label">Pending</span>
+                        </div>
+                        ${opt.product_url
+                            ? `<a class="supplier-link" href="${escAttr(opt.product_url)}" target="_blank" rel="noopener">Visit &rarr;</a>`
+                            : ''}
+                    </div>`;
+                });
+            }
+
+            html += '</div>';
+
+            // Suggest button for contributors
+            if (App.isContributor) {
+                html += `<button class="btn suggest-btn" onclick="openSuggestModal(${part.id}, '${escAttr(part.name)}')">+ Suggest Supplier</button>`;
+            }
+
+            html += '</div>'; // .supplier-panel
+            html += '</div>'; // .part-row
+        });
+
+        html += '</div></div>';
+    });
+
+    container.innerHTML = html;
+}
+
+// ────────────────────────────────────────────────────
+// Supplier Summary & Filtering
+// ────────────────────────────────────────────────────
+function normalizeSupplier(name) {
+    // Group variants: "Amazon", "Amazon - US", "Amazon - US Stock", "Amazon - CanaKit" → "Amazon"
+    // "StepperOnline US" → "StepperOnline"
+    return name
+        .replace(/\s*\(.*?\)\s*/g, '')       // remove parenthetical (Ohio), (Germany) etc.
+        .replace(/\s*[-–—]\s*.+$/, '')        // remove "- US Stock", "- CanaKit" etc.
+        .replace(/\s+(US|USA)$/i, '')          // remove trailing "US"
+        .trim();
+}
+
+function buildSupplierIndex() {
+    // Returns { normalizedName: { displayName, partIds: Set, optionCount } }
+    const index = {};
+    App.parts.forEach(p => {
+        const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved);
+        opts.forEach(o => {
+            const key = normalizeSupplier(o.supplier_name);
+            if (!key || key.toLowerCase() === 'n/a' || key.toLowerCase().startsWith('community interest')) return;
+            if (!index[key]) index[key] = { displayName: key, partIds: new Set(), optionCount: 0 };
+            index[key].partIds.add(p.id);
+            index[key].optionCount++;
+        });
+    });
+    return index;
+}
+
+function renderSupplierSummary() {
+    const index = buildSupplierIndex();
+    const sorted = Object.values(index).sort((a, b) => b.partIds.size - a.partIds.size);
+
+    const chipsEl = document.getElementById('supplierChips');
+    const clearBtn = document.getElementById('supplierClearBtn');
+
+    chipsEl.innerHTML = sorted.map(s => {
+        const isActive = App.activeSupplier && normalizeSupplier(App.activeSupplier) === s.displayName;
+        return `<div class="supplier-chip${isActive ? ' active' : ''}"
+                     onclick="toggleSupplierFilter('${escAttr(s.displayName)}')"
+                     title="${s.optionCount} options across ${s.partIds.size} parts">
+            <span>${escHtml(s.displayName)}</span>
+            <span class="chip-count">${s.partIds.size}</span>
+        </div>`;
+    }).join('');
+
+    clearBtn.classList.toggle('visible', !!App.activeSupplier);
+}
+
+function getPartsForSupplier(supplierName) {
+    const key = normalizeSupplier(supplierName);
+    return App.parts.filter(p => {
+        const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved);
+        return opts.some(o => normalizeSupplier(o.supplier_name) === key);
+    });
+}
+
+function partHasSupplier(part, supplierName) {
+    const key = normalizeSupplier(supplierName);
+    const opts = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
+    return opts.some(o => normalizeSupplier(o.supplier_name) === key);
+}
+
+function toggleSupplierFilter(supplierName) {
+    if (App.activeSupplier && normalizeSupplier(App.activeSupplier) === supplierName) {
+        App.activeSupplier = null;
+    } else {
+        App.activeSupplier = supplierName;
+    }
+    renderBOM();
+}
+
+function clearSupplierFilter() {
+    App.activeSupplier = null;
+    renderBOM();
+}
+
+function matchesSearch(part, term) {
+    if (part.name.toLowerCase().includes(term)) return true;
+    if (part.description && part.description.toLowerCase().includes(term)) return true;
+    if (part.category.toLowerCase().includes(term)) return true;
+    const opts = App.suppliersByPart[part.id] || [];
+    return opts.some(o => o.supplier_name.toLowerCase().includes(term) || (o.notes || '').toLowerCase().includes(term));
+}
+
+function handleSearch() {
+    App.searchTerm = document.getElementById('searchInput').value;
+    renderBOM();
+}
+
+// ────────────────────────────────────────────────────
+// Rendering — Moderation Queue
+// ────────────────────────────────────────────────────
+function renderModQueue() {
+    const list = document.getElementById('modList');
+    if (!App.pendingQueue.length) {
+        list.innerHTML = '<div class="mod-empty">No pending submissions.</div>';
+        return;
+    }
+
+    list.innerHTML = App.pendingQueue.map(item => `
+        <div class="mod-item" data-id="${item.id}">
+            <div class="mod-item-info">
+                <div class="mod-part">${escHtml(item.parts?.category || '')} &mdash; ${escHtml(item.parts?.name || 'Part #' + item.part_id)}</div>
+                <div class="mod-supplier">
+                    <strong>${escHtml(item.supplier_name)}</strong>
+                    ${item.product_url ? ` &mdash; <a href="${escAttr(item.product_url)}" target="_blank" rel="noopener">${escHtml(item.product_url)}</a>` : ''}
+                </div>
+                ${item.notes ? `<div class="mod-meta">${escHtml(item.notes)}</div>` : ''}
+                <div class="mod-meta">Submitted ${new Date(item.created_at).toLocaleDateString()}</div>
+            </div>
+            <div class="mod-actions">
+                <button class="btn btn-approve" onclick="approveSubmission(${item.id})">Approve</button>
+                <button class="btn btn-warn" onclick="rejectSubmission(${item.id})">Reject</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ────────────────────────────────────────────────────
+// UI Interactions
+// ────────────────────────────────────────────────────
+function toggleCategory(header) {
+    header.closest('.category-section').classList.toggle('collapsed');
+}
+
+function togglePart(summary) {
+    summary.closest('.part-row').classList.toggle('expanded');
+}
+
+function toggleModPanel() {
+    document.getElementById('modPanel').classList.toggle('visible');
+}
+
+// ────────────────────────────────────────────────────
+// Supplier Submission
+// ────────────────────────────────────────────────────
+function openSuggestModal(partId, partName) {
+    App.suggestPartId = partId;
+    document.getElementById('suggestPartName').textContent = `For: ${partName}`;
+    document.getElementById('fSupplier').value = '';
+    document.getElementById('fUrl').value = '';
+    document.getElementById('fNotes').value = '';
+    document.getElementById('suggestModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('suggestModal').classList.remove('active');
+    App.suggestPartId = null;
+}
+
+async function submitSuggestion() {
+    const supplierName = document.getElementById('fSupplier').value.trim();
+    const productUrl = document.getElementById('fUrl').value.trim();
+    const notes = document.getElementById('fNotes').value.trim();
+
+    if (!supplierName) {
+        showToast('Supplier name is required', 'error');
+        return;
+    }
+
+    const { error } = await App.sb.from('supplier_options').insert({
+        part_id: App.suggestPartId,
+        supplier_name: supplierName,
+        product_url: productUrl || null,
+        notes: notes || null,
+        submitted_by: App.user.id,
+        approved: false
+    });
+
+    if (error) {
+        console.error('Submit error:', error);
+        showToast('Failed to submit: ' + error.message, 'error');
+        return;
+    }
+
+    showToast('Submitted for review!', 'success');
+    closeModal();
+
+    // Refresh data
+    await loadBOM();
+    renderBOM();
+    if (App.isMaintainer) await loadModerationQueue();
+}
+
+// ────────────────────────────────────────────────────
+// Moderation Actions
+// ────────────────────────────────────────────────────
+async function approveSubmission(id) {
+    const { error } = await App.sb.from('supplier_options')
+        .update({ approved: true, approved_by: App.user.id })
+        .eq('id', id);
+
+    if (error) {
+        showToast('Approve failed: ' + error.message, 'error');
+        return;
+    }
+
+    showToast('Supplier approved', 'success');
+    await loadBOM();
+    await loadModerationQueue();
+    renderBOM();
+}
+
+async function rejectSubmission(id) {
+    const { error } = await App.sb.from('supplier_options')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        showToast('Reject failed: ' + error.message, 'error');
+        return;
+    }
+
+    showToast('Submission rejected', 'success');
+    await loadModerationQueue();
+}
+
+// ────────────────────────────────────────────────────
+// CSV Export
+// ────────────────────────────────────────────────────
+function exportCSV() {
+    const activeSupplier = App.activeSupplier;
+    const supplierKey = activeSupplier ? normalizeSupplier(activeSupplier) : null;
+    const fileName = supplierKey
+        ? `bom_${supplierKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_order.csv`
+        : 'concrete_printer_bom.csv';
+
+    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'Supplier', 'Product URL', 'Notes', 'STEP File URL']];
+
+    const grouped = {};
+    App.parts.forEach(p => {
+        if (!grouped[p.category]) grouped[p.category] = [];
+        grouped[p.category].push(p);
+    });
+
+    const orderedCategories = BOM_CONFIG.CATEGORY_ORDER.filter(c => grouped[c]);
+    Object.keys(grouped).forEach(c => {
+        if (!orderedCategories.includes(c)) orderedCategories.push(c);
+    });
+
+    orderedCategories.forEach(cat => {
+        (grouped[cat] || []).forEach(part => {
+            let options = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
+
+            // If supplier filter active, only include that supplier's options
+            if (supplierKey) {
+                options = options.filter(o => normalizeSupplier(o.supplier_name) === supplierKey);
+                if (!options.length) return; // skip parts without this supplier
+            }
+
+            if (!options.length) {
+                rows.push([
+                    part.category, part.name, part.description || '',
+                    part.qty, part.unit, part.mfg_type, '', '', '', ''
+                ]);
+            } else {
+                options.forEach(opt => {
+                    rows.push([
+                        part.category, part.name, part.description || '',
+                        part.qty, part.unit, part.mfg_type,
+                        opt.supplier_name, opt.product_url || '', opt.notes || '',
+                        opt.step_url || ''
+                    ]);
+                });
+            }
+        });
+    });
+
+    const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(supplierKey ? `${activeSupplier} order exported` : 'CSV exported', 'success');
+}
+
+// ────────────────────────────────────────────────────
+// Utilities
+// ────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────
+// CAD Library
+// ────────────────────────────────────────────────────
+function toggleCADLibrary() {
+    const panel = document.getElementById('cadLibraryPanel');
+    const isVisible = panel.classList.toggle('visible');
+    if (isVisible) renderCADLibrary();
+}
+
+function renderCADLibrary() {
+    const body = document.getElementById('cadLibraryBody');
+
+    // Collect parts with STEP files
+    const cadParts = [];
+    let totalSteps = 0;
+    const supplierStepCounts = {};
+
+    App.parts.forEach(p => {
+        const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved && o.step_url);
+        if (opts.length > 0) {
+            cadParts.push({ part: p, stepOptions: opts });
+            totalSteps += opts.length;
+            opts.forEach(o => {
+                const key = normalizeSupplier(o.supplier_name);
+                supplierStepCounts[key] = (supplierStepCounts[key] || 0) + 1;
+            });
+        }
+    });
+
+    // Group by category
+    const grouped = {};
+    cadParts.forEach(({ part, stepOptions }) => {
+        if (!grouped[part.category]) grouped[part.category] = [];
+        grouped[part.category].push({ part, stepOptions });
+    });
+
+    const orderedCategories = BOM_CONFIG.CATEGORY_ORDER.filter(c => grouped[c]);
+    Object.keys(grouped).forEach(c => {
+        if (!orderedCategories.includes(c)) orderedCategories.push(c);
+    });
+
+    // Top-level stats
+    const partsWithCAD = cadParts.length;
+    const partsWithoutCAD = App.parts.length - partsWithCAD;
+    const coveragePct = Math.round((partsWithCAD / App.parts.length) * 100);
+
+    let html = `
+        <div class="cad-stats">
+            <div class="cad-stat"><strong>${partsWithCAD}</strong><br>Parts with CAD</div>
+            <div class="cad-stat"><strong>${partsWithoutCAD}</strong><br>Still needed</div>
+            <div class="cad-stat"><strong>${coveragePct}%</strong><br>Coverage</div>
+            <div class="cad-stat"><strong>${totalSteps}</strong><br>STEP sources</div>
+        </div>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">
+            Download STEP files from each supplier to build the complete digital assembly.
+            Click <strong>Export Manifest</strong> to get a structured download checklist.
+            ${partsWithoutCAD > 0 ? `<br><em>${partsWithoutCAD} parts still need CAD models — contributors can suggest STEP URLs via the supplier suggestion form.</em>` : ''}
+        </p>
+    `;
+
+    orderedCategories.forEach(cat => {
+        const items = grouped[cat];
+        html += `<div class="cad-category-group"><h3>${escHtml(cat)} (${items.length})</h3>`;
+        items.forEach(({ part, stepOptions }) => {
+            html += `<div class="cad-part-row">
+                <span class="cad-part-name">${escHtml(part.name)}</span>
+                <div class="cad-part-source">
+                    ${stepOptions.map(o =>
+                        o.step_url.startsWith('/')
+                            ? `<span class="cad-source-link" title="In repo: ${escAttr(o.step_url)}">Repo: ${escHtml(o.step_url)}</span>`
+                            : `<a class="cad-source-link" href="${escAttr(o.step_url)}" target="_blank" rel="noopener" title="${escAttr(o.supplier_name)}">${escHtml(normalizeSupplier(o.supplier_name))}</a>`
+                    ).join('')}
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+
+    body.innerHTML = html;
+}
+
+function exportCADManifest() {
+    const manifest = {
+        project: BOM_CONFIG.PROJECT_TITLE,
+        generated: new Date().toISOString(),
+        description: 'STEP file download manifest for building the digital assembly model',
+        instructions: [
+            'Download each STEP file from the source URL listed.',
+            'Files from McMaster-Carr require a free account.',
+            'Files marked as "Repo" are in the project GitHub repository.',
+            'Import all STEP files into your CAD assembly (Fusion 360, FreeCAD, SolidWorks, etc.).',
+            'Parts without STEP files are listed separately — community contributions welcome.'
+        ],
+        parts_with_cad: [],
+        parts_without_cad: []
+    };
+
+    App.parts.forEach(p => {
+        const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved && o.step_url);
+        if (opts.length > 0) {
+            manifest.parts_with_cad.push({
+                category: p.category,
+                name: p.name,
+                qty: p.qty,
+                unit: p.unit,
+                sources: opts.map(o => ({
+                    supplier: o.supplier_name,
+                    step_url: o.step_url,
+                    notes: o.notes || ''
+                }))
+            });
+        } else {
+            manifest.parts_without_cad.push({
+                category: p.category,
+                name: p.name,
+                qty: p.qty,
+                unit: p.unit
+            });
+        }
+    });
+
+    const json = JSON.stringify(manifest, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cad_manifest.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`CAD manifest exported — ${manifest.parts_with_cad.length} parts with STEP files`, 'success');
+}
+
+// ────────────────────────────────────────────────────
+// SVG Icons
+// ────────────────────────────────────────────────────
+function stepIcon(size = 12) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
+        <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.36.2-.8.2-1.14 0l-7.9-4.44A.991.991 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.36-.2.8-.2 1.14 0l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15 5.04 8 12 11.85 18.96 8 12 4.15zM5 15.91l6 3.37v-6.73L5 9.18v6.73zm14 0v-6.73l-6 3.37v6.73l6-3.37z"/>
+    </svg>`;
+}
+
+function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+function escAttr(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg, type = '') {
+    const container = document.getElementById('toasts');
+    const el = document.createElement('div');
+    el.className = 'toast' + (type ? ' ' + type : '');
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => { el.remove(); }, 3500);
+}
+</script>
+</body>
+</html>
