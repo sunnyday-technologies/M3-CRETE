@@ -17,7 +17,7 @@ const BOM_CONFIG = {
 
   // Display settings
   PROJECT_TITLE: 'Concrete 3D Printer BOM',
-  PROJECT_SUBTITLE: 'Open-Source Hardware | Quad-Z Self-Tramming | Dual-Y | US Sourcing',
+  PROJECT_SUBTITLE: 'Open-Source Hardware | Quad-Z Self-Tramming | Dual-Y Belt-Pinion',
 
   BUILD_SPECS: {
     'Build Volume': '1200 x 1000 x 1000mm',
@@ -25,7 +25,7 @@ const BOM_CONFIG = {
     'Z Config': '4x Independent (Auto-Tram)',
     'Controller': 'BTT Kraken + RPi 5',
     'Motors': 'NEMA23 Standard (StallGuard)',
-    'Sourcing': '100% US Suppliers'
+    'Sourcing': 'Primarily US Suppliers'
   },
 
   // Category display order (must match category names in the database)
