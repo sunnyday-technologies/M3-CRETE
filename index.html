@@ -343,20 +343,6 @@
       letter-spacing: 0.1em;
     }
 
-    /* — DECORATIVE GRID LINES — */
-    .grid-line {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: var(--border);
-      opacity: 0.3;
-      z-index: 0;
-    }
-
-    .gl-1 { left: 25%; }
-    .gl-2 { left: 50%; }
-    .gl-3 { left: 75%; }
 
     /* — ANIMATIONS — */
     @keyframes fadeUp {
@@ -416,18 +402,12 @@
         text-align: center;
       }
 
-      .gl-1, .gl-2, .gl-3 { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- decorative vertical rules -->
-  <div class="grid-line gl-1"></div>
-  <div class="grid-line gl-2"></div>
-  <div class="grid-line gl-3"></div>
-
-  <!-- HEADER -->
+<!-- HEADER -->
   <header>
     <div class="logo">
       <span class="logo-mark">M3-CRETE</span>
