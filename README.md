@@ -8,6 +8,13 @@ M3-CRETE is an open-source hardware project for building a concrete 3D printer f
 
 Developed by [Sunnyday Technologies](https://sunn3d.com).
 
+| Spec | Value |
+|------|-------|
+| **Target system cost** | Under $5,000 |
+| **Build footprint** | Sub-1 m³ — fits on a standard US pallet (48×40 in) |
+| **Printhead weight** | ~1.5 kg |
+| **License** | CERN-OHL-W-2.0 |
+
 ---
 
 ## Why M3-CRETE
@@ -43,7 +50,7 @@ Concrete cures by hydration — a chemical reaction — not by melting and cooli
 
 ### Built to Multiply
 
-The system is designed so that printed structural components can be produced on an existing M3-CRETE unit. A working printer helps produce parts for the next one. Scalability is a feature, not an afterthought.
+Many non-structural components — brackets, guides, and enclosure parts — are designed to be 3D-printable using an existing M3-CRETE unit or any FDM printer. This reduces replication cost and simplifies field replacement. Scalability is a feature, not an afterthought.
 
 ---
 
@@ -87,7 +94,7 @@ Planned additions: CAD files, printed part STLs, assembly documentation, wiring 
 
 M3-CRETE is a hardware platform — it does not prescribe a specific concrete mix. The system is designed to work with a range of cementitious formulations optimized for layered extrusion, including OPC, LC3, and specialty blends.
 
-For AI-driven mix design optimized for 3D printing, see [CEMFORGE™](https://cemforge.ai/concrete-printers/) — a formulation engine that uses physics-based models and an 8,000+ formulation dataset to generate printable concrete mixes with target performance characteristics.
+For AI-driven mix design optimized for 3D printing, see [CEMFORGE™](https://cemforge.ai/concrete-printers/) — a machine learning formulation engine trained exclusively on 3D-printed cementitious specimen data, designed to generate printable concrete mixes with target performance characteristics.
 
 ---
 
