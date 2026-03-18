@@ -107,7 +107,7 @@ M3-CRETE is in active development. Current focus areas:
 - Establishing firmware profiles for concrete-specific extrusion parameters
 
 Interested in early access, collaboration, or providing field feedback?
-See the **[project page →](https://sunn3d.com/2025/12/31/concrete-printer/)**
+See the **[project page →](https://sunn3d.com/m3-crete/)**
 
 ---
 
@@ -134,7 +134,7 @@ See [LICENSES/](LICENSES/) for full license text.
 | Resource | Description |
 |----------|-------------|
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
-| [M3-CRETE Project Page](https://sunn3d.com/2025/12/31/concrete-printer/) | Kit details, design philosophy, and contact for early access |
+| [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Kit details, design philosophy, and contact for early access |
 | [CEMFORGE™](https://cemforge.ai/concrete-printers/) | AI-powered concrete formulation platform by Sunnyday Technologies |
 | [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Marlin/Klipper |
 
