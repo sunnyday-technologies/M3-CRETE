@@ -611,9 +611,9 @@ VALUES
    'https://www.stoneflower3d.com/store/concrete-3d-printer/',
    'Automated concrete pump — up to 10 L/min, 40 bar, aggregates up to 6mm. Includes operator training. Uses A3A-series servo driver. ~$6,000+',
    true),
-  (currval('parts_id_seq'), 'Community Interest: US-Sourced Pump',
+  (currval('parts_id_seq'), 'Sunnyday Technologies (Coming Soon)',
    '',
-   'INTEREST CHECK — NEMA34 closed-loop stepper (8.5-12Nm) + 10:1 planetary gearbox (~100Nm output) + TMC5160 external driver with StallGuard overload protection. Need 10 commitments for a small production batch. Estimated $300-500 for drive system (pump element separate).',
+   'We are developing a purpose-built concrete extrusion pump designed for the M3 motion system. This will be offered as a commercial product with proper safety engineering and support. Leave a comment or star the repo to register interest.',
    true);
 
 -- ── Extruder Mounting Bracket — Motion System Interface ──
@@ -918,8 +918,10 @@ WHERE category = 'Concrete Extrusion System';
 UPDATE parts SET description = 'REFERENCE ONLY — not included in M3 motion system kit. Purpose-built concrete 3D printing pumps from MAI, M-Tec, or StoneFlower are the proven commercial options ($5,000-6,000+). High-torque pump assembly is outside safe DIY scope.'
 WHERE name = 'Progressive Cavity Pump' AND category = 'Concrete Extrusion System';
 
--- Update community interest entry to NEMA34 (NEMA23 was undersized)
-UPDATE supplier_options SET notes = 'INTEREST CHECK — NEMA34 closed-loop stepper (8.5-12Nm) + 10:1 planetary gearbox (~100Nm output) + TMC5160 external driver with StallGuard overload protection. Need 10 commitments for a small production batch. Estimated $300-500 for drive system (pump element separate).'
+-- Update community interest → Sunnyday Technologies commercial pump
+UPDATE supplier_options SET
+  supplier_name = 'Sunnyday Technologies (Coming Soon)',
+  notes = 'We are developing a purpose-built concrete extrusion pump designed for the M3 motion system. This will be offered as a commercial product with proper safety engineering and support. Leave a comment or star the repo to register interest.'
 WHERE supplier_name ILIKE '%Community Interest%US-Sourced%'
   AND part_id = (SELECT id FROM parts WHERE name = 'Progressive Cavity Pump' LIMIT 1);
 
