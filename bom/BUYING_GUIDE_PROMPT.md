@@ -1,69 +1,57 @@
 # AI-Assisted BOM Purchasing Guide
 
-Export the BOM as JSON from [m3-crete.com/bom](https://m3-crete.com/bom) using the **Export JSON** button, then paste the following prompt into your AI assistant (Claude, ChatGPT, Gemini, etc.) along with the JSON file.
+## How It Works
+
+1. **Configure your build** in the [BOM Viewer](https://m3-crete.com/bom):
+   - Select your **model variant** (M3 / M3-2 / M3-4)
+   - Toggle **Buy / Print / CNC** on each part (click the pill buttons)
+   - Click a **supplier card** to mark it as preferred (click again to deselect)
+
+2. **Export JSON** — your selections are embedded in the export
+
+3. **Paste into your AI assistant** with the prompt below
 
 ---
 
 ## Prompt Template
 
-Copy the prompt below, fill in the bracketed fields, and attach your exported BOM JSON.
+Copy this prompt, fill in your zip code and strategy, attach the exported JSON.
 
 ```
-I have a Bill of Materials (BOM) for an open-source concrete 3D printer
-motion system (M3-CRETE). The attached JSON was exported from the
-project's interactive BOM viewer.
-
-Please help me build a complete buy list with the following requirements:
+I have a BOM (Bill of Materials) JSON export for the M3-CRETE open-source
+concrete 3D printer motion system. My selections are already embedded in
+the export — build method (buy/print/cnc) and preferred suppliers are
+marked per part.
 
 PURCHASE STRATEGY (pick one):
-→ [LOWEST COST] — Minimize total spend. Use cheapest supplier per part,
-  bulk pricing tiers, and consolidate orders to reduce shipping. Suggest
-  cheaper substitutes where substitute_ok is true.
-→ [FASTEST SHIPPING] — Prioritize Amazon Prime, DigiKey, and other
-  suppliers with 1-3 day delivery. Minimize the number of suppliers.
-  Pay more per part if it means everything arrives within a week.
-→ [BEST VALUE] — Balance cost and shipping speed. Prefer US-stocked
-  suppliers with reasonable prices. Avoid overseas shipping delays
-  but don't overpay for overnight delivery.
-→ [MAXIMUM QUALITY] — Use premium suppliers (McMaster-Carr, Gates belts,
-  igus drag chain, StepperOnline direct). Prioritize exact MPN matches,
-  brand-name components, and industrial-grade options over budget parts.
+→ LOWEST COST — Cheapest total. Use bulk pricing, suggest substitutes
+  where substitute_ok is true, consolidate by supplier for shipping.
+→ FASTEST SHIPPING — Prioritize Amazon Prime and fast US shippers.
+  Minimize number of suppliers. Everything within 1 week.
+→ BEST VALUE — Balance cost and speed. US-stocked suppliers, 1-2 week
+  delivery, reasonable prices.
+→ MAXIMUM QUALITY — Premium suppliers only (McMaster-Carr, Gates, igus).
+  Exact MPN matches, industrial-grade, longest service life.
 
 MY DETAILS:
 - Zip code: [YOUR ZIP CODE]
-- Model variant: [M3 / M3-2 / M3-4]
 - Purchase strategy: [LOWEST COST / FASTEST SHIPPING / BEST VALUE / MAXIMUM QUALITY]
-- Print vs. Buy: For parts with mfg_type "print" or "cnc", I want to
-  [BUY manufactured versions / 3D PRINT them myself / DECIDE per part]
 
 RULES:
-1. Include all parts where "exclude_from_kit" is false. Skip parts where
-   "exclude_from_kit" is true (concrete pump system is outside scope).
+1. Skip parts where "exclude_from_kit" is true.
+2. If "user_build_method" is set on a part, use that (buy/print/cnc).
+   If not set, use the default "mfg_type".
+3. If "user_preferred_supplier" or "is_preferred" is set, use that
+   supplier. Otherwise pick the best match for the purchase strategy.
+4. If "substitute_ok" is false, match the EXACT MPN — no substitutions.
+5. Use MPN and SKU fields for exact product matching where available.
+6. Consolidate orders by supplier. Note free shipping thresholds.
 
-2. Use the MPN (manufacturer part number) and SKU fields when available
-   for exact product matching. Where no MPN exists, use the part name
-   and description to find the closest match.
-
-3. If "substitute_ok" is false, match the EXACT MPN — no substitutions.
-   If "substitute_ok" is true, follow the purchase strategy above.
-
-4. Consolidate orders by supplier to minimize shipping costs. Note free
-   shipping thresholds (e.g., Amazon Prime = free, DigiKey = $6.99
-   ground, Adafruit = free over $35).
-
-5. OUTPUT FORMAT — Produce a table grouped by supplier with:
-   - Part name, quantity, unit price, line total
-   - Direct product URL (clickable)
-   - Supplier subtotal + estimated shipping
-   - Grand total with estimated tax for my state
-   - Summary comparing: parts cost, shipping, tax, all-in total
-
-6. FLAG any parts that are out of stock, discontinued, or where the
-   price has changed significantly from what the BOM description implies.
-
-Optional: If you find a significantly cheaper alternative for any part
-that still meets the engineering requirements in the description, flag
-it as a suggestion with the price difference noted.
+OUTPUT:
+- Table grouped by supplier: part, qty, unit price, line total, URL
+- Supplier subtotal + estimated shipping per supplier
+- Grand total: parts + shipping + estimated tax
+- Flag any out-of-stock, discontinued, or significantly changed prices
 ```
 
 ---
@@ -72,32 +60,30 @@ it as a suggestion with the price difference noted.
 
 | Strategy | Best For | Trade-off |
 |----------|----------|-----------|
-| **Lowest Cost** | Budget builds, patient builders | 3-6 week lead time (Bulkman3D sea freight), more suppliers to manage |
-| **Fastest Shipping** | Urgent builds, impatient builders | ~15-25% price premium, mostly Amazon |
-| **Best Value** | Most builders | Good balance — US suppliers, 1-2 week delivery, reasonable prices |
-| **Maximum Quality** | Production machines, reliability-critical | Highest cost but best components, longest service life |
+| **Lowest Cost** | Budget builds, patient builders | 3-6 week lead time (overseas), more suppliers |
+| **Fastest Shipping** | Urgent builds | ~15-25% premium, mostly Amazon Prime |
+| **Best Value** | Most builders | US suppliers, 1-2 week delivery, balanced |
+| **Maximum Quality** | Production machines | Highest cost, best components, longest life |
 
 ### Typical All-In Cost Range (M3 base, excl. concrete pump)
 
-| Strategy | Estimated Range |
-|----------|----------------|
-| Lowest Cost (3D print plates) | ~$1,900 – $2,200 |
-| Lowest Cost (buy CNC plates) | ~$2,400 – $2,700 |
-| Best Value | ~$2,600 – $3,100 |
-| Fastest Shipping | ~$2,800 – $3,300 |
-| Maximum Quality | ~$3,200 – $4,000 |
+| Strategy | Print plates | Buy CNC plates |
+|----------|-------------|----------------|
+| Lowest Cost | ~$1,900 – $2,200 | ~$2,400 – $2,700 |
+| Best Value | ~$2,200 – $2,600 | ~$2,600 – $3,100 |
+| Fastest Shipping | ~$2,400 – $2,800 | ~$2,800 – $3,300 |
+| Maximum Quality | ~$2,800 – $3,400 | ~$3,200 – $4,000 |
 
-*Ranges include parts + shipping + tax. Concrete extrusion system not included — see BOM for pump options.*
+*Ranges include parts + shipping + tax. Concrete extrusion system not included.*
 
 ---
 
 ## Tips
 
 - **Best results with**: Claude (web search + long context), ChatGPT with browsing, Perplexity
-- **Token budget**: The full BOM JSON is ~15KB — well within context limits for all major models
-- **Accuracy**: AI pricing is point-in-time. Verify final prices at checkout before purchasing.
-- **Consolidation**: Most items are available on Amazon Prime. Consolidating there saves ~$50-100 in shipping vs. ordering from each specialty supplier individually.
-- **Re-run monthly**: Prices change. Re-export the JSON and re-run the prompt to get updated pricing before you order.
+- **Full BOM JSON**: ~15KB — fits within any major model's context window
+- **Re-run monthly**: Prices change. Re-export and re-run before ordering.
+- **Consolidation**: Amazon Prime covers ~40% of items with free shipping
 
 ## Disclaimer
 
