@@ -4,7 +4,8 @@
 
 1. **Configure your build** in the [BOM Viewer](https://m3-crete.com/bom):
    - Select your **model variant** (M3 / M3-2 / M3-4)
-   - Toggle **Buy / Print / CNC** on each part (click the pill buttons)
+   - Check **I have this** on parts you already own (they'll be excluded)
+   - Toggle **Buy / Print / CNC** on each fabricated part
    - Click a **supplier card** to mark it as preferred (click again to deselect)
 
 2. **Export JSON** — your selections are embedded in the export
@@ -38,7 +39,8 @@ MY DETAILS:
 - Purchase strategy: [LOWEST COST / FASTEST SHIPPING / BEST VALUE / MAXIMUM QUALITY]
 
 RULES:
-1. Skip parts where "exclude_from_kit" is true.
+1. Skip parts where "exclude_from_kit" is true OR "user_excluded" is true.
+   These are either outside project scope or parts the user already owns.
 2. If "user_build_method" is set on a part, use that (buy/print/cnc).
    If not set, use the default "mfg_type".
 3. If "user_preferred_supplier" or "is_preferred" is set, use that
