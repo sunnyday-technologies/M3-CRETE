@@ -1970,12 +1970,12 @@ function toggleCADLibrary() {
 function renderCADLibrary() {
     const body = document.getElementById('cadLibraryBody');
 
-    // Collect parts with STEP files
+    // Collect parts with STEP files — motion system only (exclude concrete pump)
     const cadParts = [];
     let totalSteps = 0;
     const supplierStepCounts = {};
 
-    App.parts.forEach(p => {
+    App.parts.filter(p => p.category !== 'Concrete Extrusion System').forEach(p => {
         const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved && o.step_url);
         if (opts.length > 0) {
             cadParts.push({ part: p, stepOptions: opts });
@@ -1999,10 +1999,11 @@ function renderCADLibrary() {
         if (!orderedCategories.includes(c)) orderedCategories.push(c);
     });
 
-    // Top-level stats
+    // Top-level stats (motion system only)
+    const motionPartsTotal = App.parts.filter(p => p.category !== 'Concrete Extrusion System').length;
     const partsWithCAD = cadParts.length;
-    const partsWithoutCAD = App.parts.length - partsWithCAD;
-    const coveragePct = Math.round((partsWithCAD / App.parts.length) * 100);
+    const partsWithoutCAD = motionPartsTotal - partsWithCAD;
+    const coveragePct = Math.round((partsWithCAD / motionPartsTotal) * 100);
 
     let html = `
         <div class="cad-stats">
@@ -2055,7 +2056,10 @@ function exportCADManifest() {
         parts_without_cad: []
     };
 
-    App.parts.forEach(p => {
+    // Exclude Concrete Extrusion System — motion system CAD only
+    const motionParts = App.parts.filter(p => p.category !== 'Concrete Extrusion System');
+
+    motionParts.forEach(p => {
         const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved && o.step_url);
         if (opts.length > 0) {
             manifest.parts_with_cad.push({
