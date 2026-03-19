@@ -1,8 +1,8 @@
 -- ============================================================
 -- Concrete 3D Printer BOM — Supabase Schema
--- M3-CRETE  |  M3-1: 1000 x 1000 x 1000mm (1 m³) build volume
--- V-Slot frame  |  Pallet-shippable (48 x 40 in)
--- Future variants: M3-2 (1×2×1m), M3-4 (2×2×1m) — scale by adding longer extrusions
+-- M3-CRETE  |  M3-2: 2000 x 1000 x 1000mm (2 m³) build volume (default)
+-- V-Slot frame  |  Modular splice design — all extrusions ≤1200mm, pallet-shippable (48 x 40 in)
+-- Variants: M3-1 (1×1×1m, skip splice), M3-4 (2×2×1m, splice both X+Y)
 --
 -- Run this in the Supabase SQL Editor to set up the database.
 -- All migrations (001-005) are baked into this file.
@@ -112,8 +112,8 @@ CREATE POLICY "maintainers_read" ON maintainers
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Frame & Structure - Aluminum Extrusions',
         '2080 V-Slot Aluminum Extrusion (1200mm)',
-        'Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages. 1200mm provides ~1000mm usable travel after carriage clearance. 2080 oriented with 80mm vertical for maximum stiffness (Iy ≈ 33 cm⁴). Deflection ~0.05mm at 1.2m span with 3kg load. Fits within 48-inch pallet dimension. For M3-2/M3-4 variants, scale to 2200mm.',
-        7, 'lengths', 'buy', 10);
+        'Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages. 1200mm fits 48-inch pallet dimension. M3-2 X-direction rails use 2×1200mm spliced end-to-end (4 internal connectors per joint, staggered splice locations). 2080 oriented with 80mm vertical for maximum stiffness (Iy ≈ 33 cm⁴). Spliced 2080 at 2.4m span: ~0.5mm deflection at 3kg (2× stiffer than unspliced 2040 at 6ft). Qty 11: 7 frame + 4 splice extensions for X-axis.',
+        11, 'lengths', 'buy', 10);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
 VALUES
   (currval('parts_id_seq'), 'Bulkman3D',      'https://bulkman3d.com/product/v-slot-2080/',              '2080 V-Slot, cut to length, black or silver anodized',   NULL, true),
@@ -137,8 +137,8 @@ VALUES
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Frame & Structure - Aluminum Extrusions',
         '2040 V-Slot Aluminum Extrusion (1000mm)',
-        'Cross braces, cable chain mounts, electronics panel rails, and accessory mounting. 1000mm is the most common pre-cut stock length.',
-        8, 'lengths', 'buy', 30);
+        'Cross braces, cable chain mounts, electronics panel rails, and accessory mounting. 1000mm is the most common pre-cut stock length. M3-2: 4 additional for X-direction cross brace splicing (2×1000mm per brace).',
+        12, 'lengths', 'buy', 30);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
 VALUES
   (currval('parts_id_seq'), 'Bulkman3D',      'https://bulkman3d.com/product/v-slot-2040/',              '2040 V-Slot 1000mm',                      NULL, true),
@@ -151,8 +151,8 @@ VALUES
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Frame Hardware & Brackets', 'Heavy Duty Corner Brackets (20-Series)',
-        'Frame corner connections for V-Slot 20-series. Must be 20-series compatible (6mm slot). Printable saves $200+.',
-        32, 'pieces', 'print', 10);
+        'Frame corner connections for V-Slot 20-series. Must be 20-series compatible (6mm slot). M3-2 has more X-direction joints than M3-1. Printable saves $200+.',
+        40, 'pieces', 'print', 10);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
   (currval('parts_id_seq'), 'Bulkman3D',       'https://bulkman3d.com/',       '20-series cast aluminum L-bracket',   true),
@@ -161,8 +161,8 @@ VALUES
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Frame Hardware & Brackets', 'Straight Line Internal Connectors (20-Series)',
-        'Slides into T-slot to splice two extrusions end-to-end for modular frame scaling. Not needed for M3 base model (all extrusions single-piece). For M3-2/M3-4: use 4 connectors per splice joint (one per slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws.',
-        0, 'pieces (M3-2: 12, M3-4: 28)', 'buy', 15);
+        'Splice connectors for modular X-axis extension. 4 connectors per splice joint (one per T-slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws. M3-2 default: 4 splice joints × 4 connectors = 16. Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0 (skip splice).',
+        16, 'pieces', 'buy', 15);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
   (currval('parts_id_seq'), 'Amazon',        'https://amazon.com',   '20-series straight line connector 100mm with M5 screws — 4-pack or 12-pack', true),
@@ -216,8 +216,8 @@ VALUES
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('X-Axis Motion System', 'GT2 Timing Belt 10mm (Reinforced)',
-        'X-axis drive belt. ~3m needed for 1m travel (2×1.2m run + tensioner + tails). Buy extra for spares. Gates PowerGrip GT2/GT3 interchangeable at 2mm pitch.',
-        5, 'meters', 'buy', 20);
+        'X-axis drive belt. ~6m needed for 2m travel (2×2.4m run + tensioner + tails). Buy extra for spares. Gates PowerGrip GT2/GT3 interchangeable at 2mm pitch.',
+        8, 'meters', 'buy', 20);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
 VALUES
   (currval('parts_id_seq'), 'McMaster-Carr',      'https://mcmaster.com',              'Gates PowerGrip GT2 10mm',    'https://www.gates.com/us/en', true),
@@ -437,8 +437,8 @@ VALUES
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Electronics & Control System', 'Cable Drag Chain (Sealed)',
-        'Enclosed/sealed type for concrete dust protection. X-axis: 25x50mm ID, 1.5m. Y-axis: 25x38mm ID, 1.3m. Open-style chains will clog with concrete dust. igus E2 micro series is ideal for dusty environments.',
-        3, 'meters total (X: 1.5m + Y: 1.3m)', 'buy', 80);
+        'Enclosed/sealed type for concrete dust protection. X-axis: 25x50mm ID, 2.5m (M3-2 travel). Y-axis: 25x38mm ID, 1.3m. Open-style chains will clog with concrete dust. igus E2 micro series is ideal for dusty environments.',
+        4, 'meters total (X: 2.5m + Y: 1.3m)', 'buy', 80);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
 VALUES
   (currval('parts_id_seq'), 'igus',            'https://www.igus.com',  'E2 micro sealed drag chain — premium, dust-proof',  'https://www.igus.com/', true),
@@ -450,8 +450,8 @@ VALUES
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Electronics & Control System',
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)',
-        '4-conductor 18AWG, foil shield + drain, silicone jacket, continuous-flex drag-chain-rated. For X, Y, and extruder motors on moving axes. Critical for reliable StallGuard sensorless homing.',
-        15, 'meters (1 spool)', 'buy', 100);
+        '4-conductor 18AWG, foil shield + drain, silicone jacket, continuous-flex drag-chain-rated. For X, Y, and extruder motors on moving axes. M3-2 X-axis travel requires ~2m more than M3-1. Critical for reliable StallGuard sensorless homing.',
+        20, 'meters (1 spool)', 'buy', 100);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
   (currval('parts_id_seq'), 'igus',          'https://www.igus.com',     'chainflex CF211 — premium drag-chain-rated', true),
@@ -944,3 +944,47 @@ DELETE FROM parts WHERE category = 'Concrete Extrusion System'
 -- Update Extruder Mounting Bracket — the only extrusion part in the kit
 UPDATE parts SET description = 'Mounts extruder pipe to X-axis carriage plate. Standard 1" Male NPT threaded pipe connection. Lightweight — printhead target is 1.5kg. This is the only extrusion-system part in the M3 motion system kit. Hose/nozzle/hopper are pump-specific — source from your pump manufacturer.'
 WHERE name = 'Extruder Mounting Bracket' AND category = 'Concrete Extrusion System';
+
+-- ════════════════════════════════════════════════════════════
+-- ██  MIGRATION 009 — M3-2 Default Configuration            ██
+-- ════════════════════════════════════════════════════════════
+-- M3-2 (2000×1000×1000mm) is now the default build. Modular splice
+-- design: all extrusions ≤1200mm, ships on standard 48×40" pallet.
+-- X-direction rails are 2×1200mm spliced with internal connectors.
+-- Stagger splice locations across parallel rails to avoid aligned weak planes.
+-- Spliced 2080 at 2.4m: ~0.5mm deflection at 3kg (verified against
+-- working 2040 at 6ft/1829mm: 1.02mm deflection — splice is 2× stiffer).
+
+-- 2080 extrusions: 7 → 11 (add 4 for X-direction splice extensions)
+UPDATE parts SET qty = 11,
+  description = 'Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages. 1200mm fits 48-inch pallet dimension. M3-2 X-direction rails use 2×1200mm spliced end-to-end (4 internal connectors per joint, staggered splice locations). 2080 oriented with 80mm vertical for maximum stiffness (Iy ≈ 33 cm⁴). Spliced 2080 at 2.4m span: ~0.5mm deflection at 3kg (2× stiffer than unspliced 2040 at 6ft). Qty 11: 7 frame + 4 splice extensions for X-axis.'
+WHERE name ILIKE '%2080 V-Slot%1200mm%';
+
+-- 2040 cross braces: 8 → 12 (add 4 for X-direction brace splicing)
+UPDATE parts SET qty = 12,
+  description = 'Cross braces, cable chain mounts, electronics panel rails, and accessory mounting. 1000mm is the most common pre-cut stock length. M3-2: 4 additional for X-direction cross brace splicing (2×1000mm per brace).'
+WHERE name ILIKE '%2040 V-Slot%1000mm%';
+
+-- Splice connectors: 0 → 16 (4 joints × 4 connectors each)
+UPDATE parts SET qty = 16, unit = 'pieces',
+  description = 'Splice connectors for modular X-axis extension. 4 connectors per splice joint (one per T-slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws. M3-2 default: 4 splice joints × 4 connectors = 16. Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0 (skip splice).'
+WHERE name ILIKE '%Straight Line Internal Connectors%';
+
+-- Corner brackets: 32 → 40 (more X-direction joints)
+UPDATE parts SET qty = 40
+WHERE name ILIKE '%Heavy Duty Corner Brackets%';
+
+-- X-axis belt: 5m → 8m (2m travel needs ~6m belt + spare)
+UPDATE parts SET qty = 8,
+  description = 'X-axis drive belt. ~6m needed for 2m travel (2×2.4m run + tensioner + tails). Buy extra for spares. Gates PowerGrip GT2/GT3 interchangeable at 2mm pitch.'
+WHERE name ILIKE '%GT2 Timing Belt%' AND category = 'X-Axis Motion System';
+
+-- Cable drag chain: 3m → 4m (longer X travel)
+UPDATE parts SET qty = 4, unit = 'meters total (X: 2.5m + Y: 1.3m)',
+  description = 'Enclosed/sealed type for concrete dust protection. X-axis: 25x50mm ID, 2.5m (M3-2 travel). Y-axis: 25x38mm ID, 1.3m. Open-style chains will clog with concrete dust. igus E2 micro series is ideal for dusty environments.'
+WHERE name ILIKE '%Cable Drag Chain%';
+
+-- Flex motor cable: 15m → 20m (longer X drag chain run)
+UPDATE parts SET qty = 20, unit = 'meters (1 spool)',
+  description = '4-conductor 18AWG, foil shield + drain, silicone jacket, continuous-flex drag-chain-rated. For X, Y, and extruder motors on moving axes. M3-2 X-axis travel requires ~2m more than M3-1. Critical for reliable StallGuard sensorless homing.'
+WHERE name ILIKE '%Shielded Motor Cable - Flex%';
