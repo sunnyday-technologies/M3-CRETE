@@ -449,6 +449,47 @@
         .mfg-print { background: var(--badge-print); color: var(--badge-print-text); }
         .mfg-cnc   { background: var(--badge-cnc);   color: var(--badge-cnc-text); }
 
+        /* ── Buy/Print Toggle ────────────────────────── */
+        .mfg-toggle {
+            display: inline-flex;
+            gap: 2px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .mfg-toggle-btn {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            transition: all 0.15s;
+        }
+        .mfg-toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+        .mfg-toggle-btn.active-buy   { background: var(--badge-buy);   color: var(--badge-buy-text);   border-color: var(--badge-buy-text); }
+        .mfg-toggle-btn.active-print { background: var(--badge-print); color: var(--badge-print-text); border-color: var(--badge-print-text); }
+        .mfg-toggle-btn.active-cnc   { background: var(--badge-cnc);   color: var(--badge-cnc-text);   border-color: var(--badge-cnc-text); }
+
+        /* ── Preferred Supplier Highlight ─────────────── */
+        .supplier-card.preferred {
+            border-color: var(--accent) !important;
+            background: rgba(151,215,0,0.1) !important;
+        }
+        .supplier-card.preferred::after {
+            content: '★ preferred';
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+
         .supplier-count {
             font-size: 12px;
             color: var(--text-secondary);
@@ -980,6 +1021,7 @@ const App = {
     activeSupplier: null,   // supplier filter
     activeModel: BOM_CONFIG.DEFAULT_MODEL || 'M3-1',  // model variant
     suggestPartId: null,    // for the modal
+    userChoices: {},         // part_id -> { mfg: 'buy'|'print'|'cnc', preferredSupplier: opt_id|null }
 };
 
 // ────────────────────────────────────────────────────
@@ -1310,8 +1352,28 @@ function renderBOM() {
             const options = App.suppliersByPart[part.id] || [];
             const approved = options.filter(o => o.approved);
             const pending = options.filter(o => !o.approved);
-            const mfgClass = 'mfg-' + part.mfg_type;
-            const mfgLabel = part.mfg_type === 'print' ? '3D Print' : part.mfg_type === 'cnc' ? 'CNC' : 'Purchase';
+
+            // User choice for this part (mfg override + preferred supplier)
+            const choice = App.userChoices[part.id] || {};
+            const effectiveMfg = choice.mfg || part.mfg_type;
+            const mfgClass = 'mfg-' + effectiveMfg;
+            const mfgLabel = effectiveMfg === 'print' ? '3D Print' : effectiveMfg === 'cnc' ? 'CNC' : 'Purchase';
+
+            // Show buy/print/cnc toggle for parts that have alternatives
+            const canToggle = part.mfg_type === 'print' || part.mfg_type === 'cnc';
+            let toggleHtml = '';
+            if (canToggle) {
+                const isBuy = effectiveMfg === 'buy';
+                const isPrint = effectiveMfg === 'print';
+                const isCnc = effectiveMfg === 'cnc';
+                toggleHtml = `<span class="mfg-toggle">` +
+                    `<button class="mfg-toggle-btn${isBuy ? ' active-buy' : ''}" onclick="event.stopPropagation();setMfgChoice(${part.id},'buy')">Buy</button>` +
+                    (part.mfg_type === 'print' || effectiveMfg === 'print'
+                        ? `<button class="mfg-toggle-btn${isPrint ? ' active-print' : ''}" onclick="event.stopPropagation();setMfgChoice(${part.id},'print')">Print</button>`
+                        : '') +
+                    `<button class="mfg-toggle-btn${isCnc ? ' active-cnc' : ''}" onclick="event.stopPropagation();setMfgChoice(${part.id},'cnc')">CNC</button>` +
+                    `</span>`;
+            }
 
             // Auto-expand parts when supplier filter active
             const expanded = activeSupplier ? ' expanded' : '';
@@ -1331,7 +1393,7 @@ function renderBOM() {
                     <div class="part-desc">${escHtml(part.description || '')}</div>
                 </div>
                 <div class="part-qty">${pd.qty}<small>${escHtml(pd.unit)}</small></div>
-                <span class="mfg-badge ${mfgClass}">${mfgLabel}</span>
+                <span class="mfg-badge ${mfgClass}">${mfgLabel}</span>${toggleHtml}
                 <div class="supplier-count">${approved.length} supplier${approved.length !== 1 ? 's' : ''}</div>
             </div>`;
 
@@ -1340,19 +1402,21 @@ function renderBOM() {
 
             approved.forEach(opt => {
                 const isHighlighted = activeSupplier && normalizeSupplier(opt.supplier_name) === normalizeSupplier(activeSupplier);
-                const highlightClass = isHighlighted ? ' style="border-color:var(--accent);background:rgba(151,215,0,0.08);"' : '';
+                const isPreferred = choice.preferredSupplier === opt.id;
+                const highlightStyle = isHighlighted && !isPreferred ? ' style="border-color:var(--accent);background:rgba(151,215,0,0.08);"' : '';
+                const preferredClass = isPreferred ? ' preferred' : '';
                 const stepBadge = opt.step_url
-                    ? `<a class="step-badge" href="${escAttr(opt.step_url)}" target="_blank" rel="noopener" title="STEP/3D model available">${stepIcon()} STEP</a>`
+                    ? `<a class="step-badge" href="${escAttr(opt.step_url)}" target="_blank" rel="noopener" title="STEP/3D model available" onclick="event.stopPropagation()">${stepIcon()} STEP</a>`
                     : '';
 
-                html += `<div class="supplier-card"${highlightClass}>
+                html += `<div class="supplier-card${preferredClass}" onclick="setPreferredSupplier(${part.id},${opt.id})" style="cursor:pointer;${isHighlighted && !isPreferred ? 'border-color:var(--accent);background:rgba(151,215,0,0.08);' : ''}">
                     <div class="supplier-info">
                         <span class="supplier-name">${escHtml(opt.supplier_name)}</span>
                         ${stepBadge}
                         <span class="supplier-notes">${escHtml(opt.notes || '')}</span>
                     </div>
                     ${opt.product_url
-                        ? `<a class="supplier-link" href="${escAttr(opt.product_url)}" target="_blank" rel="noopener">Visit &rarr;</a>`
+                        ? `<a class="supplier-link" href="${escAttr(opt.product_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit &rarr;</a>`
                         : '<span class="supplier-notes">No link</span>'}
                 </div>`;
             });
@@ -1525,6 +1589,56 @@ function toggleModPanel() {
 }
 
 // ────────────────────────────────────────────────────
+// User Choices — Buy/Print Toggle & Preferred Supplier
+// ────────────────────────────────────────────────────
+function setMfgChoice(partId, mfgType) {
+    if (!App.userChoices[partId]) App.userChoices[partId] = {};
+    const part = App.parts.find(p => p.id === partId);
+    // Toggle off if clicking the current choice (revert to default)
+    if (App.userChoices[partId].mfg === mfgType) {
+        delete App.userChoices[partId].mfg;
+    } else {
+        App.userChoices[partId].mfg = mfgType;
+    }
+    if (!App.userChoices[partId].mfg && !App.userChoices[partId].preferredSupplier) {
+        delete App.userChoices[partId];
+    }
+    renderBOM();
+}
+
+function setPreferredSupplier(partId, optionId) {
+    if (!App.userChoices[partId]) App.userChoices[partId] = {};
+    // Toggle off if clicking the current preferred
+    if (App.userChoices[partId].preferredSupplier === optionId) {
+        delete App.userChoices[partId].preferredSupplier;
+    } else {
+        App.userChoices[partId].preferredSupplier = optionId;
+    }
+    if (!App.userChoices[partId].mfg && !App.userChoices[partId].preferredSupplier) {
+        delete App.userChoices[partId];
+    }
+    renderBOM();
+}
+
+function getUserChoiceSummary() {
+    // Returns a human-readable summary of user choices for export
+    const choices = [];
+    Object.entries(App.userChoices).forEach(([partId, choice]) => {
+        const part = App.parts.find(p => p.id === parseInt(partId));
+        if (!part) return;
+        const entry = { part: part.name };
+        if (choice.mfg) entry.build_method = choice.mfg;
+        if (choice.preferredSupplier) {
+            const opts = App.suppliersByPart[partId] || [];
+            const opt = opts.find(o => o.id === choice.preferredSupplier);
+            if (opt) entry.preferred_supplier = opt.supplier_name;
+        }
+        choices.push(entry);
+    });
+    return choices;
+}
+
+// ────────────────────────────────────────────────────
 // Supplier Submission
 // ────────────────────────────────────────────────────
 function openSuggestModal(partId, partName) {
@@ -1619,7 +1733,7 @@ function exportCSV() {
         ? `bom${modelSuffix}_${supplierKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_order.csv`
         : `concrete_printer_bom${modelSuffix}.csv`;
 
-    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
+    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
 
     const grouped = {};
     App.parts.forEach(p => {
@@ -1643,21 +1757,27 @@ function exportCSV() {
             }
 
             const pd = getPartDisplay(part);
+            const choice = App.userChoices[part.id] || {};
+            const userMfg = choice.mfg || '';
+            const prefSuppId = choice.preferredSupplier;
             if (!options.length) {
                 rows.push([
                     part.category, pd.name, part.description || '',
                     pd.qty, pd.unit, part.mfg_type,
                     part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                     part.exclude_from_kit ? 'yes' : 'no',
+                    userMfg, '',
                     '', '', '', '', ''
                 ]);
             } else {
                 options.forEach(opt => {
+                    const isPref = prefSuppId === opt.id ? 'yes' : '';
                     rows.push([
                         part.category, pd.name, part.description || '',
                         pd.qty, pd.unit, part.mfg_type,
                         part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                         part.exclude_from_kit ? 'yes' : 'no',
+                        userMfg, isPref,
                         opt.supplier_name, opt.sku || '', opt.product_url || '',
                         opt.notes || '', opt.step_url || ''
                     ]);
@@ -1697,16 +1817,24 @@ function exportJSON() {
         if (!orderedCategories.includes(c)) orderedCategories.push(c);
     });
 
+    const hasUserChoices = Object.keys(App.userChoices).length > 0;
+
     const bomData = {
         project: BOM_CONFIG.PROJECT_TITLE,
         model: App.activeModel,
         generated: new Date().toISOString(),
         disclaimer: 'Supplier listings are community-contributed reference information, not endorsements. Prices, availability, and specifications may change. Verify all details before purchasing.',
+        instructions: 'For each part: if user_build_method is set, use that method (buy/print/cnc). If user_preferred_supplier is set, prioritize that supplier. Parts with exclude_from_kit=true are informational only — skip them unless the user asks. Use MPN and SKU for exact product matching.',
+        user_selections: hasUserChoices ? getUserChoiceSummary() : 'No selections made — use default suppliers and build methods.',
         categories: orderedCategories.map(cat => ({
             name: cat,
             parts: (grouped[cat] || []).map(part => {
                 const pd = getPartDisplay(part);
                 const options = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
+                const choice = App.userChoices[part.id] || {};
+                const preferredOpt = choice.preferredSupplier
+                    ? options.find(o => o.id === choice.preferredSupplier)
+                    : null;
                 return {
                     name: pd.name,
                     description: part.description || '',
@@ -1716,12 +1844,15 @@ function exportJSON() {
                     mpn: part.mpn || null,
                     substitute_ok: part.substitute_ok !== false,
                     exclude_from_kit: !!part.exclude_from_kit,
+                    user_build_method: choice.mfg || null,
+                    user_preferred_supplier: preferredOpt ? preferredOpt.supplier_name : null,
                     suppliers: options.map(o => ({
                         supplier: o.supplier_name,
                         sku: o.sku || null,
                         url: o.product_url || null,
                         notes: o.notes || null,
-                        step_url: o.step_url || null
+                        step_url: o.step_url || null,
+                        is_preferred: o.id === choice.preferredSupplier
                     }))
                 };
             })
@@ -1738,7 +1869,11 @@ function exportJSON() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('JSON exported — feed this to your AI assistant for pricing', 'success');
+    const choiceCount = Object.keys(App.userChoices).length;
+    const msg = choiceCount > 0
+        ? `JSON exported with ${choiceCount} custom selection${choiceCount !== 1 ? 's' : ''} — paste into your AI assistant`
+        : 'JSON exported — configure build options then paste into your AI assistant';
+    showToast(msg, 'success');
 }
 
 // ────────────────────────────────────────────────────
