@@ -616,46 +616,21 @@ VALUES
    'INTEREST CHECK — NEMA34 closed-loop stepper (8.5-12Nm) + 10:1 planetary gearbox (~100Nm output) + TMC5160 external driver with StallGuard overload protection. Need 10 commitments for a small production batch. Estimated $300-500 for drive system (pump element separate).',
    true);
 
--- ── Remaining Extrusion System Components (Reference Only) ──
--- These parts ship with commercial pump systems or are generic
--- plumbing/mounting. No DIY pump motor/driver/gearbox content.
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System', 'Material Hopper 20-Liter',
-        'REFERENCE — Material reservoir above the pump. Typically included with commercial pump system or purchased separately. HDPE or stainless for concrete compatibility.',
-        1, 'hopper', 'buy', 30);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'McMaster-Carr',    'https://mcmaster.com',  'Stainless steel hopper',  true),
-  (currval('parts_id_seq'), 'US Plastic Corp',  'https://usplastic.com', 'HDPE funnel 5-gal',       true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System', 'Concrete Nozzle Assembly',
-        'REFERENCE — Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm). Often included with commercial pump system.',
-        1, 'assembly', 'buy', 40);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'Local Machine Shop', '', 'Custom machined brass or stainless nozzle', true),
-  (currval('parts_id_seq'), 'SendCutSend',  'https://sendcutsend.com', 'CNC machined replaceable tip design', true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System', 'Tubing & Quick Fittings',
-        'REFERENCE — Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.',
-        1, 'kit', 'buy', 50);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'McMaster-Carr',   'https://mcmaster.com',  'Reinforced concrete-rated hose + fittings', true),
-  (currval('parts_id_seq'), 'Grainger',        'https://grainger.com',  'Industrial reinforced concrete hose',       true);
+-- ── Extruder Mounting Bracket — Motion System Interface ──
+-- This is the ONLY extrusion-system part in the M3 build kit.
+-- Everything else (pump, hopper, hose, nozzle) is pump-specific
+-- and ships with or is sourced alongside the commercial pump.
+-- The M3 printhead connection is a standard 1" Male NPT threaded pipe.
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Concrete Extrusion System', 'Extruder Mounting Bracket',
-        'Mounts nozzle assembly to X-axis carriage. Lightweight — printhead is only 1.5kg target. This is the only extrusion-system part that interfaces with the M3 motion system.',
+        'Mounts extruder pipe to X-axis carriage plate. Standard 1" Male NPT threaded pipe connection. Lightweight — printhead target is 1.5kg. This is the only extrusion-system part in the M3 motion system kit. Hose/nozzle/hopper are pump-specific — source from your pump manufacturer.',
         1, 'bracket', 'print', 60);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
-  (currval('parts_id_seq'), 'Local CNC Shop',  '',                        'CNC Aluminum plate',       true),
-  (currval('parts_id_seq'), 'Self-Manufacture', '',                        '3D Printed reinforced',    true),
-  (currval('parts_id_seq'), 'SendCutSend',     'https://sendcutsend.com', 'Laser cut steel',          true);
+  (currval('parts_id_seq'), 'Local CNC Shop',  '',                        'CNC Aluminum plate with 1" NPT boss', true),
+  (currval('parts_id_seq'), 'Self-Manufacture', '',                        '3D Printed reinforced — STL in repo', true),
+  (currval('parts_id_seq'), 'SendCutSend',     'https://sendcutsend.com', 'Laser cut steel + welded NPT fitting', true);
 
 -- ════════════════════════════════════════════════════════════
 -- ██  FASTENERS & HARDWARE                                 ██
@@ -948,7 +923,8 @@ UPDATE supplier_options SET notes = 'INTEREST CHECK — NEMA34 closed-loop stepp
 WHERE supplier_name ILIKE '%Community Interest%US-Sourced%'
   AND part_id = (SELECT id FROM parts WHERE name = 'Progressive Cavity Pump' LIMIT 1);
 
--- Delete DIY pump component parts (cascade deletes supplier_options)
+-- Delete DIY pump component parts AND pump-specific accessories
+-- (cascade deletes supplier_options)
 DELETE FROM parts WHERE category = 'Concrete Extrusion System'
   AND name IN (
     'NEMA23 Planetary Geared Stepper (10:1) — Pump Drive',
@@ -957,21 +933,12 @@ DELETE FROM parts WHERE category = 'Concrete Extrusion System'
     'Pump Drive Coupling — Universal Joint + Connecting Rod',
     'Pump Housing & Bearing Assembly',
     'NEMA23 Motor for Extruder (Direct Drive Option)',
-    '48V Power Supply for Pump Driver (Optional)'
+    '48V Power Supply for Pump Driver (Optional)',
+    'Material Hopper 20-Liter',
+    'Concrete Nozzle Assembly',
+    'Tubing & Quick Fittings'
   );
 
--- Update remaining extrusion parts descriptions to REFERENCE
-UPDATE parts SET description = 'REFERENCE — Material reservoir above the pump. Typically included with commercial pump system or purchased separately. HDPE or stainless for concrete compatibility.',
-  mfg_type = 'buy'
-WHERE name = 'Material Hopper 20-Liter' AND category = 'Concrete Extrusion System';
-
-UPDATE parts SET description = 'REFERENCE — Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm). Often included with commercial pump system.',
-  mfg_type = 'buy'
-WHERE name = 'Concrete Nozzle Assembly' AND category = 'Concrete Extrusion System';
-
-UPDATE parts SET description = 'REFERENCE — Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.'
-WHERE name = 'Tubing & Quick Fittings' AND category = 'Concrete Extrusion System';
-
--- Remove Self-Manufacture options from remaining extrusion parts
-DELETE FROM supplier_options WHERE supplier_name = 'Self-Manufacture'
-  AND part_id IN (SELECT id FROM parts WHERE category = 'Concrete Extrusion System' AND name = 'Material Hopper 20-Liter');
+-- Update Extruder Mounting Bracket — the only extrusion part in the kit
+UPDATE parts SET description = 'Mounts extruder pipe to X-axis carriage plate. Standard 1" Male NPT threaded pipe connection. Lightweight — printhead target is 1.5kg. This is the only extrusion-system part in the M3 motion system kit. Hose/nozzle/hopper are pump-specific — source from your pump manufacturer.'
+WHERE name = 'Extruder Mounting Bracket' AND category = 'Concrete Extrusion System';
