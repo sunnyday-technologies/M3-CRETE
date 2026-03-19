@@ -586,195 +586,70 @@ VALUES
 -- ════════════════════════════════════════════════════════════
 -- ██  CONCRETE EXTRUSION SYSTEM                            ██
 -- ════════════════════════════════════════════════════════════
+-- ⚠ THIS CATEGORY IS EXCLUDED FROM THE M3 BUILD KIT.
+-- The M3-CRETE is a motion system. The concrete pump is a separate
+-- capital purchase ($5,000-6,000+ for commercial systems).
+-- These entries are REFERENCE ONLY — commercial supplier links for
+-- users to research. No DIY pump build artifacts are provided due
+-- to high-torque safety and liability concerns.
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Concrete Extrusion System', 'Progressive Cavity Pump',
-        'Core extrusion component. Purpose-built concrete 3D printing pumps from MAI, M-Tec, or StoneFlower are the proven options. Flow rate 0.7-24 L/min, grain size up to 2-6mm depending on model. If you want a US-sourced stepper-driven pump solution, leave a comment — at 10 commitments we will produce a small batch.',
+        'REFERENCE ONLY — not included in M3 motion system kit. Purpose-built concrete 3D printing pumps from MAI, M-Tec, or StoneFlower are the proven commercial options ($5,000-6,000+). High-torque pump assembly is outside safe DIY scope.',
         1, 'pump', 'buy', 10);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
   (currval('parts_id_seq'), 'MAI International (Austria)',
    'https://mai.at/en/product-range/3d-printing/mai-2pump-pictor-3d/',
-   'MAI 2PUMP PICTOR-3D — 0.7-15.5 L/min, grain up to 2mm, analog 0-10V control. Industry standard for research and startups.',
+   'MAI 2PUMP PICTOR-3D — 0.7-15.5 L/min, grain up to 2mm, analog 0-10V control. Industry standard for research and startups. ~$5,000+',
    true),
   (currval('parts_id_seq'), 'M-Tec (Germany)',
    'https://m-tec.com/',
-   'M-Tec P20 3DCP — 3-24 L/min, grain up to 4mm, Modbus-RTU control. Higher throughput for large-format printing.',
+   'M-Tec P20 3DCP — 3-24 L/min, grain up to 4mm, Modbus-RTU control. Higher throughput for large-format printing. ~$5,000+',
    true),
   (currval('parts_id_seq'), 'StoneFlower 3D (Germany)',
    'https://www.stoneflower3d.com/store/concrete-3d-printer/',
-   'Automated concrete pump — up to 10 L/min, 40 bar, aggregates up to 6mm. Includes operator training.',
+   'Automated concrete pump — up to 10 L/min, 40 bar, aggregates up to 6mm. Includes operator training. Uses A3A-series servo driver. ~$6,000+',
    true),
-  (currval('parts_id_seq'), 'Community Interest: US-Sourced Stepper Pump',
+  (currval('parts_id_seq'), 'Community Interest: US-Sourced Pump',
    '',
-   'INTEREST CHECK — stepper-driven PC pump using NEMA23 + external driver + Kraken stepper signal. Need 10 commitments for a small production batch.',
+   'INTEREST CHECK — NEMA34 closed-loop stepper (8.5-12Nm) + 10:1 planetary gearbox (~100Nm output) + TMC5160 external driver with StallGuard overload protection. Need 10 commitments for a small production batch. Estimated $300-500 for drive system (pump element separate).',
    true);
 
--- ── DIY Stepper-Driven Pump Components ───────────────────
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        'NEMA23 Planetary Geared Stepper (10:1) — Pump Drive',
-        'Drives the PC pump rotor. 10:1 planetary gearbox provides ~6Nm output torque at low RPM (50-300 RPM). Must be high-torque variant (76mm+ body, 2.8A+). Controlled via Kraken extruder stepper output.',
-        1, 'motor + gearbox assembly', 'buy', 15);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
-VALUES
-  (currval('parts_id_seq'), 'StepperOnline US',
-   'https://www.omc-stepperonline.com/nema-23-stepper-motor-l-76mm-gear-ratio-10-1-high-precision-planetary-gearbox-23hs30-2804s-hg10',
-   '23HS30-2804S-HG10 — 76mm body, 2.8A, 10:1 HG series. 6Nm max output. 15 arc-min backlash.',
-   'https://www.omc-stepperonline.com/download', true),
-  (currval('parts_id_seq'), 'StepperOnline US',
-   'https://www.omc-stepperonline.com/nema-23-stepper-motor-l-76mm-gear-ratio-10-1-mg-series-planetary-gearbox-23hs30-2904s-mg10',
-   '23HS30-2904S-MG10 — MG series budget option, 30 arc-min backlash.',
-   'https://www.omc-stepperonline.com/download', true),
-  (currval('parts_id_seq'), 'Amazon',
-   'https://amazon.com',
-   'STEPPERONLINE NEMA23 10:1 planetary — also on Amazon Prime.',
-   NULL, true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        'External Stepper Driver — TMC5160 (48V High Current)',
-        'Drives geared pump motor via Kraken STEP/DIR/EN signals. External driver recommended: higher current (6A) and 48V for more torque. SPI enables StallGuard for material blockage alarm.',
-        1, 'driver board', 'buy', 16);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
-VALUES
-  (currval('parts_id_seq'), 'West3D (US)',
-   'https://west3d.com/products/tmc5160-pro-48v-stepper-motor-driver-drivers-btt',
-   'BTT TMC5160 Pro V1.2 — 48V, external MOSFETs, SPI.',
-   'https://github.com/bigtreetech/TMC5160T-Pro', true),
-  (currval('parts_id_seq'), 'Amazon',
-   'https://amazon.com',
-   'BIGTREETECH TMC5160T Pro V1.0 — 48V, SPI/UART.',
-   NULL, true),
-  (currval('parts_id_seq'), 'Digi-Key',
-   'https://digikey.com',
-   'Analog Devices TMC5160-BOB evaluation board.',
-   NULL, true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        'Progressive Cavity Pump Element (Rotor + Stator)',
-        'Core pumping element — chrome-plated SS rotor inside elastomer stator. For mortar/concrete with aggregates up to 2-6mm. Stator: Buna Nitrile (NBR) for concrete, EPDM for alkaline. Expect stator replacement every 200-500 hours.',
-        1, 'rotor + stator set', 'buy', 17);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'Continental Ultra Pumps (Missouri)',
-   'https://www.continentalultrapumps.com/store/CP22-progressing-cavity-pump.html',
-   'CP22 pump — 0.4-4.9 GPM, 100 PSI, 3/4" NPT, chrome SS rotor, Buna stator. Smallest US-made PC pump. Call 636-456-6006.',
-   true),
-  (currval('parts_id_seq'), 'Progressive Cavity Parts (US)',
-   'https://www.progressivecavityparts.com/',
-   'Aftermarket replacement rotors and stators for Moyno, Seepex, Netzsch, Continental.',
-   true),
-  (currval('parts_id_seq'), 'Seepex (via US distributors)',
-   'https://www.seepex.com/en-nam/products/pumps/standard-progressive-cavity-pumps/bn-pump-with-block-design/',
-   'BN series — industrial PC pump. US distributors: Tencarva, Edelmann, Cummins-Wagner.',
-   true),
-  (currval('parts_id_seq'), 'Community Interest: Custom Batch',
-   '',
-   'INTEREST CHECK — small-batch custom rotor+stator. CNC SS rotor + cast NBR stator. Need 10 commitments.',
-   true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        'Pump Drive Coupling — Universal Joint + Connecting Rod',
-        'Converts motor rotation to rotor orbital motion. PC pump rotors orbit eccentrically — a rigid shaft will break. Use gear-type universal joint or double-cardan joint.',
-        1, 'coupling assembly', 'buy', 18);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, step_url, approved)
-VALUES
-  (currval('parts_id_seq'), 'McMaster-Carr',
-   'https://mcmaster.com',
-   'Miniature universal joints + flex couplings. Match bore sizes to motor output and rotor drive shaft.',
-   'https://mcmaster.com', true),
-  (currval('parts_id_seq'), 'Amazon',
-   'https://amazon.com',
-   'Stainless steel universal joint couplers (8-14mm bores) + jaw couplings.',
-   NULL, true),
-  (currval('parts_id_seq'), 'Self-Manufacture',
-   '',
-   'CNC or metal SLS custom connecting rod. STL files in repo /cad/pump/ directory.',
-   NULL, true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        'Pump Housing & Bearing Assembly',
-        'Encloses rotor/stator and provides bearing support. Must handle axial thrust. If using Continental CP22, housing is included. For DIY: CNC aluminum + sealed bearings.',
-        1, 'assembly', 'cnc', 19);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'Continental Ultra Pumps',
-   'https://www.continentalultrapumps.com/',
-   'CP22 housing included with pump purchase.',
-   true),
-  (currval('parts_id_seq'), 'McMaster-Carr',
-   'https://mcmaster.com',
-   'DIY: Flanged ball bearings (sealed, SS) + Schedule 40 SS pipe as stator housing.',
-   true),
-  (currval('parts_id_seq'), 'SendCutSend',
-   'https://sendcutsend.com',
-   'CNC-machined aluminum end plates and motor mount. Upload DXF/STEP from repo.',
-   true),
-  (currval('parts_id_seq'), 'Self-Manufacture',
-   '',
-   '3D printed PETG prototype housing for testing only — concrete slurry is abrasive.',
-   true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        'NEMA23 Motor for Extruder (Direct Drive Option)',
-        'Direct-drive option (no gearbox) for simpler pump setups or peristaltic pump. If building the stepper-driven PC pump, use the "NEMA23 Planetary Geared Stepper (10:1)" instead — the gearbox is essential for PC pump torque.',
-        1, 'motor', 'buy', 20);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'StepperOnline US', 'https://www.omc-stepperonline.com', 'NEMA23 4.5Nm 8mm shaft',        true),
-  (currval('parts_id_seq'), 'AutomationDirect', 'https://automationdirect.com',      'NEMA23 Geared 10:1',            true),
-  (currval('parts_id_seq'), 'StepperOnline US', 'https://www.omc-stepperonline.com', 'NEMA23 3Nm standard 8mm shaft', true);
-
-INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
-VALUES ('Concrete Extrusion System',
-        '48V Power Supply for Pump Driver (Optional)',
-        'Only needed if running external TMC5160 pump driver at 48V. Mean Well LRS-200-48 provides dedicated 48V for the geared stepper. Not needed if running pump from Kraken onboard driver at 24V.',
-        1, 'PSU', 'buy', 21);
-INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
-VALUES
-  (currval('parts_id_seq'), 'Mouser Electronics', 'https://mouser.com',  'Mean Well LRS-200-48 — 48V 200W enclosed',  true),
-  (currval('parts_id_seq'), 'Digi-Key',           'https://digikey.com', 'Mean Well UHP-200-48 — 48V slim profile',   true),
-  (currval('parts_id_seq'), 'Amazon',             'https://amazon.com',  'Mean Well 48V PSU — also on Amazon Prime',  true);
+-- ── Remaining Extrusion System Components (Reference Only) ──
+-- These parts ship with commercial pump systems or are generic
+-- plumbing/mounting. No DIY pump motor/driver/gearbox content.
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Concrete Extrusion System', 'Material Hopper 20-Liter',
-        'Material reservoir above the pump. HDPE or stainless for concrete compatibility. Printable in PETG for testing.',
-        1, 'hopper', 'print', 30);
+        'REFERENCE — Material reservoir above the pump. Typically included with commercial pump system or purchased separately. HDPE or stainless for concrete compatibility.',
+        1, 'hopper', 'buy', 30);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
   (currval('parts_id_seq'), 'McMaster-Carr',    'https://mcmaster.com',  'Stainless steel hopper',  true),
-  (currval('parts_id_seq'), 'US Plastic Corp',  'https://usplastic.com', 'HDPE funnel 5-gal',       true),
-  (currval('parts_id_seq'), 'Self-Manufacture', '',                      '3D Printed PETG hopper',  true);
+  (currval('parts_id_seq'), 'US Plastic Corp',  'https://usplastic.com', 'HDPE funnel 5-gal',       true);
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Concrete Extrusion System', 'Concrete Nozzle Assembly',
-        'Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm).',
-        1, 'assembly', 'cnc', 40);
+        'REFERENCE — Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm). Often included with commercial pump system.',
+        1, 'assembly', 'buy', 40);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
-  (currval('parts_id_seq'), 'Local Machine Shop', '', 'Custom machined brass nozzle',      true),
-  (currval('parts_id_seq'), 'Local Machine Shop', '', 'Stainless steel nozzle',            true),
-  (currval('parts_id_seq'), 'SendCutSend',  'https://sendcutsend.com', 'Replaceable tip design', true);
+  (currval('parts_id_seq'), 'Local Machine Shop', '', 'Custom machined brass or stainless nozzle', true),
+  (currval('parts_id_seq'), 'SendCutSend',  'https://sendcutsend.com', 'CNC machined replaceable tip design', true);
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Concrete Extrusion System', 'Tubing & Quick Fittings',
-        'Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.',
+        'REFERENCE — Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.',
         1, 'kit', 'buy', 50);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
   (currval('parts_id_seq'), 'McMaster-Carr',   'https://mcmaster.com',  'Reinforced concrete-rated hose + fittings', true),
-  (currval('parts_id_seq'), 'US Plastic Corp', 'https://usplastic.com', 'Food-grade reinforced hose set',            true),
   (currval('parts_id_seq'), 'Grainger',        'https://grainger.com',  'Industrial reinforced concrete hose',       true);
 
 INSERT INTO parts (category, name, description, qty, unit, mfg_type, sort_order)
 VALUES ('Concrete Extrusion System', 'Extruder Mounting Bracket',
-        'Mounts nozzle assembly to X-axis carriage. Lightweight — printhead is only 1.5kg target.',
+        'Mounts nozzle assembly to X-axis carriage. Lightweight — printhead is only 1.5kg target. This is the only extrusion-system part that interfaces with the M3 motion system.',
         1, 'bracket', 'print', 60);
 INSERT INTO supplier_options (part_id, supplier_name, product_url, notes, approved)
 VALUES
@@ -1056,3 +931,47 @@ WHERE supplier_name ILIKE '%West3D%'
 
 UPDATE parts SET exclude_from_kit = true
 WHERE category = 'Concrete Extrusion System';
+
+-- ════════════════════════════════════════════════════════════
+-- ██  MIGRATION 008 — Remove DIY pump components             ██
+-- ════════════════════════════════════════════════════════════
+-- Remove DIY pump motor/driver/gearbox/housing entries. High-torque
+-- pump assembly is outside safe DIY scope — liability risk.
+-- Keep only: commercial pump references, hopper, nozzle, tubing, bracket.
+
+-- Update Progressive Cavity Pump description to reference-only
+UPDATE parts SET description = 'REFERENCE ONLY — not included in M3 motion system kit. Purpose-built concrete 3D printing pumps from MAI, M-Tec, or StoneFlower are the proven commercial options ($5,000-6,000+). High-torque pump assembly is outside safe DIY scope.'
+WHERE name = 'Progressive Cavity Pump' AND category = 'Concrete Extrusion System';
+
+-- Update community interest entry to NEMA34 (NEMA23 was undersized)
+UPDATE supplier_options SET notes = 'INTEREST CHECK — NEMA34 closed-loop stepper (8.5-12Nm) + 10:1 planetary gearbox (~100Nm output) + TMC5160 external driver with StallGuard overload protection. Need 10 commitments for a small production batch. Estimated $300-500 for drive system (pump element separate).'
+WHERE supplier_name ILIKE '%Community Interest%US-Sourced%'
+  AND part_id = (SELECT id FROM parts WHERE name = 'Progressive Cavity Pump' LIMIT 1);
+
+-- Delete DIY pump component parts (cascade deletes supplier_options)
+DELETE FROM parts WHERE category = 'Concrete Extrusion System'
+  AND name IN (
+    'NEMA23 Planetary Geared Stepper (10:1) — Pump Drive',
+    'External Stepper Driver — TMC5160 (48V High Current)',
+    'Progressive Cavity Pump Element (Rotor + Stator)',
+    'Pump Drive Coupling — Universal Joint + Connecting Rod',
+    'Pump Housing & Bearing Assembly',
+    'NEMA23 Motor for Extruder (Direct Drive Option)',
+    '48V Power Supply for Pump Driver (Optional)'
+  );
+
+-- Update remaining extrusion parts descriptions to REFERENCE
+UPDATE parts SET description = 'REFERENCE — Material reservoir above the pump. Typically included with commercial pump system or purchased separately. HDPE or stainless for concrete compatibility.',
+  mfg_type = 'buy'
+WHERE name = 'Material Hopper 20-Liter' AND category = 'Concrete Extrusion System';
+
+UPDATE parts SET description = 'REFERENCE — Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm). Often included with commercial pump system.',
+  mfg_type = 'buy'
+WHERE name = 'Concrete Nozzle Assembly' AND category = 'Concrete Extrusion System';
+
+UPDATE parts SET description = 'REFERENCE — Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.'
+WHERE name = 'Tubing & Quick Fittings' AND category = 'Concrete Extrusion System';
+
+-- Remove Self-Manufacture options from remaining extrusion parts
+DELETE FROM supplier_options WHERE supplier_name = 'Self-Manufacture'
+  AND part_id IN (SELECT id FROM parts WHERE category = 'Concrete Extrusion System' AND name = 'Material Hopper 20-Liter');
