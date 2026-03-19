@@ -912,8 +912,136 @@ WHERE name ILIKE '%Power Supply 24V 600W%';
 UPDATE parts SET mpn = 'LRS-200-48', substitute_ok = false
 WHERE name ILIKE '%48V Power Supply%';
 
-UPDATE parts SET substitute_ok = false
+UPDATE parts SET mpn = 'BIGTREETECH-Kraken-V1.1', substitute_ok = false
 WHERE name ILIKE '%BTT Kraken%';
 
-UPDATE parts SET substitute_ok = false
+UPDATE parts SET mpn = 'SC1112', substitute_ok = false
 WHERE name ILIKE '%Raspberry Pi 5%';
+
+UPDATE parts SET mpn = 'FN9260-6-06'
+WHERE name ILIKE '%IEC C14 Power Inlet%';
+
+UPDATE parts SET mpn = 'HSC8-6-4A'
+WHERE name ILIKE '%Ferrule Crimping Tool%';
+
+UPDATE parts SET mpn = 'GX16-4'
+WHERE name ILIKE '%GX16-4 Aviation%';
+
+-- ════════════════════════════════════════════════════════════
+-- ██  MIGRATION 006 — Populate SKUs & Full Product URLs      ██
+-- ════════════════════════════════════════════════════════════
+-- Adds supplier-specific SKUs (ASINs, DigiKey PNs, Bulkman3D SKUs)
+-- and replaces bare domain URLs with actual product page links.
+-- Safe to re-run (UPDATE ... WHERE matches are idempotent).
+
+-- ── BTT Kraken — Amazon ASIN ──
+UPDATE supplier_options SET sku = 'B0CQX9XJ4W',
+  product_url = 'https://www.amazon.com/BIGTREETECH-Control-Onboard-8%C3%97TMC2160-High-Performance/dp/B0CQX9XJ4W'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%BTT Kraken%' LIMIT 1)
+  AND notes ILIKE '%BTT Kraken%';
+
+-- ── Raspberry Pi 5 8GB — Amazon ASIN ──
+UPDATE supplier_options SET sku = 'B0CK2FCG1K',
+  product_url = 'https://www.amazon.com/Raspberry-Pi-8GB-SC1112-Quad-core/dp/B0CK2FCG1K'
+WHERE supplier_name ILIKE '%Amazon%CanaKit%'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Raspberry Pi 5%' LIMIT 1);
+
+-- ── MeanWell LRS-600-24 — DigiKey & Mouser SKUs ──
+UPDATE supplier_options SET sku = '1866-LRS-600-24-ND',
+  product_url = 'https://www.digikey.com/en/products/detail/mean-well-usa-inc/LRS-600-24/16394242'
+WHERE supplier_name = 'Digi-Key'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Power Supply 24V 600W%' LIMIT 1);
+
+UPDATE supplier_options SET sku = '709-LRS-600-24',
+  product_url = 'https://www.mouser.com/ProductDetail/MEAN-WELL/LRS-600-24'
+WHERE supplier_name = 'Mouser Electronics'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Power Supply 24V 600W%' LIMIT 1);
+
+-- ── GX16-4 Connectors — Amazon ASINs ──
+UPDATE supplier_options SET sku = 'B07174LCGR',
+  product_url = 'https://www.amazon.com/Female-Connector-GX16-4-Silver-Aviation/dp/B07174LCGR'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%GX16-4 Aviation%' LIMIT 1)
+  AND notes ILIKE '%male-inline%';
+
+UPDATE supplier_options SET sku = 'B089YT5P3G'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%GX16-4 Aviation%' LIMIT 1)
+  AND sku IS NULL;
+
+-- ── Ferrule Crimper — Amazon ASINs ──
+UPDATE supplier_options SET sku = 'B00ODSJGSW',
+  product_url = 'https://www.amazon.com/IWISS-Self-Adjusting-AWG23-10-End-Sleeves-Ferrule/dp/B00ODSJGSW'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Ferrule Crimping%' LIMIT 1)
+  AND notes ILIKE '%IWISS%';
+
+UPDATE supplier_options SET sku = 'B00H950AK4',
+  product_url = 'https://www.amazon.com/IWISS-Crimper-Plier-Self-adjustable-Crimping/dp/B00H950AK4'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Ferrule Crimping%' LIMIT 1)
+  AND notes ILIKE '%Preciva%';
+
+-- ── IEC C14 Inlet — DigiKey & Mouser ──
+UPDATE supplier_options SET sku = 'FN9260-6-06',
+  product_url = 'https://www.digikey.com/en/product-highlight/s/schaffner/fn9260-series-power-entry-modules'
+WHERE supplier_name = 'Digi-Key'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%IEC C14%' LIMIT 1);
+
+-- ── Bulkman3D V-Wheels — product URLs ──
+UPDATE supplier_options SET sku = 'VW02-RS',
+  product_url = 'https://bulkman3d.com/product/vk0012/'
+WHERE supplier_name = 'Bulkman3D'
+  AND part_id IN (SELECT id FROM parts WHERE name ILIKE '%V-Groove%Wheels%' OR name ILIKE '%V-Groove Delrin%');
+
+-- ── Bulkman3D Extrusions — product URLs ──
+UPDATE supplier_options SET product_url = 'https://bulkman3d.com/product/v-slot-2080/'
+WHERE supplier_name = 'Bulkman3D'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%2080 V-Slot%1200mm%' LIMIT 1)
+  AND product_url = 'https://bulkman3d.com/product/v-slot-2080/';
+
+UPDATE supplier_options SET product_url = 'https://bulkman3d.com/product/v-slot-2040/'
+WHERE supplier_name = 'Bulkman3D'
+  AND part_id IN (SELECT id FROM parts WHERE name ILIKE '%2040 V-Slot%')
+  AND product_url = 'https://bulkman3d.com/product/v-slot-2040/';
+
+-- ── Eccentric Spacers — Amazon ASIN ──
+UPDATE supplier_options SET sku = 'B01D2FAV44',
+  product_url = 'https://www.amazon.com/Eccentric-Spacers-Full-Size-Wheels/dp/B01D2FAV44'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Eccentric Spacers%' LIMIT 1);
+
+-- ── Snap-On Ferrite Cores — Amazon ASIN ──
+UPDATE supplier_options SET sku = 'B01N0AV746',
+  product_url = 'https://www.amazon.com/Ferrite-Noise-Filter-Cable-3-5mm/dp/B01N0AV746'
+WHERE supplier_name = 'Amazon'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Ferrite Cores%' LIMIT 1);
+
+-- ── NEMA23 Stepper Motors — StepperOnline product URLs ──
+UPDATE supplier_options SET sku = '23HS45-4204S1',
+  product_url = 'https://www.omc-stepperonline.com/nema-23-bipolar-3nm-425oz-in-8mm-diameter-4-2a-57x57x113mm-4-wires-stepper-motor-23hs45-4204s1'
+WHERE supplier_name = 'StepperOnline US'
+  AND notes ILIKE '%3Nm 8mm%'
+  AND product_url = 'https://www.omc-stepperonline.com';
+
+-- ── Planetary Geared Stepper — StepperOnline SKUs ──
+UPDATE supplier_options SET sku = '23HS30-2804S-HG10'
+WHERE supplier_name = 'StepperOnline US'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Planetary Geared%' LIMIT 1)
+  AND notes ILIKE '%HG10%';
+
+UPDATE supplier_options SET sku = '23HS30-2904S-MG10'
+WHERE supplier_name = 'StepperOnline US'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%Planetary Geared%' LIMIT 1)
+  AND notes ILIKE '%MG10%';
+
+-- ── Continental CP22 Pump ──
+UPDATE supplier_options SET sku = 'CP22'
+WHERE supplier_name ILIKE '%Continental%'
+  AND part_id IN (SELECT id FROM parts WHERE name ILIKE '%Progressive Cavity Pump Element%');
+
+-- ── TMC5160 Pro — West3D ──
+UPDATE supplier_options SET sku = 'TMC5160T-Pro-V1.2'
+WHERE supplier_name ILIKE '%West3D%'
+  AND part_id = (SELECT id FROM parts WHERE name ILIKE '%External Stepper Driver%TMC5160%' LIMIT 1);
