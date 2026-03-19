@@ -474,6 +474,53 @@
         .mfg-toggle-btn.active-print { background: var(--badge-print); color: var(--badge-print-text); border-color: var(--badge-print-text); }
         .mfg-toggle-btn.active-cnc   { background: var(--badge-cnc);   color: var(--badge-cnc-text);   border-color: var(--badge-cnc-text); }
 
+        /* ── Exclude / "I Have This" Checkbox ─────────── */
+        .part-exclude {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            margin-left: 6px;
+        }
+        .part-exclude input { accent-color: var(--accent); cursor: pointer; margin: 0; }
+        .part-exclude:hover { color: var(--text); }
+        .part-row.user-excluded .part-summary {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+        .part-row.user-excluded .supplier-panel { display: none !important; }
+
+        /* ── Inline Help Banner ──────────────────────── */
+        .bom-help {
+            background: rgba(151,215,0,0.06);
+            border: 1px solid rgba(151,215,0,0.15);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .bom-help-text span { color: var(--accent); font-weight: 600; }
+        .bom-help-dismiss {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .bom-help-dismiss:hover { color: var(--text); }
+
         /* ── Preferred Supplier Highlight ─────────────── */
         .supplier-card.preferred {
             border-color: var(--accent) !important;
@@ -960,6 +1007,17 @@
         </div>
     </div>
 
+    <div class="bom-help" id="bomHelp">
+        <div class="bom-help-text">
+            <span>Customize your build:</span>
+            Check <span>I have this</span> to exclude parts you own.
+            Toggle <span>Buy / Print / CNC</span> on fabricated parts.
+            Click a <span>supplier card</span> to mark it preferred.
+            Then <span>Export JSON</span> → paste into your AI assistant for a priced buy list.
+        </div>
+        <button class="bom-help-dismiss" onclick="this.closest('.bom-help').style.display='none'" title="Dismiss">&times;</button>
+    </div>
+
     <div id="bomContent">
         <div class="loading-spinner"><div class="spinner"></div></div>
     </div>
@@ -1377,6 +1435,8 @@ function renderBOM() {
 
             // Auto-expand parts when supplier filter active
             const expanded = activeSupplier ? ' expanded' : '';
+            const isExcluded = !!choice.excluded;
+            const excludedClass = isExcluded ? ' user-excluded' : '';
 
             // Check if any supplier has a STEP file
             const hasCAD = approved.some(o => o.step_url);
@@ -1386,7 +1446,7 @@ function renderBOM() {
             const pd = getPartDisplay(part);
             const noteHtml = pd.note ? `<span class="model-note">${escHtml(pd.note)}</span>` : '';
 
-            html += `<div class="part-row${expanded}" data-part-id="${part.id}">`;
+            html += `<div class="part-row${expanded}${excludedClass}" data-part-id="${part.id}">`;
             html += `<div class="part-summary" onclick="togglePart(this)">
                 <div>
                     <div class="part-name">${escHtml(pd.name)}${cadBadge}${noteHtml}</div>
@@ -1394,6 +1454,9 @@ function renderBOM() {
                 </div>
                 <div class="part-qty">${pd.qty}<small>${escHtml(pd.unit)}</small></div>
                 <span class="mfg-badge ${mfgClass}">${mfgLabel}</span>${toggleHtml}
+                <label class="part-exclude" onclick="event.stopPropagation()">
+                    <input type="checkbox" ${isExcluded ? 'checked' : ''} onchange="toggleExclude(${part.id}, this.checked)">I have this
+                </label>
                 <div class="supplier-count">${approved.length} supplier${approved.length !== 1 ? 's' : ''}</div>
             </div>`;
 
@@ -1606,6 +1669,19 @@ function setMfgChoice(partId, mfgType) {
     renderBOM();
 }
 
+function toggleExclude(partId, excluded) {
+    if (!App.userChoices[partId]) App.userChoices[partId] = {};
+    if (excluded) {
+        App.userChoices[partId].excluded = true;
+    } else {
+        delete App.userChoices[partId].excluded;
+    }
+    if (!App.userChoices[partId].mfg && !App.userChoices[partId].preferredSupplier && !App.userChoices[partId].excluded) {
+        delete App.userChoices[partId];
+    }
+    renderBOM();
+}
+
 function setPreferredSupplier(partId, optionId) {
     if (!App.userChoices[partId]) App.userChoices[partId] = {};
     // Toggle off if clicking the current preferred
@@ -1627,6 +1703,7 @@ function getUserChoiceSummary() {
         const part = App.parts.find(p => p.id === parseInt(partId));
         if (!part) return;
         const entry = { part: part.name };
+        if (choice.excluded) entry.excluded = true;
         if (choice.mfg) entry.build_method = choice.mfg;
         if (choice.preferredSupplier) {
             const opts = App.suppliersByPart[partId] || [];
@@ -1733,7 +1810,7 @@ function exportCSV() {
         ? `bom${modelSuffix}_${supplierKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_order.csv`
         : `concrete_printer_bom${modelSuffix}.csv`;
 
-    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
+    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Excluded', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
 
     const grouped = {};
     App.parts.forEach(p => {
@@ -1758,6 +1835,7 @@ function exportCSV() {
 
             const pd = getPartDisplay(part);
             const choice = App.userChoices[part.id] || {};
+            const userExcl = choice.excluded ? 'yes' : '';
             const userMfg = choice.mfg || '';
             const prefSuppId = choice.preferredSupplier;
             if (!options.length) {
@@ -1766,7 +1844,7 @@ function exportCSV() {
                     pd.qty, pd.unit, part.mfg_type,
                     part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                     part.exclude_from_kit ? 'yes' : 'no',
-                    userMfg, '',
+                    userExcl, userMfg, '',
                     '', '', '', '', ''
                 ]);
             } else {
@@ -1777,7 +1855,7 @@ function exportCSV() {
                         pd.qty, pd.unit, part.mfg_type,
                         part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                         part.exclude_from_kit ? 'yes' : 'no',
-                        userMfg, isPref,
+                        userExcl, userMfg, isPref,
                         opt.supplier_name, opt.sku || '', opt.product_url || '',
                         opt.notes || '', opt.step_url || ''
                     ]);
@@ -1824,7 +1902,7 @@ function exportJSON() {
         model: App.activeModel,
         generated: new Date().toISOString(),
         disclaimer: 'Supplier listings are community-contributed reference information, not endorsements. Prices, availability, and specifications may change. Verify all details before purchasing.',
-        instructions: 'For each part: if user_build_method is set, use that method (buy/print/cnc). If user_preferred_supplier is set, prioritize that supplier. Parts with exclude_from_kit=true are informational only — skip them unless the user asks. Use MPN and SKU for exact product matching.',
+        instructions: 'Skip parts where exclude_from_kit=true OR user_excluded=true. For remaining parts: if user_build_method is set, use that method (buy/print/cnc). If user_preferred_supplier is set, prioritize that supplier. Use MPN and SKU for exact product matching.',
         user_selections: hasUserChoices ? getUserChoiceSummary() : 'No selections made — use default suppliers and build methods.',
         categories: orderedCategories.map(cat => ({
             name: cat,
@@ -1844,6 +1922,7 @@ function exportJSON() {
                     mpn: part.mpn || null,
                     substitute_ok: part.substitute_ok !== false,
                     exclude_from_kit: !!part.exclude_from_kit,
+                    user_excluded: !!choice.excluded,
                     user_build_method: choice.mfg || null,
                     user_preferred_supplier: preferredOpt ? preferredOpt.supplier_name : null,
                     suppliers: options.map(o => ({
