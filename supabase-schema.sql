@@ -1045,3 +1045,14 @@ WHERE supplier_name ILIKE '%Continental%'
 UPDATE supplier_options SET sku = 'TMC5160T-Pro-V1.2'
 WHERE supplier_name ILIKE '%West3D%'
   AND part_id = (SELECT id FROM parts WHERE name ILIKE '%External Stepper Driver%TMC5160%' LIMIT 1);
+
+-- ════════════════════════════════════════════════════════════
+-- ██  MIGRATION 007 — Concrete Extrusion = External Scope    ██
+-- ════════════════════════════════════════════════════════════
+-- The M3-CRETE is a movement system. Concrete pump is outside project
+-- scope ($5,000-6,000+ for commercial pumps). Mark entire category
+-- as excluded from default kit pricing. Parts remain in BOM for
+-- reference but are not included in cost summaries.
+
+UPDATE parts SET exclude_from_kit = true
+WHERE category = 'Concrete Extrusion System';
