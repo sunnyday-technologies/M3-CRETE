@@ -135,6 +135,62 @@
         }
         .spec-chip strong { color: var(--accent); margin-right: 4px; }
 
+        /* ── Model Selector ──────────────────────────── */
+        .model-selector {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+        }
+        .model-selector-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+        .model-chip {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .model-chip:hover {
+            border-color: var(--accent);
+            background: rgba(151,215,0,0.08);
+        }
+        .model-chip.active {
+            background: var(--accent);
+            color: #1a1d21;
+            border-color: var(--accent);
+        }
+        .model-volume {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+        .model-volume strong { color: var(--accent); }
+
+        .model-note {
+            font-size: 11px;
+            color: var(--accent-dim);
+            font-style: italic;
+            margin-left: 6px;
+        }
+
         /* ── Toolbar ──────────────────────────────────── */
         .toolbar {
             display: flex;
@@ -769,6 +825,17 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── Disclaimer ──────────────────────────────── */
+        .bom-disclaimer {
+            margin-top: 32px;
+            padding: 12px 16px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            text-align: center;
+            line-height: 1.6;
+        }
+
         /* ── Responsive ───────────────────────────────── */
         @media (max-width: 768px) {
             .header-inner { flex-direction: column; text-align: center; }
@@ -797,9 +864,12 @@
 <div class="app-container">
     <div class="specs-bar" id="specsBar"></div>
 
+    <div class="model-selector" id="modelSelector"></div>
+
     <div class="toolbar">
         <input type="text" id="searchInput" placeholder="Search parts or suppliers..." oninput="handleSearch()">
         <button class="btn" onclick="exportCSV()">Export CSV</button>
+        <button class="btn" onclick="exportJSON()">Export JSON</button>
         <button class="btn" onclick="toggleCADLibrary()" id="cadLibraryBtn" style="display:none">
             <svg style="width:14px;height:14px;fill:currentColor;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             CAD Library <span id="cadCount" style="background:var(--accent);color:white;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:4px"></span>
@@ -850,6 +920,10 @@
 
     <div id="bomContent">
         <div class="loading-spinner"><div class="spinner"></div></div>
+    </div>
+
+    <div class="bom-disclaimer">
+        Supplier listings are community-contributed reference information, not endorsements. Prices, availability, and specifications may change. Verify all details before purchasing.
     </div>
 </div>
 
@@ -903,6 +977,7 @@ const App = {
     pendingQueue: [],       // moderation queue
     searchTerm: '',
     activeSupplier: null,   // supplier filter
+    activeModel: BOM_CONFIG.DEFAULT_MODEL || 'M3-1',  // model variant
     suggestPartId: null,    // for the modal
 };
 
@@ -914,6 +989,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('projectTitle').textContent = BOM_CONFIG.PROJECT_TITLE;
     document.getElementById('projectSubtitle').textContent = BOM_CONFIG.PROJECT_SUBTITLE;
     renderSpecs();
+    renderModelSelector();
 
     // Init Supabase
     App.sb = supabase.createClient(BOM_CONFIG.SUPABASE_URL, BOM_CONFIG.SUPABASE_ANON_KEY);
@@ -1084,9 +1160,56 @@ async function loadModerationQueue() {
 // ────────────────────────────────────────────────────
 function renderSpecs() {
     const bar = document.getElementById('specsBar');
-    bar.innerHTML = Object.entries(BOM_CONFIG.BUILD_SPECS)
+    const specs = { ...BOM_CONFIG.BUILD_SPECS };
+    // Override Build Volume based on active model
+    const model = BOM_CONFIG.MODEL_VARIANTS?.[App.activeModel];
+    if (model?.volume) {
+        specs['Build Volume'] = model.volume;
+    }
+    // Remove Variants from spec chips (shown in model selector instead)
+    delete specs['Variants'];
+    bar.innerHTML = Object.entries(specs)
         .map(([k, v]) => `<div class="spec-chip"><strong>${escHtml(k)}:</strong> ${escHtml(v)}</div>`)
         .join('');
+}
+
+// ────────────────────────────────────────────────────
+// Model Selector
+// ────────────────────────────────────────────────────
+function renderModelSelector() {
+    const container = document.getElementById('modelSelector');
+    if (!BOM_CONFIG.MODEL_VARIANTS) { container.style.display = 'none'; return; }
+
+    const variants = BOM_CONFIG.MODEL_VARIANTS;
+    const active = App.activeModel;
+    const activeModel = variants[active];
+
+    let html = '<span class="model-selector-label">Model</span>';
+    html += Object.entries(variants).map(([key, v]) =>
+        `<div class="model-chip${key === active ? ' active' : ''}" onclick="setModel('${escAttr(key)}')">${escHtml(v.label)}</div>`
+    ).join('');
+    html += `<span class="model-volume"><strong>Build:</strong> ${escHtml(activeModel?.volume || '')}</span>`;
+    container.innerHTML = html;
+}
+
+function setModel(modelKey) {
+    if (!BOM_CONFIG.MODEL_VARIANTS?.[modelKey]) return;
+    App.activeModel = modelKey;
+    renderSpecs();
+    renderModelSelector();
+    renderBOM();
+}
+
+function getPartDisplay(part) {
+    const model = BOM_CONFIG.MODEL_VARIANTS?.[App.activeModel];
+    const override = model?.overrides?.[part.name];
+    if (!override) return { name: part.name, qty: part.qty, unit: part.unit, note: null };
+    return {
+        name: override.name || part.name,
+        qty: override.qty ?? part.qty,
+        unit: override.unit || part.unit,
+        note: override.note || null
+    };
 }
 
 // ────────────────────────────────────────────────────
@@ -1196,13 +1319,17 @@ function renderBOM() {
             const hasCAD = approved.some(o => o.step_url);
             const cadBadge = hasCAD ? `<span class="part-cad-indicator">${stepIcon(10)} 3D</span>` : '';
 
+            // Apply model variant overrides
+            const pd = getPartDisplay(part);
+            const noteHtml = pd.note ? `<span class="model-note">${escHtml(pd.note)}</span>` : '';
+
             html += `<div class="part-row${expanded}" data-part-id="${part.id}">`;
             html += `<div class="part-summary" onclick="togglePart(this)">
                 <div>
-                    <div class="part-name">${escHtml(part.name)}${cadBadge}</div>
+                    <div class="part-name">${escHtml(pd.name)}${cadBadge}${noteHtml}</div>
                     <div class="part-desc">${escHtml(part.description || '')}</div>
                 </div>
-                <div class="part-qty">${part.qty}<small>${escHtml(part.unit)}</small></div>
+                <div class="part-qty">${pd.qty}<small>${escHtml(pd.unit)}</small></div>
                 <span class="mfg-badge ${mfgClass}">${mfgLabel}</span>
                 <div class="supplier-count">${approved.length} supplier${approved.length !== 1 ? 's' : ''}</div>
             </div>`;
@@ -1486,11 +1613,12 @@ async function rejectSubmission(id) {
 function exportCSV() {
     const activeSupplier = App.activeSupplier;
     const supplierKey = activeSupplier ? normalizeSupplier(activeSupplier) : null;
+    const modelSuffix = App.activeModel ? `_${App.activeModel.toLowerCase().replace(/[^a-z0-9]+/g, '_')}` : '';
     const fileName = supplierKey
-        ? `bom_${supplierKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_order.csv`
-        : 'concrete_printer_bom.csv';
+        ? `bom${modelSuffix}_${supplierKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_order.csv`
+        : `concrete_printer_bom${modelSuffix}.csv`;
 
-    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'Supplier', 'Product URL', 'Notes', 'STEP File URL']];
+    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
 
     const grouped = {};
     App.parts.forEach(p => {
@@ -1513,18 +1641,24 @@ function exportCSV() {
                 if (!options.length) return; // skip parts without this supplier
             }
 
+            const pd = getPartDisplay(part);
             if (!options.length) {
                 rows.push([
-                    part.category, part.name, part.description || '',
-                    part.qty, part.unit, part.mfg_type, '', '', '', ''
+                    part.category, pd.name, part.description || '',
+                    pd.qty, pd.unit, part.mfg_type,
+                    part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
+                    part.exclude_from_kit ? 'yes' : 'no',
+                    '', '', '', '', ''
                 ]);
             } else {
                 options.forEach(opt => {
                     rows.push([
-                        part.category, part.name, part.description || '',
-                        part.qty, part.unit, part.mfg_type,
-                        opt.supplier_name, opt.product_url || '', opt.notes || '',
-                        opt.step_url || ''
+                        part.category, pd.name, part.description || '',
+                        pd.qty, pd.unit, part.mfg_type,
+                        part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
+                        part.exclude_from_kit ? 'yes' : 'no',
+                        opt.supplier_name, opt.sku || '', opt.product_url || '',
+                        opt.notes || '', opt.step_url || ''
                     ]);
                 });
             }
@@ -1542,6 +1676,68 @@ function exportCSV() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast(supplierKey ? `${activeSupplier} order exported` : 'CSV exported', 'success');
+}
+
+// ────────────────────────────────────────────────────
+// JSON Export (Agent-Readable)
+// ────────────────────────────────────────────────────
+function exportJSON() {
+    const modelSuffix = App.activeModel ? `_${App.activeModel.toLowerCase().replace(/[^a-z0-9]+/g, '_')}` : '';
+    const fileName = `concrete_printer_bom${modelSuffix}.json`;
+
+    const grouped = {};
+    App.parts.forEach(p => {
+        if (!grouped[p.category]) grouped[p.category] = [];
+        grouped[p.category].push(p);
+    });
+
+    const orderedCategories = BOM_CONFIG.CATEGORY_ORDER.filter(c => grouped[c]);
+    Object.keys(grouped).forEach(c => {
+        if (!orderedCategories.includes(c)) orderedCategories.push(c);
+    });
+
+    const bomData = {
+        project: BOM_CONFIG.PROJECT_TITLE,
+        model: App.activeModel,
+        generated: new Date().toISOString(),
+        disclaimer: 'Supplier listings are community-contributed reference information, not endorsements. Prices, availability, and specifications may change. Verify all details before purchasing.',
+        categories: orderedCategories.map(cat => ({
+            name: cat,
+            parts: (grouped[cat] || []).map(part => {
+                const pd = getPartDisplay(part);
+                const options = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
+                return {
+                    name: pd.name,
+                    description: part.description || '',
+                    qty: pd.qty,
+                    unit: pd.unit,
+                    mfg_type: part.mfg_type,
+                    mpn: part.mpn || null,
+                    substitute_ok: part.substitute_ok !== false,
+                    exclude_from_kit: !!part.exclude_from_kit,
+                    suppliers: options.map(o => ({
+                        supplier: o.supplier_name,
+                        sku: o.sku || null,
+                        url: o.product_url || null,
+                        notes: o.notes || null,
+                        step_url: o.step_url || null
+                    }))
+                };
+            })
+        }))
+    };
+
+    const json = JSON.stringify(bomData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('JSON exported — feed this to your AI assistant for pricing', 'success');
 }
 
 // ────────────────────────────────────────────────────
