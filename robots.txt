@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /cdn-cgi/
+Allow: /
+
+Sitemap: https://m3-crete.com/sitemap.xml
