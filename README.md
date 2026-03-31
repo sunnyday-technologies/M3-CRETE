@@ -125,7 +125,9 @@ This project is licensed under the **CERN Open Hardware Licence Version 2 — We
 
 You may use, modify, and distribute this design under the terms of that license. Modifications to covered files must be made available under the same license. This project includes no warranty of any kind.
 
-See [LICENSES/](LICENSES/) for full license text.
+**Dual License Notice:** V-Slot component CAD models in `CAD/Components/` are based on [OpenBuilds](https://openbuilds.com) designs and are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). All other project files (custom parts, BOM viewer, firmware configs, documentation) are licensed under CERN-OHL-W-2.0.
+
+See [LICENSES/](LICENSES/) for full license texts.
 
 ---
 
