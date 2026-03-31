@@ -365,13 +365,16 @@
         }
         .supplier-filter-notice.visible { display: flex; justify-content: space-between; align-items: center; }
 
-        /* ── Supplier Gap Warning ─────────────────────── */
+        /* ── Supplier Coverage Indicators ─────────────── */
+        .part-row.supplier-covered {
+            border-left: 3px solid var(--green);
+        }
         .part-row.no-supplier-match {
             opacity: 0.55;
             border-left: 3px solid #f59e0b;
         }
         .part-row.no-supplier-match .part-summary::after {
-            content: '⚠ Not available from this supplier';
+            content: '\26A0 Not available from selected suppliers';
             display: block;
             font-size: 11px;
             color: #f59e0b;
@@ -381,6 +384,23 @@
             color: #f59e0b;
             font-weight: 600;
             margin-left: 12px;
+        }
+        .supplier-filter-notice .full-coverage {
+            color: var(--green);
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        .coverage-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .coverage-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
         }
 
         /* ── Category Sections ────────────────────────── */
@@ -991,15 +1011,16 @@
 
     <div class="supplier-summary" id="supplierSummary">
         <div class="supplier-summary-header">
-            <h3>Suppliers &amp; Purchase Orders</h3>
-            <button class="supplier-clear" id="supplierClearBtn" onclick="clearSupplierFilter()">Clear filter</button>
+            <h3>Select Your Suppliers</h3>
+            <button class="supplier-clear" id="supplierClearBtn" onclick="clearSupplierFilter()">Clear all</button>
         </div>
+        <p style="font-size:12px;color:var(--text-dim);margin:-4px 0 8px 0">Click suppliers to build your shopping list. Parts not covered will be flagged.</p>
         <div class="supplier-chips" id="supplierChips"></div>
     </div>
 
     <div class="supplier-filter-notice" id="supplierFilterNotice">
         <span id="supplierFilterText"></span>
-        <button class="supplier-clear visible" onclick="clearSupplierFilter()">Show all</button>
+        <button class="supplier-clear visible" onclick="clearSupplierFilter()">Clear all</button>
     </div>
 
     <div class="mod-panel" id="modPanel">
@@ -1095,7 +1116,7 @@ const App = {
     suppliersByPart: {},    // part_id -> [options]
     pendingQueue: [],       // moderation queue
     searchTerm: '',
-    activeSupplier: null,   // supplier filter
+    activeSuppliers: new Set(),   // multi-supplier selection
     activeModel: BOM_CONFIG.DEFAULT_MODEL || 'M3-2',  // model variant
     suggestPartId: null,    // for the modal
     userChoices: {},         // part_id -> { mfg: 'buy'|'print'|'cnc', preferredSupplier: opt_id|null }
@@ -1388,19 +1409,23 @@ function renderBOM() {
 
     // ── Filter logic ──────────────────────────────────
     const term = App.searchTerm.toLowerCase();
-    const activeSupplier = App.activeSupplier;
+    const hasSupplierFilter = App.activeSuppliers.size > 0;
 
     // Show/hide filter notice
     const filterNotice = document.getElementById('supplierFilterNotice');
     const filterText = document.getElementById('supplierFilterText');
-    if (activeSupplier) {
-        const supplierPartCount = getPartsForSupplier(activeSupplier).length;
+    if (hasSupplierFilter) {
         const totalNonExcluded = App.parts.filter(p => !p.exclude_from_kit && !(App.userChoices[p.id] || {}).excluded).length;
-        const gapCount = totalNonExcluded - supplierPartCount;
-        const gapHtml = gapCount > 0
-            ? `<span class="gap-warning">⚠ ${gapCount} part${gapCount !== 1 ? 's' : ''} not available from this supplier — shown dimmed below</span>`
-            : '';
-        filterText.innerHTML = `Showing <strong>${supplierPartCount} parts</strong> available from <strong>${escHtml(activeSupplier)}</strong>${gapHtml}`;
+        const coveredParts = App.parts.filter(p => !p.exclude_from_kit && !(App.userChoices[p.id] || {}).excluded && partCoveredBySelected(p)).length;
+        const gapCount = totalNonExcluded - coveredParts;
+        const pct = totalNonExcluded > 0 ? Math.round((coveredParts / totalNonExcluded) * 100) : 0;
+        const supplierNames = [...App.activeSuppliers].join(' + ');
+        const statusHtml = gapCount > 0
+            ? `<span class="gap-warning">\u26A0 ${gapCount} part${gapCount !== 1 ? 's' : ''} not covered \u2014 shown dimmed below</span>`
+            : `<span class="full-coverage">\u2705 Full coverage \u2014 all parts available!</span>`;
+        const barColor = pct === 100 ? 'var(--green)' : pct >= 80 ? 'var(--amber)' : 'var(--red)';
+        filterText.innerHTML = `<strong>${coveredParts}/${totalNonExcluded} parts</strong> covered by <strong>${escHtml(supplierNames)}</strong>${statusHtml}` +
+            `<div class="coverage-bar"><div class="coverage-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>`;
         filterNotice.classList.add('visible');
     } else {
         filterNotice.classList.remove('visible');
@@ -1415,12 +1440,11 @@ function renderBOM() {
         // Text search filter
         if (term) parts = parts.filter(p => matchesSearch(p, term));
 
-        // Supplier filter: NEVER hide parts — sort matched to top, unmatched to bottom
-        // This prevents silent gaps in exported BOMs
-        if (activeSupplier) {
+        // Supplier filter: NEVER hide parts — sort covered to top, uncovered to bottom
+        if (hasSupplierFilter) {
             parts = parts.slice().sort((a, b) => {
-                const aHas = partHasSupplier(a, activeSupplier) ? 0 : 1;
-                const bHas = partHasSupplier(b, activeSupplier) ? 0 : 1;
+                const aHas = partCoveredBySelected(a) ? 0 : 1;
+                const bHas = partCoveredBySelected(b) ? 0 : 1;
                 return aHas - bHas;
             });
         }
@@ -1465,10 +1489,12 @@ function renderBOM() {
             }
 
             // Auto-expand parts when supplier filter active
-            const expanded = activeSupplier ? ' expanded' : '';
+            const expanded = hasSupplierFilter ? ' expanded' : '';
             const isExcluded = !!choice.excluded;
             const excludedClass = isExcluded ? ' user-excluded' : '';
-            const noSupplierMatch = activeSupplier && !partHasSupplier(part, activeSupplier) ? ' no-supplier-match' : '';
+            const isCovered = hasSupplierFilter && partCoveredBySelected(part);
+            const isGap = hasSupplierFilter && !partCoveredBySelected(part);
+            const coverageClass = isCovered ? ' supplier-covered' : (isGap ? ' no-supplier-match' : '');
 
             // Check if any supplier has a STEP file
             const hasCAD = approved.some(o => o.step_url);
@@ -1478,7 +1504,7 @@ function renderBOM() {
             const pd = getPartDisplay(part);
             const noteHtml = pd.note ? `<span class="model-note">${escHtml(pd.note)}</span>` : '';
 
-            html += `<div class="part-row${expanded}${excludedClass}${noSupplierMatch}" data-part-id="${part.id}">`;
+            html += `<div class="part-row${expanded}${excludedClass}${coverageClass}" data-part-id="${part.id}">`;
             html += `<div class="part-summary" onclick="togglePart(this)">
                 <div>
                     <div class="part-name">${escHtml(pd.name)}${cadBadge}${noteHtml}</div>
@@ -1496,15 +1522,15 @@ function renderBOM() {
             html += '<div class="supplier-panel"><div class="supplier-list">';
 
             approved.forEach(opt => {
-                const isHighlighted = activeSupplier && normalizeSupplier(opt.supplier_name) === normalizeSupplier(activeSupplier);
+                const isSelectedSupplier = hasSupplierFilter && App.activeSuppliers.has(normalizeSupplier(opt.supplier_name));
                 const isPreferred = choice.preferredSupplier === opt.id;
-                const highlightStyle = isHighlighted && !isPreferred ? ' style="border-color:var(--accent);background:rgba(151,215,0,0.08);"' : '';
+                const highlightStyle = isSelectedSupplier && !isPreferred ? 'border-color:var(--accent);background:rgba(151,215,0,0.08);' : '';
                 const preferredClass = isPreferred ? ' preferred' : '';
                 const stepBadge = opt.step_url
                     ? `<a class="step-badge" href="${escAttr(opt.step_url)}" target="_blank" rel="noopener" title="STEP/3D model available" onclick="event.stopPropagation()">${stepIcon()} STEP</a>`
                     : '';
 
-                html += `<div class="supplier-card${preferredClass}" onclick="setPreferredSupplier(${part.id},${opt.id})" style="cursor:pointer;${isHighlighted && !isPreferred ? 'border-color:var(--accent);background:rgba(151,215,0,0.08);' : ''}">
+                html += `<div class="supplier-card${preferredClass}" onclick="setPreferredSupplier(${part.id},${opt.id})" style="cursor:pointer;${highlightStyle}">
                     <div class="supplier-info">
                         <span class="supplier-name">${escHtml(opt.supplier_name)}</span>
                         ${stepBadge}
@@ -1586,7 +1612,7 @@ function renderSupplierSummary() {
     const clearBtn = document.getElementById('supplierClearBtn');
 
     chipsEl.innerHTML = sorted.map(s => {
-        const isActive = App.activeSupplier && normalizeSupplier(App.activeSupplier) === s.displayName;
+        const isActive = App.activeSuppliers.has(s.displayName);
         return `<div class="supplier-chip${isActive ? ' active' : ''}"
                      onclick="toggleSupplierFilter('${escAttr(s.displayName)}')"
                      title="${s.optionCount} options across ${s.partIds.size} parts">
@@ -1595,7 +1621,7 @@ function renderSupplierSummary() {
         </div>`;
     }).join('');
 
-    clearBtn.classList.toggle('visible', !!App.activeSupplier);
+    clearBtn.classList.toggle('visible', App.activeSuppliers.size > 0);
 }
 
 function getPartsForSupplier(supplierName) {
@@ -1612,17 +1638,23 @@ function partHasSupplier(part, supplierName) {
     return opts.some(o => normalizeSupplier(o.supplier_name) === key);
 }
 
+function partCoveredBySelected(part) {
+    if (App.activeSuppliers.size === 0) return false;
+    const opts = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
+    return opts.some(o => App.activeSuppliers.has(normalizeSupplier(o.supplier_name)));
+}
+
 function toggleSupplierFilter(supplierName) {
-    if (App.activeSupplier && normalizeSupplier(App.activeSupplier) === supplierName) {
-        App.activeSupplier = null;
+    if (App.activeSuppliers.has(supplierName)) {
+        App.activeSuppliers.delete(supplierName);
     } else {
-        App.activeSupplier = supplierName;
+        App.activeSuppliers.add(supplierName);
     }
     renderBOM();
 }
 
 function clearSupplierFilter() {
-    App.activeSupplier = null;
+    App.activeSuppliers.clear();
     renderBOM();
 }
 
@@ -1835,12 +1867,10 @@ async function rejectSubmission(id) {
 // CSV Export
 // ────────────────────────────────────────────────────
 function exportCSV() {
-    const activeSupplier = App.activeSupplier;
-    const supplierKey = activeSupplier ? normalizeSupplier(activeSupplier) : null;
+    const hasFilter = App.activeSuppliers.size > 0;
     const modelSuffix = App.activeModel ? `_${App.activeModel.toLowerCase().replace(/[^a-z0-9]+/g, '_')}` : '';
-    const fileName = supplierKey
-        ? `bom${modelSuffix}_${supplierKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_order.csv`
-        : `concrete_printer_bom${modelSuffix}.csv`;
+    const supplierSuffix = hasFilter ? '_' + [...App.activeSuppliers].map(s => s.toLowerCase().replace(/[^a-z0-9]+/g, '_')).join('+') : '';
+    const fileName = `bom${modelSuffix}${supplierSuffix}_order.csv`;
 
     const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Excluded', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
 
@@ -1859,13 +1889,13 @@ function exportCSV() {
         (grouped[cat] || []).forEach(part => {
             let options = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
 
-            // If supplier filter active, prefer that supplier's options but NEVER skip parts
-            if (supplierKey) {
-                const filtered = options.filter(o => normalizeSupplier(o.supplier_name) === supplierKey);
+            // If supplier filter active, prefer selected suppliers' options but NEVER skip parts
+            if (hasFilter) {
+                const filtered = options.filter(o => App.activeSuppliers.has(normalizeSupplier(o.supplier_name)));
                 if (filtered.length) {
                     options = filtered;
                 } else {
-                    // Part has no option from this supplier — include with warning, no supplier columns
+                    // Part has no option from selected suppliers — include with empty supplier columns
                     options = [];
                 }
             }
@@ -1911,15 +1941,16 @@ function exportCSV() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    // Count parts without this supplier for warning
-    if (supplierKey) {
+    // Count parts without selected suppliers for warning
+    if (hasFilter) {
         const totalParts = App.parts.filter(p => !p.exclude_from_kit).length;
-        const coveredParts = getPartsForSupplier(App.activeSupplier).length;
+        const coveredParts = App.parts.filter(p => !p.exclude_from_kit && partCoveredBySelected(p)).length;
         const gaps = totalParts - coveredParts;
-        const gapMsg = gaps > 0 ? ` (⚠ ${gaps} parts need other suppliers)` : ' (complete coverage)';
-        showToast(`${App.activeSupplier} order exported${gapMsg}`, gaps > 0 ? 'warning' : 'success');
+        const supplierNames = [...App.activeSuppliers].join(' + ');
+        const gapMsg = gaps > 0 ? ` (\u26A0 ${gaps} parts need other suppliers)` : ' (\u2705 complete coverage)';
+        showToast(`${supplierNames} order exported${gapMsg}`, gaps > 0 ? 'warning' : 'success');
     } else {
-        showToast('CSV exported', 'success');
+        showToast('Full BOM exported', 'success');
     }
 }
 
