@@ -62,7 +62,9 @@ const BOM_CONFIG = {
         'GT2 Timing Belt 10mm (Reinforced)': { qty: 5, note: 'X-axis belt: ~3m for 1m travel' },
         // Wiring (shorter X run)
         'Cable Drag Chain (Sealed)': { qty: 3, unit: 'meters total (X: 1.5m + Y: 1.3m)', note: 'Shorter X-axis drag chain' },
-        'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 15, unit: 'meters (1 spool)', note: 'Shorter X-axis run' }
+        'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 15, unit: 'meters (1 spool)', note: 'Shorter X-axis run' },
+        // Reinforcement not needed at 1m span
+        'Frame Stiffener — Long Span Reinforcement': { qty: 0, note: 'Not required — 1m spans have adequate stiffness without reinforcement' }
       }
     },
     'M3-2': {
@@ -92,7 +94,8 @@ const BOM_CONFIG = {
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 25, unit: 'meters (2 spools)', note: 'Longer runs to X+Y motors' },
         'Power Wire \u2014 12AWG Silicone (Red + Black)': { qty: 3, unit: 'meters each color (6m total)', note: 'Longer PSU-to-board run' },
         'Distribution Wire \u2014 18AWG (Red + Black)': { qty: 10, unit: 'meters total (5m each color)', note: 'Longer branch distribution' },
-        'Cable Sleeving, Labels & Tie Kit': { qty: 2, unit: 'kits', note: 'More cable to manage' }
+        'Cable Sleeving, Labels & Tie Kit': { qty: 2, unit: 'kits', note: 'More cable to manage' },
+        'Frame Stiffener — Long Span Reinforcement': { qty: 8, note: 'Both X and Y axes have 2m+ spans — 2 bars per rail' }
       }
     }
   }
