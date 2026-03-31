@@ -6,12 +6,7 @@
 // ============================================================
 
 const BOM_CONFIG = {
-  // Supabase project credentials (from Project Settings > API)
-  SUPABASE_URL: 'https://ykgdqfygshgrjmtniued.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ2RxZnlnc2hncmptdG5pdWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2OTU3MjIsImV4cCI6MjA4OTI3MTcyMn0.WJ7qSPsHmUoGPmcSXwEZPBvoeSx1G7ric2KN0utvmdM',
-
-  // GitHub repo for contributor verification
-  // Contributors = collaborators on this repo (checked via GitHub API)
+  // GitHub repo — supplier suggestions via Issues, BOM data in bom/data.json
   GITHUB_REPO_OWNER: 'sunnyday-technologies',
   GITHUB_REPO_NAME: 'M3-CRETE',
 
