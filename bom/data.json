@@ -1651,6 +1651,57 @@
       ]
     },
     {
+      "id": 66,
+      "category": "X-Axis Motion System",
+      "name": "Idler Pulley Mounting Plate",
+      "description": "Mounts smooth idler pulleys at belt return ends. One per belt return point: X-axis: 2, Y-axis: 4 (2 per side), Z-axis: 8 (2 per corner). 14 total. OpenBuilds Idler Pulley Plate allows belt tension adjustment via slotted mounting holes. Alternatively, can be 3D printed or the Linear Actuator End Mount plate works for end-of-rail positions. CRITICAL: Without these, belts have nothing to wrap around at the return end.",
+      "qty": 14,
+      "unit": "plates",
+      "mfg_type": "buy",
+      "sort_order": 35,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 213,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/pl0007/",
+          "notes": "Idler Pulley Plate - V-Slot and Open Rail compatible, belt tension adjustable",
+          "sku": "PL0007",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Plates/Idler Pulley Plate.step",
+          "approved": true
+        },
+        {
+          "id": 214,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Idler Pulley Plate - ships from US warehouse (Oklahoma)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 215,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=V-slot+idler+pulley+plate",
+          "notes": "Search for V-slot idler pulley plate - various sellers",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 216,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "3D printable - PETG or ABS, STL in CAD/Components/Plates/",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
       "id": 53,
       "category": "Concrete Extrusion System",
       "name": "Concrete Nozzle Assembly",
