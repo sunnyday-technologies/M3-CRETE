@@ -310,7 +310,7 @@
           "product_url": "https://bulkman3d.com/",
           "notes": "20-series cast aluminum L-bracket",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Brackets/Cast Corner Bracket.step",
           "approved": true
         },
         {
@@ -352,7 +352,7 @@
           "product_url": "https://makerstore.cc/product/v-slot-20-x-80mm-4/",
           "notes": "2080 V-Slot, lengths up to 2650mm",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/V-Slot/V-Slot 20x80x1000 Linear Rail.step",
           "approved": true
         },
         {
@@ -943,7 +943,7 @@
           "product_url": "https://makerstore.cc/product/v-slot-20-x-40mm/",
           "notes": "2040 V-Slot, multiple lengths",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/V-Slot/V-Slot 20x40x1000 Linear Rail.step",
           "approved": true
         },
         {
@@ -1213,7 +1213,7 @@
           "product_url": "https://bulkman3d.com/",
           "notes": "Eccentric spacer for V-Slot (6mm bore, 10mm OD)",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Hardware/Eccentric Spacer 6mm.step",
           "approved": true
         },
         {
@@ -1339,7 +1339,7 @@
           "product_url": "https://www.omc-stepperonline.com",
           "notes": "Aluminum 20T 8mm bore GT2",
           "sku": null,
-          "step_url": null,
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Pulleys/GT2 Timing Pulley 20 Tooth.step",
           "approved": true
         },
         {
@@ -1390,7 +1390,7 @@
           "product_url": "https://www.omc-stepperonline.com",
           "notes": "Aluminum 20T 8mm bore",
           "sku": null,
-          "step_url": null,
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Pulleys/GT2 Timing Pulley 20 Tooth.step",
           "approved": true
         },
         {
@@ -1441,7 +1441,7 @@
           "product_url": "https://www.omc-stepperonline.com",
           "notes": "Aluminum 20T 8mm bore — same as X/Y",
           "sku": null,
-          "step_url": null,
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Pulleys/GT2 Timing Pulley 20 Tooth.step",
           "approved": true
         },
         {
@@ -1492,7 +1492,7 @@
           "product_url": "https://www.zyltech.com/10x-1m-2040-v-groove-extrusion-bulk-pack/",
           "notes": "10-pack 1000mm V-Groove bulk — best value",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/V-Slot/V-Slot 20x40x1000 Linear Rail.step",
           "approved": true
         },
         {
@@ -1753,7 +1753,7 @@
           "product_url": "https://makerstore.cc/",
           "notes": "Solid V-Wheel polycarbonate",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Wheels/Xtreme Solid V Wheel.step",
           "approved": true
         },
         {
@@ -1828,7 +1828,7 @@
           "product_url": "https://makerstore.cc/",
           "notes": "Solid V-Wheel polycarbonate",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Wheels/Xtreme Solid V Wheel.step",
           "approved": true
         },
         {
@@ -1912,7 +1912,7 @@
           "product_url": "https://makerstore.cc/",
           "notes": "Solid V-Wheel polycarbonate",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Wheels/Xtreme Solid V Wheel.step",
           "approved": true
         },
         {
@@ -1954,7 +1954,7 @@
           "product_url": "",
           "notes": "CNC Aluminum 8mm",
           "sku": null,
-          "step_url": "https://grabcad.com/library/v-slot-gantry-kit-universal-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Plates/V-Slot Gantry Plate 20-80mm.step",
           "approved": true
         },
         {
@@ -2056,7 +2056,7 @@
           "product_url": "",
           "notes": "CNC Aluminum 6061 6mm",
           "sku": null,
-          "step_url": "https://grabcad.com/library/v-slot-gantry-kit-universal-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Plates/V-Slot Gantry Plate 20-80mm.step",
           "approved": true
         },
         {
@@ -2200,7 +2200,7 @@
           "product_url": "",
           "notes": "CNC Aluminum 6mm",
           "sku": null,
-          "step_url": "https://grabcad.com/library/v-slot-gantry-kit-universal-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Plates/V-Slot Gantry Plate 20-80mm.step",
           "approved": true
         },
         {
@@ -2260,7 +2260,7 @@
           "product_url": "",
           "notes": "CNC Aluminum mount",
           "sku": null,
-          "step_url": "https://grabcad.com/library/openbuilds-v-slot-gantry-set-all-sizes-1",
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Plates/Motor Mount Plate Nema 23.step",
           "approved": true
         },
         {
