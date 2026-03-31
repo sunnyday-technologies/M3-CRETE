@@ -1,0 +1,2890 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-03-31T00:00:00Z",
+  "source": "https://github.com/sunnyday-technologies/M3-CRETE",
+  "parts": [
+    {
+      "id": 56,
+      "category": "Fasteners & Hardware",
+      "name": "M5 Socket Head Cap Screws",
+      "description": "Primary structural fasteners for 20-series V-Slot frame. M5 is the standard for 6mm slot width.",
+      "qty": 1,
+      "unit": "500pc kit",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 164,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "M5 SHCS assortment 500pc",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 165,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "M5 SHCS basic set 500pc",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 166,
+          "supplier_name": "Bolt Depot",
+          "product_url": "https://boltdepot.com",
+          "notes": "M5 stainless kit 500pc",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "category": "Concrete Extrusion System",
+      "name": "Progressive Cavity Pump",
+      "description": "REFERENCE ONLY — not included in M3-CRETE motion system kit. The concrete extrusion system operates at high pressure and requires commercial-grade components. Proven options include progressive cavity pump systems from established manufacturers. Contact Sunnyday Technologies for current recommendations.",
+      "qty": 1,
+      "unit": "pump",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": true,
+      "suppliers": [
+        {
+          "id": 125,
+          "supplier_name": "MAI International (Austria)",
+          "product_url": "https://mai.at/en/product-range/3d-printing/mai-2pump-pictor-3d/",
+          "notes": "MAI 2PUMP PICTOR-3D — 0.7-15.5 L/min, grain up to 2mm, analog 0-10V control. Industry standard for research and startups.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 126,
+          "supplier_name": "M-Tec (Germany)",
+          "product_url": "https://m-tec.com/",
+          "notes": "M-Tec P20 3DCP — 3-24 L/min, grain up to 4mm, Modbus-RTU control. Higher throughput for large-format printing.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 127,
+          "supplier_name": "StoneFlower 3D (Germany)",
+          "product_url": "https://www.stoneflower3d.com/store/concrete-3d-printer/",
+          "notes": "Automated concrete pump — up to 10 L/min, 40 bar, aggregates up to 6mm. Includes operator training.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 128,
+          "supplier_name": "Community Interest: US-Sourced Stepper Pump",
+          "product_url": "",
+          "notes": "INTEREST CHECK — stepper-driven PC pump using NEMA23 + external driver + Kraken stepper signal. Need 10 commitments for a small production batch.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "category": "Electronics & Control System",
+      "name": "BTT Kraken Mainboard",
+      "description": "8 stepper drivers (TMC5160) — perfect for this build: X + 2×Y + 4×Z + Extruder. StallGuard sensorless homing on all axes.",
+      "qty": 1,
+      "unit": "board",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 75,
+          "supplier_name": "Filastruder",
+          "product_url": "https://www.filastruder.com",
+          "notes": "BTT Kraken v1.0",
+          "sku": null,
+          "step_url": "https://github.com/bigtreetech/Kraken/tree/master/Hardware",
+          "approved": true
+        },
+        {
+          "id": 77,
+          "supplier_name": "Filastruder",
+          "product_url": "https://www.filastruder.com",
+          "notes": "BTT Octopus Pro (alt)",
+          "sku": null,
+          "step_url": "https://github.com/bigtreetech/BIGTREETECH-OCTOPUS-Pro",
+          "approved": true
+        },
+        {
+          "id": 76,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/BIGTREETECH-Control-Onboard-8%C3%97TMC2160-High-Performance/dp/B0CQX9XJ4W",
+          "notes": "BTT Kraken",
+          "sku": "B0CQX9XJ4W",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "NEMA23 Stepper Motor (Z-axis, 8mm shaft)",
+      "description": "Four independent motors for auto-tramming via Klipper Z_TILT_ADJUST. 8mm shaft to match pulleys. Belt-driven Z — same motor type as X/Y for full parts commonality.",
+      "qty": 4,
+      "unit": "motors",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": "23HS45-4204S1",
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 58,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "NEMA23 4.5Nm High Torque 8mm shaft",
+          "sku": null,
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 59,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "NEMA23 3Nm — verify 8mm shaft",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 57,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com/nema-23-bipolar-3nm-425oz-in-8mm-diameter-4-2a-57x57x113mm-4-wires-stepper-motor-23hs45-4204s1",
+          "notes": "NEMA23 3Nm 8mm shaft",
+          "sku": "23HS45-4204S1",
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 193,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/STEPPERONLINE-Stepper-Bipolar-57x57x113mm-Engraving/dp/B0CG58KY17",
+          "notes": "STEPPERONLINE 23HS45-4204S1 3Nm 4.2A 8mm shaft",
+          "sku": "B0CG58KY17",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "category": "Dual Y-Axis Motion System",
+      "name": "NEMA23 Stepper Motor (Y-axis, 8mm shaft)",
+      "description": "Dual motors for anti-racking — TMC5160 StallGuard compatible. MUST be 8mm shaft variant. Both Y motors must be identical model for matched steps/mm.",
+      "qty": 2,
+      "unit": "motors",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": "23HS45-4204S1",
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 43,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "NEMA23 4.5Nm High Torque 8mm shaft",
+          "sku": null,
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 44,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "NEMA23 3Nm — verify 8mm shaft",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 42,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com/nema-23-bipolar-3nm-425oz-in-8mm-diameter-4-2a-57x57x113mm-4-wires-stepper-motor-23hs45-4204s1",
+          "notes": "NEMA23 3Nm 8mm shaft",
+          "sku": "23HS45-4204S1",
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 192,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/STEPPERONLINE-Stepper-Bipolar-57x57x113mm-Engraving/dp/B0CG58KY17",
+          "notes": "STEPPERONLINE 23HS45-4204S1 3Nm 4.2A 8mm shaft",
+          "sku": "B0CG58KY17",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "category": "X-Axis Motion System",
+      "name": "NEMA23 Stepper Motor (X-axis, 8mm shaft)",
+      "description": "MUST be 8mm shaft variant to match pulleys and couplers. TMC5160 StallGuard for sensorless homing. 3Nm minimum torque recommended.",
+      "qty": 1,
+      "unit": "motor",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": "23HS45-4204S1",
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 28,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "NEMA23 4.5Nm High Torque 8mm shaft",
+          "sku": null,
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 29,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "NEMA23 3Nm — verify 8mm shaft",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 27,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com/nema-23-bipolar-3nm-425oz-in-8mm-diameter-4-2a-57x57x113mm-4-wires-stepper-motor-23hs45-4204s1",
+          "notes": "NEMA23 3Nm 8mm shaft",
+          "sku": "23HS45-4204S1",
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 191,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/STEPPERONLINE-Stepper-Bipolar-57x57x113mm-Engraving/dp/B0CG58KY17",
+          "notes": "STEPPERONLINE 23HS45-4204S1 3Nm 4.2A 8mm shaft",
+          "sku": "B0CG58KY17",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "category": "Frame Hardware & Brackets",
+      "name": "Heavy Duty Corner Brackets (20-Series)",
+      "description": "Frame corner connections for V-Slot 20-series. Must be 20-series compatible (6mm slot). Printable saves $200+.",
+      "qty": 40,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 11,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "20-series cast aluminum L-bracket",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 12,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Aluminum L-bracket 20mm series",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 13,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed ABS/Nylon — STL in repo",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "category": "Frame & Structure - Aluminum Extrusions",
+      "name": "2080 V-Slot Aluminum Extrusion (1200mm)",
+      "description": "Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages. 1200mm fits 48-inch pallet dimension. M3-2 X-direction rails use 2×1200mm spliced end-to-end (4 internal connectors per joint, staggered splice locations). 2080 oriented with 80mm vertical for maximum stiffness (Iy ≈ 33 cm⁴). Spliced 2080 at 2.4m span: ~0.5mm deflection at 3kg (2× stiffer than unspliced 2040 at 6ft). Qty 11: 7 frame + 4 splice extensions for X-axis.",
+      "qty": 11,
+      "unit": "lengths",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 2,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/v-slot-20-x-80mm-4/",
+          "notes": "2080 V-Slot, lengths up to 2650mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 3,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/zyltech-2080-t-slot-aluminum-extrusion-pre-cut-length-1000mm/",
+          "notes": "2080 pre-cut, 1000-2000mm. NOTE: ZYLtech 2080 is T-slot not V-slot — verify V-groove compatibility or use for structural-only members",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 4,
+          "supplier_name": "VXB Bearings",
+          "product_url": "https://vxb.com/products/1000mm-black-v-slot-aluminum-extrusion-profile-lin",
+          "notes": "2080 V-Slot 1000mm stocked, black anodized",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-2080/",
+          "notes": "2080 V-Slot, cut to length, black or silver anodized",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 203,
+          "supplier_name": "3D Printing USA",
+          "product_url": "https://3dprintingusa.com/collections/aluminum-extrusion-v-slot",
+          "notes": "V-Slot extrusions - US stock, up to 2.5m lengths",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 204,
+          "supplier_name": "RatRig",
+          "product_url": "https://us.ratrig.com/",
+          "notes": "V-Slot custom cut-to-length - US/Canada store",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "category": "Optional Upgrades",
+      "name": "Polycarbonate Enclosure Panels",
+      "description": "Dust containment for indoor use. Sized to frame dimensions.",
+      "qty": 1,
+      "unit": "set",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 176,
+          "supplier_name": "TAP Plastics",
+          "product_url": "https://tapplastics.com",
+          "notes": "Clear polycarbonate sheets — cut to size",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 177,
+          "supplier_name": "US Plastic Corp",
+          "product_url": "https://usplastic.com",
+          "notes": "Corrugated plastic panels",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "category": "Frame Hardware & Brackets",
+      "name": "Straight Line Internal Connectors (20-Series)",
+      "description": "Splice connectors for modular X-axis extension. 4 connectors per splice joint (one per T-slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws. M3-2 default: 4 splice joints × 4 connectors = 16. Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0 (skip splice).",
+      "qty": 16,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 15,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": true,
+      "suppliers": [
+        {
+          "id": 14,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "20-series straight line connector 100mm with M5 screws — 4-pack or 12-pack",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 15,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "PZRT 2020 series straight line connector bracket",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 16,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "20-series internal joining plate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "category": "Concrete Extrusion System",
+      "name": "NEMA23 Planetary Geared Stepper (10:1) — Pump Drive",
+      "description": "Drives the PC pump rotor. 10:1 planetary gearbox provides ~6Nm output torque at low RPM (50-300 RPM). Must be high-torque variant (76mm+ body, 2.8A+). Controlled via Kraken extruder stepper output.",
+      "qty": 1,
+      "unit": "motor + gearbox assembly",
+      "mfg_type": "buy",
+      "sort_order": 15,
+      "mpn": "23HS30-2804S-HG10",
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 131,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "STEPPERONLINE NEMA23 10:1 planetary — also on Amazon Prime.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 129,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com/nema-23-stepper-motor-l-76mm-gear-ratio-10-1-high-precision-planetary-gearbox-23hs30-2804s-hg10",
+          "notes": "23HS30-2804S-HG10 — 76mm body, 2.8A, 10:1 HG series. 6Nm max output. 15 arc-min backlash.",
+          "sku": "23HS30-2804S-HG10",
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        },
+        {
+          "id": 130,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com/nema-23-stepper-motor-l-76mm-gear-ratio-10-1-mg-series-planetary-gearbox-23hs30-2904s-mg10",
+          "notes": "23HS30-2904S-MG10 — MG series budget option, 30 arc-min backlash.",
+          "sku": "23HS30-2904S-MG10",
+          "step_url": "https://www.omc-stepperonline.com/download",
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "category": "Frame & Structure - Aluminum Extrusions",
+      "name": "Frame Stiffener — Long Span Reinforcement",
+      "description": "Required for X-axis spans exceeding 1.5m (M3-2 and M3-4). Bond to the 80mm face of 2080 V-Slot with structural adhesive. Two reinforcement bars per 2080 rail. Aluminum rectangular tube recommended (zero galvanic corrosion risk). CF flat bar is lighter but more expensive. Steel NOT recommended — galvanic corrosion with aluminum causes warping. M3-1: not required.",
+      "qty": 4,
+      "unit": "bars (1.2m each)",
+      "mfg_type": "buy",
+      "sort_order": 15,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 209,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=aluminum+rectangular+tube+1x2+inch+6063",
+          "notes": "Aluminum rectangular tube 25x50x2mm 6063-T5",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 210,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/KARBXON-Carbon-Pultruded-Planes-Drones-Projects/dp/B09Q7V4FLY",
+          "notes": "KARBXON CF flat bar 20x4mm pultruded - lightweight alternative",
+          "sku": "B09Q7V4FLY",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 211,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Aluminum rectangular tube 6063-T52",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 212,
+          "supplier_name": "Metals Depot",
+          "product_url": "https://www.metalsdepot.com/",
+          "notes": "Aluminum rectangular tube - cut to length, ships from Kentucky",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "category": "Concrete Extrusion System",
+      "name": "External Stepper Driver — TMC5160 (48V High Current)",
+      "description": "Drives geared pump motor via Kraken STEP/DIR/EN signals. External driver recommended: higher current (6A) and 48V for more torque. SPI enables StallGuard for material blockage alarm.",
+      "qty": 1,
+      "unit": "driver board",
+      "mfg_type": "buy",
+      "sort_order": 16,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 133,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "BIGTREETECH TMC5160T Pro V1.0 — 48V, SPI/UART.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 134,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Analog Devices TMC5160-BOB evaluation board.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 132,
+          "supplier_name": "West3D (US)",
+          "product_url": "https://west3d.com/products/tmc5160-pro-48v-stepper-motor-driver-drivers-btt",
+          "notes": "BTT TMC5160 Pro V1.2 — 48V, external MOSFETs, SPI.",
+          "sku": "TMC5160T-Pro-V1.2",
+          "step_url": "https://github.com/bigtreetech/TMC5160T-Pro",
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "category": "Concrete Extrusion System",
+      "name": "Progressive Cavity Pump Element (Rotor + Stator)",
+      "description": "Core pumping element — chrome-plated SS rotor inside elastomer stator. For mortar/concrete with aggregates up to 2-6mm. Stator: Buna Nitrile (NBR) for concrete, EPDM for alkaline. Expect stator replacement every 200-500 hours.",
+      "qty": 1,
+      "unit": "rotor + stator set",
+      "mfg_type": "buy",
+      "sort_order": 17,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 136,
+          "supplier_name": "Progressive Cavity Parts (US)",
+          "product_url": "https://www.progressivecavityparts.com/",
+          "notes": "Aftermarket replacement rotors and stators for Moyno, Seepex, Netzsch, Continental.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 137,
+          "supplier_name": "Seepex (via US distributors)",
+          "product_url": "https://www.seepex.com/en-nam/products/pumps/standard-progressive-cavity-pumps/bn-pump-with-block-design/",
+          "notes": "BN series — industrial PC pump. US distributors: Tencarva, Edelmann, Cummins-Wagner.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 138,
+          "supplier_name": "Community Interest: Custom Batch",
+          "product_url": "",
+          "notes": "INTEREST CHECK — small-batch custom rotor+stator. CNC SS rotor + cast NBR stator. Need 10 commitments.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 135,
+          "supplier_name": "Continental Ultra Pumps (Missouri)",
+          "product_url": "https://www.continentalultrapumps.com/store/CP22-progressing-cavity-pump.html",
+          "notes": "CP22 pump — 0.4-4.9 GPM, 100 PSI, 3/4\" NPT, chrome SS rotor, Buna stator. Smallest US-made PC pump. Call 636-456-6006.",
+          "sku": "CP22",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "category": "Concrete Extrusion System",
+      "name": "Pump Drive Coupling — Universal Joint + Connecting Rod",
+      "description": "Converts motor rotation to rotor orbital motion. PC pump rotors orbit eccentrically — a rigid shaft will break. Use gear-type universal joint or double-cardan joint.",
+      "qty": 1,
+      "unit": "coupling assembly",
+      "mfg_type": "buy",
+      "sort_order": 18,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 139,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Miniature universal joints + flex couplings. Match bore sizes to motor output and rotor drive shaft.",
+          "sku": null,
+          "step_url": "https://mcmaster.com",
+          "approved": true
+        },
+        {
+          "id": 140,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Stainless steel universal joint couplers (8-14mm bores) + jaw couplings.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 141,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "CNC or metal SLS custom connecting rod. STL files in repo /cad/pump/ directory.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "category": "Concrete Extrusion System",
+      "name": "Pump Housing & Bearing Assembly",
+      "description": "Encloses rotor/stator and provides bearing support. Must handle axial thrust. If using Continental CP22, housing is included. For DIY: CNC aluminum + sealed bearings.",
+      "qty": 1,
+      "unit": "assembly",
+      "mfg_type": "cnc",
+      "sort_order": 19,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 142,
+          "supplier_name": "Continental Ultra Pumps",
+          "product_url": "https://www.continentalultrapumps.com/",
+          "notes": "CP22 housing included with pump purchase.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 143,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "DIY: Flanged ball bearings (sealed, SS) + Schedule 40 SS pipe as stator housing.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 144,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "CNC-machined aluminum end plates and motor mount. Upload DXF/STEP from repo.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 145,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D printed PETG prototype housing for testing only — concrete slurry is abrasive.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "category": "Frame Hardware & Brackets",
+      "name": "T-Slot Drop-In Nuts M5 (20-Series)",
+      "description": "300 total — M5 is the standard fastener for 20-series V-Slot (6mm slot width). Spring-loaded drop-in style recommended for easier assembly. NOT M6 — M6 is for 40-series only.",
+      "qty": 3,
+      "unit": "packs of 100",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 17,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "M5 spring-loaded T-nut 20-series",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 18,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/",
+          "notes": "M5 T-nut for 2020/2040/2080",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 19,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "M5 drop-in nut for 20mm T-slot",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 20,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "M5 T-nut 100-pack (20-series 6mm slot)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "GT2 Timing Belt 10mm (Z-axis)",
+      "description": "Belt-driven Z — same GT2 10mm belt as X/Y axes. ~3m per Z corner (up + down run + tensioner), 12m total for 4 independent Z drives. Belts shed concrete splatters unlike lead screw threads.",
+      "qty": 12,
+      "unit": "meters",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 60,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Gates PowerGrip GT2 10mm — same as X/Y",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 61,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Fiberglass core GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 62,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "Standard rubber GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "category": "X-Axis Motion System",
+      "name": "GT2 Timing Belt 10mm (Reinforced)",
+      "description": "X-axis drive belt. ~6m needed for 2m travel (2×2.4m run + tensioner + tails). Buy extra for spares. Gates PowerGrip GT2/GT3 interchangeable at 2mm pitch.",
+      "qty": 8,
+      "unit": "meters",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 30,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Gates PowerGrip GT2 10mm",
+          "sku": null,
+          "step_url": "https://www.gates.com/us/en",
+          "approved": true
+        },
+        {
+          "id": 31,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Fiberglass core GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 32,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "Standard rubber GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "category": "Optional Upgrades",
+      "name": "LED Work Lighting",
+      "description": "Work area illumination — 24V LED strips powered from main bus.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 178,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "24V LED strip 5m",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 179,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "RGB LED strip 24V",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "category": "Frame & Structure - Aluminum Extrusions",
+      "name": "2040 V-Slot Aluminum Extrusion (1200mm)",
+      "description": "Vertical posts (Z-height). 1200mm gives ~1000mm usable Z travel after motor mount and belt pulley clearance. V-groove rails serve as Z linear guides for belt-driven carriages. Fits within 48-inch pallet dimension (1200mm < 1219mm).",
+      "qty": 4,
+      "unit": "lengths",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 6,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/v-slot-20-x-40mm/",
+          "notes": "2040 V-Slot, multiple lengths",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 7,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/2040-v-groove-extrusion-pre-cut-lengths-300mm-2000mm/",
+          "notes": "2040 V-Groove (V-Slot compatible), 300-2000mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 5,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-2040/",
+          "notes": "2040 V-Slot, cut to length",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 205,
+          "supplier_name": "3D Printing USA",
+          "product_url": "https://3dprintingusa.com/collections/aluminum-extrusion-v-slot",
+          "notes": "V-Slot extrusions - US stock, up to 2.5m lengths",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 206,
+          "supplier_name": "RatRig",
+          "product_url": "https://us.ratrig.com/",
+          "notes": "V-Slot custom cut-to-length - US/Canada store",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "category": "Concrete Extrusion System",
+      "name": "NEMA23 Motor for Extruder (Direct Drive Option)",
+      "description": "Direct-drive option (no gearbox) for simpler pump setups or peristaltic pump. If building the stepper-driven PC pump, use the \"NEMA23 Planetary Geared Stepper (10:1)\" instead — the gearbox is essential for PC pump torque.",
+      "qty": 1,
+      "unit": "motor",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 146,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "NEMA23 4.5Nm 8mm shaft",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 147,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "NEMA23 Geared 10:1",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 148,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "NEMA23 3Nm standard 8mm shaft",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "category": "Fasteners & Hardware",
+      "name": "M3 Socket Head Cap Screws",
+      "description": "Electronics mounting and small parts.",
+      "qty": 1,
+      "unit": "500pc kit",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 167,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "M3 SHCS assortment 500pc",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 168,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "M3 SHCS basic set 500pc",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 169,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "M3 electronics kit",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "category": "Dual Y-Axis Motion System",
+      "name": "GT2 Timing Belt 10mm (Reinforced)",
+      "description": "Dual Y-axis belts — ~3m each side, 6m total. High load application with gantry beam.",
+      "qty": 8,
+      "unit": "meters",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 45,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Gates PowerGrip GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 46,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Fiberglass core GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 47,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "Standard rubber GT2 10mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "category": "Electronics & Control System",
+      "name": "Raspberry Pi 5 (8GB RAM)",
+      "description": "Runs Klipper firmware. 8GB recommended for large print files.",
+      "qty": 1,
+      "unit": "computer",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 78,
+          "supplier_name": "Adafruit",
+          "product_url": "https://www.adafruit.com",
+          "notes": "RPi 5 8GB",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 80,
+          "supplier_name": "Adafruit",
+          "product_url": "https://www.adafruit.com",
+          "notes": "RPi 4 8GB (alt)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 79,
+          "supplier_name": "Amazon - CanaKit",
+          "product_url": "https://www.amazon.com/Raspberry-Pi-8GB-SC1112-Quad-core/dp/B0CK2FCG1K",
+          "notes": "RPi 5 8GB Kit",
+          "sku": "B0CK2FCG1K",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "category": "Concrete Extrusion System",
+      "name": "48V Power Supply for Pump Driver (Optional)",
+      "description": "Only needed if running external TMC5160 pump driver at 48V. Mean Well LRS-200-48 provides dedicated 48V for the geared stepper. Not needed if running pump from Kraken onboard driver at 24V.",
+      "qty": 1,
+      "unit": "PSU",
+      "mfg_type": "buy",
+      "sort_order": 21,
+      "mpn": "LRS-200-48",
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 149,
+          "supplier_name": "Mouser Electronics",
+          "product_url": "https://mouser.com",
+          "notes": "Mean Well LRS-200-48 — 48V 200W enclosed",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 150,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Mean Well UHP-200-48 — 48V slim profile",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 151,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Mean Well 48V PSU — also on Amazon Prime",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "category": "Frame Hardware & Brackets",
+      "name": "Eccentric Spacers (V-Slot)",
+      "description": "Required for V-wheel preload adjustment on all motion axes (X, Y, and Z). Each V-wheel carriage uses eccentric spacers on the bottom wheels to tension against the rail. Without these, wheels cannot be properly preloaded and will be loose on the rail.",
+      "qty": 28,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 25,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 21,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "Eccentric spacer for V-Slot (6mm bore, 10mm OD)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 22,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Eccentric spacer — precision ground",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 23,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/Eccentric-Spacers-Full-Size-Wheels/dp/B01D2FAV44",
+          "notes": "V-Slot eccentric spacer 10-pack",
+          "sku": "B01D2FAV44",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "category": "Electronics & Control System",
+      "name": "7-inch Touchscreen Display",
+      "description": "User interface for printer control via KlipperScreen.",
+      "qty": 1,
+      "unit": "display",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 81,
+          "supplier_name": "Adafruit",
+          "product_url": "https://www.adafruit.com",
+          "notes": "Raspberry Pi 7\" Official",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 82,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Waveshare 7\" HDMI",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 83,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Generic 7\" capacitive touch",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "category": "Frame Hardware & Brackets",
+      "name": "Adjustable Leveling Feet M16",
+      "description": "Critical for leveling on uneven job-site floors. 1000lb-rated per foot. NOTE: M16 thread will not fit directly into 20-series V-Slot — requires printed or CNC base plates to interface with frame.",
+      "qty": 4,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 24,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Heavy duty 1000lb swivel leveling foot",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 25,
+          "supplier_name": "Grainger",
+          "product_url": "https://grainger.com",
+          "notes": "Vibration dampening leveling mount",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 26,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Standard M16 leveling foot",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "category": "X-Axis Motion System",
+      "name": "GT2 Pulley 20-Tooth (8mm Bore)",
+      "description": "Drive and idler pulleys — MUST match motor shaft diameter (8mm). Metal recommended for belt tooth engagement under load. Aluminum or steel.",
+      "qty": 4,
+      "unit": "pulleys",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 33,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "Aluminum 20T 8mm bore GT2",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 34,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Steel 20T 8mm bore GT2",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 35,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/",
+          "notes": "GT2 20T pulley — 5mm/6.35mm/8mm bore options",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 187,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/BEMONOC-2GT-Timing-Pulley-printer/dp/B01CL24CAI",
+          "notes": "BEMONOC 5-pack GT2 20T 8mm bore 10mm width",
+          "sku": "B01CL24CAI",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "category": "Dual Y-Axis Motion System",
+      "name": "GT2 Pulley 20-Tooth (8mm Bore)",
+      "description": "Multiple pulleys needed for dual Y system. MUST be 8mm bore to match motor shaft.",
+      "qty": 8,
+      "unit": "pulleys",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 48,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "Aluminum 20T 8mm bore",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 49,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Steel 20T 8mm bore",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 50,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/",
+          "notes": "GT2 20T 8mm bore",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 188,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/BEMONOC-2GT-Timing-Pulley-printer/dp/B01CL24CAI",
+          "notes": "BEMONOC 5-pack GT2 20T 8mm bore 10mm width",
+          "sku": "B01CL24CAI",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "GT2 Pulley 20-Tooth (8mm Bore, Z-axis)",
+      "description": "Drive + idler pulleys for belt Z. Same 8mm bore GT2 pulleys as X/Y — full parts commonality. 2 per Z corner (drive + idler) = 8 total.",
+      "qty": 8,
+      "unit": "pulleys",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 63,
+          "supplier_name": "StepperOnline US",
+          "product_url": "https://www.omc-stepperonline.com",
+          "notes": "Aluminum 20T 8mm bore — same as X/Y",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 64,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Steel 20T 8mm bore",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 65,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/",
+          "notes": "GT2 20T 8mm bore",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 189,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/BEMONOC-2GT-Timing-Pulley-printer/dp/B01CL24CAI",
+          "notes": "BEMONOC 5-pack GT2 20T 8mm bore 10mm width",
+          "sku": "B01CL24CAI",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "category": "Frame & Structure - Aluminum Extrusions",
+      "name": "2040 V-Slot Aluminum Extrusion (1000mm)",
+      "description": "Cross braces, cable chain mounts, electronics panel rails, and accessory mounting. 1000mm is the most common pre-cut stock length. M3-2: 4 additional for X-direction cross brace splicing (2×1000mm per brace).",
+      "qty": 12,
+      "unit": "lengths",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 9,
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/10x-1m-2040-v-groove-extrusion-bulk-pack/",
+          "notes": "10-pack 1000mm V-Groove bulk — best value",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 10,
+          "supplier_name": "VXB Bearings",
+          "product_url": "https://vxb.com/",
+          "notes": "2040 V-Slot 1000mm stocked",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 8,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-2040/",
+          "notes": "2040 V-Slot 1000mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 207,
+          "supplier_name": "3D Printing USA",
+          "product_url": "https://3dprintingusa.com/collections/aluminum-extrusion-v-slot",
+          "notes": "V-Slot extrusions - US stock, up to 2.5m lengths",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 208,
+          "supplier_name": "RatRig",
+          "product_url": "https://us.ratrig.com/",
+          "notes": "V-Slot custom cut-to-length - US/Canada store",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "category": "Concrete Extrusion System",
+      "name": "Material Hopper 20-Liter",
+      "description": "Material reservoir above the pump. HDPE or stainless for concrete compatibility. Printable in PETG for testing.",
+      "qty": 1,
+      "unit": "hopper",
+      "mfg_type": "print",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 152,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Stainless steel hopper",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 153,
+          "supplier_name": "US Plastic Corp",
+          "product_url": "https://usplastic.com",
+          "notes": "HDPE funnel 5-gal",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 154,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed PETG hopper",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "category": "Fasteners & Hardware",
+      "name": "Washers & Lock Washers Assorted",
+      "description": "Prevent loosening from vibration. Nord-Lock recommended for structural joints.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 170,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Complete M3-M8 kit",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 171,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Basic washer set",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 172,
+          "supplier_name": "Grainger",
+          "product_url": "https://grainger.com",
+          "notes": "Nord-Lock washers",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "category": "Optional Upgrades",
+      "name": "Camera Module for Monitoring",
+      "description": "Remote print monitoring via KlipperScreen or Mainsail.",
+      "qty": 1,
+      "unit": "camera",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 180,
+          "supplier_name": "Adafruit",
+          "product_url": "https://www.adafruit.com",
+          "notes": "RPi Camera v3",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 181,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "USB Webcam 1080p",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "category": "Concrete Extrusion System",
+      "name": "Concrete Nozzle Assembly",
+      "description": "Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm).",
+      "qty": 1,
+      "unit": "assembly",
+      "mfg_type": "cnc",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 155,
+          "supplier_name": "Local Machine Shop",
+          "product_url": "",
+          "notes": "Custom machined brass nozzle",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 156,
+          "supplier_name": "Local Machine Shop",
+          "product_url": "",
+          "notes": "Stainless steel nozzle",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 157,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "Replaceable tip design",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "category": "Electronics & Control System",
+      "name": "Power Supply 24V 600W",
+      "description": "MeanWell for reliability. 600W handles 7 NEMA23 steppers + accessories. 24V bus for Kraken + peripherals.",
+      "qty": 1,
+      "unit": "PSU",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": "LRS-600-24",
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 86,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Generic 24V 600W",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 85,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://www.digikey.com/en/products/detail/mean-well-usa-inc/LRS-600-24/16394242",
+          "notes": "MeanWell RSP-750-24",
+          "sku": "1866-LRS-600-24-ND",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 84,
+          "supplier_name": "Mouser Electronics",
+          "product_url": "https://www.mouser.com/ProductDetail/MEAN-WELL/LRS-600-24",
+          "notes": "MeanWell LRS-600-24",
+          "sku": "709-LRS-600-24",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "V-Groove Wheels (Z-axis Carriages)",
+      "description": "V-wheels ride the 2040 vertical post V-grooves — the frame IS the linear guide. 3 wheels per corner carriage (2 fixed + 1 eccentric) × 4 corners = 12 wheels. Same polycarbonate wheels as X/Y.",
+      "qty": 12,
+      "unit": "wheels",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 67,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Solid V-Wheel polycarbonate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 68,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "V-Slot V-Wheel kit with bearings",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 66,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vk0012/",
+          "notes": "Xtreme Solid V-Wheel — same as X/Y",
+          "sku": "VW02-RS",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "category": "Optional Upgrades",
+      "name": "HEPA Air Filtration",
+      "description": "Concrete dust particle capture for indoor operation.",
+      "qty": 1,
+      "unit": "system",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 182,
+          "supplier_name": "Grainger",
+          "product_url": "https://grainger.com",
+          "notes": "HEPA filter box fan unit",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 183,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "DIY HEPA filter + fan",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "category": "X-Axis Motion System",
+      "name": "V-Groove Delrin Wheels (Polycarbonate)",
+      "description": "Dust-resistant, critical for concrete environment. Use Polycarbonate (Xtreme/Solid) for CNC-grade loads, not standard Delrin. Rides on V-Slot extrusion V-groove rails.",
+      "qty": 8,
+      "unit": "wheels",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 37,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Solid V-Wheel polycarbonate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 38,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "V-Slot V-Wheel kit with bearings",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 36,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vk0012/",
+          "notes": "Xtreme Solid V-Wheel (polycarbonate)",
+          "sku": "VW02-RS",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "category": "Fasteners & Hardware",
+      "name": "Heat-Set Inserts M3/M5",
+      "description": "Essential for threaded connections in 3D printed parts.",
+      "qty": 1,
+      "unit": "200pc kit",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 173,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Brass insert kit M3+M5",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 174,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Economy inserts M3+M5",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 175,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Premium knurled (CNC Kitchen style)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "category": "Dual Y-Axis Motion System",
+      "name": "V-Groove Wheels (Polycarbonate)",
+      "description": "More wheels = better load distribution on the gantry beam carriages. Polycarbonate (Xtreme/Solid) for heavy gantry loads.",
+      "qty": 16,
+      "unit": "wheels",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 52,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Solid V-Wheel polycarbonate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 53,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "V-Slot V-Wheel kit with bearings",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 51,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vk0012/",
+          "notes": "Xtreme Solid V-Wheel",
+          "sku": "VW02-RS",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "category": "Dual Y-Axis Motion System",
+      "name": "Y-Axis Gantry Plates",
+      "description": "Connects gantry beam to Y-rail carriages. Must span 2080 rail width. Print saves $160+.",
+      "qty": 2,
+      "unit": "plates",
+      "mfg_type": "print",
+      "sort_order": 50,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 54,
+          "supplier_name": "Local CNC Shop",
+          "product_url": "",
+          "notes": "CNC Aluminum 8mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 55,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed CF-Nylon Reinforced",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 56,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "Laser cut steel",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 196,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vs80-1/",
+          "notes": "V-Slot Gantry Bundle Universal 20-80mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 197,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/v-slot-gantry-bundle-2/",
+          "notes": "V-Slot Gantry Bundle - ships from US warehouse",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "category": "Concrete Extrusion System",
+      "name": "Tubing & Quick Fittings",
+      "description": "Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 50,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 158,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Reinforced concrete-rated hose + fittings",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 159,
+          "supplier_name": "US Plastic Corp",
+          "product_url": "https://usplastic.com",
+          "notes": "Food-grade reinforced hose set",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 160,
+          "supplier_name": "Grainger",
+          "product_url": "https://grainger.com",
+          "notes": "Industrial reinforced concrete hose",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "category": "X-Axis Motion System",
+      "name": "X-Axis Carriage Plate Assembly",
+      "description": "Carries the 1.5kg printhead. Print saves $70+ with CF-Nylon/ABS. Must be compatible with V-Slot 2080 rail width. Hose is counter-weighted to reduce gantry loading.",
+      "qty": 1,
+      "unit": "assembly",
+      "mfg_type": "print",
+      "sort_order": 50,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 39,
+          "supplier_name": "Local CNC Shop",
+          "product_url": "",
+          "notes": "CNC Aluminum 6061 6mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 40,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed Carbon Fiber Nylon",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 41,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "Water-jet cut steel",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 194,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vs80-1/",
+          "notes": "V-Slot Gantry Bundle Universal 20-80mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 195,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/v-slot-gantry-bundle-2/",
+          "notes": "V-Slot Gantry Bundle - ships from US warehouse",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "category": "Electronics & Control System",
+      "name": "Emergency Stop Button",
+      "description": "Critical safety component. NC (normally-closed) contacts — pressing opens the circuit and kills 24V via contactor.",
+      "qty": 1,
+      "unit": "switch",
+      "mfg_type": "buy",
+      "sort_order": 50,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 87,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Mushroom E-stop NC",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 88,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "Twist-release E-stop NC",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 89,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Panel mount E-stop NC",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "category": "Optional Upgrades",
+      "name": "Carbon Fiber Stiffener Bar (2080 Rail)",
+      "description": "Bonds to outer 80mm face of 2080 V-Slot for 20-30% additional stiffness on long spans. Structural epoxy + clamp cure. Only needed if 2m span deflection is a concern.",
+      "qty": 4,
+      "unit": "bars (2m each)",
+      "mfg_type": "buy",
+      "sort_order": 50,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 184,
+          "supplier_name": "DragonPlate",
+          "product_url": "https://dragonplate.com",
+          "notes": "CF flat bar — various widths and thicknesses",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 185,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Carbon fiber flat bar 20x3mm or 30x3mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 186,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Carbon fiber rectangular bar stock",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "Z-Axis Carriage Plates",
+      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Must mount V-wheels + belt clamp. Print saves $60+.",
+      "qty": 4,
+      "unit": "plates",
+      "mfg_type": "print",
+      "sort_order": 50,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 69,
+          "supplier_name": "Local CNC Shop",
+          "product_url": "",
+          "notes": "CNC Aluminum 6mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 70,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed CF-Nylon Reinforced",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 71,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "Laser cut steel",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 198,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vs80-1/",
+          "notes": "V-Slot Gantry Bundle Universal 20-80mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 199,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/v-slot-gantry-bundle-2/",
+          "notes": "V-Slot Gantry Bundle - ships from US warehouse",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "Z-Axis Motor Mounts",
+      "description": "Print saves $90 for all 4 mounts. Must interface between NEMA23 face and 2040 V-Slot vertical post. Mounts at top or bottom of verticals.",
+      "qty": 4,
+      "unit": "mounts",
+      "mfg_type": "print",
+      "sort_order": 60,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 72,
+          "supplier_name": "Local CNC Shop",
+          "product_url": "",
+          "notes": "CNC Aluminum mount",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 73,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed PETG/ABS",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 74,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "Laser cut steel",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 200,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/pl0008-2/",
+          "notes": "NEMA23 Motor Mount Plate 6061 aluminum - 4-pack",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 201,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "NEMA23 motor mount plate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "category": "Concrete Extrusion System",
+      "name": "Extruder Mounting Bracket",
+      "description": "Mounts extruder pipe to X-axis carriage plate. Standard 1\" Male NPT threaded pipe connection. Lightweight — printhead target is 1.5kg. This is the only extrusion-system part in the M3-CRETE motion system kit. Hose, nozzle, and hopper are pump-specific.",
+      "qty": 1,
+      "unit": "bracket",
+      "mfg_type": "print",
+      "sort_order": 60,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 161,
+          "supplier_name": "Local CNC Shop",
+          "product_url": "",
+          "notes": "CNC Aluminum plate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 162,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed reinforced",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 163,
+          "supplier_name": "SendCutSend",
+          "product_url": "https://sendcutsend.com",
+          "notes": "Laser cut steel",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 202,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/vs80-1/",
+          "notes": "Universal gantry plate - adapt for extruder mount",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "category": "Electronics & Control System",
+      "name": "Cable Drag Chain (Sealed)",
+      "description": "Enclosed/sealed type for concrete dust protection. X-axis: 25x50mm ID, 2.5m (M3-2 travel). Y-axis: 25x38mm ID, 1.3m. Open-style chains will clog with concrete dust. igus E2 micro series is ideal for dusty environments.",
+      "qty": 4,
+      "unit": "meters total (X: 2.5m + Y: 1.3m)",
+      "mfg_type": "buy",
+      "sort_order": 80,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 90,
+          "supplier_name": "igus",
+          "product_url": "https://www.igus.com",
+          "notes": "E2 micro sealed drag chain — premium, dust-proof",
+          "sku": null,
+          "step_url": "https://www.igus.com/",
+          "approved": true
+        },
+        {
+          "id": 91,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Heavy duty sealed 35mm cable carrier",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 92,
+          "supplier_name": "Self-Manufacture",
+          "product_url": "",
+          "notes": "3D Printed parametric sealed chain",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 190,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/uxcell-Plastic-Cable-Carrier-Chain/dp/B01LXNJ7NI",
+          "notes": "uxcell R55 25x50mm enclosed drag chain 1M",
+          "sku": "B01LXNJ7NI",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "category": "Electronics & Control System",
+      "name": "Shielded Motor Cable - Flex-Rated (18AWG 4C)",
+      "description": "4-conductor 18AWG, foil shield + drain, silicone jacket, continuous-flex drag-chain-rated. For X, Y, and extruder motors on moving axes. M3-2 X-axis travel requires ~2m more than M3-1. Critical for reliable StallGuard sensorless homing.",
+      "qty": 20,
+      "unit": "meters (1 spool)",
+      "mfg_type": "buy",
+      "sort_order": 100,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 93,
+          "supplier_name": "igus",
+          "product_url": "https://www.igus.com",
+          "notes": "chainflex CF211 — premium drag-chain-rated",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 94,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "18AWG 4C shielded silicone flex cable",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 95,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Continuous-flex shielded cable",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "category": "Electronics & Control System",
+      "name": "Shielded Motor Cable - Static (18AWG 4C)",
+      "description": "4-conductor 18AWG, foil shield + drain, PVC jacket, UL2464. For 4 stationary Z-axis motors. Shield drain connects at controller end only (star ground).",
+      "qty": 10,
+      "unit": "meters (1 spool)",
+      "mfg_type": "buy",
+      "sort_order": 110,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 96,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Alpha Wire or Belden UL2464 shielded 4C 18AWG",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 97,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "18AWG 4C foil-shielded cable",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 98,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Shielded multi-conductor cable",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "category": "Electronics & Control System",
+      "name": "GX16-4 Aviation Connector Sets",
+      "description": "Quick-disconnect for all 8 stepper motors. IP65 when mated — critical for concrete dust protection. Panel-mount female + inline male per set. Apply dielectric grease at assembly.",
+      "qty": 10,
+      "unit": "sets (8 needed + 2 spare)",
+      "mfg_type": "buy",
+      "sort_order": 120,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 100,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Amphenol equivalent circular connectors",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 99,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/Female-Connector-GX16-4-Silver-Aviation/dp/B07174LCGR",
+          "notes": "GX16-4 male-inline + female-panel set",
+          "sku": "B07174LCGR",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "category": "Electronics & Control System",
+      "name": "Power Wire — 12AWG Silicone (Red + Black)",
+      "description": "PSU 24V output to BTT Kraken main power input. 12AWG handles 25A max draw at 600W/24V. Also used for E-stop contactor power loop.",
+      "qty": 2,
+      "unit": "meters each color (4m total)",
+      "mfg_type": "buy",
+      "sort_order": 130,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 101,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "12AWG silicone stranded wire (red + black)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 102,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "12AWG stranded hookup wire",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "category": "Electronics & Control System",
+      "name": "Distribution Wire — 18AWG (Red + Black)",
+      "description": "24V branch distribution, accessory power, E-stop signal loop. For internal control panel wiring.",
+      "qty": 6,
+      "unit": "meters total (3m each color)",
+      "mfg_type": "buy",
+      "sort_order": 135,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 103,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "18AWG silicone hookup wire assortment",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 104,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "18AWG stranded hookup wire",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "category": "Electronics & Control System",
+      "name": "Ferrule Crimping Tool + Assortment Kit",
+      "description": "Every stranded wire into a screw terminal MUST have a ferrule — critical in high-vibration concrete printer. Expect to use ~100 ferrules.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 140,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 105,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/IWISS-Self-Adjusting-AWG23-10-End-Sleeves-Ferrule/dp/B00ODSJGSW",
+          "notes": "IWISS or Wirefy ratcheting crimper + ferrule kit",
+          "sku": "B00ODSJGSW",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 106,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/IWISS-Crimper-Plier-Self-adjustable-Crimping/dp/B00H950AK4",
+          "notes": "Preciva ferrule crimping set",
+          "sku": "B00H950AK4",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "category": "Electronics & Control System",
+      "name": "IEC C14 Power Inlet w/ EMI Filter & Fuse",
+      "description": "Panel-mount AC inlet with integrated EMI filter, fuse holder (6A slow-blow for 120V), and rocker switch. Single mains entry point.",
+      "qty": 1,
+      "unit": "unit",
+      "mfg_type": "buy",
+      "sort_order": 150,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 108,
+          "supplier_name": "Mouser",
+          "product_url": "https://mouser.com",
+          "notes": "TE Connectivity Corcom series",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 109,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "IEC C14 inlet fused + filtered",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 107,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://www.digikey.com/en/product-highlight/s/schaffner/fn9260-series-power-entry-modules",
+          "notes": "Schaffner or Qualtek IEC inlet w/ filter",
+          "sku": "FN9260-6-06",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "category": "Electronics & Control System",
+      "name": "24V Safety Contactor / Relay",
+      "description": "E-stop cuts 24V power via this contactor. NC E-stop loop controls the coil. 30A contacts minimum for 600W PSU output.",
+      "qty": 1,
+      "unit": "unit",
+      "mfg_type": "buy",
+      "sort_order": 155,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 110,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Omron or Schneider 24VDC coil contactor",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 111,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "IDEC or Fuji 24VDC relay",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 112,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "24V DC coil contactor 30A+",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "category": "Electronics & Control System",
+      "name": "24V-to-5V DC-DC Buck Converter (5A)",
+      "description": "Powers Raspberry Pi 5 and touchscreen from the 24V bus. RPi 5 draws up to 5A with peripherals. Use dedicated converter, NOT Kraken 5V output.",
+      "qty": 1,
+      "unit": "unit",
+      "mfg_type": "buy",
+      "sort_order": 160,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 113,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Pololu 5V 5A step-down regulator",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 114,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Mean Well DDR-30G-5 DIN-rail mount",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 115,
+          "supplier_name": "Adafruit",
+          "product_url": "https://www.adafruit.com",
+          "notes": "5V 5A buck converter breakout",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "category": "Electronics & Control System",
+      "name": "DIN-Rail Terminal Block Kit + Rail",
+      "description": "10-position terminal blocks, end stops, jumper bars, and 0.5m 35mm DIN rail. Star-ground bus bar for all shield drain wires.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 165,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 116,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Phoenix Contact UK series + rail",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 117,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Dinkle DIN-rail terminal block kit",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 118,
+          "supplier_name": "AutomationDirect",
+          "product_url": "https://automationdirect.com",
+          "notes": "DINnector terminal block set",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "category": "Electronics & Control System",
+      "name": "Nylon Cable Gland Assortment",
+      "description": "IP68 cable glands for every wire entering the control panel. Prevents concrete dust ingress. Mount on bottom/sides only. Sizes: PG7-PG13.5.",
+      "qty": 1,
+      "unit": "50-pack assorted",
+      "mfg_type": "buy",
+      "sort_order": 170,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 119,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Nylon cable gland assortment PG7-PG13.5",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 120,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Strain relief cable glands",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "category": "Electronics & Control System",
+      "name": "Snap-On Ferrite Cores (13mm ID)",
+      "description": "One per stepper motor cable at the controller end. Suppresses EMI that interferes with StallGuard sensorless homing.",
+      "qty": 8,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 175,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 122,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://digikey.com",
+          "notes": "Fair-Rite or TDK snap ferrite",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 121,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/Ferrite-Noise-Filter-Cable-3-5mm/dp/B01N0AV746",
+          "notes": "Snap-on ferrite cores 13mm (8-pack)",
+          "sku": "B01N0AV746",
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "category": "Electronics & Control System",
+      "name": "Cable Sleeving, Labels & Tie Kit",
+      "description": "10m PET braided sleeving (1/2\" + 1/4\"), 100x UV-resistant cable ties, 30x screw-mount bases, self-laminating wire labels. Label both ends: M1-X, M2-YL, M3-YR, M4-Z1..M7-Z4, M8-EXT.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 180,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 123,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "PET sleeving + cable tie + label bundle",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 124,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://mcmaster.com",
+          "notes": "Braided sleeving, nylon ties, markers",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    }
+  ]
+}
