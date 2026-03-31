@@ -1134,201 +1134,63 @@
 <div class="toast-container" id="toasts"></div>
 
 <!-- ── Scripts ─────────────────────────────────────── -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../config.js"></script>
 <script>
 // ────────────────────────────────────────────────────
 // Application State
 // ────────────────────────────────────────────────────
 const App = {
-    sb: null,               // Supabase client
-    user: null,             // auth user
-    githubUsername: null,
-    githubToken: null,
-    isContributor: false,
-    isMaintainer: false,
-    parts: [],              // from DB
+    parts: [],              // from data.json
     suppliersByPart: {},    // part_id -> [options]
-    pendingQueue: [],       // moderation queue
     searchTerm: '',
     activeSuppliers: new Set(),   // multi-supplier selection
-    activeModel: BOM_CONFIG.DEFAULT_MODEL || 'M3-2',  // model variant
-    suggestPartId: null,    // for the modal
-    userChoices: {},         // part_id -> { mfg: 'buy'|'print'|'cnc', preferredSupplier: opt_id|null }
+    activeModel: BOM_CONFIG.DEFAULT_MODEL || 'M3-2',
+    userChoices: {},         // part_id -> { mfg, preferredSupplier, orderQty, excluded }
+    isContributor: true,    // everyone can suggest (via GitHub Issues)
 };
 
 // ────────────────────────────────────────────────────
-// Initialization
+// Initialization (Static JSON — no Supabase)
 // ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-    // Render config-driven UI immediately
     document.getElementById('projectTitle').textContent = BOM_CONFIG.PROJECT_TITLE;
     document.getElementById('projectSubtitle').textContent = BOM_CONFIG.PROJECT_SUBTITLE;
     renderSpecs();
     renderModelSelector();
-
-    // Init Supabase
-    App.sb = supabase.createClient(BOM_CONFIG.SUPABASE_URL, BOM_CONFIG.SUPABASE_ANON_KEY);
-
-    // Check session
-    const { data: { session } } = await App.sb.auth.getSession();
-    if (session) {
-        await handleSession(session);
-    }
-
-    // Listen for auth changes (handles redirect back from OAuth)
-    App.sb.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-            await handleSession(session);
-            await loadBOM();
-            renderBOM();
-        } else if (event === 'SIGNED_OUT') {
-            resetAuth();
-            renderAuthArea();
-            await loadBOM();
-            renderBOM();
-        }
-    });
-
-    // Load & render
+    renderAuthArea();
     await loadBOM();
     renderBOM();
 });
 
 // ────────────────────────────────────────────────────
-// Auth
+// Auth (GitHub link only — no Supabase)
 // ────────────────────────────────────────────────────
-async function signIn() {
-    await App.sb.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-            scopes: 'read:org',
-            redirectTo: window.location.origin + window.location.pathname
-        }
-    });
-}
-
-async function signOut() {
-    await App.sb.auth.signOut();
-}
-
-async function handleSession(session) {
-    App.user = session.user;
-    App.githubToken = session.provider_token;
-    App.githubUsername = session.user.user_metadata?.user_name
-        || session.user.user_metadata?.preferred_username
-        || null;
-
-    // Check maintainer status (server-side via Supabase)
-    const { data: maint } = await App.sb.from('maintainers')
-        .select('user_id')
-        .eq('user_id', App.user.id)
-        .maybeSingle();
-    App.isMaintainer = !!maint;
-
-    // Check contributor status (GitHub API)
-    App.isContributor = App.isMaintainer || await checkCollaborator();
-
-    renderAuthArea();
-
-    if (App.isMaintainer) {
-        await loadModerationQueue();
-    }
-}
-
-async function checkCollaborator() {
-    if (!App.githubToken || !App.githubUsername) return false;
-    try {
-        const resp = await fetch(
-            `https://api.github.com/repos/${BOM_CONFIG.GITHUB_REPO_OWNER}/${BOM_CONFIG.GITHUB_REPO_NAME}/collaborators/${App.githubUsername}`,
-            { headers: { Authorization: `token ${App.githubToken}` } }
-        );
-        return resp.status === 204;
-    } catch {
-        return false;
-    }
-}
-
-function resetAuth() {
-    App.user = null;
-    App.githubToken = null;
-    App.githubUsername = null;
-    App.isContributor = false;
-    App.isMaintainer = false;
-    App.pendingQueue = [];
-    document.getElementById('modQueueBtn').style.display = 'none';
-    document.getElementById('modPanel').classList.remove('visible');
-}
-
 function renderAuthArea() {
     const area = document.getElementById('authArea');
-    if (!App.user) {
-        area.innerHTML = '<button class="auth-btn" onclick="signIn()">Sign in with GitHub</button>';
-        return;
-    }
-    const avatar = App.user.user_metadata?.avatar_url || '';
-    const name = App.githubUsername || 'User';
-    let roleBadge = '';
-    if (App.isMaintainer) roleBadge = '<span class="role-badge maintainer">Maintainer</span>';
-    else if (App.isContributor) roleBadge = '<span class="role-badge contributor">Contributor</span>';
-
-    area.innerHTML = `
-        <div class="user-info">
-            ${avatar ? `<img class="user-avatar" src="${escHtml(avatar)}" alt="">` : ''}
-            <span>${escHtml(name)}</span>
-            ${roleBadge}
-        </div>
-        <button class="auth-btn" onclick="signOut()">Sign out</button>
-    `;
+    const ghUrl = `https://github.com/${BOM_CONFIG.GITHUB_REPO_OWNER}/${BOM_CONFIG.GITHUB_REPO_NAME}`;
+    area.innerHTML = `<a class="auth-btn" href="${ghUrl}" target="_blank" rel="noopener">View on GitHub</a>`;
 }
 
 // ────────────────────────────────────────────────────
-// Data Loading
+// Data Loading (Static JSON)
 // ────────────────────────────────────────────────────
 async function loadBOM() {
-    const { data: parts, error: pErr } = await App.sb
-        .from('parts')
-        .select('*')
-        .order('category')
-        .order('sort_order');
+    try {
+        const resp = await fetch('data.json');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const bom = await resp.json();
 
-    if (pErr) {
-        console.error('Failed to load parts:', pErr);
-        showToast('Failed to load BOM data', 'error');
-        return;
+        App.parts = bom.parts || [];
+        App.suppliersByPart = {};
+        App.parts.forEach(part => {
+            if (part.suppliers && part.suppliers.length) {
+                App.suppliersByPart[part.id] = part.suppliers;
+            }
+        });
+    } catch (err) {
+        console.error('Failed to load BOM:', err);
+        showToast('Failed to load BOM data — check data.json', 'error');
     }
-
-    const { data: options, error: oErr } = await App.sb
-        .from('supplier_options')
-        .select('*')
-        .order('created_at');
-
-    if (oErr) {
-        console.error('Failed to load suppliers:', oErr);
-    }
-
-    App.parts = parts || [];
-    App.suppliersByPart = {};
-    (options || []).forEach(opt => {
-        if (!App.suppliersByPart[opt.part_id]) App.suppliersByPart[opt.part_id] = [];
-        App.suppliersByPart[opt.part_id].push(opt);
-    });
-}
-
-async function loadModerationQueue() {
-    const { data } = await App.sb
-        .from('supplier_options')
-        .select('*, parts(name, category)')
-        .eq('approved', false)
-        .order('created_at', { ascending: true });
-
-    App.pendingQueue = data || [];
-
-    const btn = document.getElementById('modQueueBtn');
-    btn.style.display = App.isMaintainer ? '' : 'none';
-    document.getElementById('queueCount').textContent = App.pendingQueue.length;
-
-    renderModQueue();
 }
 
 // ────────────────────────────────────────────────────
@@ -1589,21 +1451,7 @@ function renderBOM() {
                 </div>`;
             });
 
-            // Show user's own pending submissions
-            if (App.user) {
-                pending.filter(o => o.submitted_by === App.user.id).forEach(opt => {
-                    html += `<div class="supplier-card pending">
-                        <div class="supplier-info">
-                            <span class="supplier-name">${escHtml(opt.supplier_name)}</span>
-                            <span class="supplier-notes">${escHtml(opt.notes || '')}</span>
-                            <span class="pending-label">Pending</span>
-                        </div>
-                        ${opt.product_url
-                            ? `<a class="supplier-link" href="${escAttr(opt.product_url)}" target="_blank" rel="noopener">Visit &rarr;</a>`
-                            : ''}
-                    </div>`;
-                });
-            }
+            // Pending submissions removed — use GitHub Issues instead
 
             html += '</div>';
 
@@ -1747,34 +1595,9 @@ function handleSearch() {
     renderBOM();
 }
 
-// ────────────────────────────────────────────────────
-// Rendering — Moderation Queue
-// ────────────────────────────────────────────────────
-function renderModQueue() {
-    const list = document.getElementById('modList');
-    if (!App.pendingQueue.length) {
-        list.innerHTML = '<div class="mod-empty">No pending submissions.</div>';
-        return;
-    }
-
-    list.innerHTML = App.pendingQueue.map(item => `
-        <div class="mod-item" data-id="${item.id}">
-            <div class="mod-item-info">
-                <div class="mod-part">${escHtml(item.parts?.category || '')} &mdash; ${escHtml(item.parts?.name || 'Part #' + item.part_id)}</div>
-                <div class="mod-supplier">
-                    <strong>${escHtml(item.supplier_name)}</strong>
-                    ${item.product_url ? ` &mdash; <a href="${escAttr(item.product_url)}" target="_blank" rel="noopener">${escHtml(item.product_url)}</a>` : ''}
-                </div>
-                ${item.notes ? `<div class="mod-meta">${escHtml(item.notes)}</div>` : ''}
-                <div class="mod-meta">Submitted ${new Date(item.created_at).toLocaleDateString()}</div>
-            </div>
-            <div class="mod-actions">
-                <button class="btn btn-approve" onclick="approveSubmission(${item.id})">Approve</button>
-                <button class="btn btn-warn" onclick="rejectSubmission(${item.id})">Reject</button>
-            </div>
-        </div>
-    `).join('');
-}
+// Moderation queue removed — use GitHub Issues/PRs for supplier suggestions
+function renderModQueue() {}
+function toggleModPanel() {}
 
 // ────────────────────────────────────────────────────
 // UI Interactions
@@ -1787,9 +1610,7 @@ function togglePart(summary) {
     summary.closest('.part-row').classList.toggle('expanded');
 }
 
-function toggleModPanel() {
-    document.getElementById('modPanel').classList.toggle('visible');
-}
+// toggleModPanel defined above
 
 // ────────────────────────────────────────────────────
 // User Choices — Buy/Print Toggle & Preferred Supplier
@@ -1883,84 +1704,16 @@ function getUserChoiceSummary() {
 // Supplier Submission
 // ────────────────────────────────────────────────────
 function openSuggestModal(partId, partName) {
-    App.suggestPartId = partId;
-    document.getElementById('suggestPartName').textContent = `For: ${partName}`;
-    document.getElementById('fSupplier').value = '';
-    document.getElementById('fUrl').value = '';
-    document.getElementById('fNotes').value = '';
-    document.getElementById('suggestModal').classList.add('active');
+    // Open a pre-filled GitHub Issue for supplier suggestions
+    const ghUrl = `https://github.com/${BOM_CONFIG.GITHUB_REPO_OWNER}/${BOM_CONFIG.GITHUB_REPO_NAME}/issues/new`;
+    const title = encodeURIComponent(`Supplier suggestion: ${partName}`);
+    const body = encodeURIComponent(`**Part:** ${partName} (ID: ${partId})\n\n**Supplier Name:** \n**Product URL:** \n**Notes:** \n**SKU/Part Number:** `);
+    window.open(`${ghUrl}?title=${title}&body=${body}&labels=supplier-suggestion`, '_blank');
 }
 
 function closeModal() {
-    document.getElementById('suggestModal').classList.remove('active');
-    App.suggestPartId = null;
-}
-
-async function submitSuggestion() {
-    const supplierName = document.getElementById('fSupplier').value.trim();
-    const productUrl = document.getElementById('fUrl').value.trim();
-    const notes = document.getElementById('fNotes').value.trim();
-
-    if (!supplierName) {
-        showToast('Supplier name is required', 'error');
-        return;
-    }
-
-    const { error } = await App.sb.from('supplier_options').insert({
-        part_id: App.suggestPartId,
-        supplier_name: supplierName,
-        product_url: productUrl || null,
-        notes: notes || null,
-        submitted_by: App.user.id,
-        approved: false
-    });
-
-    if (error) {
-        console.error('Submit error:', error);
-        showToast('Failed to submit: ' + error.message, 'error');
-        return;
-    }
-
-    showToast('Submitted for review!', 'success');
-    closeModal();
-
-    // Refresh data
-    await loadBOM();
-    renderBOM();
-    if (App.isMaintainer) await loadModerationQueue();
-}
-
-// ────────────────────────────────────────────────────
-// Moderation Actions
-// ────────────────────────────────────────────────────
-async function approveSubmission(id) {
-    const { error } = await App.sb.from('supplier_options')
-        .update({ approved: true, approved_by: App.user.id })
-        .eq('id', id);
-
-    if (error) {
-        showToast('Approve failed: ' + error.message, 'error');
-        return;
-    }
-
-    showToast('Supplier approved', 'success');
-    await loadBOM();
-    await loadModerationQueue();
-    renderBOM();
-}
-
-async function rejectSubmission(id) {
-    const { error } = await App.sb.from('supplier_options')
-        .delete()
-        .eq('id', id);
-
-    if (error) {
-        showToast('Reject failed: ' + error.message, 'error');
-        return;
-    }
-
-    showToast('Submission rejected', 'success');
-    await loadModerationQueue();
+    const el = document.getElementById('suggestModal');
+    if (el) el.classList.remove('active');
 }
 
 // ────────────────────────────────────────────────────
