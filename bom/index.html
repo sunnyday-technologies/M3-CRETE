@@ -474,6 +474,41 @@
             min-width: 80px;
         }
         .part-qty small { font-weight: 400; color: var(--text-secondary); display: block; font-size: 11px; }
+        .qty-adjust {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            margin-top: 3px;
+        }
+        .qty-adjust button {
+            width: 20px; height: 20px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg);
+            color: var(--text-dim);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+        }
+        .qty-adjust button:hover { border-color: var(--accent); color: var(--accent); }
+        .qty-adjust .qty-val {
+            min-width: 28px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .qty-adjust .qty-val.modified { color: var(--accent); }
+        .qty-adjust .qty-reset {
+            font-size: 10px;
+            color: var(--text-dim);
+            cursor: pointer;
+            margin-left: 2px;
+        }
+        .qty-adjust .qty-reset:hover { color: var(--accent); }
 
         .mfg-badge {
             font-size: 11px;
@@ -1505,12 +1540,24 @@ function renderBOM() {
             const noteHtml = pd.note ? `<span class="model-note">${escHtml(pd.note)}</span>` : '';
 
             html += `<div class="part-row${expanded}${excludedClass}${coverageClass}" data-part-id="${part.id}">`;
+            const userQty = choice.orderQty != null ? choice.orderQty : pd.qty;
+            const qtyModified = choice.orderQty != null && choice.orderQty !== pd.qty;
+            const qtyResetHtml = qtyModified ? `<span class="qty-reset" onclick="event.stopPropagation();resetOrderQty(${part.id})" title="Reset to ${pd.qty}">\u21A9</span>` : '';
+
             html += `<div class="part-summary" onclick="togglePart(this)">
                 <div>
                     <div class="part-name">${escHtml(pd.name)}${cadBadge}${noteHtml}</div>
                     <div class="part-desc">${escHtml(part.description || '')}</div>
                 </div>
-                <div class="part-qty">${pd.qty}<small>${escHtml(pd.unit)}</small></div>
+                <div class="part-qty">
+                    <span>${pd.qty}</span><small>${escHtml(pd.unit)}</small>
+                    <div class="qty-adjust" onclick="event.stopPropagation()">
+                        <button onclick="adjustOrderQty(${part.id},-1)" title="Need fewer">&minus;</button>
+                        <span class="qty-val${qtyModified ? ' modified' : ''}" title="${qtyModified ? 'Modified from ' + pd.qty : 'Order quantity'}">${userQty}</span>
+                        <button onclick="adjustOrderQty(${part.id},+1)" title="Need more">&plus;</button>
+                        ${qtyResetHtml}
+                    </div>
+                </div>
                 <span class="mfg-badge ${mfgClass}">${mfgLabel}</span>${toggleHtml}
                 <label class="part-exclude" onclick="event.stopPropagation()">
                     <input type="checkbox" ${isExcluded ? 'checked' : ''} onchange="toggleExclude(${part.id}, this.checked)">I have this
@@ -1646,9 +1693,38 @@ function partCoveredBySelected(part) {
 
 function toggleSupplierFilter(supplierName) {
     if (App.activeSuppliers.has(supplierName)) {
+        // Deselect — remove this supplier and clear its auto-assigned preferred suppliers
         App.activeSuppliers.delete(supplierName);
+        App.parts.forEach(p => {
+            const choice = App.userChoices[p.id];
+            if (!choice || !choice.preferredSupplier) return;
+            const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved);
+            const prefOpt = opts.find(o => o.id === choice.preferredSupplier);
+            if (prefOpt && normalizeSupplier(prefOpt.supplier_name) === supplierName) {
+                // Check if another active supplier covers this part
+                const altOpt = opts.find(o => o.id !== choice.preferredSupplier && App.activeSuppliers.has(normalizeSupplier(o.supplier_name)));
+                if (altOpt) {
+                    choice.preferredSupplier = altOpt.id;
+                } else {
+                    delete choice.preferredSupplier;
+                    cleanupChoice(p.id);
+                }
+            }
+        });
     } else {
+        // Select — auto-assign this supplier for parts that don't have a preferred yet
         App.activeSuppliers.add(supplierName);
+        App.parts.forEach(p => {
+            if (p.exclude_from_kit) return;
+            const choice = App.userChoices[p.id] || {};
+            if (choice.excluded) return;
+            const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved);
+            const matchingOpt = opts.find(o => normalizeSupplier(o.supplier_name) === supplierName);
+            if (matchingOpt && !choice.preferredSupplier) {
+                if (!App.userChoices[p.id]) App.userChoices[p.id] = {};
+                App.userChoices[p.id].preferredSupplier = matchingOpt.id;
+            }
+        });
     }
     renderBOM();
 }
@@ -1720,16 +1796,13 @@ function toggleModPanel() {
 // ────────────────────────────────────────────────────
 function setMfgChoice(partId, mfgType) {
     if (!App.userChoices[partId]) App.userChoices[partId] = {};
-    const part = App.parts.find(p => p.id === partId);
     // Toggle off if clicking the current choice (revert to default)
     if (App.userChoices[partId].mfg === mfgType) {
         delete App.userChoices[partId].mfg;
     } else {
         App.userChoices[partId].mfg = mfgType;
     }
-    if (!App.userChoices[partId].mfg && !App.userChoices[partId].preferredSupplier) {
-        delete App.userChoices[partId];
-    }
+    cleanupChoice(partId);
     renderBOM();
 }
 
@@ -1740,9 +1813,7 @@ function toggleExclude(partId, excluded) {
     } else {
         delete App.userChoices[partId].excluded;
     }
-    if (!App.userChoices[partId].mfg && !App.userChoices[partId].preferredSupplier && !App.userChoices[partId].excluded) {
-        delete App.userChoices[partId];
-    }
+    cleanupChoice(partId);
     renderBOM();
 }
 
@@ -1754,10 +1825,38 @@ function setPreferredSupplier(partId, optionId) {
     } else {
         App.userChoices[partId].preferredSupplier = optionId;
     }
-    if (!App.userChoices[partId].mfg && !App.userChoices[partId].preferredSupplier) {
-        delete App.userChoices[partId];
+    cleanupChoice(partId);
+    renderBOM();
+}
+
+function adjustOrderQty(partId, delta) {
+    if (!App.userChoices[partId]) App.userChoices[partId] = {};
+    const part = App.parts.find(p => p.id === partId);
+    const pd = getPartDisplay(part);
+    const current = App.userChoices[partId].orderQty != null ? App.userChoices[partId].orderQty : pd.qty;
+    const newQty = Math.max(0, current + delta);
+    if (newQty === pd.qty) {
+        delete App.userChoices[partId].orderQty;
+    } else {
+        App.userChoices[partId].orderQty = newQty;
+    }
+    cleanupChoice(partId);
+    renderBOM();
+}
+
+function resetOrderQty(partId) {
+    if (App.userChoices[partId]) {
+        delete App.userChoices[partId].orderQty;
+        cleanupChoice(partId);
     }
     renderBOM();
+}
+
+function cleanupChoice(partId) {
+    const c = App.userChoices[partId];
+    if (c && !c.mfg && !c.preferredSupplier && !c.excluded && c.orderQty == null) {
+        delete App.userChoices[partId];
+    }
 }
 
 function getUserChoiceSummary() {
@@ -1769,6 +1868,7 @@ function getUserChoiceSummary() {
         const entry = { part: part.name };
         if (choice.excluded) entry.excluded = true;
         if (choice.mfg) entry.build_method = choice.mfg;
+        if (choice.orderQty != null) entry.order_qty = choice.orderQty;
         if (choice.preferredSupplier) {
             const opts = App.suppliersByPart[partId] || [];
             const opt = opts.find(o => o.id === choice.preferredSupplier);
@@ -1872,7 +1972,7 @@ function exportCSV() {
     const supplierSuffix = hasFilter ? '_' + [...App.activeSuppliers].map(s => s.toLowerCase().replace(/[^a-z0-9]+/g, '_')).join('+') : '';
     const fileName = `bom${modelSuffix}${supplierSuffix}_order.csv`;
 
-    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Excluded', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
+    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Order Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Excluded', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
 
     const grouped = {};
     App.parts.forEach(p => {
@@ -1902,13 +2002,14 @@ function exportCSV() {
 
             const pd = getPartDisplay(part);
             const choice = App.userChoices[part.id] || {};
+            const orderQty = choice.orderQty != null ? choice.orderQty : pd.qty;
             const userExcl = choice.excluded ? 'yes' : '';
             const userMfg = choice.mfg || '';
             const prefSuppId = choice.preferredSupplier;
             if (!options.length) {
                 rows.push([
                     part.category, pd.name, part.description || '',
-                    pd.qty, pd.unit, part.mfg_type,
+                    pd.qty, orderQty, pd.unit, part.mfg_type,
                     part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                     part.exclude_from_kit ? 'yes' : 'no',
                     userExcl, userMfg, '',
@@ -1919,7 +2020,7 @@ function exportCSV() {
                     const isPref = prefSuppId === opt.id ? 'yes' : '';
                     rows.push([
                         part.category, pd.name, part.description || '',
-                        pd.qty, pd.unit, part.mfg_type,
+                        pd.qty, orderQty, pd.unit, part.mfg_type,
                         part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                         part.exclude_from_kit ? 'yes' : 'no',
                         userExcl, userMfg, isPref,
@@ -1994,6 +2095,7 @@ function exportJSON() {
                     name: pd.name,
                     description: part.description || '',
                     qty: pd.qty,
+                    order_qty: choice.orderQty != null ? choice.orderQty : pd.qty,
                     unit: pd.unit,
                     mfg_type: part.mfg_type,
                     mpn: part.mpn || null,
