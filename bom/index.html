@@ -365,6 +365,24 @@
         }
         .supplier-filter-notice.visible { display: flex; justify-content: space-between; align-items: center; }
 
+        /* ── Supplier Gap Warning ─────────────────────── */
+        .part-row.no-supplier-match {
+            opacity: 0.55;
+            border-left: 3px solid #f59e0b;
+        }
+        .part-row.no-supplier-match .part-summary::after {
+            content: '⚠ Not available from this supplier';
+            display: block;
+            font-size: 11px;
+            color: #f59e0b;
+            margin-top: 4px;
+        }
+        .supplier-filter-notice .gap-warning {
+            color: #f59e0b;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
         /* ── Category Sections ────────────────────────── */
         .category-section {
             background: var(--surface);
@@ -888,6 +906,7 @@
             animation: slideIn 0.3s ease;
         }
         .toast.success { background: #2e7d32; }
+        .toast.warning { background: #b45309; }
         .toast.error   { background: #d32f2f; }
 
         @keyframes slideIn {
@@ -1376,7 +1395,12 @@ function renderBOM() {
     const filterText = document.getElementById('supplierFilterText');
     if (activeSupplier) {
         const supplierPartCount = getPartsForSupplier(activeSupplier).length;
-        filterText.innerHTML = `Showing <strong>${supplierPartCount} parts</strong> available from <strong>${escHtml(activeSupplier)}</strong>`;
+        const totalNonExcluded = App.parts.filter(p => !p.exclude_from_kit && !(App.userChoices[p.id] || {}).excluded).length;
+        const gapCount = totalNonExcluded - supplierPartCount;
+        const gapHtml = gapCount > 0
+            ? `<span class="gap-warning">⚠ ${gapCount} part${gapCount !== 1 ? 's' : ''} not available from this supplier — shown dimmed below</span>`
+            : '';
+        filterText.innerHTML = `Showing <strong>${supplierPartCount} parts</strong> available from <strong>${escHtml(activeSupplier)}</strong>${gapHtml}`;
         filterNotice.classList.add('visible');
     } else {
         filterNotice.classList.remove('visible');
@@ -1391,8 +1415,15 @@ function renderBOM() {
         // Text search filter
         if (term) parts = parts.filter(p => matchesSearch(p, term));
 
-        // Supplier filter
-        if (activeSupplier) parts = parts.filter(p => partHasSupplier(p, activeSupplier));
+        // Supplier filter: NEVER hide parts — sort matched to top, unmatched to bottom
+        // This prevents silent gaps in exported BOMs
+        if (activeSupplier) {
+            parts = parts.slice().sort((a, b) => {
+                const aHas = partHasSupplier(a, activeSupplier) ? 0 : 1;
+                const bHas = partHasSupplier(b, activeSupplier) ? 0 : 1;
+                return aHas - bHas;
+            });
+        }
 
         if (!parts.length) return;
 
@@ -1437,6 +1468,7 @@ function renderBOM() {
             const expanded = activeSupplier ? ' expanded' : '';
             const isExcluded = !!choice.excluded;
             const excludedClass = isExcluded ? ' user-excluded' : '';
+            const noSupplierMatch = activeSupplier && !partHasSupplier(part, activeSupplier) ? ' no-supplier-match' : '';
 
             // Check if any supplier has a STEP file
             const hasCAD = approved.some(o => o.step_url);
@@ -1446,7 +1478,7 @@ function renderBOM() {
             const pd = getPartDisplay(part);
             const noteHtml = pd.note ? `<span class="model-note">${escHtml(pd.note)}</span>` : '';
 
-            html += `<div class="part-row${expanded}${excludedClass}" data-part-id="${part.id}">`;
+            html += `<div class="part-row${expanded}${excludedClass}${noSupplierMatch}" data-part-id="${part.id}">`;
             html += `<div class="part-summary" onclick="togglePart(this)">
                 <div>
                     <div class="part-name">${escHtml(pd.name)}${cadBadge}${noteHtml}</div>
@@ -1827,10 +1859,15 @@ function exportCSV() {
         (grouped[cat] || []).forEach(part => {
             let options = (App.suppliersByPart[part.id] || []).filter(o => o.approved);
 
-            // If supplier filter active, only include that supplier's options
+            // If supplier filter active, prefer that supplier's options but NEVER skip parts
             if (supplierKey) {
-                options = options.filter(o => normalizeSupplier(o.supplier_name) === supplierKey);
-                if (!options.length) return; // skip parts without this supplier
+                const filtered = options.filter(o => normalizeSupplier(o.supplier_name) === supplierKey);
+                if (filtered.length) {
+                    options = filtered;
+                } else {
+                    // Part has no option from this supplier — include with warning, no supplier columns
+                    options = [];
+                }
             }
 
             const pd = getPartDisplay(part);
@@ -1874,7 +1911,16 @@ function exportCSV() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(supplierKey ? `${activeSupplier} order exported` : 'CSV exported', 'success');
+    // Count parts without this supplier for warning
+    if (supplierKey) {
+        const totalParts = App.parts.filter(p => !p.exclude_from_kit).length;
+        const coveredParts = getPartsForSupplier(App.activeSupplier).length;
+        const gaps = totalParts - coveredParts;
+        const gapMsg = gaps > 0 ? ` (⚠ ${gaps} parts need other suppliers)` : ' (complete coverage)';
+        showToast(`${App.activeSupplier} order exported${gapMsg}`, gaps > 0 ? 'warning' : 'success');
+    } else {
+        showToast('CSV exported', 'success');
+    }
 }
 
 // ────────────────────────────────────────────────────
