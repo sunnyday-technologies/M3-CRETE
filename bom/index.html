@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Concrete 3D Printer — BOM Viewer</title>
+
+    <!-- Machine-readable BOM data (agents, crawlers, non-JS clients) -->
+    <link rel="alternate" type="application/json" href="/bom/data.json" title="M3-CRETE Bill of Materials (JSON)">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Interactive Bill of Materials for the M3-CRETE open-source concrete 3D printer. 66 parts across 9 categories with multi-supplier sourcing.">
+
+    <!-- Structured Data: JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "M3-CRETE Bill of Materials",
+      "description": "Complete bill of materials for the M3-CRETE open-source concrete 3D printer by Sunnyday Technologies. 66 parts across 9 categories: frame, motion, electronics, extrusion, and hardware.",
+      "url": "https://m3-crete.com/bom/",
+      "license": "https://ohwr.org/cern_ohl_w_v2.txt",
+      "creator": {
+        "@type": "Organization",
+        "name": "Sunnyday Technologies",
+        "url": "https://sunn3d.com"
+      },
+      "distribution": [
+        {
+          "@type": "DataDownload",
+          "encodingFormat": "application/json",
+          "contentUrl": "https://m3-crete.com/bom/data.json"
+        }
+      ],
+      "keywords": ["3D printing", "concrete", "construction", "open-source", "bill of materials", "BOM", "3DCP"],
+      "isPartOf": {
+        "@type": "CreativeWork",
+        "name": "M3-CRETE Open-Source Concrete 3D Printer",
+        "url": "https://m3-crete.com"
+      }
+    }
+    </script>
     <style>
         /* ── Reset & Base ─────────────────────────────── */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2056,5 +2091,93 @@ function showToast(msg, type = '') {
     setTimeout(() => { el.remove(); }, 3500);
 }
 </script>
+
+<!-- No-JS fallback: static BOM table for crawlers, agents, and non-JS browsers -->
+<noscript>
+<div style="max-width:1400px;margin:40px auto;padding:0 20px;color:#f0f4f7;font-family:sans-serif;">
+    <h2>M3-CRETE Bill of Materials — 66 Parts</h2>
+    <p style="margin:8px 0 16px;opacity:0.85;">Machine-readable JSON available at <a href="/bom/data.json" style="color:#97D700;">/bom/data.json</a></p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+            <tr style="border-bottom:2px solid #1a3350;text-align:left;">
+                <th style="padding:8px;">Category</th>
+                <th style="padding:8px;">Part</th>
+                <th style="padding:8px;">Qty</th>
+                <th style="padding:8px;">Type</th>
+                <th style="padding:8px;">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>2080 V-Slot Aluminum Extrusion (1200mm)</td><td>11 lengths</td><td>Buy</td><td>Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages.</td></tr>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>Frame Stiffener — Long Span Reinforcement</td><td>4 bars (1.2m each)</td><td>Buy</td><td>Required for X-axis spans exceeding 1.5m (M3-2 and M3-4).</td></tr>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>2040 V-Slot Aluminum Extrusion (1200mm)</td><td>4 lengths</td><td>Buy</td><td>Vertical posts (Z-height). 1200mm gives ~1000mm usable Z travel.</td></tr>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>2040 V-Slot Aluminum Extrusion (1000mm)</td><td>12 lengths</td><td>Buy</td><td>Cross braces, cable chain mounts, electronics panel rails, and accessory mounting.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>Heavy Duty Corner Brackets (20-Series)</td><td>40 pieces</td><td>3D Print</td><td>Frame corner connections for V-Slot 20-series. Printable saves $200+.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>Straight Line Internal Connectors (20-Series)</td><td>16 pieces</td><td>Buy</td><td>Splice connectors for modular X-axis extension.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>T-Slot Drop-In Nuts M5 (20-Series)</td><td>3 packs of 100</td><td>Buy</td><td>300 total. Spring-loaded drop-in style recommended.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>Eccentric Spacers (V-Slot)</td><td>28 pieces</td><td>Buy</td><td>Required for V-wheel preload adjustment on all motion axes.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>Adjustable Leveling Feet M16</td><td>4 pieces</td><td>Buy</td><td>Critical for leveling on uneven job-site floors. 1000lb-rated per foot.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>NEMA23 Stepper Motor (X-axis, 8mm shaft)</td><td>1 motor</td><td>Buy</td><td>8mm shaft variant. TMC5160 StallGuard for sensorless homing. 3Nm minimum.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>GT2 Timing Belt 10mm (Reinforced)</td><td>8 meters</td><td>Buy</td><td>X-axis drive belt. Gates PowerGrip GT3 preferred.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>GT2 Pulley 20-Tooth (8mm Bore)</td><td>4 pulleys</td><td>Buy</td><td>Drive and idler pulleys. Must match 8mm motor shaft.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>Idler Pulley Mounting Plate</td><td>14 plates</td><td>Buy</td><td>Mounts smooth idler pulleys at belt return ends.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>V-Groove Delrin Wheels (Polycarbonate)</td><td>8 wheels</td><td>Buy</td><td>Dust-resistant, critical for concrete environment.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>X-Axis Carriage Plate Assembly</td><td>1 assembly</td><td>3D Print</td><td>Carries the 1.5kg printhead. Print saves $70+ with CF-Nylon/ABS.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>NEMA23 Stepper Motor (Y-axis, 8mm shaft)</td><td>2 motors</td><td>Buy</td><td>Dual motors for anti-racking. TMC5160 StallGuard compatible.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>GT2 Timing Belt 10mm (Reinforced)</td><td>8 meters</td><td>Buy</td><td>Dual Y-axis belts. ~3m each side, 6m total.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>GT2 Pulley 20-Tooth (8mm Bore)</td><td>8 pulleys</td><td>Buy</td><td>Multiple pulleys for dual Y system. 8mm bore.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>V-Groove Wheels (Polycarbonate)</td><td>16 wheels</td><td>Buy</td><td>Better load distribution on gantry beam carriages.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>Y-Axis Gantry Plates</td><td>2 plates</td><td>3D Print</td><td>Connects gantry beam to Y-rail carriages. Print saves $160+.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>NEMA23 Stepper Motor (Z-axis, 8mm shaft)</td><td>4 motors</td><td>Buy</td><td>Four independent motors for auto-tramming via Klipper Z_TILT_ADJUST.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>GT2 Timing Belt 10mm (Z-axis)</td><td>12 meters</td><td>Buy</td><td>Belt-driven Z. ~3m per Z corner, 12m total.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>GT2 Pulley 20-Tooth (8mm Bore, Z-axis)</td><td>8 pulleys</td><td>Buy</td><td>Drive + idler pulleys for belt Z. Full parts commonality with X/Y.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>V-Groove Wheels (Z-axis Carriages)</td><td>12 wheels</td><td>Buy</td><td>3 wheels per corner carriage on 2040 vertical posts.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Carriage Plates</td><td>4 plates</td><td>3D Print</td><td>Connects gantry frame to V-wheel carriages on vertical posts.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Motor Mounts</td><td>4 mounts</td><td>3D Print</td><td>Print saves $90. Interfaces NEMA23 to 2040 V-Slot vertical post.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>BTT Kraken Mainboard</td><td>1 board</td><td>Buy</td><td>8x TMC5160 stepper drivers. X + 2Y + 4Z + Extruder.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Raspberry Pi 5 (8GB RAM)</td><td>1 computer</td><td>Buy</td><td>Runs Klipper firmware. 8GB for large print files.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>7-inch Touchscreen Display</td><td>1 display</td><td>Buy</td><td>User interface via KlipperScreen.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Power Supply 24V 600W</td><td>1 PSU</td><td>Buy</td><td>MeanWell. 600W handles 7 NEMA23 steppers + accessories.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Emergency Stop Button</td><td>1 switch</td><td>Buy</td><td>NC contacts. Pressing opens circuit and kills 24V via contactor.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Cable Drag Chain (Sealed)</td><td>4 meters total</td><td>Buy</td><td>Enclosed type for concrete dust protection.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Shielded Motor Cable - Flex-Rated (18AWG 4C)</td><td>20 meters</td><td>Buy</td><td>Continuous-flex drag-chain-rated. For X, Y, and extruder motors.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Shielded Motor Cable - Static (18AWG 4C)</td><td>10 meters</td><td>Buy</td><td>For 4 stationary Z-axis motors.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>GX16-4 Aviation Connector Sets</td><td>10 sets</td><td>Buy</td><td>Quick-disconnect for all 8 stepper motors. IP65 when mated.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Power Wire — 12AWG Silicone (Red + Black)</td><td>4m total</td><td>Buy</td><td>PSU 24V output to BTT Kraken main power input.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Distribution Wire — 18AWG (Red + Black)</td><td>6m total</td><td>Buy</td><td>24V branch distribution, accessory power, E-stop signal loop.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Ferrule Crimping Tool + Assortment Kit</td><td>1 kit</td><td>Buy</td><td>Every stranded wire into a screw terminal must have a ferrule.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>IEC C14 Power Inlet w/ EMI Filter &amp; Fuse</td><td>1 unit</td><td>Buy</td><td>Panel-mount AC inlet with integrated EMI filter and fuse holder.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>24V Safety Contactor / Relay</td><td>1 unit</td><td>Buy</td><td>E-stop cuts 24V power via this contactor. 30A contacts minimum.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>24V-to-5V DC-DC Buck Converter (5A)</td><td>1 unit</td><td>Buy</td><td>Powers Raspberry Pi 5 and touchscreen from 24V bus.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>DIN-Rail Terminal Block Kit + Rail</td><td>1 kit</td><td>Buy</td><td>10-position terminal blocks, end stops, jumper bars, and 0.5m DIN rail.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Nylon Cable Gland Assortment</td><td>1 50-pack</td><td>Buy</td><td>IP68 cable glands for every wire entering the control panel.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Snap-On Ferrite Cores (13mm ID)</td><td>8 pieces</td><td>Buy</td><td>One per stepper motor cable at controller end. Suppresses EMI.</td></tr>
+            <tr><td>Electronics &amp; Control System</td><td>Cable Sleeving, Labels &amp; Tie Kit</td><td>1 kit</td><td>Buy</td><td>PET braided sleeving, UV-resistant cable ties, wire labels.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Progressive Cavity Pump</td><td>1 pump</td><td>Buy</td><td>REFERENCE ONLY — not included in motion system kit.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>NEMA23 Planetary Geared Stepper (10:1)</td><td>1 motor + gearbox</td><td>Buy</td><td>Drives PC pump rotor. ~6Nm output torque at 50-300 RPM.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>External Stepper Driver — TMC5160 (48V)</td><td>1 driver board</td><td>Buy</td><td>Drives geared pump motor. Higher current (6A) and 48V.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Progressive Cavity Pump Element (Rotor + Stator)</td><td>1 set</td><td>Buy</td><td>Core pumping element. For mortar/concrete with aggregates up to 2-6mm.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Pump Drive Coupling — Universal Joint</td><td>1 assembly</td><td>Buy</td><td>Converts motor rotation to rotor orbital motion.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Pump Housing &amp; Bearing Assembly</td><td>1 assembly</td><td>CNC/Fab</td><td>Encloses rotor/stator and provides bearing support.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>NEMA23 Motor for Extruder (Direct Drive)</td><td>1 motor</td><td>Buy</td><td>Direct-drive option for simpler pump setups or peristaltic.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>48V Power Supply for Pump Driver</td><td>1 PSU</td><td>Buy</td><td>Only needed if running external TMC5160 at 48V.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Material Hopper 20-Liter</td><td>1 hopper</td><td>3D Print</td><td>Material reservoir above the pump. HDPE or stainless.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Concrete Nozzle Assembly</td><td>1 assembly</td><td>CNC/Fab</td><td>Replaceable-tip design for different layer widths (20-40mm).</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Tubing &amp; Quick Fittings</td><td>1 kit</td><td>Buy</td><td>Pump to nozzle material flow. Reinforced hose rated for concrete slurry.</td></tr>
+            <tr><td>Concrete Extrusion System</td><td>Extruder Mounting Bracket</td><td>1 bracket</td><td>3D Print</td><td>Mounts extruder pipe to X-axis carriage plate.</td></tr>
+            <tr><td>Fasteners &amp; Hardware</td><td>M5 Socket Head Cap Screws</td><td>1 500pc kit</td><td>Buy</td><td>Primary structural fasteners for 20-series V-Slot frame.</td></tr>
+            <tr><td>Fasteners &amp; Hardware</td><td>M3 Socket Head Cap Screws</td><td>1 500pc kit</td><td>Buy</td><td>Electronics mounting and small parts.</td></tr>
+            <tr><td>Fasteners &amp; Hardware</td><td>Washers &amp; Lock Washers Assorted</td><td>1 kit</td><td>Buy</td><td>Prevent loosening from vibration. Nord-Lock recommended.</td></tr>
+            <tr><td>Fasteners &amp; Hardware</td><td>Heat-Set Inserts M3/M5</td><td>1 200pc kit</td><td>Buy</td><td>Essential for threaded connections in 3D printed parts.</td></tr>
+            <tr><td>Optional Upgrades</td><td>Polycarbonate Enclosure Panels</td><td>1 set</td><td>Buy</td><td>Dust containment for indoor use.</td></tr>
+            <tr><td>Optional Upgrades</td><td>LED Work Lighting</td><td>1 kit</td><td>Buy</td><td>Work area illumination — 24V LED strips.</td></tr>
+            <tr><td>Optional Upgrades</td><td>Camera Module for Monitoring</td><td>1 camera</td><td>Buy</td><td>Remote print monitoring via KlipperScreen or Mainsail.</td></tr>
+            <tr><td>Optional Upgrades</td><td>HEPA Air Filtration</td><td>1 system</td><td>Buy</td><td>Concrete dust particle capture for indoor operation.</td></tr>
+            <tr><td>Optional Upgrades</td><td>Carbon Fiber Stiffener Bar (2080 Rail)</td><td>4 bars (2m each)</td><td>Buy</td><td>20-30% additional stiffness on long spans. Structural epoxy bond.</td></tr>
+        </tbody>
+    </table>
+</div>
+</noscript>
+
 </body>
 </html>
