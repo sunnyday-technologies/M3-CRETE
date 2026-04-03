@@ -2,6 +2,36 @@
 
 3D models for the M3-CRETE concrete 3D printer motion system.
 
+## Assembly (Draft v0.1 — In Development)
+
+The M3-2 digital twin assembly is generated programmatically from the STEP
+component library using CadQuery + Python. This is believed to be the first
+AI-assisted multi-part mechanical assembly generated from real vendor STEP files.
+
+**Status:** Draft v0.1 — frame structure complete, motion system in progress.
+
+```
+python CAD/m3_2_assembly.py          # Generates M3-2_Assembly.step
+python CAD/parametric_extrusions.py  # Generates custom-length extrusions
+python CAD/deep_probe.py             # Inspects STEP geometry for assembly math
+```
+
+**Requirements:** Python 3.11 + CadQuery 2.7.0 (`pip install cadquery`)
+
+**Assembly contents (40 parts):**
+- 4x V-Slot 2040 posts (1200mm, full height)
+- 8x V-Slot 2080 top X-rails (1160mm segments, spliced, 80mm vertical)
+- 5x V-Slot 2040 Y-braces (1160mm, 3 top + 2 bottom)
+- 2x V-Slot 2080 Y-rails (Z-platform, 1154mm)
+- 1x V-Slot 2080 gantry beam (2270mm, X-spanning)
+- 8x gantry plates (Z-carriage, sandwich posts)
+- 4x gantry plates (X-carriage + Y-rail end plates)
+- 7x NEMA23 motors (4Z horizontal + 2Y inside + 1X on carriage)
+- 4x motor mount plates
+
+**Open-bottom bridge frame** — no front/back bottom rails, allowing the printer
+to straddle walls for continuous printing.
+
 ## Directory Structure
 
 ```
