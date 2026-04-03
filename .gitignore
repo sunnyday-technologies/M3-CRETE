@@ -1,4 +1,4 @@
- OS files
+# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -8,6 +8,20 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Claude Code config (local-only)
+.claude/
+
+# Session notes / internal context (never publish)
+conversation-summary.md
+
+# Python virtual environments
+cad_venv/
+.venv/
+__pycache__/
+
+# NemoCrete — proprietary pump system (separate project)
+NEMA_CRETE/
 
 # Build artifacts
 build/
@@ -30,9 +44,31 @@ node_modules/
 *.bak
 ~*
 
+# Generated assembly output (rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py)
+CAD/M3-2_Assembly.step
+CAD/M3-2_Assembly*.step
+CAD/Custom/*.step
+CAD/Custom/*.stl
+
+# Dev/test STEP files (not for GitHub)
+CAD/box_test.step
+CAD/corner_test.step
+CAD/rotation_test.step
+
+# Dev probe/test scripts (keep locally, not essential for repo)
+CAD/box_test.py
+CAD/corner_test.py
+CAD/rotation_test.py
+CAD/read_adjusted.py
+CAD/read_v3.py
+CAD/probe_actuator.py
+CAD/extract_carriage.py
+
 # Large CAD binary archives (track with Git LFS or share separately)
 # Uncomment these if you store CAD in a separate location:
-# *.step
 # *.stl
 # *.3mf
 # *.f3d
+
+# Session / dev notes
+m3_render_prompt.md
