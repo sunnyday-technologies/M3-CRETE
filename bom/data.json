@@ -356,46 +356,10 @@
           "approved": true
         },
         {
-          "id": 3,
-          "supplier_name": "ZYLtech",
-          "product_url": "https://www.zyltech.com/zyltech-2080-t-slot-aluminum-extrusion-pre-cut-length-1000mm/",
-          "notes": "2080 pre-cut, 1000-2000mm. NOTE: ZYLtech 2080 is T-slot not V-slot — verify V-groove compatibility or use for structural-only members",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 4,
-          "supplier_name": "VXB Bearings",
-          "product_url": "https://vxb.com/products/1000mm-black-v-slot-aluminum-extrusion-profile-lin",
-          "notes": "2080 V-Slot 1000mm stocked, black anodized",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
           "id": 1,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/v-slot-2080/",
           "notes": "2080 V-Slot, cut to length, black or silver anodized",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 203,
-          "supplier_name": "3D Printing USA",
-          "product_url": "https://3dprintingusa.com/collections/aluminum-extrusion-v-slot",
-          "notes": "V-Slot extrusions - US stock, up to 2.5m lengths",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 204,
-          "supplier_name": "RatRig",
-          "product_url": "https://us.ratrig.com/",
-          "notes": "V-Slot custom cut-to-length - US/Canada store",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -963,24 +927,6 @@
           "sku": null,
           "step_url": null,
           "approved": true
-        },
-        {
-          "id": 205,
-          "supplier_name": "3D Printing USA",
-          "product_url": "https://3dprintingusa.com/collections/aluminum-extrusion-v-slot",
-          "notes": "V-Slot extrusions - US stock, up to 2.5m lengths",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 206,
-          "supplier_name": "RatRig",
-          "product_url": "https://us.ratrig.com/",
-          "notes": "V-Slot custom cut-to-length - US/Canada store",
-          "sku": null,
-          "step_url": null,
-          "approved": true
         }
       ]
     },
@@ -1030,9 +976,9 @@
       "id": 57,
       "category": "Fasteners & Hardware",
       "name": "M3 Socket Head Cap Screws",
-      "description": "Electronics mounting and small parts.",
+      "description": "Electronics mounting and small parts. ~50 needed: Kraken (4), Pi 5 (4), buck converters (12), fans (8), DIN rail (12), misc brackets (10).",
       "qty": 1,
-      "unit": "500pc kit",
+      "unit": "100pc kit",
       "mfg_type": "buy",
       "sort_order": 20,
       "mpn": null,
@@ -1043,7 +989,7 @@
           "id": 167,
           "supplier_name": "McMaster-Carr",
           "product_url": "https://mcmaster.com",
-          "notes": "M3 SHCS assortment 500pc",
+          "notes": "M3 SHCS assortment 100pc",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -1052,7 +998,7 @@
           "id": 168,
           "supplier_name": "Amazon",
           "product_url": "https://amazon.com",
-          "notes": "M3 SHCS basic set 500pc",
+          "notes": "M3 SHCS assortment 100pc",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -1487,6 +1433,15 @@
       "exclude_from_kit": false,
       "suppliers": [
         {
+          "id": 217,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/v-slot-20-x-40mm/",
+          "notes": "2040 V-Slot, US warehouse, multiple lengths available",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
           "id": 9,
           "supplier_name": "ZYLtech",
           "product_url": "https://www.zyltech.com/10x-1m-2040-v-groove-extrusion-bulk-pack/",
@@ -1509,24 +1464,6 @@
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/v-slot-2040/",
           "notes": "2040 V-Slot 1000mm",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 207,
-          "supplier_name": "3D Printing USA",
-          "product_url": "https://3dprintingusa.com/collections/aluminum-extrusion-v-slot",
-          "notes": "V-Slot extrusions - US stock, up to 2.5m lengths",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 208,
-          "supplier_name": "RatRig",
-          "product_url": "https://us.ratrig.com/",
-          "notes": "V-Slot custom cut-to-length - US/Canada store",
           "sku": null,
           "step_url": null,
           "approved": true
