@@ -39,32 +39,40 @@ STEP_DIR = os.path.join(os.path.dirname(__file__), "Components")
 def load(relpath, base=STEP_DIR):
     return cq.importers.importStep(os.path.join(base, relpath))
 
-# Cache for expensive STEP imports (don't re-read the user file 4x)
+# Cache for expensive STEP imports (don't re-read the user file N times)
 _STEP_CACHE = {}
-def load_solid_by_signature(step_path, size_target, center_target, tol=0.5):
-    """Extract a single solid from a STEP file matching size + approximate
-    center. Returns the solid wrapped as a cq.Workplane ready to add to
-    an Assembly at identity Location. Used to pick up pre-positioned parts
-    from Nick's manually-edited M3-2_Assembly_user.step (source-of-truth for
-    bracket/motor orientations that are hard to reproduce with L() rotations).
-    """
+def _cached_solids(step_path):
     if step_path not in _STEP_CACHE:
-        _STEP_CACHE[step_path] = cq.importers.importStep(step_path).val()
-    shape = _STEP_CACHE[step_path]
-    tgt_dims = sorted(size_target)
-    for s in shape.Solids():
+        _STEP_CACHE[step_path] = cq.importers.importStep(step_path).val().Solids()
+    return _STEP_CACHE[step_path]
+
+def load_solids_by_size(step_path, size_target, tol=0.5):
+    """Return list of (center, workplane) for every solid whose sorted bbox
+    dimensions match size_target within tol."""
+    tgt = sorted(size_target)
+    out = []
+    for s in _cached_solids(step_path):
         bb = s.BoundingBox()
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
-        if not all(abs(d-t) < tol for d, t in zip(dims, tgt_dims)):
-            continue
-        cx=(bb.xmax+bb.xmin)/2; cy=(bb.ymax+bb.ymin)/2; cz=(bb.zmax+bb.zmin)/2
-        if (abs(cx-center_target[0]) < tol and
-            abs(cy-center_target[1]) < tol and
-            abs(cz-center_target[2]) < tol):
-            return cq.Workplane().add(cq.Shape(s.wrapped))
-    raise RuntimeError(
-        f"No solid found in {step_path} matching size={size_target} "
-        f"center={center_target} (tol={tol})")
+        if all(abs(d-t) < tol for d, t in zip(dims, tgt)):
+            cx=(bb.xmax+bb.xmin)/2; cy=(bb.ymax+bb.ymin)/2; cz=(bb.zmax+bb.zmin)/2
+            out.append(((cx, cy, cz), cq.Workplane().add(cq.Shape(s.wrapped))))
+    return out
+
+def assign_by_nearest(solids, labeled_centers):
+    """Match each label in labeled_centers dict to the nearest-unassigned solid
+    from `solids`. Returns dict label -> (actual_center, workplane).
+    Used when we know roughly where each labeled part should be and want to
+    tolerate any manual drift in the user-edited source file."""
+    remaining = list(solids)
+    assigned = {}
+    for label, target in labeled_centers.items():
+        if not remaining:
+            raise RuntimeError(f"Ran out of solids while assigning '{label}'")
+        best_i = min(range(len(remaining)),
+                     key=lambda i: sum((remaining[i][0][j]-target[j])**2 for j in range(3)))
+        assigned[label] = remaining.pop(best_i)
+    return assigned
 
 def sao(step_file, length, rx=0, ry=0, rz=0):
     """Scale-And-Orient: stretch 1000mm stock to exact length, then bake rotation."""
@@ -429,65 +437,74 @@ Z_BELT_Y_F = 60            # belt strand Y at front posts (matches Nick's bracke
 Z_BELT_Y_R = D - 60        # = 1180 at rear posts
 Z_MOTOR_CZ = 1165          # motor + bracket center Z (body inside frame Z<1200)
 
-# Z-motor L-brackets: loaded pre-positioned from M3-2_Assembly_user.step.
-# Nick's Fusion edit (2026-04-11) rotated the front brackets around their own
-# centers — a transform that can't be cleanly reproduced via L()'s rx/ry/rz
-# rotation-then-translate order without brittle offset math. Loading the solids
-# directly from the user file guarantees fidelity to Nick's final placement.
+# Z-motion parts (brackets + motors + pulleys) are loaded pre-positioned from
+# M3-2_Assembly_user.step rather than placed parametrically. Rationale:
+#   (1) Nick's Fusion edits rotate parts around their own centers, which can't
+#       be cleanly reproduced via L()'s rx-ry-rz-then-translate order.
+#   (2) As of 2026-04-11, Nick moved the RL Z-motor ASSEMBLY outside the frame
+#       envelope to make room for the Y-motors coming in Phase C.4. Loading
+#       from the user file means future manual moves propagate automatically.
+# The rough label centers below are used only to map each loaded solid to its
+# corner post label; exact positions come from the user file.
 USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
-Z_BRACKET_CENTERS = {
-    "FL": (  94.4,  54.5, Z_MOTOR_CZ),
-    "FR": (2385.6,  54.5, Z_MOTOR_CZ),
-    "RL": (  94.5, 1185.5, Z_MOTOR_CZ),
+
+Z_BRACKET_LABELS = {                       # rough expected centers
+    "FL": (  94.4,  54.5,  Z_MOTOR_CZ),
+    "FR": (2385.6,  54.5,  Z_MOTOR_CZ),
+    "RL": (  94.5, 1185.5, Z_MOTOR_CZ),    # Nick moved → (-24.7, 1174.3, 1165)
     "RR": (2385.5, 1185.5, Z_MOTOR_CZ),
 }
-for nm, ctr in Z_BRACKET_CENTERS.items():
-    sh = load_solid_by_signature(USER_STEP, (69, 69, 65), ctr, tol=0.5)
-    add(sh, f"z_bracket_{nm}", BRK2, L(0, 0, 0))
+Z_MOTOR_LABELS = {                         # rough expected motor centers
+    "FL": (  80.9,   60,   Z_MOTOR_CZ),
+    "FR": (2399.1,   60,   Z_MOTOR_CZ),
+    "RL": (  80.9, 1180,   Z_MOTOR_CZ),    # moved → (-30.2, 1187.9, 1165)
+    "RR": (2399.1, 1180,   Z_MOTOR_CZ),
+}
+Z_PULLEY_LABELS = {                        # rough expected pulley centers
+    "FL": (  52.9,   60,   Z_MOTOR_CZ),
+    "FR": (2427.1,   60,   Z_MOTOR_CZ),
+    "RL": (  52.9, 1180,   Z_MOTOR_CZ),    # moved → (-30.2, 1215.9, 1165)
+    "RR": (2427.1, 1180,   Z_MOTOR_CZ),
+}
 
-# Motors + pulleys stay parametric — their L() rotations match Nick's placements.
-Z_MOTOR_CFG = [
-    # name, mot_tx, mot_ry, pul_tx, ty
-    ("FL",   63.2, -90,    45.9, Z_BELT_Y_F),
-    ("FR", 2416.8,  90,  2420.1, Z_BELT_Y_F),
-    ("RL",   63.2, -90,    45.9, Z_BELT_Y_R),
-    ("RR", 2416.8,  90,  2420.1, Z_BELT_Y_R),
-]
-for post_nm, mtx, mry, pltx, ty in Z_MOTOR_CFG:
-    add(motor_n23, f"z_motor_{post_nm}",  MTR, L(mtx, ty, Z_MOTOR_CZ, ry=mry))
-    add(gt2_20t,   f"z_pulley_{post_nm}", PUL, L(pltx, ty, Z_MOTOR_CZ))
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (69, 69, 65)), Z_BRACKET_LABELS).items():
+    add(sh, f"z_bracket_{label}", BRK2, L(0, 0, 0))
+
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), Z_MOTOR_LABELS).items():
+    add(sh, f"z_motor_{label}", MTR, L(0, 0, 0))
+
+z_pulley_info = {}   # label -> (cx, cy, cz, axis) — used by C.2 / C.3 parametric generators
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (14, 15, 15)), Z_PULLEY_LABELS).items():
+    add(sh, f"z_pulley_{label}", PUL, L(0, 0, 0))
+    bb_ = sh.val().BoundingBox()
+    if   abs((bb_.xmax - bb_.xmin) - 14) < 0.5: axis = "X"
+    elif abs((bb_.ymax - bb_.ymin) - 14) < 0.5: axis = "Y"
+    else:                                        axis = "Z"
+    z_pulley_info[label] = (ctr[0], ctr[1], ctr[2], axis)
 
 print(f"  Phase C.1 Z-motors: {n[0]} parts")
 
 # ============================================================
 # C.2 — Z-IDLERS at post bottoms (4x smooth idlers)
 # ============================================================
-# Each Z-belt loop runs from the motor pulley at the top of the post down
-# to a smooth idler at the bottom and back up. The idler rotation axis is
-# parallel to X (matches motor) and the idler sits directly below its motor
-# pulley so both belt strands are vertical.
-#
-# Mounting: M5 shoulder bolt through the post's inner X-face T-slot.
-#   - Bolt head inside the frame, shoulder extends inward to carry the
-#     idler pulley bore at X = pulley_center.
-#   - No dedicated idler mount plate — T-slot mount is sufficient for a
-#     12.7 mm smooth idler wheel. Shoulder bolt hardware is in the BOM.
-#
-# Placement: idler X,Y = motor pulley X,Y so belt strands are parallel to Z.
-# Idler Z = 60 mm (clear of bottom skids at Z[0,40], leaves room for belt
-# wrap and Z-carriage lower travel).
+# Parametric: one idler directly under each motor pulley, with rotation axis
+# matching the pulley's axis. For FL/FR/RR the pulley axis is X (native); for
+# the relocated RL corner the pulley axis is Y (Nick rotated motor 90° around
+# Z to get shaft-along-Y when moving the motor outside the frame envelope).
 #
 # Idler native: 12.7(X, axle) x 22(Y) x 22(Z)
-IDLER_Z = 60
-# (name, idler_cx, idler_cy)
-Z_IDLER_CFG = [
-    ("FL",   52.9,   Z_BELT_Y_F),
-    ("FR", 2427.1,   Z_BELT_Y_F),
-    ("RL",   52.9,   Z_BELT_Y_R),
-    ("RR", 2427.1,   Z_BELT_Y_R),
-]
-for nm, ix, iy in Z_IDLER_CFG:
-    add(idler_sm, f"z_idler_{nm}", IDL, L(ix, iy, IDLER_Z))
+IDLER_Z  = 60
+PULLEY_R = 6      # GT2 20T pulley effective tangent radius (belt pitch circle)
+IDLER_R  = 11     # smooth idler radius
+
+for label, (px, py, pz, axis) in z_pulley_info.items():
+    if   axis == "X": idler_shape = idler_sm
+    elif axis == "Y": idler_shape = rotate_shape(idler_sm, rz=90)
+    else:             idler_shape = rotate_shape(idler_sm, ry=90)
+    add(idler_shape, f"z_idler_{label}", IDL, L(px, py, IDLER_Z))
 
 print(f"  Phase C.2 Z-idlers: {n[0]} parts")
 
@@ -515,55 +532,60 @@ print(f"  Phase C.2 Z-idlers: {n[0]} parts")
 BELT = Color(0.59, 0.84, 0.00)     # M3-CRETE lime green
 TAB  = Color(0.70, 0.70, 0.75)     # printed nylon
 
-# Belt strand dimensions
-BELT_W  = 6                        # GT2-6 width (Y if horizontal, X if wrapped on X-axis pulleys)
-BELT_T  = 1.5                      # belt thickness (through-direction)
-# Belt strand spans vertically from motor pulley pitch circle to idler pitch circle.
-# Pulley pitch radius ~6mm, idler radius ~11mm. Average strand top/bot:
-BELT_Z0 = IDLER_Z + 11             # bottom of strand = idler top tangent
-BELT_Z1 = Z_MOTOR_CZ - 6           # top of strand = motor pulley bottom tangent
-BELT_H  = BELT_Z1 - BELT_Z0        # strand length in Z
+# Z-belt strands are generated parametrically from the loaded pulley data so
+# the ±6.5mm widened gap (matching pulley pitch circle) applies uniformly, and
+# the relocated RL strand positions follow the moved RL pulley automatically.
+# Belt box orientation matches pulley axis: the 6mm belt width runs along the
+# pulley rotation axis, and the 1.5mm thickness is radial.
+BELT_W  = 6                        # belt width along pulley rotation axis
+BELT_T  = 1.5                      # belt thickness radial from pulley
+BELT_Z0 = IDLER_Z + IDLER_R        # 71 (strand bottom tangent to idler)
+BELT_Z1 = Z_MOTOR_CZ - PULLEY_R    # 1159 (strand top tangent to pulley)
+BELT_H  = BELT_Z1 - BELT_Z0        # 1088
 
-def belt_strand(length_z):
-    """Tall thin box for a vertical belt strand. Returns a cq.Workplane."""
-    return (cq.Workplane("XY")
-            .box(BELT_T, BELT_W, length_z, centered=(True, True, False)))
+STRAND_HALF_GAP = 6.5               # half of 13mm strand spacing (pulley width)
 
-e_belt = belt_strand(BELT_H)
-
-# Pulley X: 52.9 (left) / 2427.1 (right). Strand front = pulley X - 3.5, strand rear = + 3.5
-# (tangent offsets so both strands are in the pulley's own tangent plane)
-STRAND_DX = 3.5
-for post_nm, (btx, bty, _) in Z_BRACKET_CENTERS.items():
-    is_left = btx < 1000
-    pulley_cx = 52.9 if is_left else 2427.1
-    belt_y = Z_BELT_Y_F if post_nm.startswith("F") else Z_BELT_Y_R
-    for tag, dx in [("up", -STRAND_DX), ("dn", +STRAND_DX)]:
-        add(e_belt, f"z_belt_{post_nm}_{tag}", BELT,
-            L(pulley_cx + dx, belt_y, BELT_Z0))
+for label, (px, py, pz, axis) in z_pulley_info.items():
+    if axis == "X":
+        # Strands separated in Y (tangent to pulley in Y-Z plane)
+        # Box: 6(X, along pulley axis) x 1.5(Y, radial) x BELT_H(Z)
+        strand = cq.Workplane("XY").box(BELT_W, BELT_T, BELT_H,
+                                        centered=(True, True, False))
+        offsets = [(0, -STRAND_HALF_GAP), (0, +STRAND_HALF_GAP)]
+    elif axis == "Y":
+        # Strands separated in X (tangent to pulley in X-Z plane)
+        # Box: 1.5(X, radial) x 6(Y, along pulley axis) x BELT_H(Z)
+        strand = cq.Workplane("XY").box(BELT_T, BELT_W, BELT_H,
+                                        centered=(True, True, False))
+        offsets = [(-STRAND_HALF_GAP, 0), (+STRAND_HALF_GAP, 0)]
+    else:
+        continue  # Z-axis pulley not applicable for Z-motor belts
+    for tag, (dx, dy) in zip(("fr", "bk"), offsets):
+        add(strand, f"z_belt_{label}_{tag}", BELT,
+            L(px + dx, py + dy, BELT_Z0))
 
 # L-tab: simple 3D-printed bracket attached to Z-corner plate, clamping belt.
-# Modeled as a single box at representative Z-carriage height (ZP=440).
-TAB_X = 14   # width along X (clearance of belt + pin fastener + wall)
-TAB_Y = 42   # length from plate face to belt strand + wrap
-TAB_Z = 30   # tall enough to clamp belt + hold printed pin
+# For X-axis pulleys (FL/FR/RR) the tab bridges the Y gap from plate face to
+# the closer belt strand. For the relocated Y-axis RL pulley, the "closer"
+# strand is inside the plate's X range so the tab is a short clamp at the
+# pulley Y.
+TAB_X = 14
+TAB_Y = 42   # length from plate face to belt strand + wrap (X-axis case)
+TAB_Z = 30
 
-e_tab = cq.Workplane("XY").box(TAB_X, TAB_Y, TAB_Z)
-
-# Tab position: centered on belt X, starts at plate face Y and extends outward to belt Y
-# Z at gantry representative height
-for post_nm, (btx, bty, _) in Z_BRACKET_CENTERS.items():
-    is_left = btx < 1000
-    is_front = post_nm.startswith("F")
-    pulley_cx = 52.9 if is_left else 2427.1
-    # Plate inner Y face: front plate +Y face at Y=25; rear plate -Y face at Y=1215
-    if is_front:
-        plate_face_y = 25
-        tab_cy = plate_face_y + TAB_Y/2     # extends into +Y
-    else:
-        plate_face_y = 1215
-        tab_cy = plate_face_y - TAB_Y/2     # extends into -Y
-    add(e_tab, f"z_ltab_{post_nm}", TAB, L(pulley_cx, tab_cy, ZP))
+for label, (px, py, pz, axis) in z_pulley_info.items():
+    is_front = label.startswith("F")
+    plate_face_y = 25 if is_front else 1215
+    if axis == "X":
+        # Bridge from plate face Y to closer strand Y
+        tab_cy = (plate_face_y + TAB_Y/2) if is_front else (plate_face_y - TAB_Y/2)
+        tab_shape = cq.Workplane("XY").box(TAB_X, TAB_Y, TAB_Z)
+        add(tab_shape, f"z_ltab_{label}", TAB, L(px, tab_cy, ZP))
+    else:  # axis == "Y" — tab sits at pulley Y (essentially at the plate edge)
+        tab_shape = cq.Workplane("XY").box(TAB_X, TAB_Y, TAB_Z)
+        # Anchor the tab's plate-facing end at the plate face (1215 for rear)
+        tab_cy = (plate_face_y - TAB_Y/2) if not is_front else (plate_face_y + TAB_Y/2)
+        add(tab_shape, f"z_ltab_{label}", TAB, L(px, tab_cy, ZP))
 
 print(f"  Phase C.3 Z-belts + tabs: {n[0]} parts")
 
@@ -627,6 +649,11 @@ if __name__ == "__main__":
         ("z_belt_",    "z_idler_"),  # Belt wraps idler
         ("z_ltab_",    "zpl_"),      # L-tab bolts to Z-corner plate
         ("z_ltab_",    "z_belt_"),   # L-tab clamps belt strand
+        # Known compromise (2026-04-11): Nick relocated the RL Z-motor OUTSIDE
+        # the frame. The moved inner belt strand clips the RL Z-corner plate
+        # by ~150 mm³ (1.2 x 1 x 127 mm). Will be resolved by a plate notch
+        # or safety box in a future revision.
+        ("z_belt_RL", "zpl_RL"),
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
