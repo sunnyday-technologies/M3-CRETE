@@ -44,9 +44,14 @@ node_modules/
 *.bak
 ~*
 
-# Generated assembly output (rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py)
-CAD/M3-2_Assembly.step
-CAD/M3-2_Assembly*.step
+# Generated assembly preview (rebuild with: cad_venv/Scripts/python CAD/preview_assembly.py)
+CAD/_preview/
+
+# Numbered assembly snapshots (experimental exports, keep local only)
+CAD/M3-2_Assembly[0-9]*.step
+CAD/M3-2_Assembly_user.f3d
+
+# Custom per-build CAD (user-local work)
 CAD/Custom/*.step
 CAD/Custom/*.stl
 
@@ -55,14 +60,23 @@ CAD/box_test.step
 CAD/corner_test.step
 CAD/rotation_test.step
 
-# Dev probe/test scripts (keep locally, not essential for repo)
+# Dev probe/test scripts (kept locally, not essential for repo)
 CAD/box_test.py
 CAD/corner_test.py
 CAD/rotation_test.py
 CAD/read_adjusted.py
 CAD/read_v3.py
 CAD/probe_actuator.py
+CAD/probe_brackets.py
+CAD/probe_plates.py
 CAD/extract_carriage.py
+CAD/diff_user_edit.py
+
+# NOTE: CAD/M3-2_Assembly.step AND CAD/M3-2_Assembly_user.step ARE tracked.
+# The first is the canonical rebuild artifact published with each release;
+# the second is Nick's manually-placed reference for parts whose orientation
+# can't be cleanly expressed as L()-helper rotations (e.g. the ST-M2 bracket).
+# m3_2_assembly.py reads the _user.step file directly via load_solid_by_signature()
 
 # Large CAD binary archives (track with Git LFS or share separately)
 # Uncomment these if you store CAD in a separate location:
