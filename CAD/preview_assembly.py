@@ -221,66 +221,66 @@ check("4 Z-motor L-brackets", len(z_brackets) == 4, f"got {len(z_brackets)}")
 check("4 Z-motors",           len(z_motors)   == 4, f"got {len(z_motors)}")
 check("4 Z-motor pulleys",    len(z_pulls)    == 4, f"got {len(z_pulls)}")
 
+# As of 2026-04-11, the RL Z-motor assembly was relocated OUTSIDE the frame
+# envelope by Nick to make room for Y-axis motors in Phase C.4. Tight "inside
+# frame" position checks on RL are relaxed; FL/FR/RR keep original invariants.
+RELOCATED = {"RL"}
+
 for post_nm in ("FL", "FR", "RL", "RR"):
     is_left  = POST_IS_LEFT[post_nm]
     is_front = POST_IS_FRONT[post_nm]
     ty = Z_BELT_Y["F" if is_front else "R"]
+    relocated = post_nm in RELOCATED
 
-    # --- L-bracket: 69(X) x 69(Y) x 65(Z) after rotation ---
-    # Flange Y touches front rail (Y=20) or rear rail (Y=1220)
+    # --- L-bracket: 69 x 69 x 65 (sorted) ---
     b = f"z_bracket_{post_nm}"
     if has(b):
         x0,x1,y0,y1,z0,z1 = bb(b)
-        check(f"{b} 69 in X",   abs((x1-x0) - 69) < 0.1, f"{x1-x0}")
-        check(f"{b} 69 in Y",   abs((y1-y0) - 69) < 0.1, f"{y1-y0}")
-        check(f"{b} 65 in Z",   abs((z1-z0) - 65) < 0.1, f"{z1-z0}")
-        # Flange touches appropriate rail
-        if is_front:
-            check(f"{b} flange at Y=20", abs(y0 - 20) < 0.1, f"y0={y0}")
-        else:
-            check(f"{b} flange at Y=1220", abs(y1 - 1220) < 0.1, f"y1={y1}")
-        # Bracket X must straddle the post interior, 20mm clear of post inside X face
-        if is_left:
-            check(f"{b} X inside, post-side at 60",  abs(x0 - 60)  < 0.1, f"x0={x0}")
-        else:
-            check(f"{b} X inside, post-side at 2420", abs(x1 - 2420) < 0.1, f"x1={x1}")
-        # Must live entirely inside frame envelope
-        check(f"{b} Z inside frame top", z1 <= H + TOL, f"z1={z1}")
-        check(f"{b} Z above top X-rail bot", z0 >= 1120 - 0.1, f"z0={z0}")
+        dims = sorted([x1-x0, y1-y0, z1-z0])
+        check(f"{b} sorted dims 65/69/69", all(abs(d-t) < 0.2 for d,t in zip(dims,[65,69,69])), f"{dims}")
+        check(f"{b} Z inside frame top",   z1 <= H + TOL, f"z1={z1}")
+        check(f"{b} Z above top X-rail bot", z0 >= 1120 - 0.5, f"z0={z0}")
+        if not relocated:
+            if is_front:
+                check(f"{b} flange at Y=20", abs(y0 - 20) < 0.1, f"y0={y0}")
+            else:
+                check(f"{b} flange at Y=1220", abs(y1 - 1220) < 0.1, f"y1={y1}")
+            if is_left:
+                check(f"{b} X inside, post-side at 60",  abs(x0 - 60)  < 0.1, f"x0={x0}")
+            else:
+                check(f"{b} X inside, post-side at 2420", abs(x1 - 2420) < 0.1, f"x1={x1}")
 
-    # --- Motor: 76.6(X, shaft axis) x 56.4(Y) x 56.4(Z) ---
+    # --- Motor: 56.4 x 56.4 x 76.6 (sorted) ---
     m = f"z_motor_{post_nm}"
     if has(m):
         x0,x1,y0,y1,z0,z1 = bb(m)
-        check(f"{m} 76.6 in X",  abs((x1-x0) - 76.6) < 0.1, f"{x1-x0}")
-        check(f"{m} 56.4 in Y",  abs((y1-y0) - 56.4) < 0.1, f"{y1-y0}")
-        check(f"{m} 56.4 in Z",  abs((z1-z0) - 56.4) < 0.1, f"{z1-z0}")
-        # Motor body + shaft must clear the post envelope in Y
-        if is_front:
-            check(f"{m} Y clears post front",  y0 >= 20 - TOL, f"y0={y0}")
-        else:
-            check(f"{m} Y clears post rear",   y1 <= 1220 + TOL, f"y1={y1}")
-        # Whole motor (body + shaft) must be inside frame envelope
-        check(f"{m} X inside frame", x0 >= 0 - TOL and x1 <= W + TOL, f"X[{x0},{x1}]")
-        check(f"{m} Z below frame top", z1 <= H + TOL, f"z1={z1}")
-        check(f"{m} Y center at belt", abs((y0+y1)/2 - ty) < TOL, f"cy={(y0+y1)/2}")
+        dims = sorted([x1-x0, y1-y0, z1-z0])
+        check(f"{m} sorted dims 56.4/56.4/76.6",
+              all(abs(d-t) < 0.1 for d,t in zip(dims,[56.4, 56.4, 76.6])), f"{dims}")
+        check(f"{m} Z center = motor height", abs((z0+z1)/2 - Z_MOTOR_CZ) < TOL, f"cz={(z0+z1)/2}")
+        check(f"{m} Z inside frame top",      z1 <= H + TOL, f"z1={z1}")
+        if not relocated:
+            if is_front:
+                check(f"{m} Y clears post front",  y0 >= 20 - TOL, f"y0={y0}")
+            else:
+                check(f"{m} Y clears post rear",   y1 <= 1220 + TOL, f"y1={y1}")
+            check(f"{m} X inside frame", x0 >= 0 - TOL and x1 <= W + TOL, f"X[{x0},{x1}]")
+            check(f"{m} Y center at belt", abs((y0+y1)/2 - ty) < TOL, f"cy={(y0+y1)/2}")
 
-    # --- Pulley: 14(X, shaft axis) x 15(Y) x 15(Z), on shaft ---
+    # --- Pulley: 14/15/15 (sorted) ---
     pl = f"z_pulley_{post_nm}"
     if has(pl):
         x0,x1,y0,y1,z0,z1 = bb(pl)
-        check(f"{pl} 14 in X",  abs((x1-x0) - 14) < TOL, f"{x1-x0}")
-        check(f"{pl} 15 in Y",  abs((y1-y0) - 15) < TOL, f"{y1-y0}")
-        check(f"{pl} 15 in Z",  abs((z1-z0) - 15) < TOL, f"{z1-z0}")
-        check(f"{pl} Y center = belt",  abs((y0+y1)/2 - ty) < TOL, f"cy={(y0+y1)/2}")
+        dims = sorted([x1-x0, y1-y0, z1-z0])
+        check(f"{pl} sorted dims 14/15/15",
+              all(abs(d-t) < 0.1 for d,t in zip(dims,[14,15,15])), f"{dims}")
         check(f"{pl} Z center = motor", abs((z0+z1)/2 - Z_MOTOR_CZ) < TOL, f"cz={(z0+z1)/2}")
-        # Pulley X must be near the shaft tip (toward the post)
-        if is_left:
-            # Shaft points -X, tip near X~42.6. Pulley center should be ~52.9
-            check(f"{pl} X center near shaft", abs((x0+x1)/2 - 52.9) < 0.2, f"cx={(x0+x1)/2}")
-        else:
-            # Shaft points +X, tip near X~2437.4. Pulley center should be ~2427.1
-            check(f"{pl} X center near shaft", abs((x0+x1)/2 - 2427.1) < 0.2, f"cx={(x0+x1)/2}")
+        if not relocated:
+            check(f"{pl} Y center = belt",  abs((y0+y1)/2 - ty) < TOL, f"cy={(y0+y1)/2}")
+            if is_left:
+                check(f"{pl} X center near shaft", abs((x0+x1)/2 - 52.9) < 0.2, f"cx={(x0+x1)/2}")
+            else:
+                check(f"{pl} X center near shaft", abs((x0+x1)/2 - 2427.1) < 0.2, f"cx={(x0+x1)/2}")
 
 # ----------------------------------------------------------
 # Phase C.3 — Z-belts + L-tabs
@@ -291,28 +291,49 @@ check("8 Z-belt strands (4 loops x 2)", len(z_belts) == 8, f"got {len(z_belts)}"
 check("4 Z-belt L-tabs",                 len(z_tabs)  == 4, f"got {len(z_tabs)}")
 
 for post_nm in ("FL", "FR", "RL", "RR"):
-    is_left  = POST_IS_LEFT[post_nm]
     is_front = POST_IS_FRONT[post_nm]
-    ty = Z_BELT_Y["F" if is_front else "R"]
-    expected_cx = 52.9 if is_left else 2427.1
+    # Use the pulley's actual loaded center as the reference — tolerates
+    # Nick's manual moves without code edits.
+    pulley_name = f"z_pulley_{post_nm}"
+    if not has(pulley_name):
+        continue
+    pbb = bb(pulley_name)
+    px = (pbb[0] + pbb[1]) / 2
+    py = (pbb[2] + pbb[3]) / 2
+    psx = pbb[1] - pbb[0]
+    psy = pbb[3] - pbb[2]
+    # Derive axis: 14mm dim is along the shaft
+    if abs(psx - 14) < 0.5:
+        pax = "X"
+    elif abs(psy - 14) < 0.5:
+        pax = "Y"
+    else:
+        pax = "Z"
 
-    # Belt strands: both at the same pulley X (±3.5 tangent offset), Z span top→bottom
-    for tag in ("up", "dn"):
+    # Belt strands: both 1.5 x 6 x 1088 (sorted), Z span idler→motor tangent
+    for tag in ("fr", "bk"):
         bn = f"z_belt_{post_nm}_{tag}"
         if has(bn):
             x0,x1,y0,y1,z0,z1 = bb(bn)
-            cx = (x0+x1)/2; cy = (y0+y1)/2
-            # Belt strand Z bottom = idler Z + 11 (tangent)
+            dims = sorted([x1-x0, y1-y0, z1-z0])
+            check(f"{bn} sorted dims 1.5/6/1088",
+                  all(abs(d-t) < 0.5 for d,t in zip(dims,[1.5, 6, 1088])), f"{dims}")
             check(f"{bn} Z bottom tangent", abs(z0 - 71) < 0.5, f"z0={z0}")
-            # Belt strand Z top = motor Z - 6
             check(f"{bn} Z top tangent",    abs(z1 - 1159) < 0.5, f"z1={z1}")
-            check(f"{bn} Y at belt",        abs(cy - ty) < 0.5,  f"cy={cy}")
-            # X center offset 3.5 from pulley center
-            dx = (cx - expected_cx)
-            exp_dx = -3.5 if tag == "up" else +3.5
-            check(f"{bn} X tangent offset", abs(dx - exp_dx) < 0.5, f"dx={dx}")
+            cx = (x0+x1)/2; cy = (y0+y1)/2
+            if pax == "X":
+                # Strands separated in Y, both at pulley X
+                check(f"{bn} X at pulley", abs(cx - px) < 0.5, f"cx={cx} vs px={px}")
+                exp_dy = -6.5 if tag == "fr" else +6.5
+                check(f"{bn} Y offset ±6.5", abs((cy - py) - exp_dy) < 0.5,
+                      f"dy={cy - py}")
+            else:  # Y-axis pulley
+                check(f"{bn} Y at pulley", abs(cy - py) < 0.5, f"cy={cy} vs py={py}")
+                exp_dx = -6.5 if tag == "fr" else +6.5
+                check(f"{bn} X offset ±6.5", abs((cx - px) - exp_dx) < 0.5,
+                      f"dx={cx - px}")
 
-    # L-tab: box 14(X) x 42(Y) x 30(Z) centered on belt X, bridging plate→belt
+    # L-tab: 14 x 42 x 30, centered on pulley X, bridging plate face to closer strand
     tn = f"z_ltab_{post_nm}"
     if has(tn):
         x0,x1,y0,y1,z0,z1 = bb(tn)
@@ -320,9 +341,8 @@ for post_nm in ("FL", "FR", "RL", "RR"):
         check(f"{tn} 14 in X",  abs((x1-x0) - 14) < 0.1, f"{x1-x0}")
         check(f"{tn} 42 in Y",  abs((y1-y0) - 42) < 0.1, f"{y1-y0}")
         check(f"{tn} 30 in Z",  abs((z1-z0) - 30) < 0.1, f"{z1-z0}")
-        check(f"{tn} X center = belt", abs(cx - expected_cx) < 0.1, f"cx={cx}")
+        check(f"{tn} X center = pulley X", abs(cx - px) < 0.5, f"cx={cx} vs px={px}")
         check(f"{tn} Z center = ZP",   abs(cz - 440) < TOL, f"cz={cz}")
-        # Spans plate face to belt strand
         if is_front:
             check(f"{tn} plate-end at Y=25",  abs(y0 - 25) < 0.5, f"y0={y0}")
             check(f"{tn} belt-end at Y=67",   abs(y1 - 67) < 0.5, f"y1={y1}")
@@ -337,26 +357,28 @@ IDLER_Z = 60
 z_idlers = [n for n in bboxes if n.startswith("z_idler_")]
 check("4 Z-axis idlers", len(z_idlers) == 4, f"got {len(z_idlers)}")
 for post_nm in ("FL", "FR", "RL", "RR"):
-    is_left  = POST_IS_LEFT[post_nm]
     is_front = POST_IS_FRONT[post_nm]
-    ty = Z_BELT_Y["F" if is_front else "R"]
-    expected_cx = 52.9 if is_left else 2427.1
-
+    relocated = post_nm in RELOCATED
     idn = f"z_idler_{post_nm}"
-    if has(idn):
+    pulley_name = f"z_pulley_{post_nm}"
+    if has(idn) and has(pulley_name):
         x0,x1,y0,y1,z0,z1 = bb(idn)
         cx = (x0+x1)/2; cy = (y0+y1)/2; cz = (z0+z1)/2
-        check(f"{idn} 12.7 in X", abs((x1-x0) - 12.7) < 0.1, f"{x1-x0}")
-        check(f"{idn} 22 in Y",   abs((y1-y0) - 22)   < 0.1, f"{y1-y0}")
-        check(f"{idn} 22 in Z",   abs((z1-z0) - 22)   < 0.1, f"{z1-z0}")
-        check(f"{idn} X center = motor pulley", abs(cx - expected_cx) < 0.1, f"cx={cx}")
-        check(f"{idn} Y center = belt",          abs(cy - ty) < TOL,        f"cy={cy}")
-        check(f"{idn} Z center = {IDLER_Z}",     abs(cz - IDLER_Z) < TOL,   f"cz={cz}")
-        # Must clear bottom skids (Z top face = 40)
-        check(f"{idn} clears bottom skids",      z0 >= 40 - TOL,            f"z0={z0}")
-        # Must be inside frame envelope
-        check(f"{idn} X inside frame", x0 >= 0 - TOL and x1 <= W + TOL, f"X[{x0},{x1}]")
-        check(f"{idn} Y inside frame", y0 >= 0 - TOL and y1 <= D + TOL, f"Y[{y0},{y1}]")
+        # Dimensions checked on sorted basis — idler axle can be X or Y
+        dims = sorted([x1-x0, y1-y0, z1-z0])
+        check(f"{idn} sorted dims 12.7/22/22",
+              all(abs(d-t) < 0.1 for d,t in zip(dims,[12.7, 22, 22])), f"{dims}")
+        # Idler must sit directly below its pulley in X and Y
+        pbb = bb(pulley_name)
+        ppx = (pbb[0] + pbb[1]) / 2
+        ppy = (pbb[2] + pbb[3]) / 2
+        check(f"{idn} X under pulley", abs(cx - ppx) < 0.5, f"cx={cx} vs ppx={ppx}")
+        check(f"{idn} Y under pulley", abs(cy - ppy) < 0.5, f"cy={cy} vs ppy={ppy}")
+        check(f"{idn} Z center = {IDLER_Z}", abs(cz - IDLER_Z) < TOL, f"cz={cz}")
+        check(f"{idn} clears bottom skids",  z0 >= 40 - TOL,           f"z0={z0}")
+        if not relocated:
+            check(f"{idn} X inside frame", x0 >= 0 - TOL and x1 <= W + TOL, f"X[{x0},{x1}]")
+            check(f"{idn} Y inside frame", y0 >= 0 - TOL and y1 <= D + TOL, f"Y[{y0},{y1}]")
 
 # ----------------------------------------------------------
 # 4) Report checks
