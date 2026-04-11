@@ -1,14 +1,29 @@
 #!/usr/bin/env python3
 """
-M3-CRETE M3-2 Assembly — v0.2.0
-Full CAD assembly: frame + Z-platform + gantry + motors + V-wheels + pulleys
-+ idlers + belt paths + splice connectors + drag chain mounts.
-AI-generated from OpenBuilds STEP library + parametric extrusions.
+M3-CRETE M3-2 Assembly — v0.3.0 (CLEAN REWRITE)
 
-Version history:
-  v0.1.0 — Frame structure, Z-platform, gantry beam, motors, plates (40 parts)
-  v0.2.0 — V-wheel carriages, GT2 pulleys, idler pulleys, belt paths,
-            splice connectors, drag chain mounts (~91 parts)
+Architecture follows the official render on m3-crete.com:
+  - Wider-than-deep cuboidal frame (2480 x 1240 x 1200mm outer)
+  - Top ring: closed rectangle of 2080 rails (4 X-rails spliced + 2 Y-rails)
+  - Bottom: 2 Y-skids only (open front/rear for print-over)
+  - 4 posts (2040) at corners
+  - Z-motors at BOTTOM of posts
+  - Gantry = rectangular sub-frame riding 4 Z-posts:
+      * 4 corner gantry plates (one per post, ride vertically)
+      * 2 Y-rails (2080) span front-to-back on left + right sides
+      * 1 X-beam (2080, 2x 1200mm spliced) spans between Y-rails via end plates
+
+Extrusions: ALL 1200mm standard stock. X uses splicing.
+Corner convention: rails butt at inside post faces (standard V-slot practice).
+                   Rails and posts occupy disjoint volumes at every corner.
+
+Build phases (commented sections):
+  Phase A — Frame (posts + top ring + bottom skids + corner brackets)
+  Phase B — Z-platform gantry (plates + Y-rails + X-beam)
+  Phase C — Motion (V-wheels + motors + pulleys + idlers + belts)
+
+Rebuild:  cad_venv/Scripts/python.exe CAD/m3_2_assembly.py
+Preview:  cad_venv/Scripts/cq-editor.exe CAD/m3_2_assembly.py
 """
 import cadquery as cq
 from cadquery import Assembly, Color, Location
@@ -17,13 +32,15 @@ from OCP.BRepBuilderAPI import BRepBuilderAPI_GTransform, BRepBuilderAPI_Transfo
 import os, time, math
 
 STEP_DIR = os.path.join(os.path.dirname(__file__), "Components")
-ADV_DIR  = os.path.join(os.path.dirname(__file__), "Advanced")
 
+# ============================================================
+# Helpers
+# ============================================================
 def load(relpath, base=STEP_DIR):
     return cq.importers.importStep(os.path.join(base, relpath))
 
 def sao(step_file, length, rx=0, ry=0, rz=0):
-    """Scale-And-Orient: stretch 1000mm STEP to exact length, then bake rotation."""
+    """Scale-And-Orient: stretch 1000mm stock to exact length, then bake rotation."""
     stock = cq.importers.importStep(os.path.join(STEP_DIR, "V-Slot", step_file))
     s = stock.val().wrapped
     gt = gp_GTrsf()
@@ -43,62 +60,107 @@ def L(x=0, y=0, z=0, rx=0, ry=0, rz=0):
     if rx: l = l * Location((0,0,0),(1,0,0),rx)
     return l
 
-# ============================================================
-# Dimensions (mm)
-# ============================================================
-W=2400; D=1200; H=1200       # External frame envelope
-ZP = 440                      # Z-platform representative height
-PX=40; PY=20; PT=3            # Post profile (rotated 2040)
-S40 = "V-Slot 20x40x1000 Linear Rail.step"
-S80 = "V-Slot 20x80x1000 Linear Rail.step"
+def rotate_shape(shape, rx=0, ry=0, rz=0):
+    """Bake rotations into a shape at origin (rotation order: rz, then ry, then rx).
+    Use this when a two-axis rotation is needed and L()'s rx-first order is wrong."""
+    s = shape.val().wrapped if hasattr(shape, 'val') else shape.wrapped
+    for angle, axis in [(rz,(0,0,1)), (ry,(0,1,0)), (rx,(1,0,0))]:
+        if angle:
+            t = gp_Trsf()
+            t.SetRotation(gp_Ax1(gp_Pnt(0,0,0), gp_Dir(*axis)), math.radians(angle))
+            s = BRepBuilderAPI_Transform(s, t, True).Shape()
+    return cq.Workplane().add(cq.Shape(s))
 
-# V-wheel dimensions (from probe: 10.2 x 23.9 x 23.9, centered at origin)
-VW_DIA = 23.9
-VW_THK = 10.2
-# GT2 pulley: 14.0 x 15.0 x 15.0 (center at 7,0,0 — shaft along X)
-# Smooth idler: 12.7 x 22.0 x 22.0 (centered at origin)
-# Eccentric spacer: 11.5 x 8.5 x 10.0
+# ============================================================
+# Dimensions (mm) — from 1200mm stock
+# ============================================================
+# Posts: 2040 rotated rz=90 → 40mm(X) x 20mm(Y) x 1200mm(Z)
+# Top rails: 2080 → 20mm in narrow, 80mm in tall direction
+POST_X = 40   # post profile X dimension (rotated 2040)
+POST_Y = 20   # post profile Y dimension
+RAIL_W = 20   # 2080 narrow dimension
+RAIL_H = 80   # 2080 tall dimension
 
-print("M3-CRETE M3-2 Assembly v0.2.0")
-print("=" * 50)
-print("Generating parts...")
+# X-rails: 2x 1200mm butt-spliced → rail run = 2400mm between inside post faces
+# Frame outer X = 2400 + 2*POST_X = 2480mm
+X_RAIL_LEN = 1200
+X_INNER = 2 * X_RAIL_LEN        # 2400 — between inside post X-faces
+W = X_INNER + 2 * POST_X        # 2480 — outer X
+
+# Y-rails: 1x 1200mm → rail run = 1200mm between inside post faces
+# Frame outer Y = 1200 + 2*POST_Y = 1240mm
+Y_RAIL_LEN = 1200
+Y_INNER = Y_RAIL_LEN            # 1200 — between inside post Y-faces
+D = Y_INNER + 2 * POST_Y        # 1240 — outer Y
+
+# Posts: 1200mm vertical
+POST_LEN = 1200
+H = POST_LEN                    # 1200 — outer Z
+
+# Post center coordinates (each post at its outside corner, inset by half profile)
+# Post profile X=40, Y=20 → center at (POST_X/2, POST_Y/2) from the outside corner
+FL = (POST_X/2,          POST_Y/2)           # ( 20,   10)
+FR = (W - POST_X/2,      POST_Y/2)           # (2460,  10)
+RL = (POST_X/2,          D - POST_Y/2)       # ( 20, 1230)
+RR = (W - POST_X/2,      D - POST_Y/2)       # (2460, 1230)
+POSTS = [("FL",FL),("FR",FR),("RL",RL),("RR",RR)]
+
+# Top ring Z: rails flush with top of posts (rail top face at Z=H=1200)
+# Rail 80mm tall, so rail Z center = H - RAIL_H/2 = 1160
+TOP_Z = H - RAIL_H/2            # 1160
+
+# Bottom skids: 2040 rails along Y on left + right sides
+# Bottom face at floor (Z=0). 2040 is 40mm in Z when lying flat → center Z = 20
+BOT_Z = POST_X/2                # 20
+
+# Gantry sub-frame Z (Phase B). Representative.
+ZP = 440                        # Z-platform representative height
+
+print("M3-CRETE M3-2 Assembly v0.3.0")
+print(f"Frame envelope: {W} x {D} x {H} mm")
+print(f"Print volume (hopeful): {X_INNER-80} x {Y_INNER-200} x {H-200} mm")
+print("=" * 60)
 t0 = time.time()
 
 # ============================================================
-# Load STEP parts — ALL STANDARD 1200mm LENGTHS (no trimming)
+# Load stock shapes
 # ============================================================
-e_post   = sao(S40, 1200, rz=90)           # 40x20x1200 vertical post
-e_xrail  = sao(S80, 1200, ry=90, rz=90)    # 1200x20x80 X-running rail
-e_ybrace     = sao(S40, 1160, rx=-90)        # 20x1160x40 Y-brace, bottom (between posts)
-e_ybrace_top = sao(S40, 1116, rx=-90)       # 20x1116x40 Y-brace, top (trimmed: between X-rail pairs)
-e_yrail  = sao(S80, 1200, rx=-90)           # 20x1200x80 Y-running rail
-e_gbeam  = sao(S80, 1200, ry=90, rz=90)    # 1200x20x80 gantry beam segment
+S40 = "V-Slot 20x40x1000 Linear Rail.step"
+S80 = "V-Slot 20x80x1000 Linear Rail.step"
 
-plate    = load("Plates/V-Slot Gantry Plate 20-80mm.step")
-motor    = load("Electronics/Nema 23 Stepper Motor.step")
-mmount   = load("Plates/Motor Mount Plate Nema 23.step")
-vwheel   = load("Wheels/Solid V Wheel.step")
-gt2pul   = load("Pulleys/GT2 Timing Pulley 20 Tooth.step")
-idler    = load("Pulleys/Smooth Idler Pulley Wheel.step")
-eccspacer= load("Hardware/Eccentric Spacer 6mm.step")
-idlerpl  = load("Plates/Idler Pulley Plate.step")
-cube_con = load("Brackets/Cube Corner Connector.step")
+# Post: 2040, upright (native Z-oriented), rz=90 so 40mm is in X
+# Native: X[-10,10] Y[-20,20] Z[0,1000]. After rz=90: X[-20,20] Y[-10,10] Z[0,1000]
+# After scaling Z to POST_LEN: X[-20,20] Y[-10,10] Z[0,POST_LEN]
+e_post = sao(S40, POST_LEN, rz=90)
+
+# Top X-rail: 2080, lying along X, 80mm tall (in Z)
+# Native: X[-10,10] Y[-40,40] Z[0,1200]. ry=90: X[0,1200] Y[-40,40] Z[-10,10]
+# Then rz=90: X[0,1200] Y[-10,10] Z[-40,40]. 20mm in Y, 80mm in Z. ✓
+e_xrail = sao(S80, X_RAIL_LEN, ry=90, rz=90)
+
+# Top Y-rail: 2080, lying along Y, 80mm tall (in Z)
+# Native: X[-10,10] Y[-40,40] Z[0,1200]. rx=-90: X[-10,10] Y[0,1200] Z[-40,40]
+# 20mm in X, 80mm in Z. ✓
+e_yrail = sao(S80, Y_RAIL_LEN, rx=-90)
+
+# Bottom skid: 2040, lying along Y, 40mm tall (in Z)
+# Native: X[-10,10] Y[-20,20] Z[0,1200]. rx=-90: X[-10,10] Y[0,1200] Z[-20,20]
+# 20mm in X, 40mm in Z. ✓
+e_skid = sao(S40, Y_RAIL_LEN, rx=-90)
+
+# Corner brackets + gantry plates + motion
+cast_corner = load("Brackets/Cast Corner Bracket.step")
+cube_con    = load("Brackets/Cube Corner Connector.step")
+plate_20_80 = load("Plates/V-Slot Gantry Plate 20-80mm.step")   # 127(X) x 3(Y) x 88(Z)
+vwheel      = load("Wheels/Solid V Wheel.step")                 # 10.2(X) x 23.9 x 23.9, axle in X
 
 # ============================================================
 # Colors
 # ============================================================
-ALU = Color(0.75,0.75,0.75)   # Frame aluminum
-DRK = Color(0.55,0.55,0.55)   # Z-platform rails
-BLK = Color(0.20,0.20,0.20)   # Gantry beam
-MOT = Color(0.12,0.12,0.12)   # Motors
-PLT = Color(0.65,0.68,0.65)   # Gantry plates
-MNT = Color(0.60,0.62,0.60)   # Motor mounts
-WHL = Color(0.85,0.85,0.80)   # V-wheels (delrin white)
-PUL = Color(0.30,0.30,0.30)   # Pulleys (dark metal)
-IDL = Color(0.40,0.40,0.45)   # Idlers
-GRN = Color(0.59,0.84,0.00)   # Belt (M3-CRETE lime green)
-CUB = Color(0.50,0.50,0.50)   # Cube connectors
-DRG = Color(0.15,0.15,0.15)   # Drag chain (black nylon)
+ALU = Color(0.78, 0.78, 0.80)   # Frame aluminum (light silver)
+BLK = Color(0.15, 0.15, 0.15)   # Gantry beam
+DRK = Color(0.55, 0.55, 0.58)   # Z-platform rails
+BRK = Color(0.45, 0.45, 0.48)   # Corner brackets (cast)
 
 assy = Assembly("M3-2_Assembly")
 n = [0]
@@ -106,289 +168,293 @@ def add(s, nm, c, l):
     assy.add(s, name=nm, color=c, loc=l); n[0] += 1
 
 # ============================================================
-# FRAME — Stacked/layered corners, ALL standard 1200mm lengths
+# PHASE A — FRAME
 # ============================================================
-# CORNER CONVENTION: Posts define corner positions. X-rails stack
-# behind/in-front of posts in Y. Y-braces stack above X-rails in Z.
-# Full 1200mm pieces extend through the corner zone for max rigidity.
+# 4 posts at corners
+for nm, (cx, cy) in POSTS:
+    add(e_post, f"post_{nm}", ALU, L(cx, cy, 0))
+
+# Top X-rails: front pair at Y=POST_Y/2=10, rear pair at Y=D-POST_Y/2=1230
+# Spliced at X=1200 (middle). Each rail segment = 1200mm, placed at X=40 and X=1240
+# so the pair spans X[40, 2440] — inside post X-faces.
+for side, cy in [("F", FL[1]), ("B", RL[1])]:
+    add(e_xrail, f"topX_{side}1", ALU, L(POST_X,                cy, TOP_Z))
+    add(e_xrail, f"topX_{side}2", ALU, L(POST_X + X_RAIL_LEN,   cy, TOP_Z))
+
+# Top Y-rails: left at X=10, right at X=2470. Single 1200mm each.
+# Span Y[POST_Y, POST_Y + 1200] = Y[20, 1220] — inside post Y-faces.
+for side, cx in [("L", FL[0]), ("R", FR[0])]:
+    add(e_yrail, f"topY_{side}", ALU, L(cx, POST_Y, TOP_Z))
+
+# Bottom Y-skids: left + right. Only these — no front/rear bottom rail (open for printing)
+for side, cx in [("L", FL[0]), ("R", FR[0])]:
+    add(e_skid, f"botY_{side}", ALU, L(cx, POST_Y, BOT_Z))
+
+# Splice cube connectors: omitted from visualization.
+# Real cubes sit INSIDE the T-slot cavities at X-rail butt joints (X=1240).
+# Our solid STEP rails have no T-slot channels, so adding cubes creates false clips.
+# They remain in the BOM as hidden hardware — rendered only for assembly docs.
+
+print(f"  Phase A - Frame: {n[0]} parts")
+
+# ============================================================
+# PHASE B — Z-PLATFORM GANTRY (butt-joint convention, per Mini V actuator ref)
+# ============================================================
+# Architecture: rigid rectangular sub-frame that rides vertically on 4 posts.
+#   - 4 Z-corner plates: ride each post via wheels on post narrow faces
+#                        (modeled without wheels in Phase B; wheels in Phase C)
+#   - 2 Y-rails (2080, custom-cut 1190mm): butt-joint front/rear into
+#                                          Z-corner plates' Y-inward face
+#   - 2 X-beam carriage plates: ride each Y-rail (single-sided, per reference)
+#   - 1 X-beam (2080, 2x 1200mm spliced): butt-joint into X-beam carriage plates
 #
-# Post (2040 rz=90): 40mm(X) x 20mm(Y) x 1200mm(Z)
-#   At origin: X[-20,20] Y[-10,10] Z[0,1200]
-# X-rail (2080): 1200mm(X) x 20mm(Y) x 80mm(Z)
-#   At origin: X[0,1200] Y[-10,10] Z[-40,40]
-# Y-brace (2040): 20mm(X) x 1200mm(Y) x 40mm(Z)
-#   At origin: X[-10,10] Y[0,1200] Z[-20,20]
+# Butt-joint convention: the moving extrusion's END FACE touches the plate
+# face; screws go through the plate into the extrusion end tap. A 2mm
+# plate-to-rail clearance is used where plates slide along a rail (per
+# reference Mini V actuator plate X[136.7,139.7] vs rail X[141.7,161.7]).
 #
-# Post positions (centers):
-#   FL: (20, 10)   FR: (2380, 10)
-#   RL: (20, 1190) RR: (2380, 1190)
+# V-wheel geometry follows the Mini V Belt and Pinion Actuator 500mm
+# reference exactly:
+#   - Wheel X center = rail X center (wheel centered on rail width in thickness)
+#   - Wheel pair spans perpendicular to plate thickness direction with
+#     V-groove engaging rail slot face ~2mm deep
+#   - Wheel pair spacing along travel axis = 66mm (±33mm from plate center)
 #
-# X-rails stacked behind front posts (Y=30) and in-front of rear posts (Y=1170)
-# This gives each member its own volume at corners.
+# Mid-gantry representative position: ZP=440, BEAM_Y=620 (mid-travel).
 
-# Posts: 4x 2040, full height
-add(e_post, "post_FL", ALU, L(20, 10))
-add(e_post, "post_FR", ALU, L(2380, 10))
-add(e_post, "post_RL", ALU, L(20, 1190))
-add(e_post, "post_RR", ALU, L(2380, 1190))
+# --- Geometry constants ---
+PLATE_GAP    = 2           # mm — plate ↔ rail running clearance (ref: 2mm)
+YRAIL_INSET  = 5           # mm — Y-rail inboard of post centerline
+                           # (picks up the 10mm Phase C Y-rail ↔ carriage budget
+                           #  AND lets the X-beam hit exactly 2 x 1200mm)
+YRAIL_LEN    = D - 2*POST_Y - 2*(PLATE_GAP + 3)  # 1190 mm custom cut
 
-# Top X-rails: 4x 2080, full 1200mm, stacked behind front posts / in-front of rear
-# Front pair: Y=30 → Y[20,40] (behind front posts Y[0,20])
-# Rear pair: Y=1170 → Y[1160,1180] (in front of rear posts Y[1180,1200])
-# Z center at 1120 → Z[1080,1160], 40mm below post top (Z=1200)
-TOP_Z = 1120  # top rail center Z
-add(e_xrail, "topX_F1", ALU, L(0, 30, TOP_Z))
-add(e_xrail, "topX_F2", ALU, L(1200, 30, TOP_Z))
-add(e_xrail, "topX_B1", ALU, L(0, 1170, TOP_Z))
-add(e_xrail, "topX_B2", ALU, L(1200, 1170, TOP_Z))
+# Y-rail X centerlines (5 mm inboard of post X centers)
+ZPY_L_X = POST_X/2 + YRAIL_INSET              # 25
+ZPY_R_X = W - POST_X/2 - YRAIL_INSET          # 2455
 
-# Top Y-braces: 3x 2040, trimmed 1116mm (between X-rail back faces with 2mm gap)
-# X-rail back face (front pair): Y=40. Brace starts at Y=42 (2mm gap).
-# X-rail back face (rear pair): Y=1160. Brace ends at Y=42+1116=1158 (2mm gap).
-# Brace stacks ABOVE X-rails: X-rail top at Z=1160, brace bottom at Z=1162 (2mm gap).
-# Brace center Z = 1162 + 20 = 1182. Brace top at Z=1202 (only 2mm above posts).
-BRACE_Z = TOP_Z + 62  # Z=1182, brace Z[1162,1202], 2mm gap from X-rail top
-add(e_ybrace_top, "topY_L", ALU, L(20, 42, BRACE_Z))
-add(e_ybrace_top, "topY_C", ALU, L(1200, 42, BRACE_Z))
-add(e_ybrace_top, "topY_R", ALU, L(2380, 42, BRACE_Z))
+# Front/rear Z-corner plate Y translation (ty). Native Y[0,3]; after ry=90
+# the 3mm thickness stays in Y. Plates seat 2mm off the post inside face.
+#   FL/FR plates seat on post +Y (inside) face at Y=POST_Y → Y[22,25]
+#   RL/RR plates seat on post -Y (inside) face at Y=D-POST_Y → Y[1215,1218]
+ZCPLT_TY_F = POST_Y + PLATE_GAP               # 22
+ZCPLT_TY_R = D - POST_Y - PLATE_GAP - 3       # 1215
 
-# Bottom Y-braces: 1160mm between posts, bottom flush with floor
-add(e_ybrace, "botY_L", ALU, L(20, 20, 20))
-add(e_ybrace, "botY_R", ALU, L(2380, 20, 20))
+# Y-rail butt-joint Y coordinates — rail end faces touch Z-corner plate faces
+YRAIL_TY = ZCPLT_TY_F + 3                     # 25 (front end at rear face of front plate)
 
-print(f"  Frame: {n[0]} parts")
-
-# ============================================================
-# SPLICE CONNECTORS — at X=1200 rail junctions
-# ============================================================
-# Cube connectors (20x20x20) placed inside X-rail splice joints.
-# 4 top X-rails, each spliced at X=1200. 2 connectors per splice
-# (top and bottom of the 80mm rail cavity).
-splice_x = 1200  # Junction point
-for s, yr in [("F", 30), ("B", 1170)]:  # X-rails at Y=30 and Y=1170
-    add(cube_con, f"splice_{s}_top", CUB, L(splice_x, yr, TOP_Z + 30))
-    add(cube_con, f"splice_{s}_bot", CUB, L(splice_x, yr, TOP_Z - 30))
-
-print(f"  + Splice connectors: {n[0]} parts")
-
-# ============================================================
-# Z-PLATFORM (moves up/down on posts) — full 1200mm pieces
-# ============================================================
-# Y-rails: 2x 2080, full 1200mm, left and right sides
-# Must clear Z-carriage plates (plate X envelope = post_X ± 44mm)
-# Post FL X=20, plate extends to X=20+44=64. Y-rail must start at X>64.
-# Y-rail at origin: X[-10,10]. Place at X=75 → X[65,85]. Clears plate at 64.
-add(e_yrail, "zpY_L", DRK, L(75, 0, ZP))
-add(e_yrail, "zpY_R", DRK, L(2325, 0, ZP))
-
-# Gantry beam: 2x 1200mm segments spliced at X=1200 for full 2400mm X span
-# Beam at Y=600, same Z as Y-rails. Full span X[0,2400].
-# Beam intersects Y-rails at X[65,85] and X[2315,2335] — intentional connection
-# points joined via Y-gantry plates (V-wheel carriages ride the Y-rails).
+# X-beam Z (beam centered on gantry plate center — beam fits inside 88mm plate Z envelope)
 BEAM_Z = ZP
-add(e_gbeam, "gantry_1", BLK, L(0, 600, BEAM_Z))
-add(e_gbeam, "gantry_2", BLK, L(1200, 600, BEAM_Z))
+BEAM_Y = D / 2                                # 620 — mid-Y travel
 
-print(f"  + Z-platform + gantry: {n[0]} parts")
+# ------------------------------------------------------------
+# 1) Z-CORNER PLATES (4x) — ride posts, host Y-rails via butt-joint
+# ------------------------------------------------------------
+# Native plate: 127(X) x 3(Y) x 88(Z)
+# After ry=90:  88(X)  x 3(Y) x 127(Z)   — 88 along 40mm post face ✓
+for nm, (cx, _) in POSTS:
+    ty = ZCPLT_TY_F if nm.startswith("F") else ZCPLT_TY_R
+    add(plate_20_80, f"zpl_{nm}", DRK, L(cx, ty, ZP, ry=90))
 
-# ============================================================
-# PLATES — Z-carriages, Y-gantry, X-carriage
-# ============================================================
-# Gantry plate (20-80): 127(X) x 3(Y) x 88(Z), with ry=90 → 88(X) x 3(Y) x 127(Z)
-# Plate thickness = 3mm (PT)
+# ------------------------------------------------------------
+# 2) Y-RAILS (2x) — custom 1190mm, butt-joint both ends into corner plates
+# ------------------------------------------------------------
+e_zpyrail = sao(S80, YRAIL_LEN, rx=-90)       # X[-10,10] Y[0,1190] Z[-40,40]
+add(e_zpyrail, "zpY_L", DRK, L(ZPY_L_X, YRAIL_TY, ZP))
+add(e_zpyrail, "zpY_R", DRK, L(ZPY_R_X, YRAIL_TY, ZP))
+
+# ------------------------------------------------------------
+# 3) X-BEAM CARRIAGE PLATES (2x) — single-sided on Y-rail inner X face
+# ------------------------------------------------------------
+# After rz=90: native 127(X) x 3(Y) x 88(Z) → X[-3,0] Y[-63.5,63.5] Z[-44,44]
+# Translation tx sets plate X_max. L_plate X[tx-3, tx]; R_plate X[tx-3, tx].
 #
-# Z-CARRIAGE PLATES: sandwich each post, ride vertically
-# Plate native Y[0,3] (not centered). After ry=90, Y stays [0,3].
-# Front plate: translate Y = pf - PT - 1.5 → plate Y[pf-4.5, pf-1.5] (1.5mm gap)
-# Back plate:  translate Y = pb + 1.5      → plate Y[pb+1.5,  pb+4.5] (1.5mm gap)
-# Post FL center: (20, 10). Front face pf=0, back face pb=20.
-for nm, cx, py in [("FL",20,10), ("FR",2380,10), ("RL",20,1190), ("RR",2380,1190)]:
-    pf = py - 10          # post front Y-face
-    pb = py + 10          # post back Y-face
-    add(plate, f"zpl_{nm}_f", PLT, L(cx, pf - 4.5, ZP, ry=90))   # front plate (1.5mm gap)
-    add(plate, f"zpl_{nm}_b", PLT, L(cx, pb + 1.5, ZP, ry=90))   # back plate (1.5mm gap)
+# Left rail X[ZPY_L_X - 10, ZPY_L_X + 10] = [15, 35]
+#   Plate on +X (inner) side: rail-facing face -X at 35 + gap = 37, so tx = 40
+#     → plate X[37, 40], plate +X face at 40 ← X-beam butt joint here
+# Right rail X[2445, 2465]
+#   Plate on -X (inner) side: rail-facing face +X at 2445 - gap = 2443, so tx = 2443
+#     → plate X[2440, 2443], plate -X face at 2440 ← X-beam butt joint here
+XCAR_L_TX = ZPY_L_X + RAIL_W/2 + PLATE_GAP + 3    # 40
+XCAR_R_TX = ZPY_R_X - RAIL_W/2 - PLATE_GAP        # 2443
+# Plate orientation: 127mm in Z (spans 80mm Y-rail + wheel clearance),
+# 88mm in Y (travel direction), 3mm in X (thickness, parallel to rail X-face).
+# Applied via rotate_shape() because L() can't do rz-then-rx in that order.
+xcar_plate = rotate_shape(plate_20_80, rz=90, rx=90)  # X[-3,0] Y[-44,44] Z[-63.5,63.5]
+add(xcar_plate, "xcar_L", DRK, L(XCAR_L_TX, BEAM_Y, ZP))
+add(xcar_plate, "xcar_R", DRK, L(XCAR_R_TX, BEAM_Y, ZP))
 
-# Y-GANTRY PLATES: at gantry beam ends, connecting beam to Y-rail carriages
-# These sit at the beam Y-position (Y=600), at the Y-rail X positions
-# They bridge between the Y-rail carriage and the gantry beam
-GAP = 1  # running clearance mm
-add(plate, "ypl_L", PLT, L(75, 600, ZP, ry=90))
-add(plate, "ypl_R", PLT, L(2325, 600, ZP, ry=90))
+# ------------------------------------------------------------
+# 4) X-BEAM (2x 1200mm spliced) — butt-joints both carriage plates
+# ------------------------------------------------------------
+# Beam X range [40, 2440] = exactly 2400mm = 2 x 1200mm ✓
+# Cross-section (ry=90, rz=90): X[0,L] Y[-10,10] Z[-40,40] — 20 wide Y, 80 tall Z
+# Beam Y[BEAM_Y-10, BEAM_Y+10] = [610, 630] (inside plate Y[556.5, 683.5])
+# Beam Z[BEAM_Z-40, BEAM_Z+40] = [400, 480] (inside plate Z[396, 484])
+e_gbeam = sao(S80, X_RAIL_LEN, ry=90, rz=90)
+add(e_gbeam, "gantry_1", BLK, L(XCAR_L_TX,               BEAM_Y, BEAM_Z))
+add(e_gbeam, "gantry_2", BLK, L(XCAR_L_TX + X_RAIL_LEN,  BEAM_Y, BEAM_Z))
 
-# X-CARRIAGE PLATES: sandwich the gantry beam, ride along X
-# Beam at Y=600 center, Z=BEAM_Z. Beam is 20mm in Y → Y[590,610].
-# Front plate: Y = 590 - PT - 1.5 = 585.5 → plate Y[585.5, 588.5] (1.5mm gap)
-# Back plate:  Y = 610 + 1.5     = 611.5 → plate Y[611.5, 614.5] (1.5mm gap)
-add(plate, "xcar_f", PLT, L(1200, 585.5, BEAM_Z, ry=90))
-add(plate, "xcar_b", PLT, L(1200, 611.5, BEAM_Z, ry=90))
+# ------------------------------------------------------------
+# 5) V-WHEELS on X-beam Y-carriages (8x: 4 per rail)
+# ------------------------------------------------------------
+# Per Mini V Belt and Pinion Actuator 500mm reference:
+#   - Wheel X center = rail X center (wheel thickness centered on rail width)
+#   - Wheels straddle the 80mm face in Z (pair at rail Z_center ± 50)
+#     → wheel Z center 10mm past rail 80mm face edge, engages face V-slot
+#     → reference Mini V uses 40mm face with ±30 offset; we scale to 80mm → ±50
+#   - Wheel pair spacing along travel axis Y = 66mm (±33mm from BEAM_Y)
+#
+# Wheel native: 10.2(X) x 23.9(Y) x 23.9(Z), axle in X. Rolls in Y ✓
+WHL = Color(0.90, 0.90, 0.82)     # delrin white
+WHEEL_DZ = 50                     # offset from rail Z center (80mm face + 10mm past edge)
+WHEEL_DY = 33                     # half of 66mm pair spacing along travel
 
-print(f"  + Plates: {n[0]} parts")
+for side, rx in [("L", ZPY_L_X), ("R", ZPY_R_X)]:
+    for dy_name, dy in [("fr", -WHEEL_DY), ("rr", +WHEEL_DY)]:
+        for dz_name, dz in [("top", +WHEEL_DZ), ("bot", -WHEEL_DZ)]:
+            add(vwheel, f"vw_xc_{side}_{dy_name}_{dz_name}",
+                WHL, L(rx, BEAM_Y + dy, ZP + dz))
 
-# ============================================================
-# V-WHEEL CARRIAGES
-# ============================================================
-# Each carriage = 4 V-wheels (2 fixed + 2 eccentric) riding a V-slot rail.
-# Wheel is 23.9mm dia, 10.2mm thick, centered at origin.
-# Native orientation: axle along X. Placed at plate bolt-hole offsets.
+# ------------------------------------------------------------
+# 6) V-WHEELS on Z-corner carriages (16x: 4 per post)
+# ------------------------------------------------------------
+# Each Z-corner plate rides its post by gripping the two narrow 20mm X-faces
+# (X=cx-20 and X=cx+20). 4 wheels per plate in a 2x2 (X-side x Z-level) pattern.
+#
+# Wheel orientation: rz=90 puts axle in Y → wheel rolls along post Z axis,
+# V-groove engages X-normal V-slot on the post's narrow face.
+#   Native:        X[-5.1, 5.1]    Y[-11.95, 11.95] Z[-11.95, 11.95]
+#   After rz=90:   X[-11.95, 11.95] Y[-5.1, 5.1]    Z[-11.95, 11.95]
+#
+# Wheel center X = post_cx ± 30  → 10mm past post narrow-face V-slot
+# Wheel center Y = plate mid-Y    → wheel hub centered on 3mm plate thickness
+# Wheel center Z = ZP ± 33        → standard 66mm pair spacing along travel
+WHEEL_ZC_DX = 30                 # offset from post X center (post 20mm + 10mm clearance)
+WHEEL_ZC_DZ = 33                 # half of 66mm Z-pair spacing
+# Wheel Y = POST Y-center so the V-groove engages the V-rail running along the
+# post's narrow X-face (slot centered on post Y mid-line). Prior placement at
+# the plate mid-thickness was wrong — confirmed in M3-2_Assembly_user.step edit.
+ZC_WHEEL_Y_F = POST_Y / 2          # 10   — front posts Y center
+ZC_WHEEL_Y_R = D - POST_Y / 2      # 1230 — rear posts Y center
 
-# Gantry plate bolt pattern for V-wheels (20-80 plate, 127x88mm):
-# Approx hole positions from plate center: ±45mm Z, ±25mm Z (inner pair)
-# Wheels sit on the V-groove faces of the rail.
+for nm, (cx, _) in POSTS:
+    wy = ZC_WHEEL_Y_F if nm.startswith("F") else ZC_WHEEL_Y_R
+    for xside, dx in [("lt", -WHEEL_ZC_DX), ("rt", +WHEEL_ZC_DX)]:
+        for zside, dz in [("top", +WHEEL_ZC_DZ), ("bot", -WHEEL_ZC_DZ)]:
+            add(vwheel, f"vw_zc_{nm}_{xside}_{zside}",
+                WHL, L(cx + dx, wy, ZP + dz, rz=90))
 
-def add_vwheel_quad(prefix, cx, cy, cz, axis="Z"):
-    """Add 4 V-wheels around a plate center for a given rail axis.
-    V-wheel native: 23.9mm dia, 10.2mm thick, axle along X, centered at origin.
-    Axle must be perpendicular to the rail face the wheel rides on.
-    """
-    if axis == "Z":
-        # Post is 40mm(X) x 20mm(Y), vertical. V-grooves on the 40mm X-faces.
-        # Wheels ride the X-faces → axle along Y (rz=90 rotates axle X→Y).
-        # 2 wheels on each side of post (offset in Z from carriage center).
-        for i, (dx, dz) in enumerate([(-25,-30), (-25,30), (25,-30), (25,30)]):
-            add(vwheel, f"vw_{prefix}_{i}", WHL, L(cx+dx, cy, cz+dz, rz=90))
-    elif axis == "Y":
-        # Y-rail is 2080: 80mm in Z, 20mm in X. V-grooves on the Z-faces.
-        # Wheels ride the Z-faces → axle along X (native, no rotation needed).
-        # 2 wheels on each side (offset in Y from carriage center).
-        for i, (dy, dz) in enumerate([(-30,-25), (-30,25), (30,-25), (30,25)]):
-            add(vwheel, f"vw_{prefix}_{i}", WHL, L(cx, cy+dy, cz+dz))
-    elif axis == "X":
-        # X-beam is 2080: 80mm in Z, 20mm in Y. V-grooves on the Z-faces.
-        # Wheels ride the Z-faces → axle along Y (rz=90).
-        # 2 wheels on each side (offset in X from carriage center).
-        for i, (dx, dz) in enumerate([(-30,-25), (-30,25), (30,-25), (30,25)]):
-            add(vwheel, f"vw_{prefix}_{i}", WHL, L(cx+dx, cy, cz+dz, rz=90))
-
-# Z-CARRIAGE V-WHEELS (4 carriages x 4 wheels = 16 wheels)
-# Each rides its respective post vertically.
-for nm, cx, cy in [("FL",20,10), ("FR",2380,10), ("RL",20,1190), ("RR",2380,1190)]:
-    add_vwheel_quad(f"zc_{nm}", cx, cy, ZP, axis="Z")
-
-# Y-CARRIAGE V-WHEELS (2 carriages x 4 wheels = 8 wheels)
-# Ride the Y-rails at gantry beam end positions.
-# Y-rails at X=50 and X=2350, beam at Y=600
-for nm, cx in [("L", 75), ("R", 2325)]:
-    add_vwheel_quad(f"yc_{nm}", cx, 600, ZP, axis="Y")
-
-# X-CARRIAGE V-WHEELS (1 carriage x 4 wheels = 4 wheels)
-# Printhead carriage rides gantry beam along X. Beam at Y=600, Z=BEAM_Z.
-add_vwheel_quad("xc", 1200, 600, BEAM_Z, axis="X")
-
-print(f"  + V-wheels (28): {n[0]} parts")
-
-# ============================================================
-# MOTORS + MOTOR MOUNTS
-# ============================================================
-# Z motors: STRADDLE the top Y-brace.
-# Motor body ABOVE brace, shaft points DOWN through/beside brace.
-# Shaft hub/disk at the brace level routes belt over the brace and down.
-# Brace center Z=1182, brace Z[1162,1202]. Motor mount at BRACE_Z+30=1212.
-BRACE_TOP = BRACE_Z + 20  # Z=1202, top face of the Y-brace
-
-for nm, cx, cy, sx in [("FL",20,10,1), ("FR",2380,10,-1),
-                        ("RL",20,1190,1), ("RR",2380,1190,-1)]:
-    # Z-motor: HORIZONTAL, above brace, shaft pointing INWARD (along X)
-    # Motor body OUTWARD from post (clears post), shaft reaches inward
-    # Post edge: FL X=40, FR X=2360. Motor center 50mm beyond post edge.
-    mx = cx + sx * 70  # motor center well inside frame, away from post
-    mrot = 90 * sx
-    # Mount plate on post top at brace Z
-    add(mmount, f"mmz_{nm}", MNT, L(cx, cy, BRACE_Z + 30))
-    # Motor horizontal, above brace+mount
-    add(motor,  f"mz_{nm}",  MOT, L(mx, cy, BRACE_Z + 30, ry=mrot))
-    # GT2 pulley on shaft tip
-    px = cx + sx * 95
-    add(gt2pul, f"pul_z{nm}", PUL, L(px, cy, BRACE_Z + 30, ry=mrot))
-
-# Y motors: inside frame, behind Y-rails (between Y-rail and rear X-rail)
-# Y-rail at X=75/2325. Motor offset in X so it doesn't clip Y-rail.
-# Motor at Y=1130 (away from rear post at Y=1180), shaft along -Y
-add(motor, "my_L", MOT, L(120, 1130, ZP, rx=-90))
-add(motor, "my_R", MOT, L(2280, 1130, ZP, rx=-90))
-
-# X motor: on X-carriage, beside the gantry beam (not on top — avoids clip)
-# Beam Z[400,480]. Motor beside beam in Y, shaft along X (ry=90).
-add(motor, "mx", MOT, L(1200, 640, BEAM_Z, ry=90))
-
-print(f"  + Motors: {n[0]} parts")
+print(f"  Phase B - Gantry: {n[0]} parts")
 
 # ============================================================
-# GT2 PULLEYS — Y and X motor shafts
+# PHASE C — MOTION
 # ============================================================
-# (Z-axis pulleys already placed above with motors)
+# Nick's constraints (2026-04-10 review):
+#   - Z-motors TOP of posts, idlers BOTTOM — mud protection.
+#   - All motor & idler rotation axes parallel to X-axis.
+#   - ALL motion hardware inside the frame envelope (X[0,2480] Y[0,1240] Z[0,1200])
+#     to prevent damage at construction sites.
+#   - Y-motors at REAR of Y-rails.
+#   - Stock NEMA23 mount plate used directly; belt-to-carriage via 3D-printed L-tabs.
 
-# Y motor pulleys: on shaft tip
-add(gt2pul, "pul_yL", PUL, L(120, 1110, ZP, rx=-90))
-add(gt2pul, "pul_yR", PUL, L(2280, 1110, ZP, rx=-90))
+# --- Load motion components ---
+motor_n23    = load("Electronics/Nema 23 Stepper Motor.step")     # 56.4 x 56.4 x 76.6
+gt2_20t      = load("Pulleys/GT2 Timing Pulley 20 Tooth.step")    # 14(X) x 15 x 15
+idler_sm     = load("Pulleys/Smooth Idler Pulley Wheel.step")     # 12.7(X) x 22 x 22
+# OMC StepperOnline ST-M2 NEMA 23 L-bracket (alloy steel).
+# Vendor-provided CAD — see CAD/Vendor/StepperOnline/README.md for license note.
+n23_lbracket = cq.importers.importStep(os.path.join(
+    os.path.dirname(__file__), "Vendor", "StepperOnline", "N23_angled_mount.STEP"))
 
-# X motor pulley: below motor, on beam
-add(gt2pul, "pul_x", PUL, L(1200, 600, BEAM_Z+45))
-
-print(f"  + GT2 pulleys: {n[0]} parts")
-
-# ============================================================
-# IDLER PULLEYS — belt return points
-# ============================================================
-# Smooth idler: 22mm dia, 12.7mm thick. Native axle along X.
-# For Z-axis: idler axle must be along Y (perpendicular to belt vertical run)
-# For Y-axis: idler axle must be along X (perpendicular to Y belt run)
-# For X-axis: idler axle must be along Y (perpendicular to X belt run)
-
-# Z-axis idlers: at BOTTOM of each post. Axle along Y (ry=90 not needed,
-# but we need rz=90 to rotate axle from X to Y direction... actually
-# the idler is symmetric, we just need the axle perpendicular to the
-# belt travel direction. Belt travels in Z, so axle in Y.)
-for nm, cx, cy, sx in [("FL",20,10,1), ("FR",2380,10,-1),
-                        ("RL",20,1190,1), ("RR",2380,1190,-1)]:
-    ix = cx + sx * 30  # same X offset as motor hub disk
-    add(idler, f"idl_z{nm}", IDL, L(ix, cy, 20, rz=90))
-    add(idlerpl, f"idlpl_z{nm}", MNT, L(ix, cy, 20))
-
-# Y-axis idlers: at front end of Y-rails (Y≈50). Axle along X.
-add(idler, "idl_yL", IDL, L(75, 50, ZP))
-add(idler, "idl_yR", IDL, L(2325, 50, ZP))
-
-# X-axis idlers: at each end of gantry beam. Axle along Y.
-add(idler, "idl_xL", IDL, L(100, 600, BEAM_Z+45, rz=90))
-add(idler, "idl_xR", IDL, L(2300, 600, BEAM_Z+45, rz=90))
-
-print(f"  + Idler pulleys: {n[0]} parts")
+MTR = Color(0.20, 0.20, 0.22)   # motor black
+BRK2 = Color(0.35, 0.55, 0.80)  # L-bracket blue (matches Nick's color-coding)
+PUL = Color(0.85, 0.70, 0.15)   # GT2 pulley brass/gold
+IDL = Color(0.92, 0.92, 0.92)   # smooth idler white/polished
 
 # ============================================================
-# GT2 BELT PATHS — represented as thin boxes (10mm wide belt)
+# C.1 — Z-MOTORS + ANGLED L-BRACKETS + PULLEYS (4x each, 12 parts)
 # ============================================================
-# Belts are 10mm wide GT2. Modeled as thin rectangular solids
-# for visualization. Color: M3-CRETE lime green.
-BELT_W = 10   # belt width
-BELT_T = 2    # belt thickness for visualization
+# Per Nick's 2026-04-11 update:
+#   - Stock NEMA23 mount plate REJECTED — could not clamp to frame corner
+#   - Replaced by N23_angled_mount.STEP: 65(X) x 69(Y) x 69(Z) L-bracket
+#   - Bracket sits ON TOP of the frame, flange against front/rear top X-rail
+#   - Motor body mostly inside the bracket envelope, shaft points TOWARD post
+#   - Motor + bracket entirely below Z=1200 (top of frame), so the whole
+#     mechanism stays inside the frame envelope as required for transport.
+#
+# Bracket geometry (native):
+#   X[-32.5, 32.5] — bilaterally symmetric in local X (width axis)
+#   Y[-40, 29]     — asymmetric: flange extends toward Y=-40, wall rises at Y>0
+#   Z[0, 69]       — flange at Z=0, motor mount face at top of 69mm rise
+#
+# Front posts: ry=±90 only. Flange native Y=-40 → world Y near post front rail.
+# Rear posts: ry=±90 + rx=180. rx=180 flips native Y→-Y and Z→-Z, which swaps
+#   the flange direction so it touches the REAR top X-rail instead of front.
+#
+# Motor: ry=90 (right, shaft toward +X post) or ry=-90 (left, shaft toward -X post).
+# Motor Y-symmetric so no rx needed at rear, just Y translation.
+#
+# Pulley: native X[0,14], axis = X direction (14mm along shaft). Placed with
+# tx = shaft_center - 7 so the pulley is centered on the shaft.
 
-def make_belt_segment(length, width=BELT_W, thickness=BELT_T):
-    """Create a belt segment as a thin box."""
-    return cq.Workplane("XY").box(length, thickness, width)
+Z_BELT_Y_F = 60            # belt strand Y at front posts (matches Nick's bracket Y center)
+Z_BELT_Y_R = D - 60        # = 1180 at rear posts
+Z_MOTOR_CZ = 1165          # motor + bracket center Z (body inside frame Z<1200)
 
-# Z-AXIS BELTS (4x): from hub disk (Z≈BRACE_Z-30) to bottom idler (Z=20)
-z_belt_len = BRACE_Z - 30 - 20  # ≈1090mm
-z_belt = make_belt_segment(z_belt_len)
-for nm, cx, cy, sx in [("FL",20,10,1), ("FR",2380,10,-1),
-                        ("RL",20,1190,1), ("RR",2380,1190,-1)]:
-    bx = cx + sx * 30
-    belt_center_z = (BRACE_Z - 30 + 20) / 2
-    add(z_belt, f"belt_z{nm}", GRN, L(bx, cy, belt_center_z, ry=90))
+# Per-post config:
+#   bkt_tx, bkt_ry, bkt_rx — bracket Location rotations
+#   mot_tx, mot_ry          — motor  Location rotations (rx always 0)
+#   pul_tx                   — pulley X translation (pulley center - 7)
+Z_MOTOR_CFG = [
+    # name, bkt_tx, bkt_ry, bkt_rx, mot_tx, mot_ry, pul_tx, ty
+    ("FL",    129,    -90,      0,   63.2,    -90,    45.9, Z_BELT_Y_F),
+    ("FR",   2351,     90,      0, 2416.8,     90,  2420.1, Z_BELT_Y_F),
+    ("RL",     60,    -90,    180,   63.2,    -90,    45.9, Z_BELT_Y_R),
+    ("RR",   2420,     90,    180, 2416.8,     90,  2420.1, Z_BELT_Y_R),
+]
 
-# Y-AXIS BELTS (2x): full 1200mm along Y-rails
-y_belt_len = 1100  # motor pulley to idler span
-y_belt = make_belt_segment(y_belt_len)
-for nm, cx in [("L", 75), ("R", 2325)]:
-    add(y_belt, f"belt_y{nm}", GRN, L(cx, 600, ZP+15, rz=90))
+for post_nm, btx, bry, brx, mtx, mry, pltx, ty in Z_MOTOR_CFG:
+    add(n23_lbracket, f"z_bracket_{post_nm}", BRK2,
+        L(btx, ty, Z_MOTOR_CZ, ry=bry, rx=brx))
+    add(motor_n23,    f"z_motor_{post_nm}",   MTR,
+        L(mtx, ty, Z_MOTOR_CZ, ry=mry))
+    add(gt2_20t,      f"z_pulley_{post_nm}",  PUL,
+        L(pltx, ty, Z_MOTOR_CZ))
 
-# X-AXIS BELT (1x): full span along gantry beam (2300mm usable)
-x_belt_len = 2300
-x_belt = make_belt_segment(x_belt_len)
-add(x_belt, "belt_x", GRN, L(1200, 600, BEAM_Z+45))
+print(f"  Phase C.1 Z-motors: {n[0]} parts")
 
-print(f"  + Belt paths: {n[0]} parts")
+# ============================================================
+# C.2 — Z-IDLERS at post bottoms (4x smooth idlers)
+# ============================================================
+# Each Z-belt loop runs from the motor pulley at the top of the post down
+# to a smooth idler at the bottom and back up. The idler rotation axis is
+# parallel to X (matches motor) and the idler sits directly below its motor
+# pulley so both belt strands are vertical.
+#
+# Mounting: M5 shoulder bolt through the post's inner X-face T-slot.
+#   - Bolt head inside the frame, shoulder extends inward to carry the
+#     idler pulley bore at X = pulley_center.
+#   - No dedicated idler mount plate — T-slot mount is sufficient for a
+#     12.7 mm smooth idler wheel. Shoulder bolt hardware is in the BOM.
+#
+# Placement: idler X,Y = motor pulley X,Y so belt strands are parallel to Z.
+# Idler Z = 60 mm (clear of bottom skids at Z[0,40], leaves room for belt
+# wrap and Z-carriage lower travel).
+#
+# Idler native: 12.7(X, axle) x 22(Y) x 22(Z)
+IDLER_Z = 60
+# (name, idler_cx, idler_cy)
+Z_IDLER_CFG = [
+    ("FL",   52.9,   Z_BELT_Y_F),
+    ("FR", 2427.1,   Z_BELT_Y_F),
+    ("RL",   52.9,   Z_BELT_Y_R),
+    ("RR", 2427.1,   Z_BELT_Y_R),
+]
+for nm, ix, iy in Z_IDLER_CFG:
+    add(idler_sm, f"z_idler_{nm}", IDL, L(ix, iy, IDLER_Z))
 
-# Drag chains removed — will add with proper routing after motion system is finalized
+print(f"  Phase C.2 Z-idlers: {n[0]} parts")
 
 # ============================================================
 # SUMMARY + EXPORT
@@ -403,4 +469,88 @@ t1 = time.time()
 assy.save(out)
 mb = os.path.getsize(out) / 1024 / 1024
 print(f"  {mb:.1f} MB in {time.time()-t1:.1f}s")
-print(f"\n  v0.2.0: {total} parts | Frame + V-wheels + Pulleys + Belts + Drag chains")
+
+# For CQ-Editor live preview: expose the assembly as `result`
+result = assy
+
+# ============================================================
+# INTERFERENCE CHECK (solid intersection, not just bbox)
+# ============================================================
+# Only run if invoked as __main__ (skipped in CQ-Editor to keep preview fast).
+if __name__ == "__main__":
+    print("\nRunning solid interference check...")
+    tc = time.time()
+    # Flatten assembly into (name, shape_with_location_baked) pairs
+    def bake(child, parent_loc=Location()):
+        loc = parent_loc * child.loc if child.loc else parent_loc
+        results = []
+        if child.obj is not None:
+            sh = child.obj
+            if hasattr(sh, 'val'):
+                sh = sh.val()
+            try:
+                moved = sh.moved(loc)
+                results.append((child.name, moved))
+            except Exception:
+                pass
+        for ch in child.children:
+            results.extend(bake(ch, loc))
+        return results
+
+    baked = bake(assy)
+    print(f"  Baked {len(baked)} solids")
+
+    # Intentional overlaps we don't want reported as clips.
+    # Each rule: (substr1, substr2) — if both names contain these, skip.
+    EXCLUDE_PAIRS = [
+        ("vw_xc", "zpY_"),         # X-carriage V-wheels engage Y-rail V-slot (phantom dip)
+        ("vw_xc", "xcar_"),        # X-carriage V-wheels mount on carriage plates
+        ("vw_zc", "post_"),        # Z-carriage V-wheels engage post V-slots (phantom dip)
+        ("vw_zc", "zpl_"),         # Z-carriage V-wheels mount through Z-corner plate
+        ("zpl_",  "zpY_"),         # Y-rail butt-joint end face flush with Z-corner plate
+        ("xcar_", "gantry_"),      # X-beam butt-joint end face flush with carriage plate
+        ("z_motor_",  "z_bracket_"),# Z-motor body sits inside L-bracket envelope
+        ("z_motor_",  "z_pulley_"), # Z-pulley mounted on motor shaft
+        ("z_bracket_","topX_"),     # Bracket flange rests on top X-rail
+    ]
+    def excluded(a, b):
+        for s1, s2 in EXCLUDE_PAIRS:
+            if (s1 in a and s2 in b) or (s1 in b and s2 in a):
+                return True
+        return False
+
+    clips = []
+    excluded_count = 0
+    for i in range(len(baked)):
+        n1, s1 = baked[i]
+        for j in range(i+1, len(baked)):
+            n2, s2 = baked[j]
+            # Quick bbox prefilter
+            b1 = s1.BoundingBox(); b2 = s2.BoundingBox()
+            if (b1.xmax < b2.xmin or b2.xmax < b1.xmin or
+                b1.ymax < b2.ymin or b2.ymax < b1.ymin or
+                b1.zmax < b2.zmin or b2.zmax < b1.zmin):
+                continue
+            if excluded(n1, n2):
+                excluded_count += 1
+                continue
+            # Real solid intersection
+            try:
+                inter = s1.intersect(s2)
+                vol = inter.Volume()
+                if vol > 1.0:   # ignore < 1mm3 numerical noise
+                    clips.append((n1, n2, vol))
+            except Exception as e:
+                pass
+    if excluded_count:
+        print(f"  (skipped {excluded_count} known-intentional overlaps)")
+
+    print(f"  Check time: {time.time()-tc:.1f}s")
+    if clips:
+        print(f"\n  [!] {len(clips)} solid interferences found:")
+        for n1, n2, vol in sorted(clips, key=lambda c: -c[2]):
+            print(f"    {n1:20s} vs {n2:20s}  vol={vol:10.0f} mm3")
+    else:
+        print("\n  [OK] No solid interferences - all parts occupy disjoint volumes")
+
+print(f"\n  v0.3.0 Phase A+B: Frame + Z-gantry butt-jointed ({total} parts)")
