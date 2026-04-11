@@ -210,7 +210,7 @@ for name in zwheels:
 #  custom N23 angled L-bracket; motor sits on top of frame.)
 # ----------------------------------------------------------
 Z_BELT_Y = {"F": 60, "R": D - 60}          # front 60, rear 1180
-Z_MOTOR_CZ = 1165
+Z_MOTOR_CZ = 1170   # updated 2026-04-11 — all 4 brackets at z1=1202.5, motor cz=1170
 POST_IS_LEFT  = {"FL": True, "FR": False, "RL": True, "RR": False}
 POST_IS_FRONT = {"FL": True, "FR": True,  "RL": False,"RR": False}
 
@@ -221,10 +221,11 @@ check("4 Z-motor L-brackets", len(z_brackets) == 4, f"got {len(z_brackets)}")
 check("4 Z-motors",           len(z_motors)   == 4, f"got {len(z_motors)}")
 check("4 Z-motor pulleys",    len(z_pulls)    == 4, f"got {len(z_pulls)}")
 
-# As of 2026-04-11, the RL Z-motor assembly was relocated OUTSIDE the frame
-# envelope by Nick to make room for Y-axis motors in Phase C.4. Tight "inside
-# frame" position checks on RL are relaxed; FL/FR/RR keep original invariants.
-RELOCATED = {"RL"}
+# As of 2026-04-11, ALL 4 Z-motor assemblies have been relocated OUTSIDE the
+# frame envelope by Nick to make room for the Y-axis motors in Phase C.4.
+# Tight "inside frame" position checks are relaxed for every corner; the
+# loader in m3_2_assembly.py picks up the Fusion-edited positions verbatim.
+RELOCATED = {"FL", "FR", "RL", "RR"}
 
 for post_nm in ("FL", "FR", "RL", "RR"):
     is_left  = POST_IS_LEFT[post_nm]
@@ -238,7 +239,9 @@ for post_nm in ("FL", "FR", "RL", "RR"):
         x0,x1,y0,y1,z0,z1 = bb(b)
         dims = sorted([x1-x0, y1-y0, z1-z0])
         check(f"{b} sorted dims 65/69/69", all(abs(d-t) < 0.2 for d,t in zip(dims,[65,69,69])), f"{dims}")
-        check(f"{b} Z inside frame top",   z1 <= H + TOL, f"z1={z1}")
+        # Bracket top can protrude ~2.5mm above H=1200 with motors outboard;
+        # that is accepted (a cover/safety box will handle it later).
+        check(f"{b} Z inside frame top",   z1 <= H + 3 + TOL, f"z1={z1}")
         check(f"{b} Z above top X-rail bot", z0 >= 1120 - 0.5, f"z0={z0}")
         if not relocated:
             if is_front:
@@ -286,9 +289,8 @@ for post_nm in ("FL", "FR", "RL", "RR"):
 # Phase C.3 — Z-belts + L-tabs
 # ----------------------------------------------------------
 z_belts = [n for n in bboxes if n.startswith("z_belt_")]
-z_tabs  = [n for n in bboxes if n.startswith("z_ltab_")]
 check("8 Z-belt strands (4 loops x 2)", len(z_belts) == 8, f"got {len(z_belts)}")
-check("4 Z-belt L-tabs",                 len(z_tabs)  == 4, f"got {len(z_tabs)}")
+check("no L-tabs (removed)", not any(n.startswith("z_ltab_") for n in bboxes), "found stray ltab")
 
 for post_nm in ("FL", "FR", "RL", "RR"):
     is_front = POST_IS_FRONT[post_nm]
@@ -316,10 +318,10 @@ for post_nm in ("FL", "FR", "RL", "RR"):
         if has(bn):
             x0,x1,y0,y1,z0,z1 = bb(bn)
             dims = sorted([x1-x0, y1-y0, z1-z0])
-            check(f"{bn} sorted dims 1.5/6/1088",
-                  all(abs(d-t) < 0.5 for d,t in zip(dims,[1.5, 6, 1088])), f"{dims}")
-            check(f"{bn} Z bottom tangent", abs(z0 - 71) < 0.5, f"z0={z0}")
-            check(f"{bn} Z top tangent",    abs(z1 - 1159) < 0.5, f"z1={z1}")
+            check(f"{bn} sorted dims 1.5/6/1131",
+                  all(abs(d-t) < 0.5 for d,t in zip(dims,[1.5, 6, 1131])), f"{dims}")
+            check(f"{bn} Z bottom tangent", abs(z0 - 33) < 0.5, f"z0={z0}")
+            check(f"{bn} Z top tangent",    abs(z1 - 1164) < 0.5, f"z1={z1}")
             cx = (x0+x1)/2; cy = (y0+y1)/2
             if pax == "X":
                 # Strands separated in Y, both at pulley X
@@ -333,27 +335,12 @@ for post_nm in ("FL", "FR", "RL", "RR"):
                 check(f"{bn} X offset ±6.5", abs((cx - px) - exp_dx) < 0.5,
                       f"dx={cx - px}")
 
-    # L-tab: 14 x 42 x 30, centered on pulley X, bridging plate face to closer strand
-    tn = f"z_ltab_{post_nm}"
-    if has(tn):
-        x0,x1,y0,y1,z0,z1 = bb(tn)
-        cx = (x0+x1)/2; cy = (y0+y1)/2; cz = (z0+z1)/2
-        check(f"{tn} 14 in X",  abs((x1-x0) - 14) < 0.1, f"{x1-x0}")
-        check(f"{tn} 42 in Y",  abs((y1-y0) - 42) < 0.1, f"{y1-y0}")
-        check(f"{tn} 30 in Z",  abs((z1-z0) - 30) < 0.1, f"{z1-z0}")
-        check(f"{tn} X center = pulley X", abs(cx - px) < 0.5, f"cx={cx} vs px={px}")
-        check(f"{tn} Z center = ZP",   abs(cz - 440) < TOL, f"cz={cz}")
-        if is_front:
-            check(f"{tn} plate-end at Y=25",  abs(y0 - 25) < 0.5, f"y0={y0}")
-            check(f"{tn} belt-end at Y=67",   abs(y1 - 67) < 0.5, f"y1={y1}")
-        else:
-            check(f"{tn} plate-end at Y=1215",abs(y1 - 1215) < 0.5, f"y1={y1}")
-            check(f"{tn} belt-end at Y=1173", abs(y0 - 1173) < 0.5, f"y0={y0}")
+    # L-tab removed 2026-04-11: belts clamp directly to Z-corner plate.
 
 # ----------------------------------------------------------
 # Phase C.2 — Z-idlers at post bottoms
 # ----------------------------------------------------------
-IDLER_Z = 60
+IDLER_Z = 22   # lowered 2026-04-11 for full Z-travel (bottom at 11, top at 33)
 z_idlers = [n for n in bboxes if n.startswith("z_idler_")]
 check("4 Z-axis idlers", len(z_idlers) == 4, f"got {len(z_idlers)}")
 for post_nm in ("FL", "FR", "RL", "RR"):
@@ -375,7 +362,9 @@ for post_nm in ("FL", "FR", "RL", "RR"):
         check(f"{idn} X under pulley", abs(cx - ppx) < 0.5, f"cx={cx} vs ppx={ppx}")
         check(f"{idn} Y under pulley", abs(cy - ppy) < 0.5, f"cy={cy} vs ppy={ppy}")
         check(f"{idn} Z center = {IDLER_Z}", abs(cz - IDLER_Z) < TOL, f"cz={cz}")
-        check(f"{idn} clears bottom skids",  z0 >= 40 - TOL,           f"z0={z0}")
+        # Idlers sit outboard of the bottom Y-braces in X, so they are allowed
+        # below Z=40 (brace top). Only require they stay above the frame floor.
+        check(f"{idn} above frame floor",    z0 >= 0 - TOL,            f"z0={z0}")
         if not relocated:
             check(f"{idn} X inside frame", x0 >= 0 - TOL and x1 <= W + TOL, f"X[{x0},{x1}]")
             check(f"{idn} Y inside frame", y0 >= 0 - TOL and y1 <= D + TOL, f"Y[{y0},{y1}]")
