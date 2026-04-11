@@ -39,6 +39,33 @@ STEP_DIR = os.path.join(os.path.dirname(__file__), "Components")
 def load(relpath, base=STEP_DIR):
     return cq.importers.importStep(os.path.join(base, relpath))
 
+# Cache for expensive STEP imports (don't re-read the user file 4x)
+_STEP_CACHE = {}
+def load_solid_by_signature(step_path, size_target, center_target, tol=0.5):
+    """Extract a single solid from a STEP file matching size + approximate
+    center. Returns the solid wrapped as a cq.Workplane ready to add to
+    an Assembly at identity Location. Used to pick up pre-positioned parts
+    from Nick's manually-edited M3-2_Assembly_user.step (source-of-truth for
+    bracket/motor orientations that are hard to reproduce with L() rotations).
+    """
+    if step_path not in _STEP_CACHE:
+        _STEP_CACHE[step_path] = cq.importers.importStep(step_path).val()
+    shape = _STEP_CACHE[step_path]
+    tgt_dims = sorted(size_target)
+    for s in shape.Solids():
+        bb = s.BoundingBox()
+        dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
+        if not all(abs(d-t) < tol for d, t in zip(dims, tgt_dims)):
+            continue
+        cx=(bb.xmax+bb.xmin)/2; cy=(bb.ymax+bb.ymin)/2; cz=(bb.zmax+bb.zmin)/2
+        if (abs(cx-center_target[0]) < tol and
+            abs(cy-center_target[1]) < tol and
+            abs(cz-center_target[2]) < tol):
+            return cq.Workplane().add(cq.Shape(s.wrapped))
+    raise RuntimeError(
+        f"No solid found in {step_path} matching size={size_target} "
+        f"center={center_target} (tol={tol})")
+
 def sao(step_file, length, rx=0, ry=0, rz=0):
     """Scale-And-Orient: stretch 1000mm stock to exact length, then bake rotation."""
     stock = cq.importers.importStep(os.path.join(STEP_DIR, "V-Slot", step_file))
@@ -402,25 +429,33 @@ Z_BELT_Y_F = 60            # belt strand Y at front posts (matches Nick's bracke
 Z_BELT_Y_R = D - 60        # = 1180 at rear posts
 Z_MOTOR_CZ = 1165          # motor + bracket center Z (body inside frame Z<1200)
 
-# Per-post config:
-#   bkt_tx, bkt_ry, bkt_rx — bracket Location rotations
-#   mot_tx, mot_ry          — motor  Location rotations (rx always 0)
-#   pul_tx                   — pulley X translation (pulley center - 7)
-Z_MOTOR_CFG = [
-    # name, bkt_tx, bkt_ry, bkt_rx, mot_tx, mot_ry, pul_tx, ty
-    ("FL",    129,    -90,      0,   63.2,    -90,    45.9, Z_BELT_Y_F),
-    ("FR",   2351,     90,      0, 2416.8,     90,  2420.1, Z_BELT_Y_F),
-    ("RL",     60,    -90,    180,   63.2,    -90,    45.9, Z_BELT_Y_R),
-    ("RR",   2420,     90,    180, 2416.8,     90,  2420.1, Z_BELT_Y_R),
-]
+# Z-motor L-brackets: loaded pre-positioned from M3-2_Assembly_user.step.
+# Nick's Fusion edit (2026-04-11) rotated the front brackets around their own
+# centers — a transform that can't be cleanly reproduced via L()'s rx/ry/rz
+# rotation-then-translate order without brittle offset math. Loading the solids
+# directly from the user file guarantees fidelity to Nick's final placement.
+USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
+Z_BRACKET_CENTERS = {
+    "FL": (  94.4,  54.5, Z_MOTOR_CZ),
+    "FR": (2385.6,  54.5, Z_MOTOR_CZ),
+    "RL": (  94.5, 1185.5, Z_MOTOR_CZ),
+    "RR": (2385.5, 1185.5, Z_MOTOR_CZ),
+}
+for nm, ctr in Z_BRACKET_CENTERS.items():
+    sh = load_solid_by_signature(USER_STEP, (69, 69, 65), ctr, tol=0.5)
+    add(sh, f"z_bracket_{nm}", BRK2, L(0, 0, 0))
 
-for post_nm, btx, bry, brx, mtx, mry, pltx, ty in Z_MOTOR_CFG:
-    add(n23_lbracket, f"z_bracket_{post_nm}", BRK2,
-        L(btx, ty, Z_MOTOR_CZ, ry=bry, rx=brx))
-    add(motor_n23,    f"z_motor_{post_nm}",   MTR,
-        L(mtx, ty, Z_MOTOR_CZ, ry=mry))
-    add(gt2_20t,      f"z_pulley_{post_nm}",  PUL,
-        L(pltx, ty, Z_MOTOR_CZ))
+# Motors + pulleys stay parametric — their L() rotations match Nick's placements.
+Z_MOTOR_CFG = [
+    # name, mot_tx, mot_ry, pul_tx, ty
+    ("FL",   63.2, -90,    45.9, Z_BELT_Y_F),
+    ("FR", 2416.8,  90,  2420.1, Z_BELT_Y_F),
+    ("RL",   63.2, -90,    45.9, Z_BELT_Y_R),
+    ("RR", 2416.8,  90,  2420.1, Z_BELT_Y_R),
+]
+for post_nm, mtx, mry, pltx, ty in Z_MOTOR_CFG:
+    add(motor_n23, f"z_motor_{post_nm}",  MTR, L(mtx, ty, Z_MOTOR_CZ, ry=mry))
+    add(gt2_20t,   f"z_pulley_{post_nm}", PUL, L(pltx, ty, Z_MOTOR_CZ))
 
 print(f"  Phase C.1 Z-motors: {n[0]} parts")
 
@@ -455,6 +490,82 @@ for nm, ix, iy in Z_IDLER_CFG:
     add(idler_sm, f"z_idler_{nm}", IDL, L(ix, iy, IDLER_Z))
 
 print(f"  Phase C.2 Z-idlers: {n[0]} parts")
+
+# ============================================================
+# C.3 — Z-BELTS + L-TABS (4 belt loops + 4 L-tabs)
+# ============================================================
+# Each Z-axis belt: a GT2 6mm loop running vertically between motor pulley
+# (Z=Z_MOTOR_CZ) and bottom idler (Z=IDLER_Z), pinned to the Z-corner plate
+# via an L-tab that bridges from the plate face (Y=22/1218) out to the
+# belt strand (Y=Z_BELT_Y_F/R = 60/1180). The L-tab is a 3D-printed part.
+#
+# Belt visualization: 2 strands (front + back of the loop), each modeled as
+# a thin 6 x 2 x height rectangular prism. No belt tooth geometry — this is
+# purely for clash-detection, CG, and visual clarity, not for FEA. The two
+# strands are offset in the belt's own tangent direction (here: ±7mm in X
+# centered on the pulley X).
+#
+# L-tab: 60 x 6 x 30 printed bracket. The 60mm long axis spans the gap from
+# plate face (Y ~ 22) to belt strand (Y ~ 60), a 38mm run. The tab bolts to
+# the Z-corner plate via two M3 holes and clamps the belt end via a simple
+# pin (per Nick's "we will just use a pin attachment for modeling").
+# Tab Z thickness = 30mm. Tab mid-Z follows the current ZP=440 representative
+# gantry height.
+
+BELT = Color(0.59, 0.84, 0.00)     # M3-CRETE lime green
+TAB  = Color(0.70, 0.70, 0.75)     # printed nylon
+
+# Belt strand dimensions
+BELT_W  = 6                        # GT2-6 width (Y if horizontal, X if wrapped on X-axis pulleys)
+BELT_T  = 1.5                      # belt thickness (through-direction)
+# Belt strand spans vertically from motor pulley pitch circle to idler pitch circle.
+# Pulley pitch radius ~6mm, idler radius ~11mm. Average strand top/bot:
+BELT_Z0 = IDLER_Z + 11             # bottom of strand = idler top tangent
+BELT_Z1 = Z_MOTOR_CZ - 6           # top of strand = motor pulley bottom tangent
+BELT_H  = BELT_Z1 - BELT_Z0        # strand length in Z
+
+def belt_strand(length_z):
+    """Tall thin box for a vertical belt strand. Returns a cq.Workplane."""
+    return (cq.Workplane("XY")
+            .box(BELT_T, BELT_W, length_z, centered=(True, True, False)))
+
+e_belt = belt_strand(BELT_H)
+
+# Pulley X: 52.9 (left) / 2427.1 (right). Strand front = pulley X - 3.5, strand rear = + 3.5
+# (tangent offsets so both strands are in the pulley's own tangent plane)
+STRAND_DX = 3.5
+for post_nm, (btx, bty, _) in Z_BRACKET_CENTERS.items():
+    is_left = btx < 1000
+    pulley_cx = 52.9 if is_left else 2427.1
+    belt_y = Z_BELT_Y_F if post_nm.startswith("F") else Z_BELT_Y_R
+    for tag, dx in [("up", -STRAND_DX), ("dn", +STRAND_DX)]:
+        add(e_belt, f"z_belt_{post_nm}_{tag}", BELT,
+            L(pulley_cx + dx, belt_y, BELT_Z0))
+
+# L-tab: simple 3D-printed bracket attached to Z-corner plate, clamping belt.
+# Modeled as a single box at representative Z-carriage height (ZP=440).
+TAB_X = 14   # width along X (clearance of belt + pin fastener + wall)
+TAB_Y = 42   # length from plate face to belt strand + wrap
+TAB_Z = 30   # tall enough to clamp belt + hold printed pin
+
+e_tab = cq.Workplane("XY").box(TAB_X, TAB_Y, TAB_Z)
+
+# Tab position: centered on belt X, starts at plate face Y and extends outward to belt Y
+# Z at gantry representative height
+for post_nm, (btx, bty, _) in Z_BRACKET_CENTERS.items():
+    is_left = btx < 1000
+    is_front = post_nm.startswith("F")
+    pulley_cx = 52.9 if is_left else 2427.1
+    # Plate inner Y face: front plate +Y face at Y=25; rear plate -Y face at Y=1215
+    if is_front:
+        plate_face_y = 25
+        tab_cy = plate_face_y + TAB_Y/2     # extends into +Y
+    else:
+        plate_face_y = 1215
+        tab_cy = plate_face_y - TAB_Y/2     # extends into -Y
+    add(e_tab, f"z_ltab_{post_nm}", TAB, L(pulley_cx, tab_cy, ZP))
+
+print(f"  Phase C.3 Z-belts + tabs: {n[0]} parts")
 
 # ============================================================
 # SUMMARY + EXPORT
@@ -509,9 +620,13 @@ if __name__ == "__main__":
         ("vw_zc", "zpl_"),         # Z-carriage V-wheels mount through Z-corner plate
         ("zpl_",  "zpY_"),         # Y-rail butt-joint end face flush with Z-corner plate
         ("xcar_", "gantry_"),      # X-beam butt-joint end face flush with carriage plate
-        ("z_motor_",  "z_bracket_"),# Z-motor body sits inside L-bracket envelope
-        ("z_motor_",  "z_pulley_"), # Z-pulley mounted on motor shaft
-        ("z_bracket_","topX_"),     # Bracket flange rests on top X-rail
+        ("z_motor_",   "z_bracket_"),# Z-motor body sits inside L-bracket envelope
+        ("z_motor_",   "z_pulley_"), # Z-pulley mounted on motor shaft
+        ("z_bracket_", "topX_"),     # Bracket flange rests on top X-rail
+        ("z_belt_",    "z_pulley_"), # Belt wraps pulley
+        ("z_belt_",    "z_idler_"),  # Belt wraps idler
+        ("z_ltab_",    "zpl_"),      # L-tab bolts to Z-corner plate
+        ("z_ltab_",    "z_belt_"),   # L-tab clamps belt strand
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
