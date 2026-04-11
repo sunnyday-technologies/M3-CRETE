@@ -49,7 +49,6 @@ CAD/_preview/
 
 # Numbered assembly snapshots (experimental exports, keep local only)
 CAD/M3-2_Assembly[0-9]*.step
-CAD/M3-2_Assembly_user.f3d
 
 # Custom per-build CAD (user-local work)
 CAD/Custom/*.step
