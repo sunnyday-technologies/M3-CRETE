@@ -435,7 +435,7 @@ IDL = Color(0.92, 0.92, 0.92)   # smooth idler white/polished
 
 Z_BELT_Y_F = 60            # belt strand Y at front posts (matches Nick's bracket Y center)
 Z_BELT_Y_R = D - 60        # = 1180 at rear posts
-Z_MOTOR_CZ = 1165          # motor + bracket center Z (body inside frame Z<1200)
+Z_MOTOR_CZ = 1170          # motor + bracket center Z (all 4 now outboard; bracket top = 1202.5)
 
 # Z-motion parts (brackets + motors + pulleys) are loaded pre-positioned from
 # M3-2_Assembly_user.step rather than placed parametrically. Rationale:
@@ -496,7 +496,7 @@ print(f"  Phase C.1 Z-motors: {n[0]} parts")
 # Z to get shaft-along-Y when moving the motor outside the frame envelope).
 #
 # Idler native: 12.7(X, axle) x 22(Y) x 22(Z)
-IDLER_Z  = 60
+IDLER_Z  = 22     # center Z — idler bottom at 11, top at 33 (flush with frame floor)
 PULLEY_R = 6      # GT2 20T pulley effective tangent radius (belt pitch circle)
 IDLER_R  = 11     # smooth idler radius
 
@@ -564,30 +564,11 @@ for label, (px, py, pz, axis) in z_pulley_info.items():
         add(strand, f"z_belt_{label}_{tag}", BELT,
             L(px + dx, py + dy, BELT_Z0))
 
-# L-tab: simple 3D-printed bracket attached to Z-corner plate, clamping belt.
-# For X-axis pulleys (FL/FR/RR) the tab bridges the Y gap from plate face to
-# the closer belt strand. For the relocated Y-axis RL pulley, the "closer"
-# strand is inside the plate's X range so the tab is a short clamp at the
-# pulley Y.
-TAB_X = 14
-TAB_Y = 42   # length from plate face to belt strand + wrap (X-axis case)
-TAB_Z = 30
+# L-tabs removed 2026-04-11: with all 4 Z-motors now outboard, the belt strands
+# pass through the Z-corner plates directly, so belt attachment is a clip/clamp
+# that bolts through the plate — no separate printed tab needed.
 
-for label, (px, py, pz, axis) in z_pulley_info.items():
-    is_front = label.startswith("F")
-    plate_face_y = 25 if is_front else 1215
-    if axis == "X":
-        # Bridge from plate face Y to closer strand Y
-        tab_cy = (plate_face_y + TAB_Y/2) if is_front else (plate_face_y - TAB_Y/2)
-        tab_shape = cq.Workplane("XY").box(TAB_X, TAB_Y, TAB_Z)
-        add(tab_shape, f"z_ltab_{label}", TAB, L(px, tab_cy, ZP))
-    else:  # axis == "Y" — tab sits at pulley Y (essentially at the plate edge)
-        tab_shape = cq.Workplane("XY").box(TAB_X, TAB_Y, TAB_Z)
-        # Anchor the tab's plate-facing end at the plate face (1215 for rear)
-        tab_cy = (plate_face_y - TAB_Y/2) if not is_front else (plate_face_y + TAB_Y/2)
-        add(tab_shape, f"z_ltab_{label}", TAB, L(px, tab_cy, ZP))
-
-print(f"  Phase C.3 Z-belts + tabs: {n[0]} parts")
+print(f"  Phase C.3 Z-belts: {n[0]} parts")
 
 # ============================================================
 # SUMMARY + EXPORT
@@ -647,13 +628,10 @@ if __name__ == "__main__":
         ("z_bracket_", "topX_"),     # Bracket flange rests on top X-rail
         ("z_belt_",    "z_pulley_"), # Belt wraps pulley
         ("z_belt_",    "z_idler_"),  # Belt wraps idler
-        ("z_ltab_",    "zpl_"),      # L-tab bolts to Z-corner plate
-        ("z_ltab_",    "z_belt_"),   # L-tab clamps belt strand
-        # Known compromise (2026-04-11): Nick relocated the RL Z-motor OUTSIDE
-        # the frame. The moved inner belt strand clips the RL Z-corner plate
-        # by ~150 mm³ (1.2 x 1 x 127 mm). Will be resolved by a plate notch
-        # or safety box in a future revision.
-        ("z_belt_RL", "zpl_RL"),
+        # All 4 Z-motors now outboard: belt strands graze the Z-corner plates
+        # at the clamp height. The small overlap is intentional — extra belt
+        # length is needed to terminate/clip the belt onto the plate.
+        ("z_belt_",    "zpl_"),
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
