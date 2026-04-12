@@ -258,10 +258,13 @@ plate_20_80 = _make_gantry_plate()
 # ============================================================
 # Colors
 # ============================================================
-ALU = Color(0.78, 0.78, 0.80)   # Frame aluminum (light silver)
-BLK = Color(0.15, 0.15, 0.15)   # Gantry beam
-DRK = Color(0.55, 0.55, 0.58)   # Z-platform rails
-BRK = Color(0.45, 0.45, 0.48)   # Corner brackets (cast)
+# Brand color scheme — black anodized frame, lime green accent
+ALU = Color(0.10, 0.10, 0.12)   # Black anodized frame rails
+BLK = Color(0.08, 0.08, 0.10)   # Gantry beam (darkest)
+DRK = Color(0.20, 0.20, 0.22)   # C-beam Y-rails (dark charcoal)
+BRK = Color(0.35, 0.35, 0.38)   # Corner brackets
+GRN = Color(0.40, 0.85, 0.10)   # Lime green V-wheels (brand accent)
+PH  = Color(0.25, 0.75, 0.90)   # Printhead placeholder (cyan callout)
 
 assy = Assembly("M3-2_Assembly")
 n = [0]
@@ -445,7 +448,7 @@ add(e_gbeam, "gantry_2", BLK, L(XCAR_L_TX + X_RAIL_LEN,  BEAM_Y, BEAM_Z))
 #   - Wheel pair spacing along travel axis Y = 66mm (±33mm from BEAM_Y)
 #
 # Wheel native: 10.2(X) x 23.9(Y) x 23.9(Z), axle in X. Rolls in Y ✓
-WHL = Color(0.90, 0.90, 0.82)     # delrin white
+WHL = GRN                          # lime green V-wheels (brand accent)
 WHEEL_DZ = 50                     # offset from rail Z center (80mm face + 10mm past edge)
 WHEEL_DY = 33                     # half of 66mm pair spacing along travel
 
@@ -505,10 +508,10 @@ idler_sm     = cq.Workplane("YZ").cylinder(12.7, 22 / 2)   # axle X, OD 22
 n23_lbracket = cq.importers.importStep(os.path.join(
     os.path.dirname(__file__), "Vendor", "StepperOnline", "N23_angled_mount.STEP"))
 
-MTR = Color(0.20, 0.20, 0.22)   # motor black
-BRK2 = Color(0.35, 0.55, 0.80)  # L-bracket blue (matches Nick's color-coding)
-PUL = Color(0.85, 0.70, 0.15)   # GT2 pulley brass/gold
-IDL = Color(0.92, 0.92, 0.92)   # smooth idler white/polished
+MTR = Color(0.15, 0.15, 0.18)   # motor black
+BRK2 = Color(0.30, 0.50, 0.75)  # L-bracket blue (brand secondary)
+PUL = Color(0.90, 0.75, 0.10)   # GT2 pulley brass/gold
+IDL = Color(0.85, 0.85, 0.88)   # smooth idler polished steel
 
 # ============================================================
 # C.1 — Z-MOTORS + ANGLED L-BRACKETS + PULLEYS (4x each, 12 parts)
@@ -794,6 +797,53 @@ for label, (px, py, pz, axis) in y_pulley_info.items():
 print(f"  Phase C.4 Y-motion: {n[0]} parts")
 
 # ============================================================
+# C.8 — X-AXIS MOTION (belt-pinion: fixed belt, motor rides along)
+# ============================================================
+# The X-axis uses a pinion-style drive: a single GT2 belt is fixed at both
+# ends of the gantry beam (X-beam). A motor+pulley carriage rides along the
+# beam on V-wheels, pushing the pulley against the fixed belt. The motor
+# drives itself along the belt, carrying the printhead.
+#
+# Gantry beam (2080): X[40, 2440], Y[610, 630], Z[400, 480]
+# Belt runs along the beam top face (Z=480) at Y=620 (beam center).
+
+X_MOTOR_X    = 2380     # motor position along beam (representative, near RR end)
+X_BEAM_Y     = D / 2    # 620 — beam center Y
+X_BELT_Z     = ZP + 43  # 483 — just above gantry top face (Z=480)
+X_BELT_X0    = 80       # belt start (inset from beam end)
+X_BELT_X1    = 2400     # belt end
+X_PH_X       = 1240     # printhead placeholder X (mid-beam)
+
+# X-belt: single straight strand (fixed, not a loop)
+x_belt_len = X_BELT_X1 - X_BELT_X0
+x_belt = cq.Workplane("XY").box(x_belt_len, BELT_W, BELT_T,
+                                centered=(False, True, True))
+add(x_belt, "x_belt", BELT, L(X_BELT_X0, X_BEAM_Y, X_BELT_Z))
+
+# X-motor: NEMA23 body + shaft + pulley at rear end, shaft pointing down (-Z)
+x_motor_z = X_BELT_Z + MOTOR_SHAFT_L + MOTOR_BODY / 2   # body center Z
+x_motor_body = _oriented_box(56.4, 56.4, MOTOR_BODY, "Z")
+add(x_motor_body, "x_motor", MTR, L(X_MOTOR_X, X_BEAM_Y, x_motor_z))
+
+x_shaft_z = X_BELT_Z + MOTOR_SHAFT_L / 2  # shaft center Z
+x_shaft = _oriented_cylinder(MOTOR_SHAFT_L, MOTOR_SHAFT_D / 2, "Z")
+add(x_shaft, "x_shaft", SHAFT, L(X_MOTOR_X, X_BEAM_Y, x_shaft_z))
+
+x_pulley_z = X_BELT_Z  # pulley at belt height
+x_pulley = _oriented_cylinder(14, 15 / 2, "Z")
+add(x_pulley, "x_pulley", PUL, L(X_MOTOR_X, X_BEAM_Y, x_pulley_z))
+
+# X-idler: smooth idler at the far end of the belt (tension reference)
+x_idler = rotate_shape(idler_sm, ry=90)  # axle along Z
+add(x_idler, "x_idler", IDL, L(X_BELT_X0, X_BEAM_Y, X_BELT_Z))
+
+# Printhead carriage placeholder: visual reference for nozzle mount location
+ph_box = cq.Workplane("XY").box(80, 80, 30)
+add(ph_box, "printhead", PH, L(X_PH_X, X_BEAM_Y, X_BELT_Z + 20))
+
+print(f"  Phase C.8 X-motion: {n[0]} parts")
+
+# ============================================================
 # SUMMARY + EXPORT
 # ============================================================
 total = n[0]
@@ -896,6 +946,19 @@ if __name__ == "__main__":
         ("y_bracket_", "zpl_"),
         # Y-belt crosses under the X-carriage plate clamp site.
         ("y_belt_",    "xcar_"),
+        # --- Phase C.8 X-axis ---
+        ("x_motor",    "x_shaft"),
+        ("x_motor",    "x_pulley"),
+        ("x_shaft",    "x_pulley"),
+        ("x_belt",     "x_shaft"),
+        ("x_belt",     "x_pulley"),
+        ("x_belt",     "x_idler"),
+        ("x_belt",     "gantry_"),
+        ("x_pulley",   "gantry_"),
+        ("x_idler",    "gantry_"),
+        ("x_shaft",    "gantry_"),
+        ("printhead",  "x_belt"),
+        ("printhead",  "gantry_"),
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
