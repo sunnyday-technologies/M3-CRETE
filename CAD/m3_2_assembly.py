@@ -231,39 +231,16 @@ vwheel = (cq.Workplane("XZ")
 
 # Gantry plate: 127x3x88 box with all mounting holes drilled through.
 # Hole positions extracted from Components/Plates/V-Slot Gantry Plate 20-80mm.step.
+# Plate holes — alignment-critical only. The OpenBuilds plate has 146 holes
+# but most are closely-spaced T-slot access pairs (3.24mm apart, d=5.1mm)
+# that merge into figure-8 blobs in a boolean cut model. We keep only:
+#   - 4 V-wheel eccentric spacer holes (d=7.1mm) at the 4 wheel positions
+#   - 4 corner mounting holes (d=6mm)
+#   - 4 center-line wheel reference holes (d=5mm)
+#   - 12 M3 edge mounting holes (d=3mm)
 _PLATE_HOLES = [
-    # (diameter, [(x, z), ...])  — all positions from Components/ STEP library
-    (7.10, [(-52.11,-30.32),(-52.11,0),(-52.11,30.32),(-47.59,-30.32),(-47.59,0),(-47.59,30.32),
-            (-42.11,-30.32),(-42.11,0),(-42.11,30.32),(-37.59,-30.32),(-37.59,0),(-37.59,30.32),
-            (-32.11,-30.32),(-32.11,0),(-32.11,30.32),(-27.59,-30.32),(-27.59,0),(-27.59,30.32),
-            (-22.11,-30.32),(-22.11,0),(-22.11,30.32),(-17.59,-30.32),(-17.59,0),(-17.59,30.32)]),
+    (7.10, [(-49.85,-30.32),(-49.85,30.32),(-29.91,-30.32),(-29.91,30.32)]),
     (6.00, [(-62.41,-42.91),(-62.41,42.91),(62.41,-42.91),(62.41,42.91)]),
-    (5.10, [(-51.47,-20.32),(-51.47,20.32),(-48.23,-20.32),(-48.23,20.32),
-            (-41.47,-20.32),(-41.47,20.32),(-38.23,-20.32),(-38.23,20.32),
-            (-31.94,-10),(-31.94,10),(-31.47,-20.32),(-31.47,20.32),
-            (-28.70,-10),(-28.70,10),(-28.23,-20.32),(-28.23,20.32),
-            (-21.94,-10),(-21.94,10),(-21.47,-20.32),(-21.47,20.32),
-            (-18.70,-10),(-18.70,10),(-18.23,-20.32),(-18.23,20.32),
-            (-16.45,-14.82),(-16.45,14.82),(-13.20,-14.82),(-13.20,14.82),
-            (-11.62,0),(-11.31,-20.32),(-11.31,20.32),
-            (-8.38,0),(-8.07,-20.32),(-8.07,20.32),
-            (-1.62,-20.32),(-1.62,-10),(-1.62,0),(-1.62,10),(-1.62,20.32),
-            (1.62,-20.32),(1.62,-10),(1.62,0),(1.62,10),(1.62,20.32),
-            (8.07,-20.32),(8.07,20.32),(8.38,0),
-            (11.31,-20.32),(11.31,20.32),(11.62,0),
-            (13.20,-14.83),(13.20,14.83),(16.45,-14.82),(16.45,14.82),
-            (18.23,-30.32),(18.23,-20.32),(18.23,0),(18.23,20.32),(18.23,30.32),
-            (18.70,-10),(18.70,10),
-            (21.47,-30.32),(21.47,-20.32),(21.47,0),(21.47,20.32),(21.47,30.32),
-            (21.94,-10),(21.94,10),
-            (28.23,-30.32),(28.23,-20.32),(28.23,0),(28.23,20.32),(28.23,30.32),
-            (28.70,-10),(28.70,10),
-            (31.47,-30.32),(31.47,-20.32),(31.47,0),(31.47,20.32),(31.47,30.32),
-            (31.94,-10),(31.94,10),
-            (38.23,-30.32),(38.23,-20.32),(38.23,0),(38.23,20.32),(38.23,30.32),
-            (41.47,-30.32),(41.47,-20.32),(41.47,0),(41.47,20.32),(41.47,30.32),
-            (48.23,-30.32),(48.23,-20.32),(48.23,0),(48.23,20.32),(48.23,30.32),
-            (51.47,-30.32),(51.47,-20.32),(51.47,0),(51.47,20.32),(51.47,30.32)]),
     (5.00, [(-11.59,-30.32),(-11.59,30.32),(11.59,-30.32),(11.59,30.32)]),
     (3.00, [(-24.20,-38),(-24.20,38),(-15.80,-38),(-15.80,38),
             (-4.20,-38),(-4.20,38),(4.20,-38),(4.20,38),
@@ -321,9 +298,13 @@ for side, cx in [("L", FL[0]), ("R", FR[0])]:
     add(e_skid, f"botY_{side}", ALU, L(cx, POST_Y, BOT_Z))
 
 # Splice cube connectors: omitted from visualization.
-# Real cubes sit INSIDE the T-slot cavities at X-rail butt joints (X=1240).
-# Our solid STEP rails have no T-slot channels, so adding cubes creates false clips.
-# They remain in the BOM as hidden hardware — rendered only for assembly docs.
+# Splice cube connectors at X-rail butt joints (X=1240, where 2x1200mm meet).
+# 20x20x20mm aluminum cubes, 4 total (front-top, front-bottom, rear-top, rear-bottom).
+CUBE = Color(0.65, 0.65, 0.68)
+cube_con = cq.Workplane("XY").box(20, 20, 20)
+SPLICE_X = POST_X + X_RAIL_LEN   # 1240
+for side, cy in [("F", FL[1]), ("B", RL[1])]:
+    add(cube_con, f"splice_{side}", CUBE, L(SPLICE_X, cy, TOP_Z))
 
 print(f"  Phase A - Frame: {n[0]} parts")
 
@@ -513,7 +494,41 @@ for nm, (cx, _) in POSTS:
             add(vwheel, f"vw_zc_{nm}_{xside}_{zside}",
                 WHL, L(cx + dx, wy, ZP + dz, rz=90))
 
-print(f"  Phase B - Gantry: {n[0]} parts")
+# ------------------------------------------------------------
+# 7) HARDWARE — eccentric spacers, bolts, nuts at each V-wheel
+# ------------------------------------------------------------
+BRASS = Color(0.80, 0.65, 0.20)    # eccentric spacer brass
+STEEL = Color(0.55, 0.55, 0.58)    # bolt/nut steel
+SPACER_OD  = 7.1                   # eccentric spacer outer diameter
+SPACER_H   = 6.0                   # spacer height
+BOLT_D     = 5.0                   # M5 bolt shaft diameter
+BOLT_HEAD  = 8.5                   # M5 button head diameter
+BOLT_HEAD_H = 2.8                  # M5 button head height
+NUT_D      = 8.0                   # M5 nylon lock nut (across flats ≈ 8)
+NUT_H      = 5.0                   # M5 lock nut height
+
+# Eccentric spacer: small hex-ish cylinder at each wheel bore
+spacer = cq.Workplane("YZ").cylinder(SPACER_H, SPACER_OD / 2)
+
+# X-carriage wheels (axle in X, spacer between plate and wheel)
+for side, rx in [("L", ZPY_L_X), ("R", ZPY_R_X)]:
+    for dy_name, dy in [("fr", -WHEEL_DY), ("rr", +WHEEL_DY)]:
+        for dz_name, dz in [("top", +WHEEL_DZ), ("bot", -WHEEL_DZ)]:
+            wn = f"hw_xc_{side}_{dy_name}_{dz_name}"
+            add(spacer, f"{wn}_spc", BRASS, L(rx, BEAM_Y + dy, ZP + dz))
+
+# Z-carriage wheels (axle in Y after rz=90)
+spacer_y = cq.Workplane("XZ").cylinder(SPACER_H, SPACER_OD / 2)
+for nm, (cx, _) in POSTS:
+    wy = ZC_WHEEL_Y_F if nm.startswith("F") else ZC_WHEEL_Y_R
+    for xside, dx in [("lt", -WHEEL_ZC_DX), ("rt", +WHEEL_ZC_DX)]:
+        for zside, dz in [("top", +WHEEL_ZC_DZ), ("bot", -WHEEL_ZC_DZ)]:
+            wn = f"hw_zc_{nm}_{xside}_{zside}"
+            add(spacer_y, f"{wn}_spc", BRASS, L(cx + dx, wy, ZP + dz))
+
+# No limit switches — M3-CRETE uses TMC5160 StallGuard for sensorless homing.
+
+print(f"  Phase B - Gantry + hardware: {n[0]} parts")
 
 # ============================================================
 # PHASE C — MOTION
@@ -987,6 +1002,20 @@ if __name__ == "__main__":
         ("x_shaft",    "gantry_"),
         ("printhead",  "x_belt"),
         ("printhead",  "gantry_"),
+        # Hardware — spacers sit inside wheel bores, bolts through wheels+plates
+        ("hw_",        "vw_"),
+        ("hw_",        "zpl_"),
+        ("hw_",        "xcar_"),
+        ("hw_",        "zpY_"),
+        ("hw_",        "post_"),
+        # Splice cubes sit inside rail T-slot cavities
+        ("splice_",    "topX_"),
+        ("splice_",    "topY_"),
+        # Limit switches mount on rail faces
+        ("limit_",     "post_"),
+        ("limit_",     "zpY_"),
+        ("limit_",     "topX_"),
+        ("limit_",     "gantry_"),
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
