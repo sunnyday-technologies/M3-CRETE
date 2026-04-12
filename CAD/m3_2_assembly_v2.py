@@ -213,9 +213,9 @@ e_yrail = sao(S80, Y_RAIL_LEN, rx=-90)
 # 20mm in X, 40mm in Z. ✓
 e_skid = sao(S40, Y_RAIL_LEN, rx=-90)
 
-# V2: parametric boxes for small parts (plates, wheels) — keeps STEP compact.
+# V2: plates stay as parametric boxes; wheels/pulleys/idlers are cylinders.
 plate_20_80 = cq.Workplane("XY").box(127, 3, 88)
-vwheel      = cq.Workplane("XY").box(10.2, 23.9, 23.9)
+vwheel      = cq.Workplane("YZ").cylinder(10.2, 23.9 / 2)   # axle X, OD 23.9
 
 # ============================================================
 # Colors
@@ -461,7 +461,7 @@ print(f"  Phase B - Gantry: {n[0]} parts")
 
 # --- Load motion components ---
 # motor_n23 and gt2_20t are not used in lite — motors + pulleys are parametric boxes
-idler_sm     = cq.Workplane("XY").box(12.7, 22, 22)
+idler_sm     = cq.Workplane("YZ").cylinder(12.7, 22 / 2)   # axle X, OD 22
 # OMC StepperOnline ST-M2 NEMA 23 L-bracket (alloy steel).
 # Vendor-provided CAD — see CAD/Vendor/StepperOnline/README.md for license note.
 n23_lbracket = cq.importers.importStep(os.path.join(
@@ -565,6 +565,14 @@ def _oriented_box(short, short2, long_, axle):
         return cq.Workplane("XY").box(short, long_, short2)
     return cq.Workplane("XY").box(short, short2, long_)
 
+def _oriented_cylinder(height, radius, axle):
+    """Cylinder with axis along the given axle, centered at origin."""
+    if axle == "X":
+        return cq.Workplane("YZ").cylinder(height, radius)
+    if axle == "Y":
+        return cq.Workplane("XZ").cylinder(height, radius)
+    return cq.Workplane("XY").cylinder(height, radius)
+
 # L-brackets: parametric boxes, position from loaded _user.step.
 for label, (ctr, sh) in assign_by_nearest(
         load_solids_by_size(USER_STEP, (69, 69, 65)), BRACKET_LABELS).items():
@@ -580,16 +588,14 @@ for label, (ctr, sh) in assign_by_nearest(
     box = _oriented_box(56.4, 56.4, 76.6, axle)
     add(box, _part_name("motor", label), MTR, L(*ctr))
 
-# Pulleys: parametrize as simple 14 x 15 x 15 boxes (14mm = along shaft axis).
-# Same auto-following logic. Keeps the axis info the downstream C.2/C.3/C.4
-# parametric belt + idler code already uses.
+# Pulleys: cylinders — 15mm OD, 14mm height along shaft axis.
 z_pulley_info = {}   # label (FL/FR/RL/RR) -> (cx, cy, cz, axis)  — for C.2/C.3
 y_pulley_info = {}   # label (L/R)          -> (cx, cy, cz, axis) — for C.4
 for label, (ctr, sh) in assign_by_nearest(
         load_solids_by_size(USER_STEP, (14, 15, 15)), PULLEY_LABELS).items():
     axle = _axle_from_bbox(sh.val().BoundingBox(), 14)
-    box = _oriented_box(15, 15, 14, axle)
-    add(box, _part_name("pulley", label), PUL, L(*ctr))
+    cyl = _oriented_cylinder(14, 15 / 2, axle)
+    add(cyl, _part_name("pulley", label), PUL, L(*ctr))
     if label.startswith("Z"):
         z_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
     else:
