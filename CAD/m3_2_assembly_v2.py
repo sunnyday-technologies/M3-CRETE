@@ -213,9 +213,47 @@ e_yrail = sao(S80, Y_RAIL_LEN, rx=-90)
 # 20mm in X, 40mm in Z. ✓
 e_skid = sao(S40, Y_RAIL_LEN, rx=-90)
 
-# V2: plates stay as parametric boxes; wheels/pulleys/idlers are cylinders.
-plate_20_80 = cq.Workplane("XY").box(127, 3, 88)
-vwheel      = cq.Workplane("YZ").cylinder(10.2, 23.9 / 2)   # axle X, OD 23.9
+# V-wheel: revolved V-groove profile matching V-slot rail geometry.
+# Cross-section in XZ plane (X = axle direction, Z = radial distance).
+vwheel = (cq.Workplane("XZ")
+    .moveTo(-5.1, 9.8)      # outer left edge (angled)
+    .lineTo(-3.0, 11.95)    # join outer rim
+    .lineTo( 3.0, 11.95)    # outer rim
+    .lineTo( 5.1, 9.8)      # outer right edge (angled)
+    .lineTo( 5.1, 8.0)      # inner right flange
+    .lineTo( 0.5, 8.0)      # step to bore
+    .lineTo( 0.5, 7.0)      # bore right
+    .lineTo(-0.5, 7.0)      # bore left
+    .lineTo(-0.5, 8.0)      # step from bore
+    .lineTo(-5.1, 8.0)      # inner left flange
+    .close()
+    .revolve(360, (0, 0, 0), (1, 0, 0)))
+
+# Gantry plate: 127x3x88 box with all mounting holes drilled through.
+# Hole positions extracted from Components/Plates/V-Slot Gantry Plate 20-80mm.step.
+_PLATE_HOLES = [
+    # (diameter, [(x, z), ...])
+    (7.10, [(-52.11,-30.32),(-52.11,0),(-52.11,30.32),(-47.59,-30.32),(-47.59,0),(-47.59,30.32),
+            (-42.11,-30.32),(-42.11,0),(-42.11,30.32),(-37.59,-30.32),(-37.59,0),(-37.59,30.32),
+            (-32.11,-30.32),(-32.11,0),(-32.11,30.32),(-27.59,-30.32),(-27.59,0),(-27.59,30.32),
+            (-22.11,-30.32),(-22.11,0),(-22.11,30.32),(-17.59,-30.32),(-17.59,0),(-17.59,30.32)]),
+    (6.00, [(-62.41,-42.91),(-62.41,42.91),(62.41,-42.91),(62.41,42.91)]),
+    (5.00, [(-11.59,-30.32),(-11.59,30.32),(11.59,-30.32),(11.59,30.32)]),
+    (3.00, [(-24.20,-38),(-24.20,38),(-15.80,-38),(-15.80,38),
+            (-4.20,-38),(-4.20,38),(4.20,-38),(4.20,38),
+            (15.80,-38),(15.80,38),(24.20,-38),(24.20,38)]),
+]
+
+def _make_gantry_plate():
+    """127x3x88 plate with mounting holes. Plate lies in XZ, 3mm thick in Y."""
+    plate = cq.Workplane("XZ").box(127, 88, 3, centered=(True, True, False))
+    for diam, coords in _PLATE_HOLES:
+        plate = (plate.faces(">Y").workplane(centerOption="CenterOfBoundBox")
+                 .pushPoints(coords)
+                 .hole(diam, 3))
+    return plate
+
+plate_20_80 = _make_gantry_plate()
 
 # ============================================================
 # Colors
@@ -580,26 +618,53 @@ for label, (ctr, sh) in assign_by_nearest(
     box = _oriented_box(69, 69, 65, axle)
     add(box, _part_name("bracket", label), BRK2, L(*ctr))
 
-# Motors + pulleys: parametric boxes, positions from loaded _user.step.
+# Motors: 56.4mm square body (56mm deep) + 8mm shaft cylinder.
+# Body is offset AWAY from the pulley so the shaft/pulley are visible.
+MOTOR_BODY = 56.0      # body depth along shaft axis (76.6 total - 20.6 shaft)
+MOTOR_SHAFT_D = 8.0    # shaft diameter
+MOTOR_SHAFT_L = 20.6   # shaft protrusion from body face
+SHAFT = Color(0.60, 0.60, 0.62)
 
-for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), MOTOR_LABELS).items():
-    axle = _axle_from_bbox(sh.val().BoundingBox(), 76.6)
-    box = _oriented_box(56.4, 56.4, 76.6, axle)
-    add(box, _part_name("motor", label), MTR, L(*ctr))
-
-# Pulleys: cylinders — 15mm OD, 14mm height along shaft axis.
-z_pulley_info = {}   # label (FL/FR/RL/RR) -> (cx, cy, cz, axis)  — for C.2/C.3
-y_pulley_info = {}   # label (L/R)          -> (cx, cy, cz, axis) — for C.4
+# Load pulleys FIRST so we know which direction the shaft points for each motor.
+z_pulley_info = {}
+y_pulley_info = {}
+_pulley_centers = {}   # label -> (cx, cy, cz, axle)
 for label, (ctr, sh) in assign_by_nearest(
         load_solids_by_size(USER_STEP, (14, 15, 15)), PULLEY_LABELS).items():
     axle = _axle_from_bbox(sh.val().BoundingBox(), 14)
     cyl = _oriented_cylinder(14, 15 / 2, axle)
     add(cyl, _part_name("pulley", label), PUL, L(*ctr))
+    _pulley_centers[label] = (ctr[0], ctr[1], ctr[2], axle)
     if label.startswith("Z"):
         z_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
     else:
         y_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
+
+# Now place motor body + shaft for each motor, using pulley position to
+# determine shaft direction.
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), MOTOR_LABELS).items():
+    axle = _axle_from_bbox(sh.val().BoundingBox(), 76.6)
+    pctr = _pulley_centers[label]
+    # Shaft points from motor center TOWARD the pulley along the axle.
+    axis_idx = {"X": 0, "Y": 1, "Z": 2}[axle]
+    shaft_dir = 1.0 if pctr[axis_idx] < ctr[axis_idx] else -1.0
+    # shaft_dir: +1 means pulley is at lower coord end, -1 means higher end.
+    # Actually we want the direction FROM motor TO pulley:
+    shaft_dir = -1.0 if pctr[axis_idx] < ctr[axis_idx] else 1.0
+    # Body center: shift away from pulley by half the missing length
+    body_offset = (76.6 - MOTOR_BODY) / 2 * (-shaft_dir)
+    body_ctr = list(ctr)
+    body_ctr[axis_idx] += body_offset
+    body = _oriented_box(56.4, 56.4, MOTOR_BODY, axle)
+    add(body, _part_name("motor", label), MTR, L(*body_ctr))
+    # Shaft: cylinder from body face toward pulley
+    shaft_start = ctr[axis_idx] + (76.6 / 2) * shaft_dir - MOTOR_BODY * shaft_dir
+    # Simpler: shaft center = midpoint between body face and bbox shaft-end
+    shaft_ctr = list(ctr)
+    shaft_ctr[axis_idx] += (76.6 / 2 - MOTOR_SHAFT_L / 2) * shaft_dir
+    shaft_cyl = _oriented_cylinder(MOTOR_SHAFT_L, MOTOR_SHAFT_D / 2, axle)
+    add(shaft_cyl, _part_name("shaft", label), SHAFT, L(*shaft_ctr))
 
 print(f"  Phase C.1 Z-motors + C.4 Y-motors: {n[0]} parts")
 
@@ -790,6 +855,11 @@ if __name__ == "__main__":
         # NEMA23 has a stepped shaft end where the belt enters the pulley.
         # The shaft-end volume is phantom; exclude so the belt can pass.
         ("z_motor_",   "z_belt_"),
+        # Shaft passes through pulley (mounted on it), bracket (passes through),
+        # and adjacent rail geometry.
+        ("_shaft_",    "_pulley_"),
+        ("_shaft_",    "_bracket_"),
+        ("_shaft_",    "zpY_"),
         # Post-to-rail butt joints (frame flush contact).
         ("post_",      "zpY_"),
         # X-carriage plate sits on C-beam inner face (butt-joint).
