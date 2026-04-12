@@ -71,12 +71,13 @@ CAD/probe_plates.py
 CAD/extract_carriage.py
 CAD/diff_user_edit.py
 
-# CadQuery assembly output — regeneratable from m3_2_assembly.py + _user.step.
-# Not tracked. Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
-CAD/M3-2_Assembly.step
+# Old/intermediate assembly outputs (not tracked)
 CAD/M3-2_Assembly_v2.step
 CAD/M3-2_Assembly_lite.step
 CAD/M3-2_Assembly_v20.step
+
+# NOTE: CAD/M3-2_Assembly.step IS tracked (8.8 MB) — the published assembly
+# for Hackaday.io / download. Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
 
 # Intermediate Fusion exports (superseded by M3-2_Assembly_user.step)
 CAD/M3-2_Assembly_user_cor.step
