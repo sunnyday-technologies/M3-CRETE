@@ -74,16 +74,52 @@ def assign_by_nearest(solids, labeled_centers):
         assigned[label] = remaining.pop(best_i)
     return assigned
 
+V_GROOVE_W = 9.1      # V-groove opening width (mm)
+V_GROOVE_D = 5.5      # V-groove depth from face to apex (mm)
+V_HALF_W   = V_GROOVE_W / 2   # 4.55
+
+def _vslot_profile(hw, hh):
+    """Return a polyline-traced V-slot cross-section in XY, centered at origin.
+    hw = half-width (X), hh = half-height (Y). V-groove on every face.
+    Extrude along +Z afterward. Vertices listed clockwise from bottom-left."""
+    vw, vd = V_HALF_W, V_GROOVE_D
+    pts = [
+        # Left face (X = -hw), bottom to top, with V-groove centered at Y=0
+        (-hw, -hh),
+        (-hw, -vw),
+        (-hw + vd, 0),
+        (-hw, vw),
+        (-hw, hh),
+        # Top face (Y = +hh), left to right, with V-groove centered at X=0
+        (-vw, hh),
+        (0, hh - vd),
+        (vw, hh),
+        # Right face (X = +hw), top to bottom, with V-groove centered at Y=0
+        (hw, hh),
+        (hw, vw),
+        (hw - vd, 0),
+        (hw, -vw),
+        (hw, -hh),
+        # Bottom face (Y = -hh), right to left, with V-groove centered at X=0
+        (vw, -hh),
+        (0, -hh + vd),
+        (-vw, -hh),
+    ]
+    return (cq.Workplane("XY")
+            .moveTo(*pts[0])
+            .polyline(pts[1:])
+            .close())
+
 def sao(step_file, length, rx=0, ry=0, rz=0):
-    """Lite: parametric box matching V-slot profile dimensions, same origin as
-    the detailed STEP version (centered XY, Z from 0 to length)."""
+    """Lite: parametric V-slot profile with grooves, same origin as the
+    detailed STEP version (centered XY, Z from 0 to length)."""
     if "20x80" in step_file:
-        box = cq.Workplane("XY").box(20, 80, length, centered=(True, True, False))
+        profile = _vslot_profile(10, 40).extrude(length)
     elif "20x40" in step_file:
-        box = cq.Workplane("XY").box(20, 40, length, centered=(True, True, False))
+        profile = _vslot_profile(10, 20).extrude(length)
     else:
         raise ValueError(f"Unknown stock profile: {step_file}")
-    return rotate_shape(box, rx=rx, ry=ry, rz=rz)
+    return rotate_shape(profile, rx=rx, ry=ry, rz=rz)
 
 def L(x=0, y=0, z=0, rx=0, ry=0, rz=0):
     l = Location((x, y, z))
