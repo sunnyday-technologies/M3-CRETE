@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "generated": "2026-03-31T00:00:00Z",
+  "version": "2.0.0",
+  "generated": "2026-04-12T00:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -292,53 +292,11 @@
       ]
     },
     {
-      "id": 4,
-      "category": "Frame Hardware & Brackets",
-      "name": "Heavy Duty Corner Brackets (20-Series)",
-      "description": "Frame corner connections for V-Slot 20-series. Must be 20-series compatible (6mm slot). Printable saves $200+.",
-      "qty": 40,
-      "unit": "pieces",
-      "mfg_type": "print",
-      "sort_order": 10,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 11,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/",
-          "notes": "20-series cast aluminum L-bracket",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Brackets/Cast Corner Bracket.step",
-          "approved": true
-        },
-        {
-          "id": 12,
-          "supplier_name": "McMaster-Carr",
-          "product_url": "https://mcmaster.com",
-          "notes": "Aluminum L-bracket 20mm series",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 13,
-          "supplier_name": "Self-Manufacture",
-          "product_url": "",
-          "notes": "3D Printed ABS/Nylon — STL in repo",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 1,
       "category": "Frame & Structure - Aluminum Extrusions",
       "name": "2080 V-Slot Aluminum Extrusion (1200mm)",
       "description": "Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages. 1200mm fits 48-inch pallet dimension. M3-2 X-direction rails use 2×1200mm spliced end-to-end (4 internal connectors per joint, staggered splice locations). 2080 oriented with 80mm vertical for maximum stiffness (Iy ≈ 33 cm⁴). Spliced 2080 at 2.4m span: ~0.5mm deflection at 3kg (2× stiffer than unspliced 2040 at 6ft). Qty 11: 7 frame + 4 splice extensions for X-axis.",
-      "qty": 11,
+      "qty": 8,
       "unit": "lengths",
       "mfg_type": "buy",
       "sort_order": 10,
@@ -437,48 +395,6 @@
           "notes": "20-series internal joining plate",
           "sku": null,
           "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 45,
-      "category": "Concrete Extrusion System",
-      "name": "NEMA23 Planetary Geared Stepper (10:1) — Pump Drive",
-      "description": "Drives the PC pump rotor. 10:1 planetary gearbox provides ~6Nm output torque at low RPM (50-300 RPM). Must be high-torque variant (76mm+ body, 2.8A+). Controlled via Kraken extruder stepper output.",
-      "qty": 1,
-      "unit": "motor + gearbox assembly",
-      "mfg_type": "buy",
-      "sort_order": 15,
-      "mpn": "23HS30-2804S-HG10",
-      "substitute_ok": false,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 131,
-          "supplier_name": "Amazon",
-          "product_url": "https://amazon.com",
-          "notes": "STEPPERONLINE NEMA23 10:1 planetary — also on Amazon Prime.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 129,
-          "supplier_name": "StepperOnline US",
-          "product_url": "https://www.omc-stepperonline.com/nema-23-stepper-motor-l-76mm-gear-ratio-10-1-high-precision-planetary-gearbox-23hs30-2804s-hg10",
-          "notes": "23HS30-2804S-HG10 — 76mm body, 2.8A, 10:1 HG series. 6Nm max output. 15 arc-min backlash.",
-          "sku": "23HS30-2804S-HG10",
-          "step_url": "https://www.omc-stepperonline.com/download",
-          "approved": true
-        },
-        {
-          "id": 130,
-          "supplier_name": "StepperOnline US",
-          "product_url": "https://www.omc-stepperonline.com/nema-23-stepper-motor-l-76mm-gear-ratio-10-1-mg-series-planetary-gearbox-23hs30-2904s-mg10",
-          "notes": "23HS30-2904S-MG10 — MG series budget option, 30 arc-min backlash.",
-          "sku": "23HS30-2904S-MG10",
-          "step_url": "https://www.omc-stepperonline.com/download",
           "approved": true
         }
       ]
@@ -774,9 +690,9 @@
     {
       "id": 20,
       "category": "Quad Z-Axis System (Self-Tramming)",
-      "name": "GT2 Timing Belt 10mm (Z-axis)",
+      "name": "GT2 Timing Belt 10mm (Z-axis, 4x ~2.5m loops)",
       "description": "Belt-driven Z — same GT2 10mm belt as X/Y axes. ~3m per Z corner (up + down run + tensioner), 12m total for 4 independent Z drives. Belts shed concrete splatters unlike lead screw threads.",
-      "qty": 12,
+      "qty": 4,
       "unit": "meters",
       "mfg_type": "buy",
       "sort_order": 20,
@@ -816,9 +732,9 @@
     {
       "id": 10,
       "category": "X-Axis Motion System",
-      "name": "GT2 Timing Belt 10mm (Reinforced)",
-      "description": "X-axis drive belt. ~6m needed for 2m travel (2×2.4m run + tensioner + tails). Buy extra for spares. Gates PowerGrip GT2/GT3 interchangeable at 2mm pitch.",
-      "qty": 8,
+      "name": "GT2 Timing Belt 10mm (Y-axis, 2x ~2.5m loops)",
+      "description": "Y-axis motion belts, 10mm reinforced GT2",
+      "qty": 2,
       "unit": "meters",
       "mfg_type": "buy",
       "sort_order": 20,
@@ -889,90 +805,6 @@
       ]
     },
     {
-      "id": 2,
-      "category": "Frame & Structure - Aluminum Extrusions",
-      "name": "2040 V-Slot Aluminum Extrusion (1200mm)",
-      "description": "Vertical posts (Z-height). 1200mm gives ~1000mm usable Z travel after motor mount and belt pulley clearance. V-groove rails serve as Z linear guides for belt-driven carriages. Fits within 48-inch pallet dimension (1200mm < 1219mm).",
-      "qty": 4,
-      "unit": "lengths",
-      "mfg_type": "buy",
-      "sort_order": 20,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 6,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/v-slot-20-x-40mm/",
-          "notes": "2040 V-Slot, multiple lengths",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/V-Slot/V-Slot 20x40x1000 Linear Rail.step",
-          "approved": true
-        },
-        {
-          "id": 7,
-          "supplier_name": "ZYLtech",
-          "product_url": "https://www.zyltech.com/2040-v-groove-extrusion-pre-cut-lengths-300mm-2000mm/",
-          "notes": "2040 V-Groove (V-Slot compatible), 300-2000mm",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 5,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/v-slot-2040/",
-          "notes": "2040 V-Slot, cut to length",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 50,
-      "category": "Concrete Extrusion System",
-      "name": "NEMA23 Motor for Extruder (Direct Drive Option)",
-      "description": "Direct-drive option (no gearbox) for simpler pump setups or peristaltic pump. If building the stepper-driven PC pump, use the \"NEMA23 Planetary Geared Stepper (10:1)\" instead — the gearbox is essential for PC pump torque.",
-      "qty": 1,
-      "unit": "motor",
-      "mfg_type": "buy",
-      "sort_order": 20,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 146,
-          "supplier_name": "StepperOnline US",
-          "product_url": "https://www.omc-stepperonline.com",
-          "notes": "NEMA23 4.5Nm 8mm shaft",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 147,
-          "supplier_name": "AutomationDirect",
-          "product_url": "https://automationdirect.com",
-          "notes": "NEMA23 Geared 10:1",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 148,
-          "supplier_name": "StepperOnline US",
-          "product_url": "https://www.omc-stepperonline.com",
-          "notes": "NEMA23 3Nm standard 8mm shaft",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 57,
       "category": "Fasteners & Hardware",
       "name": "M3 Socket Head Cap Screws",
@@ -1017,9 +849,9 @@
     {
       "id": 15,
       "category": "Dual Y-Axis Motion System",
-      "name": "GT2 Timing Belt 10mm (Reinforced)",
-      "description": "Dual Y-axis belts — ~3m each side, 6m total. High load application with gantry beam.",
-      "qty": 8,
+      "name": "GT2 Timing Belt 6mm (X-axis, 1x ~2.4m fixed strand)",
+      "description": "X-axis belt-pinion drive, 6mm width fits within 20-slot",
+      "qty": 1,
       "unit": "meters",
       "mfg_type": "buy",
       "sort_order": 20,
@@ -1145,7 +977,7 @@
       "category": "Frame Hardware & Brackets",
       "name": "Eccentric Spacers (V-Slot)",
       "description": "Required for V-wheel preload adjustment on all motion axes (X, Y, and Z). Each V-wheel carriage uses eccentric spacers on the bottom wheels to tension against the rail. Without these, wheels cannot be properly preloaded and will be loose on the rail.",
-      "qty": 28,
+      "qty": 24,
       "unit": "pieces",
       "mfg_type": "buy",
       "sort_order": 25,
@@ -1269,9 +1101,9 @@
     {
       "id": 11,
       "category": "X-Axis Motion System",
-      "name": "GT2 Pulley 20-Tooth (8mm Bore)",
+      "name": "GT2 Pulley 20-Tooth (8mm Bore, all axes)",
       "description": "Drive and idler pulleys — MUST match motor shaft diameter (8mm). Metal recommended for belt tooth engagement under load. Aluminum or steel.",
-      "qty": 4,
+      "qty": 7,
       "unit": "pulleys",
       "mfg_type": "buy",
       "sort_order": 30,
@@ -1312,159 +1144,6 @@
           "product_url": "https://www.amazon.com/BEMONOC-2GT-Timing-Pulley-printer/dp/B01CL24CAI",
           "notes": "BEMONOC 5-pack GT2 20T 8mm bore 10mm width",
           "sku": "B01CL24CAI",
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 16,
-      "category": "Dual Y-Axis Motion System",
-      "name": "GT2 Pulley 20-Tooth (8mm Bore)",
-      "description": "Multiple pulleys needed for dual Y system. MUST be 8mm bore to match motor shaft.",
-      "qty": 8,
-      "unit": "pulleys",
-      "mfg_type": "buy",
-      "sort_order": 30,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 48,
-          "supplier_name": "StepperOnline US",
-          "product_url": "https://www.omc-stepperonline.com",
-          "notes": "Aluminum 20T 8mm bore",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Pulleys/GT2 Timing Pulley 20 Tooth.step",
-          "approved": true
-        },
-        {
-          "id": 49,
-          "supplier_name": "McMaster-Carr",
-          "product_url": "https://mcmaster.com",
-          "notes": "Steel 20T 8mm bore",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 50,
-          "supplier_name": "ZYLtech",
-          "product_url": "https://www.zyltech.com/",
-          "notes": "GT2 20T 8mm bore",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 188,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/BEMONOC-2GT-Timing-Pulley-printer/dp/B01CL24CAI",
-          "notes": "BEMONOC 5-pack GT2 20T 8mm bore 10mm width",
-          "sku": "B01CL24CAI",
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 21,
-      "category": "Quad Z-Axis System (Self-Tramming)",
-      "name": "GT2 Pulley 20-Tooth (8mm Bore, Z-axis)",
-      "description": "Drive + idler pulleys for belt Z. Same 8mm bore GT2 pulleys as X/Y — full parts commonality. 2 per Z corner (drive + idler) = 8 total.",
-      "qty": 8,
-      "unit": "pulleys",
-      "mfg_type": "buy",
-      "sort_order": 30,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 63,
-          "supplier_name": "StepperOnline US",
-          "product_url": "https://www.omc-stepperonline.com",
-          "notes": "Aluminum 20T 8mm bore — same as X/Y",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Pulleys/GT2 Timing Pulley 20 Tooth.step",
-          "approved": true
-        },
-        {
-          "id": 64,
-          "supplier_name": "McMaster-Carr",
-          "product_url": "https://mcmaster.com",
-          "notes": "Steel 20T 8mm bore",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 65,
-          "supplier_name": "ZYLtech",
-          "product_url": "https://www.zyltech.com/",
-          "notes": "GT2 20T 8mm bore",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 189,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/BEMONOC-2GT-Timing-Pulley-printer/dp/B01CL24CAI",
-          "notes": "BEMONOC 5-pack GT2 20T 8mm bore 10mm width",
-          "sku": "B01CL24CAI",
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "category": "Frame & Structure - Aluminum Extrusions",
-      "name": "2040 V-Slot Aluminum Extrusion (1000mm)",
-      "description": "Cross braces, cable chain mounts, electronics panel rails, and accessory mounting. 1000mm is the most common pre-cut stock length. M3-2: 4 additional for X-direction cross brace splicing (2×1000mm per brace).",
-      "qty": 12,
-      "unit": "lengths",
-      "mfg_type": "buy",
-      "sort_order": 30,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 217,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/v-slot-20-x-40mm/",
-          "notes": "2040 V-Slot, US warehouse, multiple lengths available",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 9,
-          "supplier_name": "ZYLtech",
-          "product_url": "https://www.zyltech.com/10x-1m-2040-v-groove-extrusion-bulk-pack/",
-          "notes": "10-pack 1000mm V-Groove bulk — best value",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/V-Slot/V-Slot 20x40x1000 Linear Rail.step",
-          "approved": true
-        },
-        {
-          "id": 10,
-          "supplier_name": "VXB Bearings",
-          "product_url": "https://vxb.com/",
-          "notes": "2040 V-Slot 1000mm stocked",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 8,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/v-slot-2040/",
-          "notes": "2040 V-Slot 1000mm",
-          "sku": null,
           "step_url": null,
           "approved": true
         }
@@ -1592,7 +1271,7 @@
       "category": "X-Axis Motion System",
       "name": "Idler Pulley Mounting Plate",
       "description": "Mounts smooth idler pulleys at belt return ends. One per belt return point: X-axis: 2, Y-axis: 4 (2 per side), Z-axis: 8 (2 per corner). 14 total. OpenBuilds Idler Pulley Plate allows belt tension adjustment via slotted mounting holes. Alternatively, can be 3D printed or the Linear Actuator End Mount plate works for end-of-rail positions. CRITICAL: Without these, belts have nothing to wrap around at the return end.",
-      "qty": 14,
+      "qty": 7,
       "unit": "plates",
       "mfg_type": "buy",
       "sort_order": 35,
@@ -1723,48 +1402,6 @@
       ]
     },
     {
-      "id": 22,
-      "category": "Quad Z-Axis System (Self-Tramming)",
-      "name": "V-Groove Wheels (Z-axis Carriages)",
-      "description": "V-wheels ride the 2040 vertical post V-grooves — the frame IS the linear guide. 3 wheels per corner carriage (2 fixed + 1 eccentric) × 4 corners = 12 wheels. Same polycarbonate wheels as X/Y.",
-      "qty": 12,
-      "unit": "wheels",
-      "mfg_type": "buy",
-      "sort_order": 40,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 67,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/",
-          "notes": "Solid V-Wheel polycarbonate",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Wheels/Xtreme Solid V Wheel.step",
-          "approved": true
-        },
-        {
-          "id": 68,
-          "supplier_name": "Amazon",
-          "product_url": "https://amazon.com",
-          "notes": "V-Slot V-Wheel kit with bearings",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 66,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/vk0012/",
-          "notes": "Xtreme Solid V-Wheel — same as X/Y",
-          "sku": "VW02-RS",
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 63,
       "category": "Optional Upgrades",
       "name": "HEPA Air Filtration",
@@ -1792,48 +1429,6 @@
           "product_url": "https://amazon.com",
           "notes": "DIY HEPA filter + fan",
           "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 12,
-      "category": "X-Axis Motion System",
-      "name": "V-Groove Delrin Wheels (Polycarbonate)",
-      "description": "Dust-resistant, critical for concrete environment. Use Polycarbonate (Xtreme/Solid) for CNC-grade loads, not standard Delrin. Rides on V-Slot extrusion V-groove rails.",
-      "qty": 8,
-      "unit": "wheels",
-      "mfg_type": "buy",
-      "sort_order": 40,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 37,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/",
-          "notes": "Solid V-Wheel polycarbonate",
-          "sku": null,
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Wheels/Xtreme Solid V Wheel.step",
-          "approved": true
-        },
-        {
-          "id": 38,
-          "supplier_name": "Amazon",
-          "product_url": "https://amazon.com",
-          "notes": "V-Slot V-Wheel kit with bearings",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 36,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/vk0012/",
-          "notes": "Xtreme Solid V-Wheel (polycarbonate)",
-          "sku": "VW02-RS",
           "step_url": null,
           "approved": true
         }
@@ -1886,7 +1481,7 @@
       "category": "Dual Y-Axis Motion System",
       "name": "V-Groove Wheels (Polycarbonate)",
       "description": "More wheels = better load distribution on the gantry beam carriages. Polycarbonate (Xtreme/Solid) for heavy gantry loads.",
-      "qty": 16,
+      "qty": 24,
       "unit": "wheels",
       "mfg_type": "buy",
       "sort_order": 40,
@@ -2128,48 +1723,6 @@
       ]
     },
     {
-      "id": 64,
-      "category": "Optional Upgrades",
-      "name": "Carbon Fiber Stiffener Bar (2080 Rail)",
-      "description": "Bonds to outer 80mm face of 2080 V-Slot for 20-30% additional stiffness on long spans. Structural epoxy + clamp cure. Only needed if 2m span deflection is a concern.",
-      "qty": 4,
-      "unit": "bars (2m each)",
-      "mfg_type": "buy",
-      "sort_order": 50,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 184,
-          "supplier_name": "DragonPlate",
-          "product_url": "https://dragonplate.com",
-          "notes": "CF flat bar — various widths and thicknesses",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 185,
-          "supplier_name": "Amazon",
-          "product_url": "https://amazon.com",
-          "notes": "Carbon fiber flat bar 20x3mm or 30x3mm",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 186,
-          "supplier_name": "McMaster-Carr",
-          "product_url": "https://mcmaster.com",
-          "notes": "Carbon fiber rectangular bar stock",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 23,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Z-Axis Carriage Plates",
@@ -2256,57 +1809,6 @@
           "supplier_name": "Amazon",
           "product_url": "https://www.amazon.com/s?k=NEMA+23+L+bracket+stepper",
           "notes": "Generic NEMA23 alloy steel L-brackets are widely available. Verify dimensions match ST-M2 (65 x 69 x 69 mm).",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
-      "id": 55,
-      "category": "Concrete Extrusion System",
-      "name": "Extruder Mounting Bracket",
-      "description": "Mounts extruder pipe to X-axis carriage plate. Standard 1\" Male NPT threaded pipe connection. Lightweight — printhead target is 1.5kg. This is the only extrusion-system part in the M3-CRETE motion system kit. Hose, nozzle, and hopper are pump-specific.",
-      "qty": 1,
-      "unit": "bracket",
-      "mfg_type": "print",
-      "sort_order": 60,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 161,
-          "supplier_name": "Local CNC Shop",
-          "product_url": "",
-          "notes": "CNC Aluminum plate",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 162,
-          "supplier_name": "Self-Manufacture",
-          "product_url": "",
-          "notes": "3D Printed reinforced",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 163,
-          "supplier_name": "SendCutSend",
-          "product_url": "https://sendcutsend.com",
-          "notes": "Laser cut steel",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 202,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/vs80-1/",
-          "notes": "Universal gantry plate - adapt for extruder mount",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2846,6 +2348,139 @@
           "approved": true
         }
       ]
+    },
+    {
+      "id": 67,
+      "category": "Frame - Extrusions",
+      "name": "C-Beam 40x80 Linear Rail (1200mm) - Z-posts",
+      "description": "4x vertical Z-posts replacing 2040. Belt runs inside the channel (hidden, protected from concrete dust). +6x stiffer than 2040. See docs/cbeam-upgrade-analysis.md",
+      "qty": 4,
+      "unit": "pc",
+      "mfg_type": "buy",
+      "sort_order": 1,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1101,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-4080/",
+          "notes": "Factory-direct, lowest bulk pricing",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1102,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/c-beam/",
+          "notes": "US warehouse, domestic shipping",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "category": "Frame - Extrusions",
+      "name": "C-Beam 40x80 Linear Rail (1200mm) - Z-platform Y-rails",
+      "description": "2x horizontal Y-rails. Carries the gantry along Y-axis. Belt runs inside channel for anti-racking.",
+      "qty": 2,
+      "unit": "pc",
+      "mfg_type": "buy",
+      "sort_order": 2,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1104,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-4080/",
+          "notes": "Factory-direct, lowest bulk pricing",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1105,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/c-beam/",
+          "notes": "US warehouse, domestic shipping",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "category": "Motion - Plates",
+      "name": "V-Slot Gantry Plate 20-80mm (OpenBuilds)",
+      "description": "6 total: 4x Z-corner carriage plates + 2x X-carriage plates. 127x88x3mm with standard wheel mounting pattern.",
+      "qty": 6,
+      "unit": "pc",
+      "mfg_type": "buy",
+      "sort_order": 10,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1107,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-4080/",
+          "notes": "Factory-direct, lowest bulk pricing",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1108,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/c-beam/",
+          "notes": "US warehouse, domestic shipping",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "category": "Motion - Hardware",
+      "name": "Flat NEMA23 Motor Mount Plate",
+      "description": "Y-axis motor mounts (2x). Simpler and cheaper than L-bracket since Y-motors are inboard and don't need perpendicular mounting.",
+      "qty": 2,
+      "unit": "pc",
+      "mfg_type": "buy",
+      "sort_order": 20,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1110,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/v-slot-4080/",
+          "notes": "Factory-direct, lowest bulk pricing",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1111,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/c-beam/",
+          "notes": "US warehouse, domestic shipping",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     }
-  ]
+  ],
+  "notes": "v2.0: C-Beam Z-post upgrade, belt width reconciliation (Z/Y=10mm, X=6mm), wheel count 36->24, pulley count 20->7, removed out-of-scope pump/extruder parts"
 }
