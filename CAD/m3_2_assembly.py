@@ -292,11 +292,25 @@ for nm, (cx, _) in POSTS:
     add(plate_20_80, f"zpl_{nm}", DRK, L(cx, ty, ZP, ry=90))
 
 # ------------------------------------------------------------
-# 2) Y-RAILS (2x) — custom 1190mm, butt-joint both ends into corner plates
+# 2) Y-RAILS (2x) — OpenBuilds C-Beam 40x80x1200, loaded from _userYY.step
 # ------------------------------------------------------------
-e_zpyrail = sao(S80, YRAIL_LEN, rx=-90)       # X[-10,10] Y[0,1190] Z[-40,40]
-add(e_zpyrail, "zpY_L", DRK, L(ZPY_L_X, YRAIL_TY, ZP))
-add(e_zpyrail, "zpY_R", DRK, L(ZPY_R_X, YRAIL_TY, ZP))
+# Upgraded 2026-04-11 from parametric 2080 to C-beam so the Y-axis belt can
+# route INSIDE the channel, clearing the X-beam. Geometry is loaded from
+# Fusion (source of truth) but snapped to Z=400 because Nick's Fusion placement
+# has the R beam at Z=399 (1mm drift from canonical).
+CBEAM_LABELS = {
+    "L": (  15.0, 620.0, 440.0),   # expected center — outboard of post, along Y
+    "R": (2465.0, 620.0, 440.0),
+}
+CBEAM_USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(CBEAM_USER_STEP, (40, 80, 1200)), CBEAM_LABELS).items():
+    # Snap center to canonical (15/2465, 620, 440) — fixes 1mm Z drift on R
+    # and the ~0.012mm Y drift from Fusion's placement rounding.
+    dx = CBEAM_LABELS[label][0] - ctr[0]
+    dy = 620.0 - ctr[1]
+    dz = 440.0 - ctr[2]
+    add(sh, f"zpY_{label}", DRK, L(dx, dy, dz))
 
 # ------------------------------------------------------------
 # 3) X-BEAM CARRIAGE PLATES (2x) — single-sided on Y-rail inner X face
@@ -446,46 +460,97 @@ Z_MOTOR_CZ = 1170          # motor + bracket center Z (all 4 now outboard; brack
 #       from the user file means future manual moves propagate automatically.
 # The rough label centers below are used only to map each loaded solid to its
 # corner post label; exact positions come from the user file.
+# 2026-04-11: source-of-truth moved to _userY.step, which contains both the
+# 4 Z-motor subassemblies (unchanged from _user.step) AND the 2 new Y-motor
+# subassemblies placed for Phase C.4. _user.step is kept around for history
+# but is no longer loaded.
 USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
 
-Z_BRACKET_LABELS = {                       # rough expected centers
-    "FL": (  94.4,  54.5,  Z_MOTOR_CZ),
-    "FR": (2385.6,  54.5,  Z_MOTOR_CZ),
-    "RL": (  94.5, 1185.5, Z_MOTOR_CZ),    # Nick moved → (-24.7, 1174.3, 1165)
-    "RR": (2385.5, 1185.5, Z_MOTOR_CZ),
+# Combined Z+Y bracket/motor/pulley labels — all 6 share the same sorted
+# dimension signatures, so assign_by_nearest needs every expected center
+# present as a candidate label, otherwise a Y solid could be mis-mapped into
+# a Z slot. Label prefix "Z" vs "Y" routes the loaded solid to the right
+# naming + downstream code.
+BRACKET_LABELS = {
+    "ZFL": (  94.4,  54.5,  Z_MOTOR_CZ),
+    "ZFR": (2385.6,  54.5,  Z_MOTOR_CZ),
+    "ZRL": (  94.5, 1185.5, Z_MOTOR_CZ),
+    "ZRR": (2385.5, 1185.5, Z_MOTOR_CZ),
+    "YL":  (  69.7, 1184.3, 441.8),        # Y-motor bracket, rear-left (inside C-beam L)
+    "YR":  (2410.5, 1180.5, 445.0),        # Y-motor bracket, rear-right (inside C-beam R)
 }
-Z_MOTOR_LABELS = {                         # rough expected motor centers
-    "FL": (  80.9,   60,   Z_MOTOR_CZ),
-    "FR": (2399.1,   60,   Z_MOTOR_CZ),
-    "RL": (  80.9, 1180,   Z_MOTOR_CZ),    # moved → (-30.2, 1187.9, 1165)
-    "RR": (2399.1, 1180,   Z_MOTOR_CZ),
+MOTOR_LABELS = {
+    "ZFL": (  80.9,   60,   Z_MOTOR_CZ),
+    "ZFR": (2399.1,   60,   Z_MOTOR_CZ),
+    "ZRL": (  80.9, 1180,   Z_MOTOR_CZ),
+    "ZRR": (2399.1, 1180,   Z_MOTOR_CZ),
+    "YL":  (  56.1, 1178.8, 441.8),
+    "YR":  (2424.1, 1175.0, 445.0),
 }
-Z_PULLEY_LABELS = {                        # rough expected pulley centers
-    "FL": (  52.9,   60,   Z_MOTOR_CZ),
-    "FR": (2427.1,   60,   Z_MOTOR_CZ),
-    "RL": (  52.9, 1180,   Z_MOTOR_CZ),    # moved → (-30.2, 1215.9, 1165)
-    "RR": (2427.1, 1180,   Z_MOTOR_CZ),
+PULLEY_LABELS = {
+    "ZFL": (  52.9,   60,   Z_MOTOR_CZ),
+    "ZFR": (2427.1,   60,   Z_MOTOR_CZ),
+    "ZRL": (  52.9, 1180,   Z_MOTOR_CZ),
+    "ZRR": (2427.1, 1180,   Z_MOTOR_CZ),
+    "YL":  (  28.1, 1178.8, 441.8),         # inside C-beam L channel
+    "YR":  (2452.1, 1175.0, 445.0),         # inside C-beam R channel
 }
+
+def _part_name(kind, label):
+    """ZFL -> z_<kind>_FL ; YL -> y_<kind>_L"""
+    if label.startswith("Z"):
+        return f"z_{kind}_{label[1:]}"
+    return f"y_{kind}_{label[1:]}"
+
+# L-brackets: keep the detailed Fusion geometry (mounting holes + flanges
+# matter for BOM and clearance checks).
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (69, 69, 65)), BRACKET_LABELS).items():
+    add(sh, _part_name("bracket", label), BRK2, L(0, 0, 0))
+
+# Motors: parametrize as simple 56.4 x 56.4 x 76.6 boxes — the shaft axis is
+# the 76.6mm dimension. We still *load* each motor body to pick up its true
+# center + orientation from Fusion, but we *add* a simple box instead. This
+# drops ~9 MB of detailed NEMA23 geometry from each assembly export while
+# auto-following any Fusion moves.
+def _axle_from_bbox(bb, long_dim, tol=0.5):
+    """Return 'X'/'Y'/'Z' — whichever bbox dim matches long_dim."""
+    dx, dy, dz = bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin
+    if abs(dx - long_dim) < tol: return "X"
+    if abs(dy - long_dim) < tol: return "Y"
+    return "Z"
+
+def _oriented_box(short, short2, long_, axle):
+    """Rectangular box with `long_` along the given axle and `short`/`short2`
+    on the two perpendicular axes. Centered at origin."""
+    if axle == "X":
+        return cq.Workplane("XY").box(long_, short, short2)
+    if axle == "Y":
+        return cq.Workplane("XY").box(short, long_, short2)
+    return cq.Workplane("XY").box(short, short2, long_)
 
 for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(USER_STEP, (69, 69, 65)), Z_BRACKET_LABELS).items():
-    add(sh, f"z_bracket_{label}", BRK2, L(0, 0, 0))
+        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), MOTOR_LABELS).items():
+    axle = _axle_from_bbox(sh.val().BoundingBox(), 76.6)
+    box = _oriented_box(56.4, 56.4, 76.6, axle)
+    add(box, _part_name("motor", label), MTR, L(*ctr))
 
+# Pulleys: parametrize as simple 14 x 15 x 15 boxes (14mm = along shaft axis).
+# Same auto-following logic. Keeps the axis info the downstream C.2/C.3/C.4
+# parametric belt + idler code already uses.
+z_pulley_info = {}   # label (FL/FR/RL/RR) -> (cx, cy, cz, axis)  — for C.2/C.3
+y_pulley_info = {}   # label (L/R)          -> (cx, cy, cz, axis) — for C.4
 for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), Z_MOTOR_LABELS).items():
-    add(sh, f"z_motor_{label}", MTR, L(0, 0, 0))
+        load_solids_by_size(USER_STEP, (14, 15, 15)), PULLEY_LABELS).items():
+    axle = _axle_from_bbox(sh.val().BoundingBox(), 14)
+    box = _oriented_box(15, 15, 14, axle)
+    add(box, _part_name("pulley", label), PUL, L(*ctr))
+    if label.startswith("Z"):
+        z_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
+    else:
+        y_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
 
-z_pulley_info = {}   # label -> (cx, cy, cz, axis) — used by C.2 / C.3 parametric generators
-for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(USER_STEP, (14, 15, 15)), Z_PULLEY_LABELS).items():
-    add(sh, f"z_pulley_{label}", PUL, L(0, 0, 0))
-    bb_ = sh.val().BoundingBox()
-    if   abs((bb_.xmax - bb_.xmin) - 14) < 0.5: axis = "X"
-    elif abs((bb_.ymax - bb_.ymin) - 14) < 0.5: axis = "Y"
-    else:                                        axis = "Z"
-    z_pulley_info[label] = (ctr[0], ctr[1], ctr[2], axis)
-
-print(f"  Phase C.1 Z-motors: {n[0]} parts")
+print(f"  Phase C.1 Z-motors + C.4 Y-motors: {n[0]} parts")
 
 # ============================================================
 # C.2 — Z-IDLERS at post bottoms (4x smooth idlers)
@@ -571,6 +636,48 @@ for label, (px, py, pz, axis) in z_pulley_info.items():
 print(f"  Phase C.3 Z-belts: {n[0]} parts")
 
 # ============================================================
+# C.4 — Y-AXIS MOTION (2 idlers + 2 belt loops)
+# ============================================================
+# Y-motor subassemblies (bracket + motor + pulley) are pre-placed in
+# _userY.step by Nick, with shaft-along-Z (axle=Z) pointing down and the
+# pulley at Z~429 inside the Z-platform Y-rail envelope. From those loaded
+# pulley positions we parametrically derive:
+#   - 2 Y-idlers at the front end of each rail (Y~20), same X as the
+#     pulley, same Z, rotation axis = Z.
+#   - 2 horizontal Y-belt loops, each with 2 strands running along Y from
+#     rear pulley to front idler, offset ±6.5 mm in X (strand spacing =
+#     pulley pitch width).
+# Belt length per rail ≈ 2 × (Y_pulley - Y_idler) ≈ 2 × 1160 = 2320 mm.
+# Each belt loop is cut by the X-beam carriage plate (intentional clamp
+# site — covered by an EXCLUDE_PAIRS entry added below).
+
+Y_IDLER_Y = 32             # inset from front-end by 12mm to clear the front post
+Y_BELT_ZC = None           # derived per-rail from pulley center Z
+
+for label, (px, py, pz, axis) in y_pulley_info.items():
+    # Expect axis == "Z" (shaft down); guard against accidental re-orientation
+    if axis != "Z":
+        continue
+    # --- Y-idler: 12.7 (Z, axle) x 22 (X) x 22 (Y) ---
+    # Start from native idler_sm (axle along X) and rotate 90° around Y
+    # to put axle along Z.
+    idler_shape = rotate_shape(idler_sm, ry=90)
+    add(idler_shape, f"y_idler_{label}", IDL, L(px, Y_IDLER_Y, pz))
+
+    # --- Y-belt strands: 2 parallel horizontal strands along Y ---
+    # Axis = Z → strands separated in X, belt width 6mm along Z (axle),
+    # radial thickness 1.5mm in X, length in Y.
+    belt_len = py - Y_IDLER_Y - PULLEY_R - IDLER_R   # tangent-to-tangent
+    strand = cq.Workplane("XY").box(BELT_T, belt_len, BELT_W,
+                                    centered=(True, False, True))
+    y_start = Y_IDLER_Y + IDLER_R  # front strand end tangent to idler
+    for tag, dx in (("lt", -STRAND_HALF_GAP), ("rt", +STRAND_HALF_GAP)):
+        add(strand, f"y_belt_{label}_{tag}", BELT,
+            L(px + dx, y_start, pz))
+
+print(f"  Phase C.4 Y-motion: {n[0]} parts")
+
+# ============================================================
 # SUMMARY + EXPORT
 # ============================================================
 total = n[0]
@@ -628,10 +735,37 @@ if __name__ == "__main__":
         ("z_bracket_", "topX_"),     # Bracket flange rests on top X-rail
         ("z_belt_",    "z_pulley_"), # Belt wraps pulley
         ("z_belt_",    "z_idler_"),  # Belt wraps idler
+        # Parametrized motor body is a full 56.4x76.6x56.4 box, but the real
+        # NEMA23 has a stepped shaft end where the belt enters the pulley.
+        # The shaft-end volume is phantom; exclude so the belt can pass.
+        ("z_motor_",   "z_belt_"),
+        # Post-to-rail butt joints (frame flush contact).
+        ("post_",      "zpY_"),
         # All 4 Z-motors now outboard: belt strands graze the Z-corner plates
         # at the clamp height. The small overlap is intentional — extra belt
         # length is needed to terminate/clip the belt onto the plate.
         ("z_belt_",    "zpl_"),
+        # --- Phase C.4 Y-axis ---
+        ("y_motor_",   "y_bracket_"),# Motor body sits inside L-bracket envelope
+        ("y_motor_",   "y_pulley_"), # Pulley mounted on motor shaft
+        ("y_belt_",    "y_pulley_"), # Belt wraps pulley
+        ("y_belt_",    "y_idler_"),  # Belt wraps idler
+        ("y_bracket_", "zpY_"),      # Y-bracket bolts to inside face of Z-platform Y-rail
+        ("y_motor_",   "zpY_"),      # Y-motor body sits adjacent to the rail
+        ("y_pulley_",  "zpY_"),      # Y-pulley sits inside the rail envelope
+        # Y-belt runs inside the C-beam channel along the full rail length —
+        # intentional routing (the whole point of the C-beam upgrade).
+        ("y_belt_",    "zpY_"),
+        # Y-idler sits inside the front end of the C-beam channel.
+        ("y_idler_",   "zpY_"),
+        # Y-pulley sits inside the rear end of the C-beam channel.
+        ("y_pulley_",  "zpY_"),
+        # Y-motor body is adjacent to / partially inside the C-beam envelope.
+        ("y_motor_",   "zpY_"),
+        # Y-bracket bolts to the C-beam inside face.
+        ("y_bracket_", "zpY_"),
+        # Y-belt crosses under the X-carriage plate clamp site.
+        ("y_belt_",    "xcar_"),
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
