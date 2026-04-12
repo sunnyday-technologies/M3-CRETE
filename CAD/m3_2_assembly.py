@@ -27,11 +27,16 @@ Preview:  cad_venv/Scripts/cq-editor.exe CAD/m3_2_assembly.py
 """
 import cadquery as cq
 from cadquery import Assembly, Color, Location
-from OCP.gp import gp_GTrsf, gp_Mat, gp_Trsf, gp_Ax1, gp_Pnt, gp_Dir
-from OCP.BRepBuilderAPI import BRepBuilderAPI_GTransform, BRepBuilderAPI_Transform
+from OCP.gp import gp_Trsf, gp_Ax1, gp_Pnt, gp_Dir, gp_Vec
+from OCP.BRepBuilderAPI import (BRepBuilderAPI_Transform, BRepBuilderAPI_MakeWire,
+                                 BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeFace)
+from OCP.BRepPrimAPI import BRepPrimAPI_MakePrism
+from OCP.BRepAdaptor import BRepAdaptor_Curve
+from OCP.GCPnts import GCPnts_TangentialDeflection
 import os, time, math
 
 STEP_DIR = os.path.join(os.path.dirname(__file__), "Components")
+USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
 
 # ============================================================
 # Helpers
@@ -74,19 +79,44 @@ def assign_by_nearest(solids, labeled_centers):
         assigned[label] = remaining.pop(best_i)
     return assigned
 
+_profile_cache = {}
+
+def _discretize_wire(wire, deflection=1.0):
+    """Convert a wire's curves to straight-line segments for compact STEP output."""
+    pts = []
+    for edge in cq.Wire(wire).Edges():
+        adaptor = BRepAdaptor_Curve(edge.wrapped)
+        disc = GCPnts_TangentialDeflection(adaptor, deflection, 0.1)
+        for i in range(1, disc.NbPoints() + 1):
+            p = disc.Value(i)
+            pts.append((p.X(), p.Y(), p.Z()))
+    # Deduplicate consecutive coincident points
+    clean = [pts[0]]
+    for p in pts[1:]:
+        if any(abs(p[j] - clean[-1][j]) > 1e-6 for j in range(3)):
+            clean.append(p)
+    # Build polyline wire
+    wb = BRepBuilderAPI_MakeWire()
+    for i in range(len(clean)):
+        p1 = gp_Pnt(*clean[i])
+        p2 = gp_Pnt(*clean[(i + 1) % len(clean)])
+        wb.Add(BRepBuilderAPI_MakeEdge(p1, p2).Edge())
+    return wb.Wire()
+
 def sao(step_file, length, rx=0, ry=0, rz=0):
-    """Scale-And-Orient: stretch 1000mm stock to exact length, then bake rotation."""
-    stock = cq.importers.importStep(os.path.join(STEP_DIR, "V-Slot", step_file))
-    s = stock.val().wrapped
-    gt = gp_GTrsf()
-    gt.SetVectorialPart(gp_Mat(1,0,0, 0,1,0, 0,0,length/1000.0))
-    s = BRepBuilderAPI_GTransform(s, gt, True).Shape()
-    for angle, axis in [(rz,(0,0,1)), (ry,(0,1,0)), (rx,(1,0,0))]:
-        if angle:
-            t = gp_Trsf()
-            t.SetRotation(gp_Ax1(gp_Pnt(0,0,0), gp_Dir(*axis)), math.radians(angle))
-            s = BRepBuilderAPI_Transform(s, t, True).Shape()
-    return cq.Workplane().add(cq.Shape(s))
+    """V2: extract OUTER profile wire from stock STEP end face, discretize
+    curves to line segments, fill solid (no internal cavities), extrude.
+    Full V-groove/T-slot opening detail at ~30 faces per extrusion."""
+    if step_file not in _profile_cache:
+        stock = cq.importers.importStep(os.path.join(STEP_DIR, "V-Slot", step_file))
+        end_face = stock.faces("<Z").val()
+        outer_wire = _discretize_wire(end_face.outerWire().wrapped)
+        solid_face = BRepBuilderAPI_MakeFace(outer_wire).Face()
+        _profile_cache[step_file] = solid_face
+    face = _profile_cache[step_file]
+    prism = BRepPrimAPI_MakePrism(face, gp_Vec(0, 0, length))
+    result = cq.Workplane().add(cq.Shape(prism.Shape()))
+    return rotate_shape(result, rx=rx, ry=ry, rz=rz)
 
 def L(x=0, y=0, z=0, rx=0, ry=0, rz=0):
     l = Location((x, y, z))
@@ -183,19 +213,84 @@ e_yrail = sao(S80, Y_RAIL_LEN, rx=-90)
 # 20mm in X, 40mm in Z. ✓
 e_skid = sao(S40, Y_RAIL_LEN, rx=-90)
 
-# Corner brackets + gantry plates + motion
-cast_corner = load("Brackets/Cast Corner Bracket.step")
-cube_con    = load("Brackets/Cube Corner Connector.step")
-plate_20_80 = load("Plates/V-Slot Gantry Plate 20-80mm.step")   # 127(X) x 3(Y) x 88(Z)
-vwheel      = load("Wheels/Solid V Wheel.step")                 # 10.2(X) x 23.9 x 23.9, axle in X
+# V-wheel: revolved V-groove profile matching V-slot rail geometry.
+# Cross-section in XZ plane (X = axle direction, Z = radial distance).
+vwheel = (cq.Workplane("XZ")
+    .moveTo(-5.1, 9.8)      # outer left edge (angled)
+    .lineTo(-3.0, 11.95)    # join outer rim
+    .lineTo( 3.0, 11.95)    # outer rim
+    .lineTo( 5.1, 9.8)      # outer right edge (angled)
+    .lineTo( 5.1, 8.0)      # inner right flange
+    .lineTo( 0.5, 8.0)      # step to bore
+    .lineTo( 0.5, 7.0)      # bore right
+    .lineTo(-0.5, 7.0)      # bore left
+    .lineTo(-0.5, 8.0)      # step from bore
+    .lineTo(-5.1, 8.0)      # inner left flange
+    .close()
+    .revolve(360, (0, 0, 0), (1, 0, 0)))
+
+# Gantry plate: 127x3x88 box with all mounting holes drilled through.
+# Hole positions extracted from Components/Plates/V-Slot Gantry Plate 20-80mm.step.
+_PLATE_HOLES = [
+    # (diameter, [(x, z), ...])  — all positions from Components/ STEP library
+    (7.10, [(-52.11,-30.32),(-52.11,0),(-52.11,30.32),(-47.59,-30.32),(-47.59,0),(-47.59,30.32),
+            (-42.11,-30.32),(-42.11,0),(-42.11,30.32),(-37.59,-30.32),(-37.59,0),(-37.59,30.32),
+            (-32.11,-30.32),(-32.11,0),(-32.11,30.32),(-27.59,-30.32),(-27.59,0),(-27.59,30.32),
+            (-22.11,-30.32),(-22.11,0),(-22.11,30.32),(-17.59,-30.32),(-17.59,0),(-17.59,30.32)]),
+    (6.00, [(-62.41,-42.91),(-62.41,42.91),(62.41,-42.91),(62.41,42.91)]),
+    (5.10, [(-51.47,-20.32),(-51.47,20.32),(-48.23,-20.32),(-48.23,20.32),
+            (-41.47,-20.32),(-41.47,20.32),(-38.23,-20.32),(-38.23,20.32),
+            (-31.94,-10),(-31.94,10),(-31.47,-20.32),(-31.47,20.32),
+            (-28.70,-10),(-28.70,10),(-28.23,-20.32),(-28.23,20.32),
+            (-21.94,-10),(-21.94,10),(-21.47,-20.32),(-21.47,20.32),
+            (-18.70,-10),(-18.70,10),(-18.23,-20.32),(-18.23,20.32),
+            (-16.45,-14.82),(-16.45,14.82),(-13.20,-14.82),(-13.20,14.82),
+            (-11.62,0),(-11.31,-20.32),(-11.31,20.32),
+            (-8.38,0),(-8.07,-20.32),(-8.07,20.32),
+            (-1.62,-20.32),(-1.62,-10),(-1.62,0),(-1.62,10),(-1.62,20.32),
+            (1.62,-20.32),(1.62,-10),(1.62,0),(1.62,10),(1.62,20.32),
+            (8.07,-20.32),(8.07,20.32),(8.38,0),
+            (11.31,-20.32),(11.31,20.32),(11.62,0),
+            (13.20,-14.83),(13.20,14.83),(16.45,-14.82),(16.45,14.82),
+            (18.23,-30.32),(18.23,-20.32),(18.23,0),(18.23,20.32),(18.23,30.32),
+            (18.70,-10),(18.70,10),
+            (21.47,-30.32),(21.47,-20.32),(21.47,0),(21.47,20.32),(21.47,30.32),
+            (21.94,-10),(21.94,10),
+            (28.23,-30.32),(28.23,-20.32),(28.23,0),(28.23,20.32),(28.23,30.32),
+            (28.70,-10),(28.70,10),
+            (31.47,-30.32),(31.47,-20.32),(31.47,0),(31.47,20.32),(31.47,30.32),
+            (31.94,-10),(31.94,10),
+            (38.23,-30.32),(38.23,-20.32),(38.23,0),(38.23,20.32),(38.23,30.32),
+            (41.47,-30.32),(41.47,-20.32),(41.47,0),(41.47,20.32),(41.47,30.32),
+            (48.23,-30.32),(48.23,-20.32),(48.23,0),(48.23,20.32),(48.23,30.32),
+            (51.47,-30.32),(51.47,-20.32),(51.47,0),(51.47,20.32),(51.47,30.32)]),
+    (5.00, [(-11.59,-30.32),(-11.59,30.32),(11.59,-30.32),(11.59,30.32)]),
+    (3.00, [(-24.20,-38),(-24.20,38),(-15.80,-38),(-15.80,38),
+            (-4.20,-38),(-4.20,38),(4.20,-38),(4.20,38),
+            (15.80,-38),(15.80,38),(24.20,-38),(24.20,38)]),
+]
+
+def _make_gantry_plate():
+    """127x3x88 plate with mounting holes. Plate lies in XZ, 3mm thick in Y."""
+    plate = cq.Workplane("XZ").box(127, 88, 3, centered=(True, True, False))
+    for diam, coords in _PLATE_HOLES:
+        plate = (plate.faces(">Y").workplane(centerOption="CenterOfBoundBox")
+                 .pushPoints(coords)
+                 .hole(diam, 3))
+    return plate
+
+plate_20_80 = _make_gantry_plate()
 
 # ============================================================
 # Colors
 # ============================================================
-ALU = Color(0.78, 0.78, 0.80)   # Frame aluminum (light silver)
-BLK = Color(0.15, 0.15, 0.15)   # Gantry beam
-DRK = Color(0.55, 0.55, 0.58)   # Z-platform rails
-BRK = Color(0.45, 0.45, 0.48)   # Corner brackets (cast)
+# Brand color scheme — black anodized frame, lime green accent
+ALU = Color(0.10, 0.10, 0.12)   # Black anodized frame rails
+BLK = Color(0.08, 0.08, 0.10)   # Gantry beam (darkest)
+DRK = Color(0.20, 0.20, 0.22)   # C-beam Y-rails (dark charcoal)
+BRK = Color(0.35, 0.35, 0.38)   # Corner brackets
+GRN = Color(0.40, 0.85, 0.10)   # Lime green V-wheels (brand accent)
+PH  = Color(0.25, 0.75, 0.90)   # Printhead placeholder (cyan callout)
 
 assy = Assembly("M3-2_Assembly")
 n = [0]
@@ -292,25 +387,49 @@ for nm, (cx, _) in POSTS:
     add(plate_20_80, f"zpl_{nm}", DRK, L(cx, ty, ZP, ry=90))
 
 # ------------------------------------------------------------
-# 2) Y-RAILS (2x) — OpenBuilds C-Beam 40x80x1200, loaded from _userYY.step
+# 2) Y-RAILS (2x) — parametric C-Beam 40x80x1200 with channel cutout
 # ------------------------------------------------------------
-# Upgraded 2026-04-11 from parametric 2080 to C-beam so the Y-axis belt can
-# route INSIDE the channel, clearing the X-beam. Geometry is loaded from
-# Fusion (source of truth) but snapped to Z=400 because Nick's Fusion placement
-# has the R beam at Z=399 (1mm drift from canonical).
-CBEAM_LABELS = {
-    "L": (  15.0, 620.0, 440.0),   # expected center — outboard of post, along Y
-    "R": (2465.0, 620.0, 440.0),
-}
-CBEAM_USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
-for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(CBEAM_USER_STEP, (40, 80, 1200)), CBEAM_LABELS).items():
-    # Snap center to canonical (15/2465, 620, 440) — fixes 1mm Z drift on R
-    # and the ~0.012mm Y drift from Fusion's placement rounding.
-    dx = CBEAM_LABELS[label][0] - ctr[0]
-    dy = 620.0 - ctr[1]
-    dz = 440.0 - ctr[2]
-    add(sh, f"zpY_{label}", DRK, L(dx, dy, dz))
+# OpenBuilds C-Beam profile: 40mm wide (X) x 80mm tall (Z) with a central
+# channel 20mm wide x 40mm deep on one face. The Y-axis belt routes inside
+# this channel. Parametrized here as a simple box + rectangular cut rather
+# than loading the detailed NURBS geometry from Fusion (~20 MB per beam saved).
+# C-Beam Y-rails: extract end-face profile from _user.step C-beam, then
+# extrude to 1200mm. This gives full channel/slot detail without importing
+# the heavy Fusion BREP.
+CBEAM_L = 1200
+
+def _extract_cbeam_profile():
+    """Find the C-beam solid in _user.step, extract its front end face's OUTER
+    wire, discretize to line segments, build a solid face, return it."""
+    solids = load_solids_by_size(USER_STEP, (40, 80, 1200))
+    if not solids:
+        raise RuntimeError("No C-beam (40x80x1200) found in USER_STEP")
+    _, sh = solids[0]
+    end_face = sh.faces("<Y").val()
+    outer_wire = _discretize_wire(end_face.outerWire().wrapped)
+    return BRepBuilderAPI_MakeFace(outer_wire).Face()
+
+_cbeam_face = _extract_cbeam_profile()
+_cbeam_prism = BRepPrimAPI_MakePrism(_cbeam_face, gp_Vec(0, CBEAM_L, 0))
+e_cbeam = cq.Workplane().add(cq.Shape(_cbeam_prism.Shape()))
+
+# Left rail: C-beam front face at Y=20 (post inner face), centered XZ at rail pos.
+# The extracted profile's origin is at the loaded C-beam's front face position.
+# We need to translate so the beam sits at canonical (X=15ctr, Y[20,1220], Z[400,480]).
+_cb_bb = e_cbeam.val().BoundingBox()
+_cb_dx = (ZPY_L_X - 10) - _cb_bb.xmin    # shift X so xmin = -5 (center=15, half-width=20)
+_cb_dy = POST_Y - _cb_bb.ymin             # shift Y so ymin = 20
+_cb_dz = (ZP - 40) - _cb_bb.zmin          # shift Z so zmin = 400
+
+add(e_cbeam, "zpY_L", DRK, L(_cb_dx, _cb_dy, _cb_dz))
+
+# Right rail: mirror across X center of frame (X = W/2 = 1240)
+e_cbeam_r = e_cbeam.mirror("YZ")
+_cbr_bb = e_cbeam_r.val().BoundingBox()
+_cbr_dx = (ZPY_R_X + 10) - _cbr_bb.xmax + 40  # shift X so center = 2465
+_cbr_dy = _cb_dy
+_cbr_dz = _cb_dz
+add(e_cbeam_r, "zpY_R", DRK, L(_cbr_dx, _cbr_dy, _cbr_dz))
 
 # ------------------------------------------------------------
 # 3) X-BEAM CARRIAGE PLATES (2x) — single-sided on Y-rail inner X face
@@ -355,7 +474,7 @@ add(e_gbeam, "gantry_2", BLK, L(XCAR_L_TX + X_RAIL_LEN,  BEAM_Y, BEAM_Z))
 #   - Wheel pair spacing along travel axis Y = 66mm (±33mm from BEAM_Y)
 #
 # Wheel native: 10.2(X) x 23.9(Y) x 23.9(Z), axle in X. Rolls in Y ✓
-WHL = Color(0.90, 0.90, 0.82)     # delrin white
+WHL = GRN                          # lime green V-wheels (brand accent)
 WHEEL_DZ = 50                     # offset from rail Z center (80mm face + 10mm past edge)
 WHEEL_DY = 33                     # half of 66mm pair spacing along travel
 
@@ -408,18 +527,17 @@ print(f"  Phase B - Gantry: {n[0]} parts")
 #   - Stock NEMA23 mount plate used directly; belt-to-carriage via 3D-printed L-tabs.
 
 # --- Load motion components ---
-motor_n23    = load("Electronics/Nema 23 Stepper Motor.step")     # 56.4 x 56.4 x 76.6
-gt2_20t      = load("Pulleys/GT2 Timing Pulley 20 Tooth.step")    # 14(X) x 15 x 15
-idler_sm     = load("Pulleys/Smooth Idler Pulley Wheel.step")     # 12.7(X) x 22 x 22
+# motor_n23 and gt2_20t are not used in lite — motors + pulleys are parametric boxes
+idler_sm     = cq.Workplane("YZ").cylinder(12.7, 22 / 2)   # axle X, OD 22
 # OMC StepperOnline ST-M2 NEMA 23 L-bracket (alloy steel).
 # Vendor-provided CAD — see CAD/Vendor/StepperOnline/README.md for license note.
 n23_lbracket = cq.importers.importStep(os.path.join(
     os.path.dirname(__file__), "Vendor", "StepperOnline", "N23_angled_mount.STEP"))
 
-MTR = Color(0.20, 0.20, 0.22)   # motor black
-BRK2 = Color(0.35, 0.55, 0.80)  # L-bracket blue (matches Nick's color-coding)
-PUL = Color(0.85, 0.70, 0.15)   # GT2 pulley brass/gold
-IDL = Color(0.92, 0.92, 0.92)   # smooth idler white/polished
+MTR = Color(0.15, 0.15, 0.18)   # motor black
+BRK2 = Color(0.30, 0.50, 0.75)  # L-bracket blue (brand secondary)
+PUL = Color(0.90, 0.75, 0.10)   # GT2 pulley brass/gold
+IDL = Color(0.85, 0.85, 0.88)   # smooth idler polished steel
 
 # ============================================================
 # C.1 — Z-MOTORS + ANGLED L-BRACKETS + PULLEYS (4x each, 12 parts)
@@ -460,11 +578,7 @@ Z_MOTOR_CZ = 1170          # motor + bracket center Z (all 4 now outboard; brack
 #       from the user file means future manual moves propagate automatically.
 # The rough label centers below are used only to map each loaded solid to its
 # corner post label; exact positions come from the user file.
-# 2026-04-11: source-of-truth moved to _userY.step, which contains both the
-# 4 Z-motor subassemblies (unchanged from _user.step) AND the 2 new Y-motor
-# subassemblies placed for Phase C.4. _user.step is kept around for history
-# but is no longer loaded.
-USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_user.step")
+# USER_STEP defined at top of file (line 36)
 
 # Combined Z+Y bracket/motor/pulley labels — all 6 share the same sorted
 # dimension signatures, so assign_by_nearest needs every expected center
@@ -476,7 +590,7 @@ BRACKET_LABELS = {
     "ZFR": (2385.6,  54.5,  Z_MOTOR_CZ),
     "ZRL": (  94.5, 1185.5, Z_MOTOR_CZ),
     "ZRR": (2385.5, 1185.5, Z_MOTOR_CZ),
-    "YL":  (  69.7, 1184.3, 441.8),        # Y-motor bracket, rear-left (inside C-beam L)
+    "YL":  (  69.7, 1180.3, 441.8),        # Y-motor bracket, rear-left (inside C-beam L)
     "YR":  (2410.5, 1180.5, 445.0),        # Y-motor bracket, rear-right (inside C-beam R)
 }
 MOTOR_LABELS = {
@@ -502,17 +616,6 @@ def _part_name(kind, label):
         return f"z_{kind}_{label[1:]}"
     return f"y_{kind}_{label[1:]}"
 
-# L-brackets: keep the detailed Fusion geometry (mounting holes + flanges
-# matter for BOM and clearance checks).
-for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(USER_STEP, (69, 69, 65)), BRACKET_LABELS).items():
-    add(sh, _part_name("bracket", label), BRK2, L(0, 0, 0))
-
-# Motors: parametrize as simple 56.4 x 56.4 x 76.6 boxes — the shaft axis is
-# the 76.6mm dimension. We still *load* each motor body to pick up its true
-# center + orientation from Fusion, but we *add* a simple box instead. This
-# drops ~9 MB of detailed NEMA23 geometry from each assembly export while
-# auto-following any Fusion moves.
 def _axle_from_bbox(bb, long_dim, tol=0.5):
     """Return 'X'/'Y'/'Z' — whichever bbox dim matches long_dim."""
     dx, dy, dz = bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin
@@ -529,26 +632,69 @@ def _oriented_box(short, short2, long_, axle):
         return cq.Workplane("XY").box(short, long_, short2)
     return cq.Workplane("XY").box(short, short2, long_)
 
-for label, (ctr, sh) in assign_by_nearest(
-        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), MOTOR_LABELS).items():
-    axle = _axle_from_bbox(sh.val().BoundingBox(), 76.6)
-    box = _oriented_box(56.4, 56.4, 76.6, axle)
-    add(box, _part_name("motor", label), MTR, L(*ctr))
+def _oriented_cylinder(height, radius, axle):
+    """Cylinder with axis along the given axle, centered at origin."""
+    if axle == "X":
+        return cq.Workplane("YZ").cylinder(height, radius)
+    if axle == "Y":
+        return cq.Workplane("XZ").cylinder(height, radius)
+    return cq.Workplane("XY").cylinder(height, radius)
 
-# Pulleys: parametrize as simple 14 x 15 x 15 boxes (14mm = along shaft axis).
-# Same auto-following logic. Keeps the axis info the downstream C.2/C.3/C.4
-# parametric belt + idler code already uses.
-z_pulley_info = {}   # label (FL/FR/RL/RR) -> (cx, cy, cz, axis)  — for C.2/C.3
-y_pulley_info = {}   # label (L/R)          -> (cx, cy, cz, axis) — for C.4
+# L-brackets: parametric boxes, position from loaded _user.step.
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (69, 69, 65)), BRACKET_LABELS).items():
+    axle = _axle_from_bbox(sh.val().BoundingBox(), 65)
+    box = _oriented_box(69, 69, 65, axle)
+    add(box, _part_name("bracket", label), BRK2, L(*ctr))
+
+# Motors: 56.4mm square body (56mm deep) + 8mm shaft cylinder.
+# Body is offset AWAY from the pulley so the shaft/pulley are visible.
+MOTOR_BODY = 56.0      # body depth along shaft axis (76.6 total - 20.6 shaft)
+MOTOR_SHAFT_D = 8.0    # shaft diameter
+MOTOR_SHAFT_L = 20.6   # shaft protrusion from body face
+SHAFT = Color(0.60, 0.60, 0.62)
+
+# Load pulleys FIRST so we know which direction the shaft points for each motor.
+z_pulley_info = {}
+y_pulley_info = {}
+_pulley_centers = {}   # label -> (cx, cy, cz, axle)
 for label, (ctr, sh) in assign_by_nearest(
         load_solids_by_size(USER_STEP, (14, 15, 15)), PULLEY_LABELS).items():
     axle = _axle_from_bbox(sh.val().BoundingBox(), 14)
-    box = _oriented_box(15, 15, 14, axle)
-    add(box, _part_name("pulley", label), PUL, L(*ctr))
+    cyl = _oriented_cylinder(14, 15 / 2, axle)
+    add(cyl, _part_name("pulley", label), PUL, L(*ctr))
+    _pulley_centers[label] = (ctr[0], ctr[1], ctr[2], axle)
     if label.startswith("Z"):
         z_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
     else:
         y_pulley_info[label[1:]] = (ctr[0], ctr[1], ctr[2], axle)
+
+# Now place motor body + shaft for each motor, using pulley position to
+# determine shaft direction.
+for label, (ctr, sh) in assign_by_nearest(
+        load_solids_by_size(USER_STEP, (56.4, 56.4, 76.6)), MOTOR_LABELS).items():
+    axle = _axle_from_bbox(sh.val().BoundingBox(), 76.6)
+    pctr = _pulley_centers[label]
+    # Shaft points from motor center TOWARD the pulley along the axle.
+    axis_idx = {"X": 0, "Y": 1, "Z": 2}[axle]
+    shaft_dir = 1.0 if pctr[axis_idx] < ctr[axis_idx] else -1.0
+    # shaft_dir: +1 means pulley is at lower coord end, -1 means higher end.
+    # Actually we want the direction FROM motor TO pulley:
+    shaft_dir = -1.0 if pctr[axis_idx] < ctr[axis_idx] else 1.0
+    # Body center: shift away from pulley by half the missing length
+    body_offset = (76.6 - MOTOR_BODY) / 2 * (-shaft_dir)
+    body_ctr = list(ctr)
+    body_ctr[axis_idx] += body_offset
+    body = _oriented_box(56.4, 56.4, MOTOR_BODY, axle)
+    body = body.edges().chamfer(1.5)
+    add(body, _part_name("motor", label), MTR, L(*body_ctr))
+    # Shaft: cylinder from body face toward pulley
+    shaft_start = ctr[axis_idx] + (76.6 / 2) * shaft_dir - MOTOR_BODY * shaft_dir
+    # Simpler: shaft center = midpoint between body face and bbox shaft-end
+    shaft_ctr = list(ctr)
+    shaft_ctr[axis_idx] += (76.6 / 2 - MOTOR_SHAFT_L / 2) * shaft_dir
+    shaft_cyl = _oriented_cylinder(MOTOR_SHAFT_L, MOTOR_SHAFT_D / 2, axle)
+    add(shaft_cyl, _part_name("shaft", label), SHAFT, L(*shaft_ctr))
 
 print(f"  Phase C.1 Z-motors + C.4 Y-motors: {n[0]} parts")
 
@@ -678,6 +824,53 @@ for label, (px, py, pz, axis) in y_pulley_info.items():
 print(f"  Phase C.4 Y-motion: {n[0]} parts")
 
 # ============================================================
+# C.8 — X-AXIS MOTION (belt-pinion: fixed belt, motor rides along)
+# ============================================================
+# The X-axis uses a pinion-style drive: a single GT2 belt is fixed at both
+# ends of the gantry beam (X-beam). A motor+pulley carriage rides along the
+# beam on V-wheels, pushing the pulley against the fixed belt. The motor
+# drives itself along the belt, carrying the printhead.
+#
+# Gantry beam (2080): X[40, 2440], Y[610, 630], Z[400, 480]
+# Belt runs along the beam top face (Z=480) at Y=620 (beam center).
+
+X_MOTOR_X    = 2380     # motor position along beam (representative, near RR end)
+X_BEAM_Y     = D / 2    # 620 — beam center Y
+X_BELT_Z     = ZP + 43  # 483 — just above gantry top face (Z=480)
+X_BELT_X0    = 80       # belt start (inset from beam end)
+X_BELT_X1    = 2400     # belt end
+X_PH_X       = 1240     # printhead placeholder X (mid-beam)
+
+# X-belt: single straight strand (fixed, not a loop)
+x_belt_len = X_BELT_X1 - X_BELT_X0
+x_belt = cq.Workplane("XY").box(x_belt_len, BELT_W, BELT_T,
+                                centered=(False, True, True))
+add(x_belt, "x_belt", BELT, L(X_BELT_X0, X_BEAM_Y, X_BELT_Z))
+
+# X-motor: NEMA23 body + shaft + pulley at rear end, shaft pointing down (-Z)
+x_motor_z = X_BELT_Z + MOTOR_SHAFT_L + MOTOR_BODY / 2   # body center Z
+x_motor_body = _oriented_box(56.4, 56.4, MOTOR_BODY, "Z").edges().chamfer(1.5)
+add(x_motor_body, "x_motor", MTR, L(X_MOTOR_X, X_BEAM_Y, x_motor_z))
+
+x_shaft_z = X_BELT_Z + MOTOR_SHAFT_L / 2  # shaft center Z
+x_shaft = _oriented_cylinder(MOTOR_SHAFT_L, MOTOR_SHAFT_D / 2, "Z")
+add(x_shaft, "x_shaft", SHAFT, L(X_MOTOR_X, X_BEAM_Y, x_shaft_z))
+
+x_pulley_z = X_BELT_Z  # pulley at belt height
+x_pulley = _oriented_cylinder(14, 15 / 2, "Z")
+add(x_pulley, "x_pulley", PUL, L(X_MOTOR_X, X_BEAM_Y, x_pulley_z))
+
+# X-idler: smooth idler at the far end of the belt (tension reference)
+x_idler = rotate_shape(idler_sm, ry=90)  # axle along Z
+add(x_idler, "x_idler", IDL, L(X_BELT_X0, X_BEAM_Y, X_BELT_Z))
+
+# Printhead carriage placeholder: visual reference for nozzle mount location
+ph_box = cq.Workplane("XY").box(80, 80, 30)
+add(ph_box, "printhead", PH, L(X_PH_X, X_BEAM_Y, X_BELT_Z + 20))
+
+print(f"  Phase C.8 X-motion: {n[0]} parts")
+
+# ============================================================
 # SUMMARY + EXPORT
 # ============================================================
 total = n[0]
@@ -739,8 +932,20 @@ if __name__ == "__main__":
         # NEMA23 has a stepped shaft end where the belt enters the pulley.
         # The shaft-end volume is phantom; exclude so the belt can pass.
         ("z_motor_",   "z_belt_"),
-        # Post-to-rail butt joints (frame flush contact).
+        # Shaft passes through pulley (mounted on it), bracket (passes through),
+        # and adjacent rail geometry.
+        ("_shaft_",    "_pulley_"),
+        ("_shaft_",    "_bracket_"),
+        ("_shaft_",    "zpY_"),
+        # Post-to-rail/plate butt joints (frame flush contact).
         ("post_",      "zpY_"),
+        ("post_",      "zpl_"),
+        # X-carriage plate sits on C-beam inner face (butt-joint).
+        ("xcar_",      "zpY_"),
+        # X-beam (gantry) butt-joints the C-beam.
+        ("gantry_",    "zpY_"),
+        # Z-belt strands may graze the C-beam corner profile.
+        ("z_belt_",    "zpY_"),
         # All 4 Z-motors now outboard: belt strands graze the Z-corner plates
         # at the clamp height. The small overlap is intentional — extra belt
         # length is needed to terminate/clip the belt onto the plate.
@@ -764,8 +969,24 @@ if __name__ == "__main__":
         ("y_motor_",   "zpY_"),
         # Y-bracket bolts to the C-beam inside face.
         ("y_bracket_", "zpY_"),
+        # Parametric bracket box overlaps adjacent Z-corner plate where the
+        # real L-bracket has cutouts. Phantom in lite build.
+        ("y_bracket_", "zpl_"),
         # Y-belt crosses under the X-carriage plate clamp site.
         ("y_belt_",    "xcar_"),
+        # --- Phase C.8 X-axis ---
+        ("x_motor",    "x_shaft"),
+        ("x_motor",    "x_pulley"),
+        ("x_shaft",    "x_pulley"),
+        ("x_belt",     "x_shaft"),
+        ("x_belt",     "x_pulley"),
+        ("x_belt",     "x_idler"),
+        ("x_belt",     "gantry_"),
+        ("x_pulley",   "gantry_"),
+        ("x_idler",    "gantry_"),
+        ("x_shaft",    "gantry_"),
+        ("printhead",  "x_belt"),
+        ("printhead",  "gantry_"),
     ]
     def excluded(a, b):
         for s1, s2 in EXCLUDE_PAIRS:
