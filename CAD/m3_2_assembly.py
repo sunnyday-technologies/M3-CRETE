@@ -231,26 +231,20 @@ vwheel = (cq.Workplane("XZ")
 
 # Gantry plate: 127x3x88 box with all mounting holes drilled through.
 # Hole positions extracted from Components/Plates/V-Slot Gantry Plate 20-80mm.step.
-# Plate holes — alignment-critical only. The OpenBuilds plate has 146 holes
-# but most are closely-spaced T-slot access pairs (3.24mm apart, d=5.1mm)
-# that merge into figure-8 blobs in a boolean cut model. We keep only:
-#   - 4 V-wheel eccentric spacer holes (d=7.1mm) at the 4 wheel positions
-#   - 4 corner mounting holes (d=6mm)
-#   - 4 center-line wheel reference holes (d=5mm)
-#   - 12 M3 edge mounting holes (d=3mm)
-_PLATE_HOLES = [
-    (7.10, [(-49.85,-30.32),(-49.85,30.32),(-29.91,-30.32),(-29.91,30.32)]),
-    (6.00, [(-62.41,-42.91),(-62.41,42.91),(62.41,-42.91),(62.41,42.91)]),
-    (5.00, [(-11.59,-30.32),(-11.59,30.32),(11.59,-30.32),(11.59,30.32)]),
-    (3.00, [(-24.20,-38),(-24.20,38),(-15.80,-38),(-15.80,38),
-            (-4.20,-38),(-4.20,38),(4.20,-38),(4.20,38),
-            (15.80,-38),(15.80,38),(24.20,-38),(24.20,38)]),
-]
-
+# Gantry plate: 127x3x88 with filleted corners + key alignment holes.
 def _make_gantry_plate():
-    """127x3x88 plate with mounting holes. Plate lies in XZ, 3mm thick in Y."""
-    plate = cq.Workplane("XZ").box(127, 88, 3, centered=(True, True, False))
-    for diam, coords in _PLATE_HOLES:
+    plate = (cq.Workplane("XZ")
+             .rect(127, 88)
+             .extrude(3)
+             .edges("|Y").fillet(3))         # 3mm corner radius
+    for diam, coords in [
+        (7.10, [(-49.85,-30.32),(-49.85,30.32),(-29.91,-30.32),(-29.91,30.32)]),
+        (6.00, [(-62.41,-42.91),(-62.41,42.91),(62.41,-42.91),(62.41,42.91)]),
+        (5.00, [(-11.59,-30.32),(-11.59,30.32),(11.59,-30.32),(11.59,30.32)]),
+        (3.00, [(-24.20,-38),(-24.20,38),(-15.80,-38),(-15.80,38),
+                (-4.20,-38),(-4.20,38),(4.20,-38),(4.20,38),
+                (15.80,-38),(15.80,38),(24.20,-38),(24.20,38)]),
+    ]:
         plate = (plate.faces(">Y").workplane(centerOption="CenterOfBoundBox")
                  .pushPoints(coords)
                  .hole(diam, 3))
@@ -702,7 +696,12 @@ for label, (ctr, sh) in assign_by_nearest(
     body_ctr[axis_idx] += body_offset
     body = _oriented_box(56.4, 56.4, MOTOR_BODY, axle)
     body = body.edges().chamfer(1.5)
+    # Locating boss on shaft face (38mm dia, 2mm tall)
+    boss = _oriented_cylinder(2, 38 / 2, axle)
+    boss_ctr = list(body_ctr)
+    boss_ctr[axis_idx] += (MOTOR_BODY / 2 + 1) * shaft_dir
     add(body, _part_name("motor", label), MTR, L(*body_ctr))
+    add(boss, _part_name("boss", label), MTR, L(*boss_ctr))
     # Shaft: cylinder from body face toward pulley
     shaft_start = ctr[axis_idx] + (76.6 / 2) * shaft_dir - MOTOR_BODY * shaft_dir
     # Simpler: shaft center = midpoint between body face and bbox shaft-end
@@ -862,24 +861,38 @@ x_belt = cq.Workplane("XY").box(x_belt_len, BELT_W, BELT_T,
                                 centered=(False, True, True))
 add(x_belt, "x_belt", BELT, L(X_BELT_X0, X_BEAM_Y, X_BELT_Z))
 
-# X-motor: NEMA23 body + shaft + pulley at rear end, shaft pointing down (-Z)
-x_motor_z = X_BELT_Z + MOTOR_SHAFT_L + MOTOR_BODY / 2   # body center Z
+# X-motor: NEMA23 body + boss + shaft + pulley, shaft pointing down (-Z)
+x_motor_z = X_BELT_Z + MOTOR_SHAFT_L + MOTOR_BODY / 2
 x_motor_body = _oriented_box(56.4, 56.4, MOTOR_BODY, "Z").edges().chamfer(1.5)
 add(x_motor_body, "x_motor", MTR, L(X_MOTOR_X, X_BEAM_Y, x_motor_z))
+x_boss = _oriented_cylinder(2, 38 / 2, "Z")
+add(x_boss, "x_boss", MTR, L(X_MOTOR_X, X_BEAM_Y, X_BELT_Z + MOTOR_SHAFT_L + 1))
 
-x_shaft_z = X_BELT_Z + MOTOR_SHAFT_L / 2  # shaft center Z
+x_shaft_z = X_BELT_Z + MOTOR_SHAFT_L / 2
 x_shaft = _oriented_cylinder(MOTOR_SHAFT_L, MOTOR_SHAFT_D / 2, "Z")
 add(x_shaft, "x_shaft", SHAFT, L(X_MOTOR_X, X_BEAM_Y, x_shaft_z))
 
-x_pulley_z = X_BELT_Z  # pulley at belt height
+x_pulley_z = X_BELT_Z
 x_pulley = _oriented_cylinder(14, 15 / 2, "Z")
 add(x_pulley, "x_pulley", PUL, L(X_MOTOR_X, X_BEAM_Y, x_pulley_z))
 
-# X-idler: smooth idler at the far end of the belt (tension reference)
-x_idler = rotate_shape(idler_sm, ry=90)  # axle along Z
+# X-idler at far end of belt
+x_idler = rotate_shape(idler_sm, ry=90)
 add(x_idler, "x_idler", IDL, L(X_BELT_X0, X_BEAM_Y, X_BELT_Z))
 
-# Printhead carriage placeholder: visual reference for nozzle mount location
+# X-carriage: double-plate anti-racking design (2 plates straddling the gantry beam)
+# Plate oriented in YZ plane, riding on gantry beam V-slots.
+x_car_plate = rotate_shape(plate_20_80, rz=90, rx=90)
+add(x_car_plate, "xcar_x_fr", DRK, L(X_PH_X, X_BEAM_Y - 33, ZP))
+add(x_car_plate, "xcar_x_rr", DRK, L(X_PH_X, X_BEAM_Y + 33, ZP))
+
+# 4 V-wheels on X-carriage (2 per plate, riding gantry beam 80mm faces)
+for pn, py_off in [("fr", -33), ("rr", +33)]:
+    for dz_name, dz in [("top", +WHEEL_DZ), ("bot", -WHEEL_DZ)]:
+        add(vwheel, f"vw_x_{pn}_{dz_name}", GRN,
+            L(X_PH_X, X_BEAM_Y + py_off, ZP + dz, rz=90))
+
+# Printhead carriage placeholder
 ph_box = cq.Workplane("XY").box(80, 80, 30)
 add(ph_box, "printhead", PH, L(X_PH_X, X_BEAM_Y, X_BELT_Z + 20))
 
@@ -951,6 +964,9 @@ if __name__ == "__main__":
         # and adjacent rail geometry.
         ("_shaft_",    "_pulley_"),
         ("_shaft_",    "_bracket_"),
+        ("_boss_",     "_bracket_"),
+        ("_boss_",     "_shaft_"),
+        ("_boss_",     "_motor_"),
         ("_shaft_",    "zpY_"),
         # Post-to-rail/plate butt joints (frame flush contact).
         ("post_",      "zpY_"),
@@ -1002,6 +1018,17 @@ if __name__ == "__main__":
         ("x_shaft",    "gantry_"),
         ("printhead",  "x_belt"),
         ("printhead",  "gantry_"),
+        ("printhead",  "xcar_x_"),
+        ("xcar_x_",    "gantry_"),
+        ("xcar_x_",    "vw_x_"),
+        ("xcar_x_",    "x_belt"),
+        ("xcar_x_",    "printhead"),
+        ("xcar_x_",    "xcar_x_"),
+        ("vw_x_",      "gantry_"),
+        ("vw_x_",      "printhead"),
+        ("_boss_",     "zpY_"),
+        ("x_boss",     "x_shaft"),
+        ("x_boss",     "x_motor"),
         # Hardware — spacers sit inside wheel bores, bolts through wheels+plates
         ("hw_",        "vw_"),
         ("hw_",        "zpl_"),
