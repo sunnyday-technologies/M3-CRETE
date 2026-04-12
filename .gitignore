@@ -71,11 +71,17 @@ CAD/probe_plates.py
 CAD/extract_carriage.py
 CAD/diff_user_edit.py
 
-# NOTE: CAD/M3-2_Assembly.step AND CAD/M3-2_Assembly_user.step ARE tracked.
-# The first is the canonical rebuild artifact published with each release;
-# the second is Nick's manually-placed reference for parts whose orientation
-# can't be cleanly expressed as L()-helper rotations (e.g. the ST-M2 bracket).
-# m3_2_assembly.py reads the _user.step file directly via load_solid_by_signature()
+# CadQuery assembly output — regeneratable from m3_2_assembly.py + _user.step.
+# Not tracked (100 MB+). Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
+CAD/M3-2_Assembly.step
+
+# Intermediate Fusion exports (superseded by M3-2_Assembly_user.step)
+CAD/M3-2_Assembly_user_cor.step
+CAD/M3-2_Assembly_userY.step
+CAD/M3-2_Assembly_userYY.step
+
+# NOTE: CAD/M3-2_Assembly_user.step IS tracked — it is Nick's Fusion-placed
+# reference geometry (L-brackets, C-beams) that m3_2_assembly.py loads directly.
 
 # Large CAD binary archives (track with Git LFS or share separately)
 # Uncomment these if you store CAD in a separate location:

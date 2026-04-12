@@ -125,16 +125,18 @@ for nm in ("FL","FR","RL","RR"):
         check(f"{p} X span = 88", abs((x1-x0)-88) < TOL, f"{x1-x0}")
         check(f"{p} Z span = 127",abs((z1-z0)-127) < TOL, f"{z1-z0}")
 
-# Y-rails: length = 1190, butt-join at Y=25 / Y=1215, inside Z-corner plates
+# Y-rails: 1200mm C-beams (40x80), loaded from _userYY.step, snapped to Z=400.
+# Span Y[20, 1220] (butt-joined to post inner faces at front/rear).
 for side in ("L","R"):
     r = f"zpY_{side}"
     if has(r):
         x0,x1,y0,y1,z0,z1 = bb(r)
-        check(f"{r} length 1190",      abs((y1-y0)-1190) < TOL, f"{y1-y0}")
-        check(f"{r} front at Y=25",    abs(y0-25) < TOL, f"y0={y0}")
-        check(f"{r} rear at Y=1215",   abs(y1-1215) < TOL, f"y1={y1}")
-        check(f"{r} width 20 in X",    abs((x1-x0)-20) < TOL, f"{x1-x0}")
-        check(f"{r} height 80 in Z",   abs((z1-z0)-80) < TOL, f"{z1-z0}")
+        check(f"{r} length 1200",      abs((y1-y0)-1200) < TOL, f"{y1-y0}")
+        check(f"{r} front at Y=20",    abs(y0-20) < TOL, f"y0={y0}")
+        check(f"{r} rear at Y=1220",   abs(y1-1220) < TOL, f"y1={y1}")
+        check(f"{r} width 40 in X (C-beam)", abs((x1-x0)-40) < TOL, f"{x1-x0}")
+        check(f"{r} height 80 in Z",         abs((z1-z0)-80) < TOL, f"{z1-z0}")
+        check(f"{r} Z bottom at 400",        abs(z0-400) < TOL, f"z0={z0}")
 
 # X-beam: 2 segments, each 1200mm, total span 2400mm with butt-joints at 40/2440
 g1 = bb("gantry_1") if has("gantry_1") else None
