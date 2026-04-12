@@ -72,8 +72,11 @@ CAD/extract_carriage.py
 CAD/diff_user_edit.py
 
 # CadQuery assembly output — regeneratable from m3_2_assembly.py + _user.step.
-# Not tracked (100 MB+). Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
+# Not tracked. Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
 CAD/M3-2_Assembly.step
+CAD/M3-2_Assembly_v2.step
+CAD/M3-2_Assembly_lite.step
+CAD/M3-2_Assembly_v20.step
 
 # Intermediate Fusion exports (superseded by M3-2_Assembly_user.step)
 CAD/M3-2_Assembly_user_cor.step
