@@ -11,14 +11,14 @@ See `bom_structural.csv`.
 
 ## Hardware BOM derivation rules
 
-Hardware is **not modeled in CAD** — it's derived by rule from the
+Hardware is **not modeled in CAD** â€” it's derived by rule from the
 structural inventory plus a programmatic C-beam joint detector.
 
 ### C-beam joints: 27 detected
 
 Detected by 5 mm bbox adjacency between any two C-beams. Each joint
-uses 1× T-plate or L-plate corner connector + 5× M5×10 button-head
-SHCS + 5× M5 drop-in T-nut.
+uses 1Ã— T-plate or L-plate corner connector + 5Ã— M5Ã—10 button-head
+SHCS + 5Ã— M5 drop-in T-nut.
 
 Joint pairs:
 
@@ -52,16 +52,16 @@ Joint pairs:
 
 ### V-wheels
 
-24 wheels. Each: 1× M5×40 SHCS, 1× M5 nyloc, 2× M5 washer.
+24 wheels. Each: 1Ã— M5Ã—40 SHCS, 1Ã— M5 nyloc, 2Ã— M5 washer.
 Half (12) get eccentric spacers (one side per wheel pair),
 the other half (12) get standard precision spacers.
 
 ### Motors / brackets
 
-6 motors × 4 NEMA23 face screws (M5×10) = 24 screws.
-4 brackets × 4 rail-face screws (M5×10) + T-nuts = 16 pairs.
+6 motors Ã— 4 NEMA23 face screws (M5Ã—10) = 24 screws.
+4 brackets Ã— 4 rail-face screws (M5Ã—10) + T-nuts = 16 pairs.
 Note: Y-motor brackets and the rack-and-pinion X-motor mounting are
-not yet modeled — add them when the X-axis lands.
+not yet modeled â€” add them when the X-axis lands.
 
 ### M5 fastener totals (sum across all line items)
 
