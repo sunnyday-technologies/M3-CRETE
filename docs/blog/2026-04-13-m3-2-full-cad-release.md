@@ -9,6 +9,8 @@ canonical: https://m3-crete.com/blog/m3-2-full-cad-release/
 
 # M3-2: Full CAD Release
 
+![M3-CRETE M3-2 concrete 3D printer — full CAD assembly render](/images/M3-CRETE_render.jpg)
+
 A two-meter concrete 3D printer, fully defined in Python, released today under CERN-OHL-W-2.0. Every dimension is a variable. Every part is off-the-shelf. The STEP file is on GitHub.
 
 ## What the M3-2 Is
