@@ -26,40 +26,11 @@ spec.loader.exec_module(mod)
 sys.stdout = sys.__stdout__
 
 import cadquery as cq
-from OCP.gp import gp_Trsf
 
-# Walk the in-memory assembly directly, composing locations manually for
-# each child so we get world-correct bboxes. CadQuery's assy.traverse()
-# hands back per-child locs but obj.val().located() REPLACES rather than
-# COMPOSES the source-baked location, so we must do it ourselves.
-def world_bbox(child):
-    """Return (xmin,xmax,ymin,ymax,zmin,zmax) for a child in world coords."""
-    obj = child.obj
-    if obj is None:
-        return None
-    sh = obj.val() if hasattr(obj, "val") else obj
-    # Compose: child.loc is the assembly-side location; sh already carries
-    # whatever source-baked location it had. Multiply.
-    composed_loc = child.loc * sh.location() if child.loc else sh.location()
-    placed = sh.copy()
-    placed.wrapped.Location(composed_loc.wrapped)
-    bb = placed.BoundingBox()
-    return (bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax)
-
-top_solids = []                    # placeholder so name_for_dims still works
-class _Stub:
-    def __init__(self, b): self._b = b
-    def BoundingBox(self):
-        class B: pass
-        b = B(); b.xmin,b.xmax,b.ymin,b.ymax,b.zmin,b.zmax = self._b
-        return b
-for name, child in mod.assy.traverse():
-    if child.obj is None:
-        continue
-    wb = world_bbox(child)
-    if wb is None:
-        continue
-    top_solids.append(_Stub(wb))
+# Use toCompound() — composes locations correctly for both Solids and
+# Shells (C-beams export as open shells, so we need both).
+compound = mod.assy.toCompound()
+top_solids = list(compound.Solids()) + list(compound.Shells())
 
 # Assign a name based on bbox signature (top_solids only — C-beam shells
 # are folded into top_solids when present, and free shells are deduped by bbox)
