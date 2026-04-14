@@ -1,7 +1,7 @@
 item,qty,size,notes
-"Corner connector plate (T- or L-shape, 5-hole)",0,5-hole 4080 series,One per detected joint pair (0)
-M5 button-head SHCS,0,M5 x 10 mm,C-beam joint screws (5 per joint)
-M5 drop-in T-nut,0,"M5, 4080 series",Mating T-nuts in C-beam slots
+"Corner connector plate (T- or L-shape, 5-hole)",27,5-hole 4080 series,One per detected joint pair (27)
+M5 button-head SHCS,135,M5 x 10 mm,C-beam joint screws (5 per joint)
+M5 drop-in T-nut,135,"M5, 4080 series",Mating T-nuts in C-beam slots
 M5 SHCS,24,M5 x 40 mm,V-wheel axle bolt
 M5 nyloc nut,24,M5,V-wheel axle nut
 M5 flat washer,48,M5,Each side of v-wheel stack
@@ -13,5 +13,5 @@ M5 flat washer,10,M5,Each side of idler
 M5 SHCS,24,M5 x 10 mm,NEMA23 face mounting (4 per motor)
 M5 SHCS,16,M5 x 10 mm,Bracket rail face
 M5 drop-in T-nut,16,"M5, 4080 series",Mating T-nuts for bracket rail face
-M5 SHCS,18,M5 x 16 mm,Through C-beam web into shim/Z-post
-M5 drop-in T-nut,18,"M5, 4080 series",Anchor in Z-post slot
+M5 SHCS,10,M5 x 16 mm,Through C-beam web into shim/Z-post
+M5 drop-in T-nut,10,"M5, 4080 series",Anchor in Z-post slot

@@ -71,21 +71,25 @@ CAD/probe_plates.py
 CAD/extract_carriage.py
 CAD/diff_user_edit.py
 
-# Old/intermediate assembly outputs (not tracked)
+# Local CAD working copies — authoritative output is CAD/M3-2_Assembly.step
+# Everything under CAD/M3-2_* is local-only by default; the single tracked
+# file is CAD/M3-2_Assembly.step via the negation below.
 CAD/M3-2_Assembly_v2.step
 CAD/M3-2_Assembly_lite.step
 CAD/M3-2_Assembly_v20.step
+CAD/M3-2_AllC.step
+CAD/M3-2_Assembly_user.step
+CAD/M3-2_Assembly_user.f3d
+CAD/M3-2_Assembly_new.f3d
+CAD/M3-2_Assembly_*.step
+!CAD/M3-2_Assembly.step
+CAD/M3-2_As*.step
+CAD/M3-2_Ass*.step
+CAD/M3-2_Az*.step
+CAD/test_*.step
 
-# NOTE: CAD/M3-2_Assembly.step IS tracked (8.8 MB) — the published assembly
-# for Hackaday.io / download. Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
-
-# Intermediate Fusion exports (superseded by M3-2_Assembly_user.step)
-CAD/M3-2_Assembly_user_cor.step
-CAD/M3-2_Assembly_userY.step
-CAD/M3-2_Assembly_userYY.step
-
-# NOTE: CAD/M3-2_Assembly_user.step IS tracked — it is Nick's Fusion-placed
-# reference geometry (L-brackets, C-beams) that m3_2_assembly.py loads directly.
+# NOTE: CAD/M3-2_Assembly.step IS tracked — the published assembly for
+# Hackaday.io / download. Rebuild with: cad_venv/Scripts/python CAD/m3_2_assembly.py
 
 # Large CAD binary archives (track with Git LFS or share separately)
 # Uncomment these if you store CAD in a separate location:
@@ -95,3 +99,6 @@ CAD/M3-2_Assembly_userYY.step
 
 # Session / dev notes
 m3_render_prompt.md
+
+# Session logs — private decision reference, never publish
+docs/session_logs/
