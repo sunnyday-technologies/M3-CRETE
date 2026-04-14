@@ -1,0 +1,10 @@
+item,qty,dims_mm,material,role
+C-beam 4080 1m extrusion,0,40 x 80 x 1000,Aluminum,"All frame members (Z-post, X-rail, Y-rail, mid braces)"
+L-bracket NEMA23 / T-slot,4,65 x 69 x 69,Aluminum / steel,Z-motor mount (also reusable for Y)
+Stepper motor NEMA23,6,56.4 x 56.4 x 76.6,Steel,4 Z + 2 Y; X (rack-and-pinion) TBD
+V-wheel (XL solid polycarbonate),24,24 x 11,Polycarbonate / steel,Gantry running on C-beam V-grooves
+GT2 timing pulley,6,16T 5mm bore,Aluminum,Drive pulleys
+Smooth idler pulley,5,22 x 13,Aluminum,Belt return idlers
+Z-corner gantry plate,6,127 x 88 x 3,Aluminum,Gantry carriage plates (six corners)
+Belt clamp / belt run,3582,GT2 6mm,Fiber-reinforced rubber,Z + Y belts (X TBD)
+Y-rail / Z-post 4mm shim,18,80 x 4 x 40,Aluminum / steel,Spacer between flat C-beam end and Z-post
