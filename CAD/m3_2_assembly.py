@@ -17,7 +17,28 @@ from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GCPnts import GCPnts_TangentialDeflection
 import os, time, math
 
-USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_AsXX.step")
+USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_AllC.step")
+
+# ============================================================
+# Frame: 1000mm C-beam extrusions (shipping constraint).
+# Source M3-2_AllC.step is already in the 1000mm envelope (Nick's manual
+# corner-RR adjustments baked in), so SXY=SZ=1 — no scaling. Corner
+# fixups below mirror Nick's RR edits onto the other three corners.
+# ============================================================
+L         = 1000.0                              # extrusion length (= source)
+OLD_L     = 1000.0                              # SXY/SZ become 1.0
+SHIM_THK  = 4.0                                 # 4mm spacer between Y-rail end and Z-post
+NX_RIGHT  = 2.0 * L + 80.0                      # right Z-post X center  (2080)
+NZ_TOP    = L                                   # top of frame Z         (1000)
+# Y-direction frame rails span Y[Y_RAIL_START, Y_RAIL_END]; Z-posts and
+# top X rails are pushed OUT by SHIM_THK to leave room for end spacers.
+Y_RAIL_START = 20.0                                       # all Y rails start here
+Y_RAIL_END   = L + 20.0                                   # all Y rails end here
+Y_POST_F     = Y_RAIL_START - 20.0 - SHIM_THK             # front Z-post Y center  (-4)
+Y_POST_R     = Y_RAIL_END   + 20.0 + SHIM_THK             # rear  Z-post Y center  (1044)
+NY_REAR      = Y_POST_R                                   # alias for back-compat
+SXY       = (2.0 * L + 80.0) / (2.0 * OLD_L + 80.0)       # 2080/2480 ≈ 0.8387
+SZ        = L / OLD_L                                      # 1000/1200 ≈ 0.8333
 
 # ============================================================
 # Helpers
@@ -188,9 +209,47 @@ print("M3-CRETE M3-2 Assembly v3.0 (filter-and-replace)")
 print(f"Loading {USER_STEP}...")
 t0 = time.time()
 
+# Load both solids AND free shells — Nick's C-beams are exported as shells,
+# not solids, so we must iterate both.
 stock = cq.importers.importStep(USER_STEP)
-solids = stock.val().Solids()
-print(f"  {len(solids)} solids loaded in {time.time()-t0:.1f}s")
+_stock_compound = stock.val()
+solids = list(_stock_compound.Solids())
+
+# Collect C-beam shells (not inside any solid). These are Nick's Fusion-placed
+# C-beam Z-posts and Y-rails, which export as shells instead of solids.
+# Filter: sorted bbox dims match (40, 80, 1200) within tolerance.
+from OCP.TopAbs import TopAbs_SHELL
+from OCP.TopExp import TopExp_Explorer
+from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeSolid
+from OCP.TopoDS import TopoDS
+from OCP.BRepBndLib import BRepBndLib
+from OCP.Bnd import Bnd_Box
+
+cbeam_shells = []
+e = TopExp_Explorer(_stock_compound.wrapped, TopAbs_SHELL)
+seen_bboxes = set()
+while e.More():
+    sh = e.Current()
+    bb = Bnd_Box()
+    BRepBndLib.Add_s(sh, bb)
+    if not bb.IsVoid():
+        xmin,ymin,zmin,xmax,ymax,zmax = bb.Get()
+        dx = round(xmax-xmin, 1); dy = round(ymax-ymin, 1); dz = round(zmax-zmin, 1)
+        sorted_dims = tuple(sorted([dx,dy,dz]))
+        if sorted_dims == (40.0, 80.0, 1000.0):
+            # Dedup by bbox tuple (distinct C-beams will have different positions)
+            key = (round(xmin,1),round(ymin,1),round(zmin,1),round(xmax,1),round(ymax,1),round(zmax,1))
+            if key not in seen_bboxes:
+                seen_bboxes.add(key)
+                try:
+                    shell = TopoDS.Shell_s(sh)
+                    solid = BRepBuilderAPI_MakeSolid(shell).Solid()
+                    cbeam_shells.append(cq.Solid(solid))
+                except: pass
+    e.Next()
+
+solids = list(solids) + cbeam_shells
+print(f"  {len(solids)} total parts ({len(cbeam_shells)} C-beam shells loaded)")
 
 assy = Assembly("M3-2_Assembly")
 n = [0]
@@ -213,9 +272,9 @@ if os.path.exists(_stock_path):
     _stock = cq.importers.importStep(_stock_path)
     _end_face = _stock.faces("<Z").val()
     _outer_wire = _discretize_wire(_end_face.outerWire().wrapped, deflection=1.0)
-    _solid_face = BRepBuilderAPI_MakeFace(_outer_wire).Face()
-    # Extrude 1200mm along +Z
-    _prism = BRepPrimAPI_MakePrism(_solid_face, gp_Vec(0, 0, 1200))
+    # Extrude the WIRE (not a filled face) to get an open shell of side faces
+    # only — no end caps. Real V-slot extrusions are hollow at the ends.
+    _prism = BRepPrimAPI_MakePrism(_outer_wire, gp_Vec(0, 0, L))
     _stock_beam = cq.Workplane().add(cq.Shape(_prism.Shape()))
     # Stock: 40(X) × 80(Y) × 1200(Z), channel on -X.
     # Target: 80(X) × 40(Y) × 1200(Z) with channel on ±Y (long axis X per Nick).
@@ -224,23 +283,77 @@ if os.path.exists(_stock_path):
     # For front posts, rotate -90° to get +Y channel.
     _cbeam_rear  = _stock_beam.rotate((0,0,0), (0,0,1), 90)   # channel -Y
     _cbeam_front = _stock_beam.rotate((0,0,0), (0,0,1), -90)  # channel +Y
-    print(f"  Built C-beam Z-post templates from 1000mm stock "
-          f"(80x40 cross-section, long axis X, channel ±Y)")
+    # Y-rail templates: rotate stock -90° around X so long axis Z→Y.
+    # Result: X[-20,20] (40), Y[0,1200] (1200), Z[-40,40] (80).
+    # Channel stays on -X face (suitable for RIGHT rail at high X).
+    _cbeam_yrail_R = _stock_beam.rotate((0,0,0), (1,0,0), -90)
+    # Mirror around Y for LEFT rail (channel on +X face, facing inward).
+    _cbeam_yrail_L = _cbeam_yrail_R.rotate((0,0,0), (0,1,0), 180)
 
-    # Place 4 Z-posts. Positions derived from Nick's example RR corner:
-    # wheels at X=2412/2512 (span 100 → post 80mm wide in X, center 2460),
-    # all belts/pulleys/idlers centered at X=2460 Y=1227.
-    # Other corners mirrored around frame center (1240, 620).
+    # Flat-lying Y-rail: 80(X) × 1200(Y) × 40(Z), channel -Z.
+    # For top + bottom Y-direction frame members — wider stiffness, channel
+    # facing down avoids debris catch (top) and accepts leg extensions (bottom).
+    _cbeam_yrail_flat = (_stock_beam
+                         .rotate((0,0,0), (1,0,0), -90)
+                         .rotate((0,0,0), (0,1,0), 90))
+
+    # Tall X-rail: 1200(X) × 40(Y) × 80(Z), channel ±Y inward.
+    _cbeam_xrail_chanYp = (_stock_beam
+                           .rotate((0,0,0), (0,1,0), 90)
+                           .rotate((0,0,0), (1,0,0), 90))
+    _cbeam_xrail_chanYn = _cbeam_xrail_chanYp.rotate((0,0,0), (1,0,0), 180)
+
+    # Flat-lying X-rail: 1200(X) × 80(Y) × 40(Z), channel -Z.
+    # For mid-frame X-direction cross-braces (frame center, channel down).
+    _cbeam_xrail_flat = _cbeam_yrail_flat.rotate((0,0,0), (0,0,1), -90)
+
+    print(f"  Built C-beam templates: Z-posts, Y-rails (tall + flat), "
+          f"X-rails (tall + flat)")
+
+    # Place 4 Z-posts. Posts shifted outward in Y by 4mm to make room for
+    # 4mm shims between top Y-rails / bottom Y-skids and Z-post inner faces.
+    # This gives the 1200mm C-beam Y-gantry an 8mm running clearance
+    # (4mm + 3mm carriage plate + 1mm working gap on each side).
     _POST_POSITIONS = [
-        ("FL", 20,   13,   "+Y"),
-        ("FR", 2460, 13,   "+Y"),
-        ("RL", 20,   1227, "-Y"),
-        ("RR", 2460, 1227, "-Y"),
+        ("FL", 0,    -4,   "+Y"),
+        ("FR", 2480, -4,   "+Y"),
+        ("RL", 0,    1244, "-Y"),
+        ("RR", 2480, 1244, "-Y"),
     ]
-    for label, px, py, chan in _POST_POSITIONS:
-        template = _cbeam_front if chan == "+Y" else _cbeam_rear
-        assy.add(template, name=f"post_cbeam_{label}",
-                 color=DRK, loc=Location((px, py, 0)))
+    # Nick's C-beam shells (Z-posts + Y-rails) are matched to template
+    # instances inside the main loop below — keyed by orientation + position.
+
+    # 8x 4mm Y-direction shims between flat top/bottom Y C-beams and Z-post
+    # inner faces. New flat C-beam end face is 80(X) × 40(Z), so shim is
+    # 80×4×40, anchored on Z-post X-centerline (X=0 left, X=2480 right).
+    SHIM = Color(0.85, 0.45, 0.10)   # orange — visually distinct from frame
+    # Shims sit only between STATIC frame Y-members (top, bottom, top middle)
+    # and the Z-posts they butt against — they create the 4 mm clearance
+    # the gantry needs to traverse along the Z-posts. The mid-height gantry
+    # rails carry the moving gantry; their ends don't need shims.
+    shim_4080_flat = cq.Workplane("XY").box(80, SHIM_THK, 40)
+    _SY_F = Y_RAIL_START - SHIM_THK / 2.0    # 18 — front shim Y center (Y[16,20])
+    _SY_R = Y_RAIL_END   + SHIM_THK / 2.0    # 1022 — rear  shim Y center
+    _SZ_T = NZ_TOP - 20.0                    # 980 — top   shim Z center
+    _SZ_B = 20.0                             # 20  — bot   shim Z center
+    _SX_TM = NX_RIGHT / 2.0                  # 1040 — top mid Y rail X center
+    shim_specs = [
+        # Top Y flat rails (sides + middle): 4 corner shims + 2 mid shims
+        ("top_L_front",   0.0,      _SY_F, _SZ_T, shim_4080_flat),
+        ("top_R_front",   NX_RIGHT, _SY_F, _SZ_T, shim_4080_flat),
+        ("top_L_rear",    0.0,      _SY_R, _SZ_T, shim_4080_flat),
+        ("top_R_rear",    NX_RIGHT, _SY_R, _SZ_T, shim_4080_flat),
+        ("topmid_front",  _SX_TM,   _SY_F, _SZ_T, shim_4080_flat),
+        ("topmid_rear",   _SX_TM,   _SY_R, _SZ_T, shim_4080_flat),
+        # Bottom Y skids (4 corners)
+        ("bot_L_front",   0.0,      _SY_F, _SZ_B, shim_4080_flat),
+        ("bot_R_front",   NX_RIGHT, _SY_F, _SZ_B, shim_4080_flat),
+        ("bot_L_rear",    0.0,      _SY_R, _SZ_B, shim_4080_flat),
+        ("bot_R_rear",    NX_RIGHT, _SY_R, _SZ_B, shim_4080_flat),
+    ]
+    for name, sx, sy, sz, shim_shape in shim_specs:
+        assy.add(shim_shape, name=f"shim_{name}", color=SHIM,
+                 loc=Location((sx, sy, sz)))
         n[0] += 1
 else:
     print(f"  WARNING: C-beam stock not found at {_stock_path}")
@@ -255,46 +368,107 @@ for s in solids:
     cy = (bb.ymin + bb.ymax) / 2
     cz = (bb.zmin + bb.zmax) / 2
 
-    # Z-posts are now added before the main loop from _POST_POSITIONS
-    # Skip any remaining 2040 solids with dz=1200 (shouldn't be any in Azzz)
-    if dims == (20.0, 40.0, 1200.0) and abs(dz - 1200) < 1:
+    # Skip the OLD shims baked into the source — script rebuilds shims fresh.
+    if dims == (4.0, 40.0, 80.0):
         continue
 
-    if dims == (40.0, 80.0, 1200.0):
-        # Y-rail C-BEAM: replace with solid-fill outer-wire extrude
-        wp = cq.Workplane().add(s)
+    # ============================================================
+    # CORNER FIXUPS — mirror Nick's RR edits to FL/FR/RL.
+    # Nick adjusted the rear-right Z-motor stack so the bracket / motor /
+    # belt align correctly with the corner Z-gantry plate. The same
+    # geometry applies symmetrically to the other three corners.
+    #
+    # Per-part deltas (toward frame center for Y, away for X):
+    #   Z-motor:  X ±4.25 (outward), Y ±12 (inward), Z +6.75 (up)
+    #   bracket:  X ±4.25 (outward), Y ±12 (inward)
+    #   plate:    Y ±3 (inward) — Z-corner gantry plate only
+    # ============================================================
+    fix_dx = fix_dy = fix_dz = 0.0
+
+    # 1. Z-motor + bracket corner stack (top of frame)
+    if cz > 900 and dims in {(56.4, 56.4, 76.6), (65.0, 69.0, 69.0)}:
+        is_left  = cx < 1040
+        is_front = cy < 520
+        is_RR    = (not is_left) and (not is_front)
+        if not is_RR:                                 # RR already in source
+            sign_x = -1.0 if is_left  else +1.0
+            sign_y = +1.0 if is_front else -1.0
+            fix_dx = 4.25 * sign_x
+            fix_dy = 12.0 * sign_y
+            if dims == (56.4, 56.4, 76.6):
+                fix_dz = 6.75
+
+    # 2. Corner Z-gantry plate (mid-height, near Z-post inner Y face)
+    elif dims == (3.0, 88.0, 127.0) and 200 < cz < 600:
+        if cy < 100:                                  # front corner plate
+            fix_dy = +3.0
+        elif cy > 940:                                # rear corner plate
+            is_RR_plate = (cx > 1040)
+            if not is_RR_plate:                       # RR already in source
+                fix_dy = -3.0
+
+    fcx, fcy, fcz = cx + fix_dx, cy + fix_dy, cz + fix_dz
+
+    # ============================================================
+    # C-BEAM (40x80x1000 in AllC source) → 1000mm template
+    # AllC source positions are authoritative — just substitute the
+    # geometry with our parametric template at the source bbox.min.
+    # ============================================================
+    if dims == (40.0, 80.0, 1000.0):
         try:
-            replacement = _solid_fill_extrude(wp, "<Y", gp_Vec(0, 1200, 0))
-            # Translate to match original position
-            orig_ymin = bb.ymin
-            rep_bb = replacement.val().BoundingBox()
-            dy_shift = orig_ymin - rep_bb.ymin
-            dx_shift = bb.xmin - rep_bb.xmin
-            dz_shift = bb.zmin - rep_bb.zmin
-            assy.add(replacement, name=f"zpY_{replaced_cbeams}",
-                     color=DRK, loc=Location((dx_shift, dy_shift, dz_shift)))
+            if abs(dz - 1000) < 1:
+                template = _cbeam_rear if cy < 520 else _cbeam_front
+                kind = "Zpost"
+            elif abs(dy - 1000) < 1:
+                if 300 < cz < 600:
+                    template = _cbeam_yrail_R if cx < 1040 else _cbeam_yrail_L
+                    kind = "Yrail"
+                else:
+                    template = _cbeam_yrail_flat
+                    kind = "Yflat"
+            elif abs(dx - 1000) < 1:
+                if cz > 900:
+                    template = _cbeam_xrail_chanYp if cy < 520 else _cbeam_xrail_chanYn
+                    kind = "Xtop"
+                else:
+                    template = _cbeam_xrail_flat
+                    kind = "Xmid"
+            else:
+                raise RuntimeError(f"unexpected C-beam dims {dims}")
+            tbb = template.val().BoundingBox()
+            assy.add(template, name=f"cbeam_{kind}_{replaced_cbeams}",
+                     color=DRK,
+                     loc=Location((bb.xmin - tbb.xmin,
+                                    bb.ymin - tbb.ymin,
+                                    bb.zmin - tbb.zmin)))
             replaced_cbeams += 1
             n[0] += 1
             continue
         except Exception as e:
-            print(f"  C-beam solid-fill failed: {e}, loading as-is")
+            print(f"  C-beam placement failed at ({cx:.0f},{cy:.0f},{cz:.0f}): {e}")
+            continue
 
-    elif dims == (65.0, 69.0, 69.0):
-        # L-BRACKET: pass through from Fusion (original geometry for correct
-        # bolt spacing). Nick confirmed no IP issue with corner reinforcements
-        # removed. 879 KB each, ~4 brackets.
+    # ============================================================
+    # L-BRACKET — generic NEMA23 / T-slot bracket (replaces vendor IP).
+    # AllC source already has bracket positions correct (bottom-anchored
+    # at Z=NZ_TOP, Y push-out applied), so just translate by the corner
+    # fixup deltas in fcx/fcy/fcz.
+    # ============================================================
+    if dims == (65.0, 69.0, 69.0):
         wp = cq.Workplane().add(s)
-        assy.add(wp, name=f"bracket_{replaced_brackets}",
-                 color=BRK2, loc=Location((0, 0, 0)))
+        assy.add(wp, name=f"bracket_{replaced_brackets}", color=BRK2,
+                 loc=Location((fcx - cx, fcy - cy, fcz - cz)))
         replaced_brackets += 1
         n[0] += 1
         continue
 
-    # DEFAULT: pass through from Fusion at full fidelity
-    color = BELT if dims in BELT_SIGS else SIG_COLORS.get(dims, ALU)
-    name_prefix = {
-        (20.0, 80.0, 1200.0): "rail_2080",
-        (20.0, 40.0, 1200.0): "rail_2040",
+    # ============================================================
+    # DEFAULT pass-through — translate by corner fixup delta only.
+    # AllC source positions are otherwise authoritative.
+    # ============================================================
+    is_belt = dims[0] == 1.5 and dims[1] == 6.0
+    color = BELT if is_belt else SIG_COLORS.get(dims, ALU)
+    name_prefix = "belt" if is_belt else {
         (56.4, 56.4, 76.6):   "motor",
         (3.0, 88.0, 127.0):   "plate",
         (10.2, 23.9, 23.9):   "vwheel",
@@ -305,7 +479,7 @@ for s in solids:
 
     wp = cq.Workplane().add(s)
     assy.add(wp, name=f"{name_prefix}_{n[0]}", color=color,
-             loc=Location((0, 0, 0)))
+             loc=Location((fcx - cx, fcy - cy, fcz - cz)))
     n[0] += 1
 
 print(f"\n  {n[0]} parts total")
