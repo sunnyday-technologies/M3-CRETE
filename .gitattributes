@@ -1,2 +1,7 @@
+# Large CAD exports — stored via Git LFS so future pushes and clones
+# don't have to re-transfer the full 60-70 MB step blob. See GitHub docs:
+# https://docs.github.com/en/repositories/working-with-files/managing-large-files
 CAD/*.step filter=lfs diff=lfs merge=lfs -text
 CAD/*.STEP filter=lfs diff=lfs merge=lfs -text
+CAD/Components/**/*.step filter=lfs diff=lfs merge=lfs -text
+CAD/Components/**/*.STEP filter=lfs diff=lfs merge=lfs -text
