@@ -256,6 +256,13 @@ n = [0]
 replaced_cbeams = 0
 replaced_brackets = 0
 
+# Tracking lists for post-loop additions (corner connectors, Y-motor
+# brackets, idler axle brackets) — each entry is a world bbox tuple
+# (xmin, xmax, ymin, ymax, zmin, zmax).
+cbeam_bbs   = []   # for joint detection
+ymotor_bbs  = []   # for Y-motor bracket placement
+idler_bbs   = []   # for idler axle bracket placement
+
 # Generic brackets built per-instance (each needs correct axle orientation)
 
 # Build C-beam Z-post template from the 1000mm stock STEP profile.
@@ -441,6 +448,7 @@ for s in solids:
                      loc=Location((bb.xmin - tbb.xmin,
                                     bb.ymin - tbb.ymin,
                                     bb.zmin - tbb.zmin)))
+            cbeam_bbs.append((bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
             replaced_cbeams += 1
             n[0] += 1
             continue
@@ -480,7 +488,116 @@ for s in solids:
     wp = cq.Workplane().add(s)
     assy.add(wp, name=f"{name_prefix}_{n[0]}", color=color,
              loc=Location((fcx - cx, fcy - cy, fcz - cz)))
+
+    # Track parts that need post-loop bracket additions (in WORLD coords
+    # = source coords + fixup delta, since SXY=SZ=1).
+    wbb = (bb.xmin + (fcx-cx), bb.xmax + (fcx-cx),
+           bb.ymin + (fcy-cy), bb.ymax + (fcy-cy),
+           bb.zmin + (fcz-cz), bb.zmax + (fcz-cz))
+    if dims == (56.4, 56.4, 76.6) and fcz < 600:
+        ymotor_bbs.append(wbb)
+    elif dims == (12.7, 22.0, 22.0):
+        idler_bbs.append(wbb)
     n[0] += 1
+
+# ============================================================
+# POST-LOOP additions: corner connectors, Y-motor brackets, idler brackets
+# ============================================================
+CONN_COLOR  = Color(0.45, 0.45, 0.50)   # steel grey
+IDL_BRK_COLOR = Color(0.45, 0.45, 0.50)
+FRAME_CTR = (NX_RIGHT / 2.0, (Y_POST_F + Y_POST_R) / 2.0, NZ_TOP / 2.0)
+
+def _cbeam_axis(b):
+    if (b[5] - b[4]) > 500: return 'Z'
+    if (b[3] - b[2]) > 500: return 'Y'
+    if (b[1] - b[0]) > 500: return 'X'
+    return None
+
+def _joint_normal(a, b):
+    aa, bb_ax = _cbeam_axis(a), _cbeam_axis(b)
+    if aa is None or bb_ax is None or aa == bb_ax:
+        return None
+    return ({'X', 'Y', 'Z'} - {aa, bb_ax}).pop()
+
+def _joint_center(a, b):
+    return (
+        (max(a[0], b[0]) + min(a[1], b[1])) / 2.0,
+        (max(a[2], b[2]) + min(a[3], b[3])) / 2.0,
+        (max(a[4], b[4]) + min(a[5], b[5])) / 2.0,
+    )
+
+def _bbs_touch(a, b, tol=5.0):
+    return (a[0] - tol <= b[1] and b[0] - tol <= a[1] and
+            a[2] - tol <= b[3] and b[2] - tol <= a[3] and
+            a[4] - tol <= b[5] and b[4] - tol <= a[5])
+
+# --- Corner connector plates (5-hole T/L plate, simplified as flat 80x80x5) ---
+CONN_W      = 80.0
+CONN_T      = 5.0
+CONN_OFFSET = 22.5     # half C-beam width (20) + half plate thk (2.5)
+n_connectors = 0
+for i in range(len(cbeam_bbs)):
+    for j in range(i + 1, len(cbeam_bbs)):
+        if not _bbs_touch(cbeam_bbs[i], cbeam_bbs[j]): continue
+        normal = _joint_normal(cbeam_bbs[i], cbeam_bbs[j])
+        if normal is None: continue
+        cx, cy, cz = _joint_center(cbeam_bbs[i], cbeam_bbs[j])
+        # Push outward from frame center along the normal axis
+        if normal == 'X':
+            cx += CONN_OFFSET if cx >= FRAME_CTR[0] else -CONN_OFFSET
+            plate = cq.Workplane("YZ").box(CONN_T, CONN_W, CONN_W)
+        elif normal == 'Y':
+            cy += CONN_OFFSET if cy >= FRAME_CTR[1] else -CONN_OFFSET
+            plate = cq.Workplane("XZ").box(CONN_W, CONN_T, CONN_W)
+        else:  # 'Z'
+            cz += CONN_OFFSET if cz >= FRAME_CTR[2] else -CONN_OFFSET
+            plate = cq.Workplane("XY").box(CONN_W, CONN_W, CONN_T)
+        assy.add(plate, name=f"connector_{n_connectors}", color=CONN_COLOR,
+                 loc=Location((cx, cy, cz)))
+        n_connectors += 1
+        n[0] += 1
+print(f"  {n_connectors} corner connector plates")
+
+# --- Y-motor brackets (re-use generic NEMA23 L-bracket template) ---
+# Y-motors have their long axis in X (motor cross-section is 56.4 x 56.4
+# in Y-Z, and the 76.6mm shaft direction is X). The bracket sits flush to
+# the motor's NEMA face on the +X or -X side, depending on which side of
+# frame center the motor is.
+n_ybrackets = 0
+for wbb in ymotor_bbs:
+    cx = (wbb[0] + wbb[1]) / 2.0
+    cy = (wbb[2] + wbb[3]) / 2.0
+    cz = (wbb[4] + wbb[5]) / 2.0
+    is_left = cx < FRAME_CTR[0]
+    bracket = _make_generic_bracket("X")          # 65mm axis along X
+    bbb = bracket.val().BoundingBox()
+    bracket_dx = (bbb.xmax - bbb.xmin)
+    new_cx = cx + (-bracket_dx/2 - 1 if is_left else +bracket_dx/2 + 1)
+    bcx = (bbb.xmin + bbb.xmax) / 2.0
+    bcy = (bbb.ymin + bbb.ymax) / 2.0
+    bcz = (bbb.zmin + bbb.zmax) / 2.0
+    assy.add(bracket, name=f"bracket_Y_{n_ybrackets}", color=BRK2,
+             loc=Location((new_cx - bcx, cy - bcy, cz - bcz)))
+    n_ybrackets += 1
+    n[0] += 1
+print(f"  {n_ybrackets} Y-motor brackets")
+
+# --- Idler axle support brackets (small flat plate behind each idler) ---
+# Each idler gets a 30 x 5 x 30 plate behind it (anchored to the C-beam face
+# the idler bolts to). For simplicity, plate is in Y-Z plane (X-thick).
+n_idlerbrk = 0
+idler_brk = cq.Workplane("YZ").box(5, 30, 30)
+for wbb in idler_bbs:
+    cx = (wbb[0] + wbb[1]) / 2.0
+    cy = (wbb[2] + wbb[3]) / 2.0
+    cz = (wbb[4] + wbb[5]) / 2.0
+    # Push outward in X (left or right edge of frame)
+    nx = cx + (-15 if cx < FRAME_CTR[0] else +15)
+    assy.add(idler_brk, name=f"bracket_idler_{n_idlerbrk}", color=IDL_BRK_COLOR,
+             loc=Location((nx, cy, cz)))
+    n_idlerbrk += 1
+    n[0] += 1
+print(f"  {n_idlerbrk} idler axle brackets")
 
 print(f"\n  {n[0]} parts total")
 print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
