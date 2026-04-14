@@ -44,6 +44,8 @@ def name_for_dims(dims_sorted):
     if dims_sorted == (3.0, 88.0, 127.0):    return "plate"
     if dims_sorted == (20.0, 20.0, 20.0):    return "splice"
     if dims_sorted == (4.0, 40.0, 80.0):     return "shim"
+    if dims_sorted == (5.0, 80.0, 80.0):     return "connector"
+    if dims_sorted == (5.0, 30.0, 30.0):     return "idlerbrk"
     if dims_sorted[0] == 1.5 and dims_sorted[1] == 6.0: return "belt"
     return "part"
 
@@ -63,8 +65,8 @@ for i, s in enumerate(top_solids):
     parts.append((nm, bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
 
 def tag_of(name):
-    for p in ("cbeam","bracket","motor","vwheel","pulley","idler","plate",
-              "splice","belt","shim","part","rail"):
+    for p in ("cbeam","connector","idlerbrk","bracket","motor","vwheel",
+              "pulley","idler","plate","splice","belt","shim","part","rail"):
         if name.startswith(p): return p
     return "other"
 
@@ -89,14 +91,16 @@ N_JOINTS = len(joint_pairs)
 STRUCTURAL = [
     # name, qty, dims_mm, material, role
     ("C-beam 4080 1m extrusion",          inv["cbeam"],       "40 x 80 x 1000", "Aluminum", "All frame members (Z-post, X-rail, Y-rail, mid braces)"),
-    ("L-bracket NEMA23 / T-slot",         inv["bracket"],     "65 x 69 x 69",   "Aluminum / steel", "Z-motor mount (also reusable for Y)"),
+    ("L-bracket NEMA23 / T-slot",         inv["bracket"],     "65 x 69 x 69",   "Aluminum / steel", "Motor mount: 4 Z + 2 Y"),
     ("Stepper motor NEMA23",              inv["motor"],       "56.4 x 56.4 x 76.6", "Steel", "4 Z + 2 Y; X (rack-and-pinion) TBD"),
     ("V-wheel (XL solid polycarbonate)",  inv["vwheel"],      "24 x 11",        "Polycarbonate / steel", "Gantry running on C-beam V-grooves"),
     ("GT2 timing pulley",                 inv["pulley"],      "16T 5mm bore",   "Aluminum",  "Drive pulleys"),
     ("Smooth idler pulley",               inv["idler"],       "22 x 13",        "Aluminum",  "Belt return idlers"),
+    ("Idler axle bracket",                inv["idlerbrk"],    "30 x 30 x 5",    "Steel",     "Support plate for each idler axle"),
     ("Z-corner gantry plate",             inv["plate"],       "127 x 88 x 3",   "Aluminum",  "Gantry carriage plates (six corners)"),
     ("Belt clamp / belt run",             inv["belt"] + inv["part"], "GT2 6mm", "Fiber-reinforced rubber", "Z + Y belts (X TBD)"),
     ("Y-rail / Z-post 4mm shim",          inv["shim"],        "80 x 4 x 40",    "Aluminum / steel", "Spacer between flat C-beam end and Z-post"),
+    ("4080 corner connector plate (L/T)", inv["connector"],   "80 x 80 x 5",    "Steel",     "5-hole bracket at every perpendicular C-beam joint"),
 ]
 with open(os.path.join(HERE, "bom_structural.csv"), "w", newline="") as f:
     w = csv.writer(f)
@@ -105,6 +109,10 @@ with open(os.path.join(HERE, "bom_structural.csv"), "w", newline="") as f:
 
 # ---------- Hardware BOM (rule-derived) ----------
 N_CBEAM_JOINTS    = N_JOINTS
+# Of those joints, the perpendicular ones get L-corner plates and the
+# parallel/inline ones get inline splices. The CAD model places only
+# perpendicular L-plates (matching `inv["connector"]`).
+N_INLINE_SPLICE   = N_JOINTS - inv["connector"]
 N_VWHEEL          = inv["vwheel"]
 N_VWHEEL_ECC      = N_VWHEEL // 2          # eccentric spacers — one side only
 N_VWHEEL_STD      = N_VWHEEL - N_VWHEEL_ECC
@@ -116,7 +124,8 @@ N_SHIM            = inv["shim"]
 HARDWARE = [
     # item, qty, size, notes
     # --- C-beam joints (5 screws per corner per user) ---
-    ("Corner connector plate (T- or L-shape, 5-hole)", N_CBEAM_JOINTS, "5-hole 4080 series", f"One per detected joint pair ({N_CBEAM_JOINTS})"),
+    ("L-corner plate (5-hole 4080)",                   inv["connector"], "5-hole 4080 series", f"Perpendicular C-beam joints (modeled in CAD)"),
+    ("Inline splice plate (5-hole 4080)",              N_INLINE_SPLICE, "5-hole 4080 series", "Parallel C-beams meeting end-to-end (e.g. top X rails at center)"),
     ("M5 button-head SHCS",                            N_CBEAM_JOINTS * 5, "M5 x 10 mm",        "C-beam joint screws (5 per joint)"),
     ("M5 drop-in T-nut",                               N_CBEAM_JOINTS * 5, "M5, 4080 series",   "Mating T-nuts in C-beam slots"),
 
@@ -131,6 +140,9 @@ HARDWARE = [
     ("M5 SHCS",                                        N_IDLER, "M5 x 30 mm",          "Smooth idler axle"),
     ("M5 nyloc nut",                                   N_IDLER, "M5",                  "Idler axle nut"),
     ("M5 flat washer",                                 N_IDLER * 2, "M5",              "Each side of idler"),
+    # --- Idler axle brackets (1 axle bracket per idler, 2 screws into C-beam slot) ---
+    ("M5 SHCS",                                        inv["idlerbrk"] * 2, "M5 x 10 mm", "Idler axle bracket to C-beam"),
+    ("M5 drop-in T-nut",                               inv["idlerbrk"] * 2, "M5, 4080 series", "Mating T-nuts for idler bracket"),
 
     # --- Motors (NEMA23 face × 4 fasteners per motor) ---
     ("M5 SHCS",                                        N_MOTOR * 4, "M5 x 10 mm",      "NEMA23 face mounting (4 per motor)"),
