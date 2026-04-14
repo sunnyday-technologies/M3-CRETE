@@ -5,7 +5,7 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 3651).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 90).
 
 See `bom_structural.csv`.
 
@@ -14,7 +14,7 @@ See `bom_structural.csv`.
 Hardware is **not modeled in CAD** — it's derived by rule from the
 structural inventory plus a programmatic C-beam joint detector.
 
-### C-beam joints: 0 detected
+### C-beam joints: 27 detected
 
 Detected by 5 mm bbox adjacency between any two C-beams. Each joint
 uses 1× T-plate or L-plate corner connector + 5× M5×10 button-head
@@ -22,6 +22,33 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
+- cbeam_146 <-> cbeam_147
+- cbeam_146 <-> cbeam_155
+- cbeam_146 <-> cbeam_160
+- cbeam_146 <-> cbeam_162
+- cbeam_147 <-> cbeam_149
+- cbeam_147 <-> cbeam_150
+- cbeam_147 <-> cbeam_162
+- cbeam_148 <-> cbeam_159
+- cbeam_149 <-> cbeam_150
+- cbeam_149 <-> cbeam_156
+- cbeam_149 <-> cbeam_160
+- cbeam_150 <-> cbeam_152
+- cbeam_150 <-> cbeam_154
+- cbeam_151 <-> cbeam_153
+- cbeam_151 <-> cbeam_155
+- cbeam_151 <-> cbeam_157
+- cbeam_151 <-> cbeam_158
+- cbeam_152 <-> cbeam_162
+- cbeam_153 <-> cbeam_161
+- cbeam_154 <-> cbeam_162
+- cbeam_155 <-> cbeam_157
+- cbeam_155 <-> cbeam_160
+- cbeam_156 <-> cbeam_157
+- cbeam_156 <-> cbeam_160
+- cbeam_156 <-> cbeam_161
+- cbeam_157 <-> cbeam_161
+- cbeam_158 <-> cbeam_161
 
 ### V-wheels
 
@@ -40,11 +67,11 @@ not yet modeled — add them when the X-axis lands.
 
 | Item | Qty |
 |---|---|
-| M5 T-nut | 34 |
+| M5 T-nut | 161 |
 | M5 flat washer | 58 |
 | M5 nyloc nut | 29 |
-| M5 x 10 mm | 40 |
-| M5 x 16 mm | 18 |
+| M5 x 10 mm | 175 |
+| M5 x 16 mm | 10 |
 | M5 x 30 mm | 5 |
 | M5 x 40 mm | 24 |
 
