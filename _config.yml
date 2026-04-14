@@ -1,0 +1,46 @@
+# Jekyll / GitHub Pages configuration for m3-crete.com
+#
+# This site is HAND-AUTHORED HTML — not Jekyll-generated. The blog posts
+# under /blog/ are static HTML files styled to match the existing press
+# and index pages. We use Jekyll only as the GitHub Pages build pipeline
+# (it defaults to processing the whole repo as a Jekyll site).
+#
+# The exclude list below prevents Jekyll from walking into directories
+# that contain non-blog content — CAD source files, component libraries,
+# session logs, Python scripts, and anything with its own encoding rules
+# that would crash the kramdown markdown parser.
+
+title: M3-CRETE
+description: Open-source meter-scale concrete 3D printer by Sunnyday Technologies.
+url: https://m3-crete.com
+
+# Do not process these paths as Jekyll content
+exclude:
+  - CAD/
+  - cad_venv/
+  - docs/session_logs/
+  - docs/hackaday/
+  - docs/blog/            # markdown source only; published HTML lives in /blog/
+  - docs/cbeam-upgrade-analysis.md
+  - docs/cbeam-corner-upgrade-bom-impact.md
+  - docs/full-system-bom-audit.md
+  - docs/structural-audit.md
+  - docs/step-files-needed.md
+  - docs/session-2026-04-13-bom-audit.md
+  - docs/m3crete-hackaday-prompt.md
+  - docs/PREVIEW_HARNESS_NOTES.md
+  - bom/data.json         # large JSON, not a page
+  - .claude/
+  - "*.py"
+  - "*.step"
+  - "*.f3d"
+  - "*.stl"
+  - Gemfile
+  - Gemfile.lock
+  - README.md             # repo README, not a public page
+  - LICENSE
+  - LICENSE.md
+  - CLAUDE.md
+
+# Keep default theme so primer-styled directories still render if needed
+theme: jekyll-theme-primer
