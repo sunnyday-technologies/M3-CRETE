@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "generated": "2026-04-12T00:00:00Z",
+  "generated": "2026-04-14T07:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2379,6 +2379,15 @@
           "sku": null,
           "step_url": null,
           "approved": true
+        },
+        {
+          "id": 1112,
+          "supplier_name": "ZYLtech Engineering",
+          "product_url": "https://www.zyltech.com/zyltech-4080c-v-groove-aluminum-extrusion-pre-cut-sizes-1000mm-and-1200mm/",
+          "notes": "4080C V-groove aluminum extrusion. Houston TX warehouse, US domestic ground ship. Stocks 1000 mm and 1200 mm pre-cut lengths — the only verified US source that carries 1200 mm. ",
+          "sku": "4080C-1000",
+          "step_url": null,
+          "approved": true
         }
       ]
     },
@@ -2410,6 +2419,15 @@
           "product_url": "https://makerstore.cc/product/c-beam/",
           "notes": "US warehouse, domestic shipping",
           "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1113,
+          "supplier_name": "ZYLtech Engineering",
+          "product_url": "https://www.zyltech.com/zyltech-4080c-v-groove-aluminum-extrusion-pre-cut-sizes-1000mm-and-1200mm/",
+          "notes": "4080C V-groove aluminum extrusion. Houston TX warehouse, US domestic ground ship. Stocks 1000 mm and 1200 mm pre-cut lengths — the only verified US source that carries 1200 mm. ",
+          "sku": "4080C-1000",
           "step_url": null,
           "approved": true
         }
@@ -2475,6 +2493,99 @@
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/product/c-beam/",
           "notes": "US warehouse, domestic shipping",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "category": "Frame Hardware & Brackets",
+      "name": "Inside Hidden Corner Bracket (L-type, 20-Series)",
+      "description": "Hidden L-brackets that drop into the V-slot channel from inside and reinforce 90-degree corner joints where C-beams meet. Invisible from outside the frame. Used at every top frame corner (post-to-X-rail-to-Y-rail junction) and at the bottom skid corners. Doubled at each junction for shear strength. Black anodized aluminum, 20-series compatible, works identically in C-beam and V-slot channels.",
+      "qty": 16,
+      "unit": "brackets",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1114,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/inside-hidden-bracket/",
+          "notes": "Inside hidden corner bracket, black anodized, 20-series.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1115,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/inside-hidden-bracket-for-v-slot-2020-2040-2080/",
+          "notes": "Inside hidden bracket for V-Slot 2020/2040/2080. Black anodized.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1116,
+          "supplier_name": "ZYLtech Engineering",
+          "product_url": "https://www.zyltech.com/search/?q=inside+hidden+bracket",
+          "notes": "Houston TX domestic source. Verify 20-series fit before ordering.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1117,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=inside+hidden+corner+bracket+2020+aluminum+extrusion",
+          "notes": "Generic 20-series inside hidden brackets widely available.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "category": "Frame Hardware & Brackets",
+      "name": "Tee Joining Plate (5-Hole, 20-Series)",
+      "description": "5-hole T-plate for the center X-spreader junctions where the spreader meets the top front and rear X-rails at a tee intersection. Distributes load across the T joint and prevents rotational slop at the spreader ends. Black anodized aluminum, drops into 20-series V-slot channels on both legs. Used in Nick's Bulkman3D ",
+      "qty": 4,
+      "unit": "plates",
+      "mfg_type": "buy",
+      "sort_order": 32,
+      "mpn": "PLATE-90-5",
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1118,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/5-hole-joining-plate/",
+          "notes": "5-hole 90-degree joining plate, PLATE-90-5. ",
+          "sku": "PLATE-90-5",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1119,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/product/5-hole-90-degree-joining-plate/",
+          "notes": "5-Hole 90-Degree Joining Plate, 2020 series, black anodized. ",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1120,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=5+hole+joining+plate+2020+aluminum+extrusion",
+          "notes": "Generic 5-hole T-plates for 20-series extrusion widely available.",
           "sku": null,
           "step_url": null,
           "approved": true
