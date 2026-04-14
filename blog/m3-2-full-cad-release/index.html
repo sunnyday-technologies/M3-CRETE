@@ -10,7 +10,7 @@
   <meta property="og:description" content="A two-meter concrete 3D printer, fully defined in Python, released under CERN-OHL-W-2.0. Single-SKU C-beam frame, parametric CadQuery source, open hardware." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://m3-crete.com/blog/m3-2-full-cad-release/" />
-  <meta property="og:image" content="https://m3-crete.com/docs/M3-CRETE_render.jpg" />
+  <meta property="og:image" content="https://m3-crete.com/images/M3-CRETE_render.jpg" />
   <meta property="article:published_time" content="2026-04-13" />
   <meta property="article:author" content="Nick Sonnentag" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -160,6 +160,24 @@
     }
 
     .article-meta span { color: var(--light); }
+
+    /* HERO IMAGE */
+    .article-hero {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+    }
+
+    .article-hero img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
 
     /* ARTICLE BODY */
     .article-body {
@@ -314,6 +332,7 @@
       header { padding: 1.25rem 1.5rem; }
       .logo-sub { display: none; }
       .article-header { padding: 3rem 1.5rem 1.5rem; }
+      .article-hero { padding: 0 1.5rem; }
       .article-body { padding: 1.5rem 1.5rem 3rem; font-size: 0.98rem; }
       .article-body h2 { font-size: 1.25rem; }
 
@@ -351,6 +370,11 @@
       <div>by <span>Nick Sonnentag</span></div>
       <div>CERN-OHL-W-2.0</div>
     </div>
+  </section>
+
+  <!-- HERO IMAGE -->
+  <section class="article-hero">
+    <img src="/images/M3-CRETE_render.jpg" alt="M3-CRETE M3-2 concrete 3D printer — full CAD assembly render" loading="eager" />
   </section>
 
   <!-- ARTICLE BODY -->
