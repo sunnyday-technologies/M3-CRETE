@@ -5,72 +5,72 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 90).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 121).
 
 See `bom_structural.csv`.
 
 ## Hardware BOM derivation rules
 
-Hardware is **not modeled in CAD** â€” it's derived by rule from the
+Hardware is **not modeled in CAD** — it's derived by rule from the
 structural inventory plus a programmatic C-beam joint detector.
 
 ### C-beam joints: 27 detected
 
 Detected by 5 mm bbox adjacency between any two C-beams. Each joint
-uses 1Ã— T-plate or L-plate corner connector + 5Ã— M5Ã—10 button-head
-SHCS + 5Ã— M5 drop-in T-nut.
+uses 1× T-plate or L-plate corner connector + 5× M5×10 button-head
+SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
-- cbeam_146 <-> cbeam_147
-- cbeam_146 <-> cbeam_155
-- cbeam_146 <-> cbeam_160
-- cbeam_146 <-> cbeam_162
-- cbeam_147 <-> cbeam_149
-- cbeam_147 <-> cbeam_150
-- cbeam_147 <-> cbeam_162
-- cbeam_148 <-> cbeam_159
-- cbeam_149 <-> cbeam_150
-- cbeam_149 <-> cbeam_156
-- cbeam_149 <-> cbeam_160
-- cbeam_150 <-> cbeam_152
-- cbeam_150 <-> cbeam_154
-- cbeam_151 <-> cbeam_153
-- cbeam_151 <-> cbeam_155
-- cbeam_151 <-> cbeam_157
-- cbeam_151 <-> cbeam_158
-- cbeam_152 <-> cbeam_162
-- cbeam_153 <-> cbeam_161
-- cbeam_154 <-> cbeam_162
-- cbeam_155 <-> cbeam_157
-- cbeam_155 <-> cbeam_160
-- cbeam_156 <-> cbeam_157
-- cbeam_156 <-> cbeam_160
-- cbeam_156 <-> cbeam_161
-- cbeam_157 <-> cbeam_161
-- cbeam_158 <-> cbeam_161
+- cbeam_177 <-> cbeam_178
+- cbeam_177 <-> cbeam_186
+- cbeam_177 <-> cbeam_191
+- cbeam_177 <-> cbeam_193
+- cbeam_178 <-> cbeam_180
+- cbeam_178 <-> cbeam_181
+- cbeam_178 <-> cbeam_193
+- cbeam_179 <-> cbeam_190
+- cbeam_180 <-> cbeam_181
+- cbeam_180 <-> cbeam_187
+- cbeam_180 <-> cbeam_191
+- cbeam_181 <-> cbeam_183
+- cbeam_181 <-> cbeam_185
+- cbeam_182 <-> cbeam_184
+- cbeam_182 <-> cbeam_186
+- cbeam_182 <-> cbeam_188
+- cbeam_182 <-> cbeam_189
+- cbeam_183 <-> cbeam_193
+- cbeam_184 <-> cbeam_192
+- cbeam_185 <-> cbeam_193
+- cbeam_186 <-> cbeam_188
+- cbeam_186 <-> cbeam_191
+- cbeam_187 <-> cbeam_188
+- cbeam_187 <-> cbeam_191
+- cbeam_187 <-> cbeam_192
+- cbeam_188 <-> cbeam_192
+- cbeam_189 <-> cbeam_192
 
 ### V-wheels
 
-24 wheels. Each: 1Ã— M5Ã—40 SHCS, 1Ã— M5 nyloc, 2Ã— M5 washer.
+24 wheels. Each: 1× M5×40 SHCS, 1× M5 nyloc, 2× M5 washer.
 Half (12) get eccentric spacers (one side per wheel pair),
 the other half (12) get standard precision spacers.
 
 ### Motors / brackets
 
-6 motors Ã— 4 NEMA23 face screws (M5Ã—10) = 24 screws.
-4 brackets Ã— 4 rail-face screws (M5Ã—10) + T-nuts = 16 pairs.
+6 motors × 4 NEMA23 face screws (M5×10) = 24 screws.
+6 brackets × 4 rail-face screws (M5×10) + T-nuts = 24 pairs.
 Note: Y-motor brackets and the rack-and-pinion X-motor mounting are
-not yet modeled â€” add them when the X-axis lands.
+not yet modeled — add them when the X-axis lands.
 
 ### M5 fastener totals (sum across all line items)
 
 | Item | Qty |
 |---|---|
-| M5 T-nut | 161 |
+| M5 T-nut | 179 |
 | M5 flat washer | 58 |
 | M5 nyloc nut | 29 |
-| M5 x 10 mm | 175 |
+| M5 x 10 mm | 193 |
 | M5 x 16 mm | 10 |
 | M5 x 30 mm | 5 |
 | M5 x 40 mm | 24 |
