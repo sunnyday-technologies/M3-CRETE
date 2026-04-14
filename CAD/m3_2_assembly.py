@@ -278,9 +278,11 @@ _stock_path = os.path.join(os.path.dirname(__file__),
 if os.path.exists(_stock_path):
     _stock = cq.importers.importStep(_stock_path)
     _end_face = _stock.faces("<Z").val()
-    _outer_wire = _discretize_wire(_end_face.outerWire().wrapped, deflection=1.0)
-    # Extrude the WIRE (not a filled face) to get an open shell of side faces
-    # only — no end caps. Real V-slot extrusions are hollow at the ends.
+    # EXPERIMENT: feed the native wire (with CIRCLE arcs preserved) straight
+    # into MakePrism instead of discretizing to straight segments. Should
+    # produce proper cylindrical side faces for the V-grooves and drop the
+    # STEP file size dramatically (was 68 MB w/ discretization).
+    _outer_wire = _end_face.outerWire().wrapped
     _prism = BRepPrimAPI_MakePrism(_outer_wire, gp_Vec(0, 0, L))
     _stock_beam = cq.Workplane().add(cq.Shape(_prism.Shape()))
     # Stock: 40(X) × 80(Y) × 1200(Z), channel on -X.
