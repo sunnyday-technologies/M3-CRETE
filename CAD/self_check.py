@@ -131,7 +131,39 @@ for m in motors:
         problems.append(f"motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) "
                         f"nearest bracket is {d:.0f} mm away (> 50 mm)")
 
-# ---------- CHECK 4: cbeam joint count matches connector count ----------
+# ---------- CHECK 4: plate vs cbeam interference (catches clipping) ----------
+from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
+from OCP.GProp import GProp_GProps
+from OCP.BRepGProp import BRepGProp
+
+def bb_overlap(a, b, tol=-0.01):
+    b1, b2 = a.BoundingBox(), b.BoundingBox()
+    return (b1.xmin < b2.xmax + tol and b2.xmin < b1.xmax + tol and
+            b1.ymin < b2.ymax + tol and b2.ymin < b1.ymax + tol and
+            b1.zmin < b2.zmax + tol and b2.zmin < b1.zmax + tol)
+
+plate_idx = [i for i, s in enumerate(parts) if label_of(s) == 'plate']
+cbeam_idx = [i for i, s in enumerate(parts) if label_of(s) == 'cbeam']
+for i in plate_idx:
+    for j in cbeam_idx:
+        if not bb_overlap(parts[i], parts[j]):
+            continue
+        try:
+            common = BRepAlgoAPI_Common(parts[i].wrapped, parts[j].wrapped)
+            common.Build()
+            if common.IsDone():
+                gp = GProp_GProps()
+                BRepGProp.VolumeProperties_s(common.Shape(), gp)
+                v = gp.Mass()
+                if v > 0.5:
+                    pc = center(parts[i])
+                    problems.append(
+                        f"plate at ({pc[0]:.0f},{pc[1]:.0f},{pc[2]:.0f}) "
+                        f"clips cbeam by {v:.0f} mm^3")
+        except Exception:
+            pass
+
+# ---------- CHECK 5: cbeam joint count matches connector count ----------
 cbeams = [s for s in parts if label_of(s) == 'cbeam']
 cb_bbs = []
 for s in cbeams:
