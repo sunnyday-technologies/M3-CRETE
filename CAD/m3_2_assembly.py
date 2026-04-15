@@ -545,12 +545,16 @@ for i in range(len(cbeam_bbs)):
         if normal is None: continue
         cx, cy, cz = _joint_center(cbeam_bbs[i], cbeam_bbs[j])
         # Push outward from frame center along the normal axis
+        # Workplane("XY/XZ/YZ").box(length, width, height) puts HEIGHT along
+        # the workplane's normal axis. For a 80x80x5 plate the 5mm is always
+        # the height (normal), so we pass box(CONN_W, CONN_W, CONN_T) for
+        # all three orientations.
         if normal == 'X':
             cx += CONN_OFFSET if cx >= FRAME_CTR[0] else -CONN_OFFSET
-            plate = cq.Workplane("YZ").box(CONN_T, CONN_W, CONN_W)
+            plate = cq.Workplane("YZ").box(CONN_W, CONN_W, CONN_T)
         elif normal == 'Y':
             cy += CONN_OFFSET if cy >= FRAME_CTR[1] else -CONN_OFFSET
-            plate = cq.Workplane("XZ").box(CONN_W, CONN_T, CONN_W)
+            plate = cq.Workplane("XZ").box(CONN_W, CONN_W, CONN_T)
         else:  # 'Z'
             cz += CONN_OFFSET if cz >= FRAME_CTR[2] else -CONN_OFFSET
             plate = cq.Workplane("XY").box(CONN_W, CONN_W, CONN_T)
