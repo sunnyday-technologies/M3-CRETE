@@ -407,14 +407,31 @@ for s in solids:
             if dims == (56.4, 56.4, 76.6):
                 fix_dz = 6.75
 
-    # 2. Corner Z-gantry plate (mid-height, near Z-post inner Y face)
+    # 2. Gantry plates (mid-height, signature 3x88x127)
+    #    — Corner Z-gantry plates snap to an ABSOLUTE Y target so all 4
+    #      corners match Nick's RR position uniformly (front cy=18.52,
+    #      rear cy=1021.48). This removes the 0.65 mm clip FR had from
+    #      the relative +3 fixup because the source cy values aren't
+    #      perfectly symmetric.
+    #    — Mid X-carriage plates (at cy~520) snap to X targets so their
+    #      inner face clears the mid Y rail by 1 mm. The source has them
+    #      clipping 0.3-2.1 mm into the rail, never modeled flush.
     elif dims == (3.0, 88.0, 127.0) and 200 < cz < 600:
+        # 1 mm gap to mid Y rail end. Plate is 3 mm thick (3/2=1.5 half);
+        # rail starts at Y=20 (front) or ends at Y=1020 (rear). Gap 1 mm
+        # -> plate inner face at Y=19 (front) or Y=1021 (rear).
         if cy < 100:                                  # front corner plate
-            fix_dy = +3.0
+            fix_dy = 17.5 - cy                        # plate Y[16, 19], 1 mm gap
         elif cy > 940:                                # rear corner plate
-            is_RR_plate = (cx > 1040)
-            if not is_RR_plate:                       # RR already in source
-                fix_dy = -3.0
+            fix_dy = 1022.5 - cy                      # plate Y[1021, 1024], 1 mm gap
+        elif 400 < cy < 600:                          # mid X-carriage plate
+            # Mid Y rail inner X faces: left rail ends at X=32.9, right
+            # rail starts at X=2048.9. Plate is 3 mm thick in X, want
+            # 1 mm clearance -> plate cx = rail_face ± (1 + 1.5).
+            if cx < 1040:
+                fix_dx = 35.4 - cx
+            else:
+                fix_dx = 2046.4 - cx
 
     fcx, fcy, fcz = cx + fix_dx, cy + fix_dy, cz + fix_dz
 
