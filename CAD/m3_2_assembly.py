@@ -550,10 +550,22 @@ def _bbs_touch(a, b, tol=5.0):
             a[2] - tol <= b[3] and b[2] - tol <= a[3] and
             a[4] - tol <= b[5] and b[4] - tol <= a[5])
 
-# --- Corner connector plates (5-hole T/L plate, simplified as flat 80x80x5) ---
-CONN_W      = 80.0
-CONN_T      = 5.0
-CONN_OFFSET = 22.5     # half C-beam width (20) + half plate thk (2.5)
+# --- Corner connector plates: real 5-hole joining plates from STEP library ---
+# Uses CAD/Advanced/Plates/Joining Plate 90 Degree.step (60x4x60mm L-plate)
+# for 90-degree frame corners. Native orientation: flat in XZ plane, 4mm
+# thick along Y. Re-centered to origin once, then cloned + rotated per joint.
+CONN_OFFSET = 22.0     # half C-beam width (20) + half plate thk (2)
+
+HERE = os.path.dirname(__file__)
+_PLATE_90_RAW = cq.importers.importStep(
+    os.path.join(HERE, "Advanced", "Plates", "Joining Plate 90 Degree.step"))
+_bb90 = _PLATE_90_RAW.val().BoundingBox()
+_PLATE_90 = _PLATE_90_RAW.translate((
+    -(_bb90.xmin + _bb90.xmax) / 2.0,
+    -(_bb90.ymin + _bb90.ymax) / 2.0,
+    -(_bb90.zmin + _bb90.zmax) / 2.0,
+))
+
 n_connectors = 0
 for i in range(len(cbeam_bbs)):
     for j in range(i + 1, len(cbeam_bbs)):
@@ -561,20 +573,16 @@ for i in range(len(cbeam_bbs)):
         normal = _joint_normal(cbeam_bbs[i], cbeam_bbs[j])
         if normal is None: continue
         cx, cy, cz = _joint_center(cbeam_bbs[i], cbeam_bbs[j])
-        # Push outward from frame center along the normal axis
-        # Workplane("XY/XZ/YZ").box(length, width, height) puts HEIGHT along
-        # the workplane's normal axis. For a 80x80x5 plate the 5mm is always
-        # the height (normal), so we pass box(CONN_W, CONN_W, CONN_T) for
-        # all three orientations.
+        plate = _PLATE_90.translate((0, 0, 0))
         if normal == 'X':
             cx += CONN_OFFSET if cx >= FRAME_CTR[0] else -CONN_OFFSET
-            plate = cq.Workplane("YZ").box(CONN_W, CONN_W, CONN_T)
+            plate = plate.rotate((0, 0, 0), (0, 0, 1), 90)
         elif normal == 'Y':
+            # native: Y is already the thickness axis — no rotation needed
             cy += CONN_OFFSET if cy >= FRAME_CTR[1] else -CONN_OFFSET
-            plate = cq.Workplane("XZ").box(CONN_W, CONN_W, CONN_T)
         else:  # 'Z'
             cz += CONN_OFFSET if cz >= FRAME_CTR[2] else -CONN_OFFSET
-            plate = cq.Workplane("XY").box(CONN_W, CONN_W, CONN_T)
+            plate = plate.rotate((0, 0, 0), (1, 0, 0), -90)
         assy.add(plate, name=f"connector_{n_connectors}", color=CONN_COLOR,
                  loc=Location((cx, cy, cz)))
         n_connectors += 1
