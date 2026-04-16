@@ -97,7 +97,7 @@ def bb(name):
 W, D, H = mod.W, mod.D, mod.H
 check("Frame W = 2480mm", W == 2480, f"W={W}")
 check("Frame D = 1240mm", D == 1240, f"D={D}")
-check("Frame H = 1200mm", H == 1200, f"H={H}")
+check("Frame H = 1000mm", H == 1000, f"H={H}")
 
 # 4 posts + top ring (4 X-rails + 2 Y-rails) + 2 bottom skids = 12 frame parts
 frame_parts = [n for n in bboxes if n.startswith(("post_","topX_","topY_","botY_"))]
@@ -125,20 +125,20 @@ for nm in ("FL","FR","RL","RR"):
         check(f"{p} X span = 88", abs((x1-x0)-88) < TOL, f"{x1-x0}")
         check(f"{p} Z span = 127",abs((z1-z0)-127) < TOL, f"{z1-z0}")
 
-# Y-rails: 1200mm C-beams (40x80), loaded from _userYY.step, snapped to Z=400.
+# Y-rails: 1000mm C-beams (40x80), loaded from _userYY.step, snapped to Z=400.
 # Span Y[20, 1220] (butt-joined to post inner faces at front/rear).
 for side in ("L","R"):
     r = f"zpY_{side}"
     if has(r):
         x0,x1,y0,y1,z0,z1 = bb(r)
-        check(f"{r} length 1200",      abs((y1-y0)-1200) < TOL, f"{y1-y0}")
+        check(f"{r} length 1000",      abs((y1-y0)-1000) < TOL, f"{y1-y0}")
         check(f"{r} front at Y=20",    abs(y0-20) < TOL, f"y0={y0}")
         check(f"{r} rear at Y=1220",   abs(y1-1220) < TOL, f"y1={y1}")
         check(f"{r} width 40 in X (C-beam)", abs((x1-x0)-40) < TOL, f"{x1-x0}")
         check(f"{r} height 80 in Z",         abs((z1-z0)-80) < TOL, f"{z1-z0}")
         check(f"{r} Z bottom at 400",        abs(z0-400) < TOL, f"z0={z0}")
 
-# X-beam: 2 segments, each 1200mm, total span 2400mm with butt-joints at 40/2440
+# X-beam: 2 segments, each 1000mm, total span 2000mm with butt-joints at 40/2440
 g1 = bb("gantry_1") if has("gantry_1") else None
 g2 = bb("gantry_2") if has("gantry_2") else None
 if g1 and g2:
@@ -197,14 +197,14 @@ for name in zwheels:
     check(f"{name} X center", abs(cx - expected_cx) < 0.1, f"cx={cx} vs {expected_cx}")
     check(f"{name} Y center", abs(cy - expected_cy) < 0.1, f"cy={cy} vs {expected_cy}")
     check(f"{name} Z center", abs(cz - expected_cz) < 0.1, f"cz={cz} vs {expected_cz}")
-    # Wheel must engage (overlap by ~2mm) the post narrow face V-slot
+    # Wheel must engage (overlap by ~2mm) the post narrow face C-beam
     if xside == "lt":
         # Wheel touches post X=cx-20 face (post left narrow face)
         post_face = POST_CX[post_nm] - 20
-        check(f"{name} engages post left V-slot",  x1 > post_face + 1.5 and x1 < post_face + 2.5, f"x1={x1}")
+        check(f"{name} engages post left C-beam",  x1 > post_face + 1.5 and x1 < post_face + 2.5, f"x1={x1}")
     else:
         post_face = POST_CX[post_nm] + 20
-        check(f"{name} engages post right V-slot", x0 < post_face - 1.5 and x0 > post_face - 2.5, f"x0={x0}")
+        check(f"{name} engages post right C-beam", x0 < post_face - 1.5 and x0 > post_face - 2.5, f"x0={x0}")
 
 # ----------------------------------------------------------
 # Phase C.1 — Z-motors, angled L-brackets, pulleys
@@ -241,7 +241,7 @@ for post_nm in ("FL", "FR", "RL", "RR"):
         x0,x1,y0,y1,z0,z1 = bb(b)
         dims = sorted([x1-x0, y1-y0, z1-z0])
         check(f"{b} sorted dims 65/69/69", all(abs(d-t) < 0.2 for d,t in zip(dims,[65,69,69])), f"{dims}")
-        # Bracket top can protrude ~2.5mm above H=1200 with motors outboard;
+        # Bracket top can protrude ~2.5mm above H=1000 with motors outboard;
         # that is accepted (a cover/safety box will handle it later).
         check(f"{b} Z inside frame top",   z1 <= H + 3 + TOL, f"z1={z1}")
         check(f"{b} Z above top X-rail bot", z0 >= 1120 - 0.5, f"z0={z0}")

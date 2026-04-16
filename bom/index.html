@@ -2108,14 +2108,12 @@ function showToast(msg, type = '') {
             </tr>
         </thead>
         <tbody>
-            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>2080 V-Slot Aluminum Extrusion (1200mm)</td><td>11 lengths</td><td>Buy</td><td>Main frame horizontals and gantry beam. V-groove rails on all 4 faces for wheel carriages.</td></tr>
-            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>Frame Stiffener — Long Span Reinforcement</td><td>4 bars (1.2m each)</td><td>Buy</td><td>Required for X-axis spans exceeding 1.5m (M3-2 and M3-4).</td></tr>
-            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>2040 V-Slot Aluminum Extrusion (1200mm)</td><td>4 lengths</td><td>Buy</td><td>Vertical posts (Z-height). 1200mm gives ~1000mm usable Z travel.</td></tr>
-            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>2040 V-Slot Aluminum Extrusion (1000mm)</td><td>12 lengths</td><td>Buy</td><td>Cross braces, cable chain mounts, electronics panel rails, and accessory mounting.</td></tr>
-            <tr><td>Frame Hardware &amp; Brackets</td><td>Heavy Duty Corner Brackets (20-Series)</td><td>40 pieces</td><td>3D Print</td><td>Frame corner connections for V-Slot 20-series. Printable saves $200+.</td></tr>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>4080 C-Beam Aluminum Extrusion (1000mm)</td><td>12 lengths</td><td>Buy</td><td>Primary frame structure: Z-posts, Y-gantry rails, X-rails. C opening faces inward. All 1000mm standard lengths.</td></tr>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>Frame Stiffener — Long Span Reinforcement</td><td>4 bars (1m each)</td><td>Buy</td><td>Aluminum rectangular tube for X-axis spans exceeding 1.5m (M3-2 and M3-4). Not steel — galvanic corrosion risk.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>5-Hole 90-Degree Joining Plate</td><td>27 pieces</td><td>Buy</td><td>T-plate or L-plate corner connectors at every 4080-to-4080 junction. 5 screws per corner.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>Straight Line Internal Connectors (20-Series)</td><td>16 pieces</td><td>Buy</td><td>Splice connectors for modular X-axis extension.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>T-Slot Drop-In Nuts M5 (20-Series)</td><td>3 packs of 100</td><td>Buy</td><td>300 total. Spring-loaded drop-in style recommended.</td></tr>
-            <tr><td>Frame Hardware &amp; Brackets</td><td>Eccentric Spacers (V-Slot)</td><td>28 pieces</td><td>Buy</td><td>Required for V-wheel preload adjustment on all motion axes.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>Eccentric Spacers</td><td>28 pieces</td><td>Buy</td><td>Required for V-wheel preload adjustment on all motion axes.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>Adjustable Leveling Feet M16</td><td>4 pieces</td><td>Buy</td><td>Critical for leveling on uneven job-site floors. 1000lb-rated per foot.</td></tr>
             <tr><td>X-Axis Motion System</td><td>NEMA23 Stepper Motor (X-axis, 8mm shaft)</td><td>1 motor</td><td>Buy</td><td>8mm shaft variant. TMC5160 StallGuard for sensorless homing. 3Nm minimum.</td></tr>
             <tr><td>X-Axis Motion System</td><td>GT2 Timing Belt 10mm (Reinforced)</td><td>8 meters</td><td>Buy</td><td>X-axis drive belt. Gates PowerGrip GT3 preferred.</td></tr>
@@ -2131,9 +2129,9 @@ function showToast(msg, type = '') {
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>NEMA23 Stepper Motor (Z-axis, 8mm shaft)</td><td>4 motors</td><td>Buy</td><td>Four independent motors for auto-tramming via Klipper Z_TILT_ADJUST.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>GT2 Timing Belt 10mm (Z-axis)</td><td>12 meters</td><td>Buy</td><td>Belt-driven Z. ~3m per Z corner, 12m total.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>GT2 Pulley 20-Tooth (8mm Bore, Z-axis)</td><td>8 pulleys</td><td>Buy</td><td>Drive + idler pulleys for belt Z. Full parts commonality with X/Y.</td></tr>
-            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>V-Groove Wheels (Z-axis Carriages)</td><td>12 wheels</td><td>Buy</td><td>3 wheels per corner carriage on 2040 vertical posts.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>V-Groove Wheels (Z-axis Carriages)</td><td>12 wheels</td><td>Buy</td><td>3 wheels per corner carriage on 4080 C-beam posts.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Carriage Plates</td><td>4 plates</td><td>3D Print</td><td>Connects gantry frame to V-wheel carriages on vertical posts.</td></tr>
-            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Motor Mounts</td><td>4 mounts</td><td>3D Print</td><td>Print saves $90. Interfaces NEMA23 to 2040 V-Slot vertical post.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Motor Mounts</td><td>4 mounts</td><td>3D Print</td><td>Print saves $90. Interfaces NEMA23 to 4080 C-beam post.</td></tr>
             <tr><td>Electronics &amp; Control System</td><td>BTT Kraken Mainboard</td><td>1 board</td><td>Buy</td><td>8x TMC5160 stepper drivers. X + 2Y + 4Z + Extruder.</td></tr>
             <tr><td>Electronics &amp; Control System</td><td>Raspberry Pi 5 (8GB RAM)</td><td>1 computer</td><td>Buy</td><td>Runs Klipper firmware. 8GB for large print files.</td></tr>
             <tr><td>Electronics &amp; Control System</td><td>7-inch Touchscreen Display</td><td>1 display</td><td>Buy</td><td>User interface via KlipperScreen.</td></tr>
@@ -2165,7 +2163,7 @@ function showToast(msg, type = '') {
             <tr><td>Concrete Extrusion System</td><td>Concrete Nozzle Assembly</td><td>1 assembly</td><td>CNC/Fab</td><td>Replaceable-tip design for different layer widths (20-40mm).</td></tr>
             <tr><td>Concrete Extrusion System</td><td>Tubing &amp; Quick Fittings</td><td>1 kit</td><td>Buy</td><td>Pump to nozzle material flow. Reinforced hose rated for concrete slurry.</td></tr>
             <tr><td>Concrete Extrusion System</td><td>Extruder Mounting Bracket</td><td>1 bracket</td><td>3D Print</td><td>Mounts extruder pipe to X-axis carriage plate.</td></tr>
-            <tr><td>Fasteners &amp; Hardware</td><td>M5 Socket Head Cap Screws</td><td>1 500pc kit</td><td>Buy</td><td>Primary structural fasteners for 20-series V-Slot frame.</td></tr>
+            <tr><td>Fasteners &amp; Hardware</td><td>M5 Socket Head Cap Screws</td><td>1 500pc kit</td><td>Buy</td><td>Primary structural fasteners for 4080 C-beam frame.</td></tr>
             <tr><td>Fasteners &amp; Hardware</td><td>M3 Socket Head Cap Screws</td><td>1 500pc kit</td><td>Buy</td><td>Electronics mounting and small parts.</td></tr>
             <tr><td>Fasteners &amp; Hardware</td><td>Washers &amp; Lock Washers Assorted</td><td>1 kit</td><td>Buy</td><td>Prevent loosening from vibration. Nord-Lock recommended.</td></tr>
             <tr><td>Fasteners &amp; Hardware</td><td>Heat-Set Inserts M3/M5</td><td>1 200pc kit</td><td>Buy</td><td>Essential for threaded connections in 3D printed parts.</td></tr>
@@ -2173,7 +2171,7 @@ function showToast(msg, type = '') {
             <tr><td>Optional Upgrades</td><td>LED Work Lighting</td><td>1 kit</td><td>Buy</td><td>Work area illumination — 24V LED strips.</td></tr>
             <tr><td>Optional Upgrades</td><td>Camera Module for Monitoring</td><td>1 camera</td><td>Buy</td><td>Remote print monitoring via KlipperScreen or Mainsail.</td></tr>
             <tr><td>Optional Upgrades</td><td>HEPA Air Filtration</td><td>1 system</td><td>Buy</td><td>Concrete dust particle capture for indoor operation.</td></tr>
-            <tr><td>Optional Upgrades</td><td>Carbon Fiber Stiffener Bar (2080 Rail)</td><td>4 bars (2m each)</td><td>Buy</td><td>20-30% additional stiffness on long spans. Structural epoxy bond.</td></tr>
+            <tr><td>Optional Upgrades</td><td>Carbon Fiber Stiffener Bar (4080 C-Beam)</td><td>4 bars (2m each)</td><td>Buy</td><td>20-30% additional stiffness on long spans. Structural epoxy bond to 4080 C-beam.</td></tr>
         </tbody>
     </table>
 </div>
