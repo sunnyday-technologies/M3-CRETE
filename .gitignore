@@ -102,6 +102,16 @@ m3_render_prompt.md
 
 # Session logs — private decision reference, never publish
 docs/session_logs/
+docs/session-*.md
+
+# Draft content — publish separately when ready
+docs/blog/
+docs/hackaday/
+docs/m3crete-hackaday-prompt.md
+docs/step-files-needed.md
+
+# CAD session screenshots
+images/Claude_CAD/
 
 # Publications — local-only drafts, whitepapers, blog posts, session archives
 # Pulls data from private M3 discussions; never publish via this repo
