@@ -550,44 +550,55 @@ def _bbs_touch(a, b, tol=5.0):
             a[2] - tol <= b[3] and b[2] - tol <= a[3] and
             a[4] - tol <= b[5] and b[4] - tol <= a[5])
 
-# --- Corner connector plates: real 5-hole joining plates from STEP library ---
-# Uses CAD/Advanced/Plates/Joining Plate 90 Degree.step (60x4x60mm L-plate)
-# for 90-degree frame corners. Native orientation: flat in XZ plane, 4mm
-# thick along Y. Re-centered to origin once, then cloned + rotated per joint.
-CONN_OFFSET = 22.0     # half C-beam width (20) + half plate thk (2)
-
+# --- 3D-printed Z-motor enclosures (replace metal L-corner plates) ---
+# Each enclosure caps a Z-post top and grabs adjacent Y+X rails for
+# 3-axis registration. Includes NEMA23 motor mount and belt routing.
+# Metal L-plates removed — frame joints rely on printed enclosures at
+# the 4 corners plus T-nut bolting at mid-span junctions.
 HERE = os.path.dirname(__file__)
-_PLATE_90_RAW = cq.importers.importStep(
-    os.path.join(HERE, "Advanced", "Plates", "Joining Plate 90 Degree.step"))
-_bb90 = _PLATE_90_RAW.val().BoundingBox()
-_PLATE_90 = _PLATE_90_RAW.translate((
-    -(_bb90.xmin + _bb90.xmax) / 2.0,
-    -(_bb90.ymin + _bb90.ymax) / 2.0,
-    -(_bb90.zmin + _bb90.zmax) / 2.0,
+ENCL_COLOR = Color(0.2, 0.2, 0.2)  # dark grey (printed part)
+
+_ENCL_FL_RAW = cq.importers.importStep(
+    os.path.join(HERE, "Custom", "Z_Motor_Enclosure_FL.step"))
+_ebb = _ENCL_FL_RAW.val().BoundingBox()
+_ENCL_FL = _ENCL_FL_RAW.translate((
+    -(_ebb.xmin + _ebb.xmax) / 2.0,
+    -(_ebb.ymin + _ebb.ymax) / 2.0,
+    -(_ebb.zmin + _ebb.zmax) / 2.0,
 ))
 
-n_connectors = 0
-for i in range(len(cbeam_bbs)):
-    for j in range(i + 1, len(cbeam_bbs)):
-        if not _bbs_touch(cbeam_bbs[i], cbeam_bbs[j]): continue
-        normal = _joint_normal(cbeam_bbs[i], cbeam_bbs[j])
-        if normal is None: continue
-        cx, cy, cz = _joint_center(cbeam_bbs[i], cbeam_bbs[j])
-        plate = _PLATE_90.translate((0, 0, 0))
-        if normal == 'X':
-            cx += CONN_OFFSET if cx >= FRAME_CTR[0] else -CONN_OFFSET
-            plate = plate.rotate((0, 0, 0), (0, 0, 1), 90)
-        elif normal == 'Y':
-            # native: Y is already the thickness axis — no rotation needed
-            cy += CONN_OFFSET if cy >= FRAME_CTR[1] else -CONN_OFFSET
-        else:  # 'Z'
-            cz += CONN_OFFSET if cz >= FRAME_CTR[2] else -CONN_OFFSET
-            plate = plate.rotate((0, 0, 0), (1, 0, 0), -90)
-        assy.add(plate, name=f"connector_{n_connectors}", color=CONN_COLOR,
-                 loc=Location((cx, cy, cz)))
-        n_connectors += 1
-        n[0] += 1
-print(f"  {n_connectors} corner connector plates")
+_ENCL_FR_RAW = cq.importers.importStep(
+    os.path.join(HERE, "Custom", "Z_Motor_Enclosure_FR.step"))
+_ebb2 = _ENCL_FR_RAW.val().BoundingBox()
+_ENCL_FR = _ENCL_FR_RAW.translate((
+    -(_ebb2.xmin + _ebb2.xmax) / 2.0,
+    -(_ebb2.ymin + _ebb2.ymax) / 2.0,
+    -(_ebb2.zmin + _ebb2.zmax) / 2.0,
+))
+
+# Place enclosures at the 4 Z-post tops.
+# Z-post centers (X,Y) from frame constants; Z = NZ_TOP (post top face)
+CB_D = 40.0  # narrow face of 4080
+z_corners = [
+    ("FL", 0.0,       Y_POST_F + CB_D/2, _ENCL_FL),   # front-left
+    ("FR", NX_RIGHT,  Y_POST_F + CB_D/2, _ENCL_FR),   # front-right
+    ("RL", 0.0,       Y_POST_R - CB_D/2, _ENCL_FL),   # rear-left
+    ("RR", NX_RIGHT,  Y_POST_R - CB_D/2, _ENCL_FR),   # rear-right
+]
+
+n_enclosures = 0
+for label, px, py, encl_template in z_corners:
+    encl = encl_template.translate((0, 0, 0))
+    # Rear corners need 180-degree rotation about Z to flip the Y-wing direction
+    if "R" in label[0:2] and label[1] == "L":
+        encl = encl.rotate((0, 0, 0), (0, 0, 1), 180)
+    elif "R" in label[0:2] and label[1] == "R":
+        encl = encl.rotate((0, 0, 0), (0, 0, 1), 180)
+    assy.add(encl, name=f"z_enclosure_{label}", color=ENCL_COLOR,
+             loc=Location((px, py, NZ_TOP)))
+    n_enclosures += 1
+    n[0] += 1
+print(f"  {n_enclosures} Z-motor enclosures (3D printed)")
 
 # --- Y-motor brackets (re-use generic NEMA23 L-bracket template) ---
 # Y-motors have their long axis in X (motor cross-section is 56.4 x 56.4
