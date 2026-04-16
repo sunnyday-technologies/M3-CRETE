@@ -550,79 +550,71 @@ def _bbs_touch(a, b, tol=5.0):
             a[2] - tol <= b[3] and b[2] - tol <= a[3] and
             a[4] - tol <= b[5] and b[4] - tol <= a[5])
 
-# --- 3D-printed Z-motor enclosures (replace metal L-corner plates) ---
-# Each enclosure caps a Z-post top and grabs adjacent Y+X rails for
-# 3-axis registration. Includes NEMA23 motor mount and belt routing.
-# Metal L-plates removed — frame joints rely on printed enclosures at
-# the 4 corners plus T-nut bolting at mid-span junctions.
+# --- Z-motor mount: simple 4mm plate + 5mm post cap ---
+# 4mm plate extends from Z-post top upward to motor top height, with
+# NEMA23 bolt holes matching the L-bracket face. Plate is in XZ plane
+# (4mm thick in Y), positioned at the motor's NEMA face.
+# 5mm cap sits flat on top of each Z-post.
+import math as _math
 HERE = os.path.dirname(__file__)
-ENCL_COLOR = Color(0.2, 0.2, 0.2)  # dark grey (printed part)
+ZMOUNT_COLOR = Color(0.25, 0.25, 0.30)   # dark printed part
+CAP_COLOR    = Color(0.30, 0.30, 0.35)
 
-_ENCL_FL_RAW = cq.importers.importStep(
-    os.path.join(HERE, "Custom", "Z_Motor_Enclosure_FL.step"))
-_ebb = _ENCL_FL_RAW.val().BoundingBox()
-_ENCL_FL = _ENCL_FL_RAW.translate((
-    -(_ebb.xmin + _ebb.xmax) / 2.0,
-    -(_ebb.ymin + _ebb.ymax) / 2.0,
-    -(_ebb.zmin + _ebb.zmax) / 2.0,
-))
+# Dimensions from model probe:
+#   Post top Z=1000, motor bottom Z=1012, motor top Z=1068
+#   Motor center Z=1040, shaft in Y
+PLATE_THK   = 4.0        # mm (Y-direction thickness)
+PLATE_W     = 80.0       # mm (X-direction, matches post 80mm face)
+PLATE_H     = 68.0       # mm (Z-direction, from post top to motor top: 1068-1000)
+CAP_THK     = 5.0        # mm cap on top of post
+CAP_W       = 80.0
+CAP_D       = 40.0       # matches post 40mm depth
 
-_ENCL_FR_RAW = cq.importers.importStep(
-    os.path.join(HERE, "Custom", "Z_Motor_Enclosure_FR.step"))
-_ebb2 = _ENCL_FR_RAW.val().BoundingBox()
-_ENCL_FR = _ENCL_FR_RAW.translate((
-    -(_ebb2.xmin + _ebb2.xmax) / 2.0,
-    -(_ebb2.ymin + _ebb2.ymax) / 2.0,
-    -(_ebb2.zmin + _ebb2.zmax) / 2.0,
-))
+NEMA_PCD    = 47.14      # mm
+NEMA_BOLT   = 5.5        # mm M5 clearance
+NEMA_CENTER = 23.0       # mm shaft bore
+MOTOR_CTR_Z = 40.0       # mm above post top (1040 - 1000)
 
-# Place enclosures at the 4 Z-post tops.
-# Z-post centers (X,Y) from frame constants; Z = NZ_TOP (post top face)
-CB_D = 40.0  # narrow face of 4080
-z_corners = [
-    ("FL", 0.0,       Y_POST_F + CB_D/2, _ENCL_FL),   # front-left
-    ("FR", NX_RIGHT,  Y_POST_F + CB_D/2, _ENCL_FR),   # front-right
-    ("RL", 0.0,       Y_POST_R - CB_D/2, _ENCL_FL),   # rear-left
-    ("RR", NX_RIGHT,  Y_POST_R - CB_D/2, _ENCL_FR),   # rear-right
+# Build the motor mount plate (in XZ plane, centered at origin)
+_zplate = (cq.Workplane("XZ")
+           .box(PLATE_W, PLATE_H, PLATE_THK)
+           .faces(">Y").workplane()
+           .pushPoints([
+               (NEMA_PCD/2 * _math.cos(_math.radians(a)),
+                NEMA_PCD/2 * _math.sin(_math.radians(a)) + MOTOR_CTR_Z - PLATE_H/2)
+               for a in [45, 135, 225, 315]])
+           .hole(NEMA_BOLT)
+           .faces(">Y").workplane()
+           .transformed(offset=(0, MOTOR_CTR_Z - PLATE_H/2, 0))
+           .hole(NEMA_CENTER))
+
+# Build the post cap (flat in XY plane)
+_zcap = cq.Workplane("XY").box(CAP_W, CAP_D, CAP_THK)
+
+# Place at each Z-motor position (4 corners, known from frame geometry).
+# Front motors: NEMA face at Y=bb.ymin (~6), shaft points +Y into post
+# Rear motors: NEMA face at Y=bb.ymax (~1036), shaft points -Y into post
+_z_motor_corners = [
+    (0.0,       Y_POST_F, 6.0,    True),   # front-left,  face_y=6
+    (NX_RIGHT,  Y_POST_F, 4.0,    True),   # front-right, face_y=4
+    (0.0,       Y_POST_R, 1036.0, False),   # rear-left,   face_y=1036
+    (NX_RIGHT,  Y_POST_R, 1035.0, False),   # rear-right,  face_y=1035
 ]
 
-n_enclosures = 0
-for label, px, py, encl_template in z_corners:
-    encl = encl_template.translate((0, 0, 0))
-    # Rear corners need 180-degree rotation about Z to flip the Y-wing direction
-    if "R" in label[0:2] and label[1] == "L":
-        encl = encl.rotate((0, 0, 0), (0, 0, 1), 180)
-    elif "R" in label[0:2] and label[1] == "R":
-        encl = encl.rotate((0, 0, 0), (0, 0, 1), 180)
-    assy.add(encl, name=f"z_enclosure_{label}", color=ENCL_COLOR,
-             loc=Location((px, py, NZ_TOP)))
-    n_enclosures += 1
-    n[0] += 1
-print(f"  {n_enclosures} Z-motor enclosures (3D printed)")
+n_zmounts = 0
+for post_x, post_y, face_y, is_front in _z_motor_corners:
+    plate = _zplate.translate((0, 0, 0))
+    plate_z = NZ_TOP + PLATE_H / 2.0
+    assy.add(plate, name=f"zmount_plate_{n_zmounts}", color=ZMOUNT_COLOR,
+             loc=Location((post_x, face_y, plate_z)))
+    assy.add(_zcap, name=f"zmount_cap_{n_zmounts}", color=CAP_COLOR,
+             loc=Location((post_x, post_y, NZ_TOP + CAP_THK / 2.0)))
+    n_zmounts += 1
+    n[0] += 2
+print(f"  {n_zmounts} Z-motor mounts (4mm plate + 5mm cap each)")
 
-# --- Y-motor brackets (re-use generic NEMA23 L-bracket template) ---
-# Y-motors have their long axis in X (motor cross-section is 56.4 x 56.4
-# in Y-Z, and the 76.6mm shaft direction is X). The bracket sits flush to
-# the motor's NEMA face on the +X or -X side, depending on which side of
-# frame center the motor is.
-n_ybrackets = 0
-for wbb in ymotor_bbs:
-    cx = (wbb[0] + wbb[1]) / 2.0
-    cy = (wbb[2] + wbb[3]) / 2.0
-    cz = (wbb[4] + wbb[5]) / 2.0
-    is_left = cx < FRAME_CTR[0]
-    bracket = _make_generic_bracket("X")          # 65mm axis along X
-    bbb = bracket.val().BoundingBox()
-    bracket_dx = (bbb.xmax - bbb.xmin)
-    new_cx = cx + (-bracket_dx/2 - 1 if is_left else +bracket_dx/2 + 1)
-    bcx = (bbb.xmin + bbb.xmax) / 2.0
-    bcy = (bbb.ymin + bbb.ymax) / 2.0
-    bcz = (bbb.zmin + bbb.zmax) / 2.0
-    assy.add(bracket, name=f"bracket_Y_{n_ybrackets}", color=BRK2,
-             loc=Location((new_cx - bcx, cy - bcy, cz - bcz)))
-    n_ybrackets += 1
-    n[0] += 1
-print(f"  {n_ybrackets} Y-motor brackets")
+# Y-motor brackets removed — motors mount directly to frame via
+# printed brackets (designed separately, placed in Fusion).
 
 # --- Idler axle support brackets (small flat plate behind each idler) ---
 # Each idler gets a 30 x 5 x 30 plate behind it (anchored to the C-beam face
