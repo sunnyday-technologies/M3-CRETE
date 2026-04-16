@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Generate parametric V-Slot extrusions at exact lengths by extracting
-the cross-section profile from the OpenBuilds STEP files and extruding
+Generate parametric C-Beam extrusions at exact lengths by extracting
+the cross-section profile from the source STEP files and extruding
 to the specified length.
 
-This preserves the exact V-groove geometry, fillet radii, and slot
+This preserves the exact C-beam geometry, fillet radii, and slot
 dimensions from the original STEP while allowing any custom length.
 """
 import cadquery as cq
 import os
 
-STEP_DIR = os.path.join(os.path.dirname(__file__), "Components", "V-Slot")
+STEP_DIR = os.path.join(os.path.dirname(__file__), "Advanced", "Linear Rail")
 
 
 def make_extrusion(step_file: str, length_mm: float):
     """
-    Load a V-Slot STEP file, extract its end-face cross-section,
+    Load a C-Beam STEP file, extract its end-face cross-section,
     and extrude it to the desired length.
 
     The STEP files have their length along Z, with end faces at Z=0 and Z=1000.
@@ -97,12 +97,11 @@ def make_extrusion_scale(step_file: str, length_mm: float):
 if __name__ == "__main__":
     print("Testing parametric extrusion generation...\n")
 
-    TARGET_LEN = 1200.0
+    TARGET_LEN = 1000.0
 
     # Test the non-uniform scale approach (most reliable for STEP imports)
     for name, step_file in [
-        ("2080", "V-Slot 20x80x1000 Linear Rail.step"),
-        ("2040", "V-Slot 20x40x1000 Linear Rail.step"),
+        ("4080", "C-Beam 40x80x1000 Linear Rail.step"),
     ]:
         print(f"  {name} at {TARGET_LEN}mm...")
         try:

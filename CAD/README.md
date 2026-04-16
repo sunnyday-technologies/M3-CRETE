@@ -34,11 +34,11 @@ python CAD/deep_probe.py             # Inspects STEP geometry for assembly math
 **Requirements:** Python 3.11 + CadQuery 2.7.0 (`pip install cadquery`)
 
 **Assembly contents (40 parts):**
-- 4x V-Slot 2040 posts (1200mm, full height)
-- 8x V-Slot 2080 top X-rails (1160mm segments, spliced, 80mm vertical)
-- 5x V-Slot 2040 Y-braces (1160mm, 3 top + 2 bottom)
-- 2x V-Slot 2080 Y-rails (Z-platform, 1154mm)
-- 1x V-Slot 2080 gantry beam (2270mm, X-spanning)
+- 4x C-Beam 4080 posts (1000mm, full height)
+- 8x C-Beam 4080 top X-rails (1000mm segments, spliced)
+- 5x C-Beam 4080 Y-braces (1000mm)
+- 2x C-Beam 4080 Y-rails (1000mm)
+- 2x C-Beam 4080 gantry beam (1000mm, spliced to 2000mm)
 - 8x gantry plates (Z-carriage, sandwich posts)
 - 4x gantry plates (X-carriage + Y-rail end plates)
 - 7x NEMA23 motors (4Z horizontal + 2Y inside + 1X on carriage)
@@ -51,8 +51,8 @@ to straddle walls for continuous printing.
 
 ```
 CAD/
-├── Components/     Standard V-Slot parts (OpenBuilds-compatible, CC BY-SA 4.0)
-│   ├── V-Slot/         Extrusion profiles (2020, 2040, 2080)
+├── Components/     Standard parts (OpenBuilds-compatible, CC BY-SA 4.0)
+│   ├── V-Slot/         Extrusion profiles (4080 C-Beam primary)
 │   ├── Plates/         Gantry plates, motor mounts, idler plates
 │   ├── Wheels/         V-wheels (Delrin, Xtreme, idler pulleys)
 │   ├── Bearings/       625-2RS, 688Z ball bearings
@@ -97,7 +97,7 @@ The M3-2 uses approximately **20 unique component types** (many repeated):
 
 | Component | Unique Models | Total Qty |
 |-----------|--------------|-----------|
-| V-Slot extrusions | 3 (2080, 2040×2) | 27 lengths |
+| C-Beam 4080 extrusions | 1 (4080 C-Beam) | ~17 segments |
 | Gantry/carriage plates | 3 types | 12 plates |
 | Motor mounts | 1 type | 8 mounts |
 | V-wheels | 2 types | 36 wheels |
