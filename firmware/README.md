@@ -41,7 +41,7 @@ Frame origin `(0, 0, 0)` is at the **front-left corner of the build surface**. L
              │                                          │    (2× at rear,
              │                                          │     inboard of
              │           BUILD VOLUME                   │     rear Z-posts)
-             │         1900 × 900 × 900 mm              │
+             │         2000 × 1000 × 1000 mm             │
              │                                          │
              │                                          │  ← X motor
              │                                          │    on X-carriage
@@ -54,7 +54,7 @@ Frame origin `(0, 0, 0)` is at the **front-left corner of the build surface**. L
              ← X−                                     X+ →
                 HOME
 
-  ◆ = Z motor (NEMA23) on top brace, straddling each 2040 Z-post
+  ◆ = Z motor (NEMA23) on top brace, straddling each 4080 C-beam Z-post
       (4 motors total, each with its own StallGuard-based homing)
 ```
 
@@ -64,7 +64,7 @@ Frame origin `(0, 0, 0)` is at the **front-left corner of the build surface**. L
 |------|----------------|---------------|---------------------|
 | X    | toward X−      | X = 0         | left frame post     |
 | Y    | toward Y−      | Y = 0         | front Z-posts frame |
-| Z    | toward Z+      | Z = 900       | top brace (per post)|
+| Z    | toward Z+      | Z = 1000      | top brace (per post)|
 
 **Homing sequence** (set in `homing.cfg`):
 
