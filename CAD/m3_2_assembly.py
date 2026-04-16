@@ -2,7 +2,7 @@
 M3-CRETE M3-2 Assembly — v3 (filter-and-replace from Fusion export)
 
 Loads all parts from M3-2_Assembly_user.v21.step, then:
-  - Replaces C-beams (40x80x1200) with solid-fill parametric versions
+  - Replaces C-beams (40x80x1000) with solid-fill parametric versions
   - Replaces L-brackets (65x69x69) with generic parametric L-plates
     (NEMA23 bolt pattern + T20 rail mounting, no StepperOnline IP)
   - Everything else passes through at full Fusion fidelity
@@ -37,8 +37,8 @@ Y_RAIL_END   = L + 20.0                                   # all Y rails end here
 Y_POST_F     = Y_RAIL_START - 20.0 - SHIM_THK             # front Z-post Y center  (-4)
 Y_POST_R     = Y_RAIL_END   + 20.0 + SHIM_THK             # rear  Z-post Y center  (1044)
 NY_REAR      = Y_POST_R                                   # alias for back-compat
-SXY       = (2.0 * L + 80.0) / (2.0 * OLD_L + 80.0)       # 2080/2480 ≈ 0.8387
-SZ        = L / OLD_L                                      # 1000/1200 ≈ 0.8333
+SXY       = (2.0 * L + 80.0) / (2.0 * OLD_L + 80.0)       # 2080/2080 = 1.0
+SZ        = L / OLD_L                                      # 1000/1000 = 1.0
 
 # ============================================================
 # Helpers
