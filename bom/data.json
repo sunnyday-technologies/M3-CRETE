@@ -1,6 +1,6 @@
 {
-  "version": "2.2.0",
-  "generated": "2026-04-15T20:00:00Z",
+  "version": "2.3.0",
+  "generated": "2026-04-16T04:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2427,9 +2427,9 @@
     {
       "id": 72,
       "category": "Frame Hardware & Brackets",
-      "name": "5-Hole 90-Degree Joining Plate (20-Series, 60x60x4mm)",
-      "description": "L-shaped 5-hole joining plate for all perpendicular 4080 C-beam frame junctions. 60x60x4mm black anodized aluminum, 20-series V-slot compatible. M3-2 default: 24 joints + 3 spares = 27. CAD source: CAD/Advanced/Plates/Joining Plate 90 Degree.step",
-      "qty": 27,
+      "name": "5-Hole 90-Degree Joining Plate (X-axis splice reinforcement)",
+      "description": "Metal joining plates retained ONLY at the 4 X-axis splice joints (where two 1000mm C-beams butt together for the 2m gantry beam). All other frame corners use 3D-printed enclosures/brackets. CAD source: CAD/Advanced/Plates/Joining Plate 90 Degree.step",
+      "qty": 4,
       "unit": "plates",
       "mfg_type": "buy",
       "sort_order": 30,
@@ -2493,6 +2493,72 @@
           "supplier_name": "Amazon",
           "product_url": "https://www.amazon.com/s?k=small+aluminum+angle+bracket+30mm",
           "notes": "Generic 30mm aluminum brackets widely available.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "category": "3D-Printed Structural",
+      "name": "Z-Motor Enclosure (NEMA23, corner node)",
+      "description": "Structural corner node that caps each Z-post and grabs adjacent Y-rail + X-rail for 3-axis registration. Integrates NEMA23 motor mount, belt routing slot, and 4mm Y-shim. 146x96x88mm. Print in PETG (8mm walls) for prototype or CCF (3-4mm walls) for production. CAD source: CAD/Custom/Z_Motor_Enclosure_FL.step (FL/FR mirror pair, RL/RR = 180-degree rotation).",
+      "qty": 4,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 35,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": []
+    },
+    {
+      "id": 76,
+      "category": "3D-Printed Structural",
+      "name": "Y-Motor Bracket (NEMA23, integrated 4mm shim)",
+      "description": "L-shaped bracket mounts Y-axis NEMA23 to top of Z-post. Base acts as 4mm shim spacer. 80x50x74mm. NEMA23 bolt pattern (47.14mm PCD), 4x M5 T-nut holes. Print in PETG (8mm walls) or CCF (3-4mm). CAD source: CAD/Custom/Y_Motor_Bracket_NEMA23.step",
+      "qty": 2,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 36,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": []
+    },
+    {
+      "id": 77,
+      "category": "3D-Printed Structural",
+      "name": "X-Splice T-Bracket (gantry beam butt joint)",
+      "description": "T-shaped bracket spans the butt joint where two 1000mm C-beams splice to form the 2m X-axis gantry beam. Top plate + 30mm drop flange into C-channel. 120x80x36mm, 12x M5 bolt holes. Works WITH CF reinforcement rods and standard bar inserts. Print in PETG or CCF. CAD source: CAD/Custom/X_Splice_T_Bracket.step",
+      "qty": 2,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 37,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": []
+    },
+    {
+      "id": 78,
+      "category": "Frame - Reinforcement",
+      "name": "Carbon Fiber Reinforcement Rod (12mm OD pultruded tube)",
+      "description": "12mm OD / 10mm ID pultruded carbon fiber tubes, epoxied into top and bottom C-beam channels of the 2m gantry beam. Two rods span the full 2m continuously (bridging the splice joint). Provides 2.2x stiffness increase, reduces center sag from 0.9mm to 0.42mm. ~200g total weight penalty. E=230 GPa (3.3x aluminum). Bond with structural epoxy (West System or JB Weld).",
+      "qty": 2,
+      "unit": "rods (2m each)",
+      "mfg_type": "buy",
+      "sort_order": 12,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1140,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=12mm+carbon+fiber+tube+pultruded+2m",
+          "notes": "Pultruded CF tubes widely available. Verify 12mm OD, 10mm ID.",
           "sku": null,
           "step_url": null,
           "approved": true
