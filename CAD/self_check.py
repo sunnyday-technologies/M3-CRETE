@@ -47,7 +47,8 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (88.0, 96.0, 146.0):  'z-encl',
+    (4.0, 68.0, 80.0):    'zmount-plate',
+    (5.0, 40.0, 80.0):    'zmount-cap',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
 
@@ -69,14 +70,15 @@ def label_of(s):
 inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
-    'bracket': 6,          # 4 Z + 2 Y
+    'bracket': 4,          # 4 Z (Y-motor brackets removed)
     'motor': 6,            # 4 Z + 2 Y
     'vwheel': 24,
     'pulley': 6,
     'idler': 5,
     'plate': 6,
     'shim': 10,
-    'z-encl': 4,
+    'zmount-plate': 4,
+    'zmount-cap': 4,
     'idler-brk': 5,
     'belt': 12,
 }
@@ -91,23 +93,20 @@ for k in sorted(set(list(inv.keys()) + list(EXPECTED.keys()))):
     if got != want:
         problems.append(f"inventory: {k} got {got}, expected {want}")
 
-# ---------- CHECK 2: Z-motor enclosure bbox sanity ----------
-# Each enclosure should be ~88 x 96 x 146 mm (within 10% tolerance).
+# ---------- CHECK 2: Z-motor mount plate sanity ----------
+# Each plate should be ~4 x 68 x 80 mm; each cap ~5 x 40 x 80 mm.
 for s in parts:
-    if label_of(s) != 'z-encl':
-        continue
-    bb = s.BoundingBox()
-    dx, dy, dz = bb.xmax - bb.xmin, bb.ymax - bb.ymin, bb.zmax - bb.zmin
-    dims = sorted([dx, dy, dz])
-    expected = [88.0, 96.0, 146.0]
-    ok = all(abs(dims[i] - expected[i]) / expected[i] < 0.10 for i in range(3))
-    if not ok:
-        cx = (bb.xmin + bb.xmax) / 2
-        cy = (bb.ymin + bb.ymax) / 2
-        cz = (bb.zmin + bb.zmax) / 2
-        problems.append(
-            f"z-encl at ({cx:.0f},{cy:.0f},{cz:.0f}) has unexpected dims "
-            f"({dx:.1f}, {dy:.1f}, {dz:.1f})")
+    lbl = label_of(s)
+    if lbl == 'zmount-plate':
+        bb = s.BoundingBox()
+        dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
+        if dims[0] > 6:  # thinnest dim should be ~4mm
+            problems.append(f"zmount-plate dims {dims} — thinnest axis > 6mm")
+    elif lbl == 'zmount-cap':
+        bb = s.BoundingBox()
+        dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
+        if dims[0] > 8:  # thinnest dim should be ~5mm
+            problems.append(f"zmount-cap dims {dims} — thinnest axis > 8mm")
 
 # ---------- CHECK 3: motors attached to brackets (within 50 mm) ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
@@ -161,16 +160,16 @@ for i in plate_idx:
         except Exception:
             pass
 
-# ---------- CHECK 5: Z-enclosures at top 4 corners (Z near NZ_TOP) ----------
-# Z-enclosures should sit near the top of the frame (Z > 900)
-enclosures = [s for s in parts if label_of(s) == 'z-encl']
-for s in enclosures:
-    bb = s.BoundingBox()
-    cz = (bb.zmin + bb.zmax) / 2
-    if cz < 900:
-        cx = (bb.xmin + bb.xmax) / 2
-        cy = (bb.ymin + bb.ymax) / 2
-        problems.append(f"z-encl at ({cx:.0f},{cy:.0f},{cz:.0f}) is below Z=900 — should be at frame top")
+# ---------- CHECK 5: Z-motor mounts at top of frame (Z > 950) ----------
+for s in parts:
+    lbl = label_of(s)
+    if lbl in ('zmount-plate', 'zmount-cap'):
+        bb = s.BoundingBox()
+        if bb.zmin < 950:
+            cx = (bb.xmin + bb.xmax) / 2
+            cy = (bb.ymin + bb.ymax) / 2
+            cz = (bb.zmin + bb.zmax) / 2
+            problems.append(f"{lbl} at ({cx:.0f},{cy:.0f},{cz:.0f}) below Z=950")
 
 # ---------- REPORT ----------
 print()
