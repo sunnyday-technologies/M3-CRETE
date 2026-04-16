@@ -2333,7 +2333,7 @@
           "id": 1101,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/v-slot-4080/",
-          "notes": "Factory-direct from China, DDP sea freight 30-35 days. Stocks 100-1500 mm in 50 mm increments. Select 1000 mm at checkout. Confirmed per Bulkman3D ",
+          "notes": "Factory-direct from China, DDP sea freight 30-35 days. Stocks 100-1500 mm in 50 mm increments. Select 1000 mm at checkout.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2342,7 +2342,7 @@
           "id": 1102,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/product/c-beam/",
-          "notes": "US domestic warehouse, Atoka OK. UPS Ground ~3 days. Stocks 1000 mm, 1500 mm, and 2400 mm (2400 mm requires freight quote). Select 1000 mm Black C-Beam at checkout. ",
+          "notes": "US domestic warehouse, Atoka OK. UPS Ground ~3 days. Stocks 1000 mm, 1500 mm, and 2400 mm (2400 mm requires freight quote). Select 1000 mm Black C-Beam at checkout.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2351,7 +2351,7 @@
           "id": 1112,
           "supplier_name": "ZYLtech Engineering",
           "product_url": "https://www.zyltech.com/zyltech-4080c-v-groove-aluminum-extrusion-pre-cut-sizes-1000mm-and-1200mm/",
-          "notes": "Houston TX warehouse, US domestic ground ship. Stocks 1000 mm and 1200 mm pre-cut lengths. Select 1000 mm at checkout. ",
+          "notes": "Houston TX warehouse, US domestic ground ship. Stocks 1000 mm and 1200 mm pre-cut lengths. Select 1000 mm at checkout.",
           "sku": "4080C-1000",
           "step_url": null,
           "approved": true
@@ -2441,7 +2441,7 @@
           "id": 1118,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/product/5-hole-joining-plate/",
-          "notes": "5-hole 90-degree joining plate, PLATE-90-5. ",
+          "notes": "5-hole 90-degree joining plate, PLATE-90-5.",
           "sku": "PLATE-90-5",
           "step_url": null,
           "approved": true
@@ -2450,7 +2450,7 @@
           "id": 1119,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/5-hole-90-degree-joining-plate/",
-          "notes": "5-Hole 90-Degree Joining Plate, 2020 series, black anodized. ",
+          "notes": "5-Hole 90-Degree Joining Plate, 2020 series, black anodized.",
           "sku": null,
           "step_url": null,
           "approved": true
