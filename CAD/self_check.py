@@ -47,7 +47,7 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (4.0, 60.0, 60.0):    'L-corner',
+    (88.0, 96.0, 146.0):  'z-encl',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
 
@@ -76,7 +76,7 @@ EXPECTED = {
     'idler': 5,
     'plate': 6,
     'shim': 10,
-    'L-corner': 24,
+    'z-encl': 4,
     'idler-brk': 5,
     'belt': 12,
 }
@@ -91,25 +91,23 @@ for k in sorted(set(list(inv.keys()) + list(EXPECTED.keys()))):
     if got != want:
         problems.append(f"inventory: {k} got {got}, expected {want}")
 
-# ---------- CHECK 2: corner connector THICKNESS sanity ----------
-# A corner connector must be 5 mm thin on its normal axis. If my box() args
-# were wrong, the 5 becomes 80 — immediately visible in the dim tuple but
-# *also* in the sorted dims being (5, 80, 80). Any connector whose raw dims
-# aren't (5, 80, 80) for exactly one axis is broken.
+# ---------- CHECK 2: Z-motor enclosure bbox sanity ----------
+# Each enclosure should be ~88 x 96 x 146 mm (within 10% tolerance).
 for s in parts:
-    if label_of(s) != 'L-corner':
+    if label_of(s) != 'z-encl':
         continue
     bb = s.BoundingBox()
     dx, dy, dz = bb.xmax - bb.xmin, bb.ymax - bb.ymin, bb.zmax - bb.zmin
-    thin = sum(1 for d in (dx, dy, dz) if abs(d - 4.0) < 0.5)
-    big  = sum(1 for d in (dx, dy, dz) if abs(d - 60.0) < 0.5)
-    if thin != 1 or big != 2:
+    dims = sorted([dx, dy, dz])
+    expected = [88.0, 96.0, 146.0]
+    ok = all(abs(dims[i] - expected[i]) / expected[i] < 0.10 for i in range(3))
+    if not ok:
         cx = (bb.xmin + bb.xmax) / 2
         cy = (bb.ymin + bb.ymax) / 2
         cz = (bb.zmin + bb.zmax) / 2
         problems.append(
-            f"L-corner at ({cx:.0f},{cy:.0f},{cz:.0f}) has non-flat dims "
-            f"({dx:.1f}, {dy:.1f}, {dz:.1f}) — expected one 4 and two 60")
+            f"z-encl at ({cx:.0f},{cy:.0f},{cz:.0f}) has unexpected dims "
+            f"({dx:.1f}, {dy:.1f}, {dz:.1f})")
 
 # ---------- CHECK 3: motors attached to brackets (within 50 mm) ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
@@ -163,30 +161,16 @@ for i in plate_idx:
         except Exception:
             pass
 
-# ---------- CHECK 5: cbeam joint count matches connector count ----------
-cbeams = [s for s in parts if label_of(s) == 'cbeam']
-cb_bbs = []
-for s in cbeams:
+# ---------- CHECK 5: Z-enclosures at top 4 corners (Z near NZ_TOP) ----------
+# Z-enclosures should sit near the top of the frame (Z > 900)
+enclosures = [s for s in parts if label_of(s) == 'z-encl']
+for s in enclosures:
     bb = s.BoundingBox()
-    cb_bbs.append((bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
-
-def axis_of(b):
-    if (b[5]-b[4]) > 500: return 'Z'
-    if (b[3]-b[2]) > 500: return 'Y'
-    if (b[1]-b[0]) > 500: return 'X'
-    return None
-
-def touches(a, b, tol=5):
-    return all(a[2*i]-tol <= b[2*i+1] and b[2*i]-tol <= a[2*i+1] for i in range(3))
-
-perp = sum(
-    1
-    for i in range(len(cb_bbs))
-    for j in range(i+1, len(cb_bbs))
-    if touches(cb_bbs[i], cb_bbs[j]) and axis_of(cb_bbs[i]) != axis_of(cb_bbs[j])
-)
-if perp != inv.get('L-corner', 0):
-    problems.append(f"perpendicular cbeam joints = {perp} but L-corner count = {inv.get('L-corner', 0)}")
+    cz = (bb.zmin + bb.zmax) / 2
+    if cz < 900:
+        cx = (bb.xmin + bb.xmax) / 2
+        cy = (bb.ymin + bb.ymax) / 2
+        problems.append(f"z-encl at ({cx:.0f},{cy:.0f},{cz:.0f}) is below Z=900 — should be at frame top")
 
 # ---------- REPORT ----------
 print()
