@@ -117,15 +117,18 @@ def center(s):
 def dist(a, b):
     return ((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2) ** 0.5
 
+# Only check Z-motors (Z > 900) — Y-motors mount directly to frame
 for m in motors:
     mc = center(m)
+    if mc[2] < 900:
+        continue  # Y-motor, skip bracket check
     nearest = min(brackets, key=lambda b: dist(mc, center(b)), default=None)
     if nearest is None:
-        problems.append(f"motor at {mc} has no bracket")
+        problems.append(f"Z-motor at {mc} has no bracket")
         continue
     d = dist(mc, center(nearest))
     if d > 50:
-        problems.append(f"motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) "
+        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) "
                         f"nearest bracket is {d:.0f} mm away (> 50 mm)")
 
 # ---------- CHECK 4: plate vs cbeam interference (catches clipping) ----------
