@@ -47,7 +47,7 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (5.0, 80.0, 80.0):    'L-corner',
+    (4.0, 60.0, 60.0):    'L-corner',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
 
@@ -101,15 +101,15 @@ for s in parts:
         continue
     bb = s.BoundingBox()
     dx, dy, dz = bb.xmax - bb.xmin, bb.ymax - bb.ymin, bb.zmax - bb.zmin
-    thin = sum(1 for d in (dx, dy, dz) if abs(d - 5.0) < 0.5)
-    big  = sum(1 for d in (dx, dy, dz) if abs(d - 80.0) < 0.5)
+    thin = sum(1 for d in (dx, dy, dz) if abs(d - 4.0) < 0.5)
+    big  = sum(1 for d in (dx, dy, dz) if abs(d - 60.0) < 0.5)
     if thin != 1 or big != 2:
         cx = (bb.xmin + bb.xmax) / 2
         cy = (bb.ymin + bb.ymax) / 2
         cz = (bb.zmin + bb.zmax) / 2
         problems.append(
             f"L-corner at ({cx:.0f},{cy:.0f},{cz:.0f}) has non-flat dims "
-            f"({dx:.1f}, {dy:.1f}, {dz:.1f}) — expected one 5 and two 80")
+            f"({dx:.1f}, {dy:.1f}, {dz:.1f}) — expected one 4 and two 60")
 
 # ---------- CHECK 3: motors attached to brackets (within 50 mm) ----------
 motors  = [s for s in parts if label_of(s) == 'motor']

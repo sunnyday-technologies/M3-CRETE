@@ -1,6 +1,6 @@
 {
-  "version": "2.1.0",
-  "generated": "2026-04-14T07:30:00Z",
+  "version": "2.2.0",
+  "generated": "2026-04-15T20:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2425,65 +2425,14 @@
       ]
     },
     {
-      "id": 71,
-      "category": "Frame Hardware & Brackets",
-      "name": "Inside Hidden Corner Bracket (L-type, 20-Series)",
-      "description": "Hidden L-brackets that drop into the V-slot channel from inside and reinforce 90-degree corner joints where C-beams meet. Invisible from outside the frame. Used at every top frame corner (post-to-X-rail-to-Y-rail junction) and at the bottom skid corners. Doubled at each junction for shear strength. Black anodized aluminum, 20-series compatible, works identically in C-beam and V-slot channels.",
-      "qty": 16,
-      "unit": "brackets",
-      "mfg_type": "buy",
-      "sort_order": 30,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 1114,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/inside-hidden-bracket/",
-          "notes": "Inside hidden corner bracket, black anodized, 20-series.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1115,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/inside-hidden-bracket-for-v-slot-2020-2040-2080/",
-          "notes": "Inside hidden bracket for V-Slot 2020/2040/2080. Black anodized.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1116,
-          "supplier_name": "ZYLtech Engineering",
-          "product_url": "https://www.zyltech.com/search/?q=inside+hidden+bracket",
-          "notes": "Houston TX domestic source. Verify 20-series fit before ordering.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1117,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=inside+hidden+corner+bracket+2020+aluminum+extrusion",
-          "notes": "Generic 20-series inside hidden brackets widely available.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 72,
       "category": "Frame Hardware & Brackets",
-      "name": "Tee Joining Plate (5-Hole, 20-Series)",
-      "description": "5-hole T-plate for the center X-spreader junctions where the spreader meets the top front and rear X-rails at a tee intersection. Distributes load across the T joint and prevents rotational slop at the spreader ends. Black anodized aluminum, drops into 20-series V-slot channels on both legs. Used in Nick's Bulkman3D ",
-      "qty": 4,
+      "name": "5-Hole 90-Degree Joining Plate (20-Series, 60x60x4mm)",
+      "description": "L-shaped 5-hole joining plate for all perpendicular 4080 C-beam frame junctions. 60x60x4mm black anodized aluminum, 20-series V-slot compatible. M3-2 default: 24 joints + 3 spares = 27. CAD source: CAD/Advanced/Plates/Joining Plate 90 Degree.step",
+      "qty": 27,
       "unit": "plates",
       "mfg_type": "buy",
-      "sort_order": 32,
+      "sort_order": 30,
       "mpn": "PLATE-90-5",
       "substitute_ok": true,
       "exclude_from_kit": false,
@@ -2518,41 +2467,32 @@
       ]
     },
     {
-      "id": 73,
+      "id": 74,
       "category": "Frame Hardware & Brackets",
-      "name": "Outside 90-Degree Corner Bracket (20-Series)",
-      "description": "Standard outside-mount right-angle corner bracket, visible on the frame exterior. Complement to the inside hidden bracket [71] — the inside hidden bracket hides inside the channel and handles tensile loads, the outside bracket is visible on the corner and handles shear. Used together at the 4 primary top frame corners for full double-shear reinforcement. Black anodized aluminum, 20-series slot compatible (works on C-beam V-groove rails the same way it works on V-slot).",
-      "qty": 8,
+      "name": "Idler Axle Support Bracket (30x30x5mm)",
+      "description": "Small flat bracket behind each belt idler, anchors idler axle to C-beam face. 30x30x5mm aluminum or steel. 5 needed (4 Z-bottom + 1 X-end). Can be fabricated (CNC or waterjet) or sourced as generic small angle bracket.",
+      "qty": 5,
       "unit": "brackets",
       "mfg_type": "buy",
-      "sort_order": 31,
+      "sort_order": 33,
       "mpn": null,
       "substitute_ok": true,
       "exclude_from_kit": false,
       "suppliers": [
         {
-          "id": 1121,
+          "id": 1130,
           "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/corner-bracket/",
-          "notes": "Standard 90-degree outside corner bracket, black anodized, 20-series.",
+          "product_url": "https://makerstore.cc/product/angle-bracket/",
+          "notes": "Generic small angle bracket, verify 30mm size.",
           "sku": null,
           "step_url": null,
           "approved": true
         },
         {
-          "id": 1122,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/angle-corner-connector/",
-          "notes": "Angle corner connector, fits 2020/2040/2080 series, black anodized.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1123,
+          "id": 1131,
           "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=2020+aluminum+extrusion+corner+bracket",
-          "notes": "Generic 20-series corner brackets widely available, check dimensions before ordering.",
+          "product_url": "https://www.amazon.com/s?k=small+aluminum+angle+bracket+30mm",
+          "notes": "Generic 30mm aluminum brackets widely available.",
           "sku": null,
           "step_url": null,
           "approved": true
