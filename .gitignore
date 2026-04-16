@@ -102,3 +102,11 @@ m3_render_prompt.md
 
 # Session logs — private decision reference, never publish
 docs/session_logs/
+
+# Publications — local-only drafts, whitepapers, blog posts, session archives
+# Pulls data from private M3 discussions; never publish via this repo
+Publications/
+
+# Consolidated history archive — raw Claude transcripts, VICTORiA cross-refs,
+# doc snapshots. Local-only, never publish. Refresh via _archive/refresh.sh.
+_archive/
