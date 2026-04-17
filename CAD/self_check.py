@@ -47,8 +47,8 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (4.0, 68.0, 80.0):    'zmount-plate',
-    (5.0, 40.0, 80.0):    'zmount-cap',
+    (4.0, 80.0, 102.0):   'zmount',
+    (5.0, 40.0, 80.0):    'zcap',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
 
@@ -70,15 +70,15 @@ def label_of(s):
 inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
-    'bracket': 4,          # 4 Z (Y-motor brackets removed)
+    'bracket': 0,          # all L-brackets removed
     'motor': 6,            # 4 Z + 2 Y
     'vwheel': 24,
     'pulley': 6,
     'idler': 5,
     'plate': 6,
-    'shim': 10,
-    'zmount-plate': 4,
-    'zmount-cap': 4,
+    'shim': 6,             # 10 original - 4 replaced by zmount
+    'zmount': 4,
+    'zcap': 4,
     'idler-brk': 5,
     'belt': 12,
 }
@@ -93,20 +93,20 @@ for k in sorted(set(list(inv.keys()) + list(EXPECTED.keys()))):
     if got != want:
         problems.append(f"inventory: {k} got {got}, expected {want}")
 
-# ---------- CHECK 2: Z-motor mount plate sanity ----------
-# Each plate should be ~4 x 68 x 80 mm; each cap ~5 x 40 x 80 mm.
+# ---------- CHECK 2: combined motor-mount/spacer sanity ----------
+# Each zmount should be ~4 x 80 x 102 mm; each zcap ~5 x 40 x 80 mm.
 for s in parts:
     lbl = label_of(s)
-    if lbl == 'zmount-plate':
+    if lbl == 'zmount':
         bb = s.BoundingBox()
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
-        if dims[0] > 6:  # thinnest dim should be ~4mm
-            problems.append(f"zmount-plate dims {dims} — thinnest axis > 6mm")
-    elif lbl == 'zmount-cap':
+        if dims[0] > 6:
+            problems.append(f"zmount dims {dims} — thinnest axis > 6mm")
+    elif lbl == 'zcap':
         bb = s.BoundingBox()
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
-        if dims[0] > 8:  # thinnest dim should be ~5mm
-            problems.append(f"zmount-cap dims {dims} — thinnest axis > 8mm")
+        if dims[0] > 8:
+            problems.append(f"zcap dims {dims} — thinnest axis > 8mm")
 
 # ---------- CHECK 3: motors attached to brackets (within 50 mm) ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
@@ -117,19 +117,21 @@ def center(s):
 def dist(a, b):
     return ((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2) ** 0.5
 
-# Only check Z-motors (Z > 900) — Y-motors mount directly to frame
+# Z-motors should have a zmount plate nearby (not a bracket — brackets removed).
+# Y-motors mount directly to frame, skip them.
+zmounts = [s for s in parts if label_of(s) == 'zmount']
 for m in motors:
     mc = center(m)
     if mc[2] < 900:
-        continue  # Y-motor, skip bracket check
-    nearest = min(brackets, key=lambda b: dist(mc, center(b)), default=None)
+        continue  # Y-motor, skip
+    nearest = min(zmounts, key=lambda b: dist(mc, center(b)), default=None)
     if nearest is None:
-        problems.append(f"Z-motor at {mc} has no bracket")
+        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) has no zmount plate")
         continue
     d = dist(mc, center(nearest))
-    if d > 50:
+    if d > 100:  # wider tolerance — plate spans 102mm from Z=960 to Z=1062
         problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) "
-                        f"nearest bracket is {d:.0f} mm away (> 50 mm)")
+                        f"nearest zmount is {d:.0f} mm away (> 100 mm)")
 
 # ---------- CHECK 4: plate vs cbeam interference (catches clipping) ----------
 from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
@@ -163,16 +165,16 @@ for i in plate_idx:
         except Exception:
             pass
 
-# ---------- CHECK 5: Z-motor mounts at top of frame (Z > 950) ----------
+# ---------- CHECK 5: motor-mount plates span shim+motor zone (Z > 900) ----------
 for s in parts:
     lbl = label_of(s)
-    if lbl in ('zmount-plate', 'zmount-cap'):
+    if lbl in ('zmount', 'zcap'):
         bb = s.BoundingBox()
-        if bb.zmin < 950:
+        if bb.zmin < 900:
             cx = (bb.xmin + bb.xmax) / 2
             cy = (bb.ymin + bb.ymax) / 2
             cz = (bb.zmin + bb.zmax) / 2
-            problems.append(f"{lbl} at ({cx:.0f},{cy:.0f},{cz:.0f}) below Z=950")
+            problems.append(f"{lbl} at ({cx:.0f},{cy:.0f},{cz:.0f}) below Z=900")
 
 # ---------- REPORT ----------
 print()
