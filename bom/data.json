@@ -1,6 +1,6 @@
 {
-  "version": "2.3.0",
-  "generated": "2026-04-16T04:00:00Z",
+  "version": "2.4.0",
+  "generated": "2026-04-17T07:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2392,39 +2392,6 @@
       ]
     },
     {
-      "id": 70,
-      "category": "Motion - Hardware",
-      "name": "Flat NEMA23 Motor Mount Plate",
-      "description": "Y-axis motor mounts (2x). Simpler and cheaper than L-bracket since Y-motors are inboard and don't need perpendicular mounting.",
-      "qty": 2,
-      "unit": "pc",
-      "mfg_type": "buy",
-      "sort_order": 20,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 1110,
-          "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/v-slot-4080/",
-          "notes": "Factory-direct, lowest bulk pricing",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1111,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/c-beam/",
-          "notes": "US warehouse, domestic shipping",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 72,
       "category": "Frame Hardware & Brackets",
       "name": "5-Hole 90-Degree Joining Plate (X-axis splice reinforcement)",
@@ -2502,26 +2469,12 @@
     {
       "id": 75,
       "category": "3D-Printed Structural",
-      "name": "Z-Motor Enclosure (NEMA23, corner node)",
-      "description": "Structural corner node that caps each Z-post and grabs adjacent Y-rail + X-rail for 3-axis registration. Integrates NEMA23 motor mount, belt routing slot, and 4mm Y-shim. 146x96x88mm. Print in PETG (8mm walls) for prototype or CCF (3-4mm walls) for production. CAD source: CAD/Custom/Z_Motor_Enclosure_FL.step (FL/FR mirror pair, RL/RR = 180-degree rotation).",
+      "name": "Z-Motor Mount/Spacer Plate (4mm, combined, 3D printed)",
+      "description": "Combined motor-mount and Y-rail spacer plate. Single 4mm x 80mm x 102mm printed part replaces BOTH the old 4mm shim AND the L-bracket at each Z-post corner. NEMA23 bolt pattern in upper section, T-nut mounting in lower section. Print in PETG (prototype) or CCF (production). CAD: integrated into m3_2_assembly.py (parametric).",
       "qty": 4,
       "unit": "pieces",
       "mfg_type": "print",
       "sort_order": 35,
-      "mpn": null,
-      "substitute_ok": false,
-      "exclude_from_kit": false,
-      "suppliers": []
-    },
-    {
-      "id": 76,
-      "category": "3D-Printed Structural",
-      "name": "Y-Motor Bracket (NEMA23, integrated 4mm shim)",
-      "description": "L-shaped bracket mounts Y-axis NEMA23 to top of Z-post. Base acts as 4mm shim spacer. 80x50x74mm. NEMA23 bolt pattern (47.14mm PCD), 4x M5 T-nut holes. Print in PETG (8mm walls) or CCF (3-4mm). CAD source: CAD/Custom/Y_Motor_Bracket_NEMA23.step",
-      "qty": 2,
-      "unit": "pieces",
-      "mfg_type": "print",
-      "sort_order": 36,
       "mpn": null,
       "substitute_ok": false,
       "exclude_from_kit": false,
