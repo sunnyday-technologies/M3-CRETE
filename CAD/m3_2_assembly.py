@@ -347,11 +347,8 @@ if os.path.exists(_stock_path):
     _SZ_B = 20.0                             # 20  — bot   shim Z center
     _SX_TM = NX_RIGHT / 2.0                  # 1040 — top mid Y rail X center
     shim_specs = [
-        # Top Y flat rails (sides + middle): 4 corner shims + 2 mid shims
-        ("top_L_front",   0.0,      _SY_F, _SZ_T, shim_4080_flat),
-        ("top_R_front",   NX_RIGHT, _SY_F, _SZ_T, shim_4080_flat),
-        ("top_L_rear",    0.0,      _SY_R, _SZ_T, shim_4080_flat),
-        ("top_R_rear",    NX_RIGHT, _SY_R, _SZ_T, shim_4080_flat),
+        # Top Y flat rails: 2 mid shims only (4 corner shims replaced by
+        # combined motor-mount plates in post-loop section)
         ("topmid_front",  _SX_TM,   _SY_F, _SZ_T, shim_4080_flat),
         ("topmid_rear",   _SX_TM,   _SY_R, _SZ_T, shim_4080_flat),
         # Bottom Y skids (4 corners)
@@ -476,17 +473,10 @@ for s in solids:
             continue
 
     # ============================================================
-    # L-BRACKET — generic NEMA23 / T-slot bracket (replaces vendor IP).
-    # AllC source already has bracket positions correct (bottom-anchored
-    # at Z=NZ_TOP, Y push-out applied), so just translate by the corner
-    # fixup deltas in fcx/fcy/fcz.
+    # L-BRACKET — REMOVED. Z-motor brackets replaced by combined
+    # motor-mount/spacer plates (placed in post-loop). Skip entirely.
     # ============================================================
     if dims == (65.0, 69.0, 69.0):
-        wp = cq.Workplane().add(s)
-        assy.add(wp, name=f"bracket_{replaced_brackets}", color=BRK2,
-                 loc=Location((fcx - cx, fcy - cy, fcz - cz)))
-        replaced_brackets += 1
-        n[0] += 1
         continue
 
     # ============================================================
@@ -550,68 +540,69 @@ def _bbs_touch(a, b, tol=5.0):
             a[2] - tol <= b[3] and b[2] - tol <= a[3] and
             a[4] - tol <= b[5] and b[4] - tol <= a[5])
 
-# --- Z-motor mount: simple 4mm plate + 5mm post cap ---
-# 4mm plate extends from Z-post top upward to motor top height, with
-# NEMA23 bolt holes matching the L-bracket face. Plate is in XZ plane
-# (4mm thick in Y), positioned at the motor's NEMA face.
-# 5mm cap sits flat on top of each Z-post.
+# --- Combined motor-mount/spacer plates (replaces shim + bracket) ---
+# Single 4mm plate on the Y-face of each Z-post corner. Extends from
+# Z=960 (where the old shim started) up to Z=1062 (motor top), giving
+# a 102mm tall plate that acts as both the Y-rail spacer AND the NEMA23
+# motor mount. No separate shim, no L-bracket — one printed part.
+# Plus a 5mm cap on top of each Z-post.
 import math as _math
 HERE = os.path.dirname(__file__)
-ZMOUNT_COLOR = Color(0.25, 0.25, 0.30)   # dark printed part
-CAP_COLOR    = Color(0.30, 0.30, 0.35)
+MOUNT_COLOR = Color(1.0, 0.5, 0.0)       # orange — highlight the new part
+CAP_COLOR   = Color(0.30, 0.30, 0.35)
 
-# Dimensions from model probe:
-#   Post top Z=1000, motor bottom Z=1012, motor top Z=1068
-#   Motor center Z=1040, shaft in Y
 PLATE_THK   = 4.0        # mm (Y-direction thickness)
 PLATE_W     = 80.0       # mm (X-direction, matches post 80mm face)
-PLATE_H     = 68.0       # mm (Z-direction, from post top to motor top: 1068-1000)
-CAP_THK     = 5.0        # mm cap on top of post
+PLATE_H     = 102.0      # mm (Z-direction: from Z=960 to Z=1062)
+CAP_THK     = 5.0
 CAP_W       = 80.0
-CAP_D       = 40.0       # matches post 40mm depth
+CAP_D       = 40.0
 
 NEMA_PCD    = 47.14      # mm
 NEMA_BOLT   = 5.5        # mm M5 clearance
 NEMA_CENTER = 23.0       # mm shaft bore
-MOTOR_CTR_Z = 40.0       # mm above post top (1040 - 1000)
+# Motor center is at Z=1040. Plate bottom is at Z=960.
+# Motor center offset from plate bottom = 1040-960 = 80mm.
+# From plate center (Z=1011): motor center is at +29mm.
+MOTOR_CTR_FROM_CENTER = 29.0  # mm above plate center
 
-# Build the motor mount plate (in XZ plane, centered at origin)
-_zplate = (cq.Workplane("XZ")
+# Build combined plate (in XZ plane, centered at origin)
+_zmount = (cq.Workplane("XZ")
            .box(PLATE_W, PLATE_H, PLATE_THK)
            .faces(">Y").workplane()
            .pushPoints([
                (NEMA_PCD/2 * _math.cos(_math.radians(a)),
-                NEMA_PCD/2 * _math.sin(_math.radians(a)) + MOTOR_CTR_Z - PLATE_H/2)
+                NEMA_PCD/2 * _math.sin(_math.radians(a)) + MOTOR_CTR_FROM_CENTER)
                for a in [45, 135, 225, 315]])
            .hole(NEMA_BOLT)
            .faces(">Y").workplane()
-           .transformed(offset=(0, MOTOR_CTR_Z - PLATE_H/2, 0))
+           .transformed(offset=(0, MOTOR_CTR_FROM_CENTER, 0))
            .hole(NEMA_CENTER))
 
-# Build the post cap (flat in XY plane)
+# Post cap
 _zcap = cq.Workplane("XY").box(CAP_W, CAP_D, CAP_THK)
 
-# Place at each Z-motor position (4 corners, known from frame geometry).
-# Front motors: NEMA face at Y=bb.ymin (~6), shaft points +Y into post
-# Rear motors: NEMA face at Y=bb.ymax (~1036), shaft points -Y into post
-_z_motor_corners = [
-    (0.0,       Y_POST_F, 6.0,    True),   # front-left,  face_y=6
-    (NX_RIGHT,  Y_POST_F, 4.0,    True),   # front-right, face_y=4
-    (0.0,       Y_POST_R, 1036.0, False),   # rear-left,   face_y=1036
-    (NX_RIGHT,  Y_POST_R, 1035.0, False),   # rear-right,  face_y=1035
+# 4 Z-motor corners. Plate Y = post Y-face (between post and Y-rail).
+# Front posts: plate on +Y face (Y = post_ymax = Y_POST_F + 20 = 16)
+# Rear posts:  plate on -Y face (Y = post_ymin = Y_POST_R - 20 = 1024)
+_z_corners = [
+    (0.0,       16.0  + PLATE_THK/2, Y_POST_F),   # front-left
+    (NX_RIGHT,  16.0  + PLATE_THK/2, Y_POST_F),   # front-right
+    (0.0,       1024.0 - PLATE_THK/2, Y_POST_R),   # rear-left
+    (NX_RIGHT,  1024.0 - PLATE_THK/2, Y_POST_R),   # rear-right
 ]
 
 n_zmounts = 0
-for post_x, post_y, face_y, is_front in _z_motor_corners:
-    plate = _zplate.translate((0, 0, 0))
-    plate_z = NZ_TOP + PLATE_H / 2.0
-    assy.add(plate, name=f"zmount_plate_{n_zmounts}", color=ZMOUNT_COLOR,
-             loc=Location((post_x, face_y, plate_z)))
-    assy.add(_zcap, name=f"zmount_cap_{n_zmounts}", color=CAP_COLOR,
+for post_x, plate_y, post_y in _z_corners:
+    plate = _zmount.translate((0, 0, 0))
+    plate_z = 960.0 + PLATE_H / 2.0  # center of 102mm plate starting at Z=960
+    assy.add(plate, name=f"zmount_{n_zmounts}", color=MOUNT_COLOR,
+             loc=Location((post_x, plate_y, plate_z)))
+    assy.add(_zcap, name=f"zcap_{n_zmounts}", color=CAP_COLOR,
              loc=Location((post_x, post_y, NZ_TOP + CAP_THK / 2.0)))
     n_zmounts += 1
     n[0] += 2
-print(f"  {n_zmounts} Z-motor mounts (4mm plate + 5mm cap each)")
+print(f"  {n_zmounts} combined motor-mount/spacer plates (orange) + caps")
 
 # Y-motor brackets removed — motors mount directly to frame via
 # printed brackets (designed separately, placed in Fusion).
