@@ -351,11 +351,8 @@ if os.path.exists(_stock_path):
         # combined motor-mount plates in post-loop section)
         ("topmid_front",  _SX_TM,   _SY_F, _SZ_T, shim_4080_flat),
         ("topmid_rear",   _SX_TM,   _SY_R, _SZ_T, shim_4080_flat),
-        # Bottom Y skids (4 corners)
-        ("bot_L_front",   0.0,      _SY_F, _SZ_B, shim_4080_flat),
-        ("bot_R_front",   NX_RIGHT, _SY_F, _SZ_B, shim_4080_flat),
-        ("bot_L_rear",    0.0,      _SY_R, _SZ_B, shim_4080_flat),
-        ("bot_R_rear",    NX_RIGHT, _SY_R, _SZ_B, shim_4080_flat),
+        # Bottom 4 corner shims removed — replaced by combined bottom
+        # spacer/idler-mount plates in post-loop section
     ]
     for name, sx, sy, sz, shim_shape in shim_specs:
         assy.add(shim_shape, name=f"shim_{name}", color=SHIM,
@@ -391,18 +388,22 @@ for s in solids:
     # ============================================================
     fix_dx = fix_dy = fix_dz = 0.0
 
-    # 1. Z-motor + bracket corner stack (top of frame)
+    # 1. Z-motor corner stack — drop all motors flush onto post top (Z=1000)
     if cz > 900 and dims in {(56.4, 56.4, 76.6), (65.0, 69.0, 69.0)}:
         is_left  = cx < 1040
         is_front = cy < 520
         is_RR    = (not is_left) and (not is_front)
-        if not is_RR:                                 # RR already in source
+        if is_RR:
+            # RR source is at different Z than the others
+            if dims == (56.4, 56.4, 76.6):
+                fix_dz = -11.9  # 1000 - 1011.9
+        else:
             sign_x = -1.0 if is_left  else +1.0
             sign_y = +1.0 if is_front else -1.0
             fix_dx = 4.25 * sign_x
             fix_dy = 12.0 * sign_y
             if dims == (56.4, 56.4, 76.6):
-                fix_dz = 6.75
+                fix_dz = -5.25  # 1000 - 1005.25
 
     # 2. Gantry plates (mid-height, signature 3x88x127)
     #    — Corner Z-gantry plates snap to an ABSOLUTE Y target so all 4
@@ -553,7 +554,9 @@ CAP_COLOR   = Color(0.30, 0.30, 0.35)
 
 PLATE_THK   = 4.0        # mm (Y-direction thickness)
 PLATE_W     = 80.0       # mm (X-direction, matches post 80mm face)
-PLATE_H     = 102.0      # mm (Z-direction: from Z=960 to Z=1062)
+# Motor now flush on post top: body bottom at Z=1000, center at Z=1028.2
+# Plate from Z=960 (shim start) to Z=1056 (motor top) = 96mm
+PLATE_H     = 96.0       # mm (Z-direction: from Z=960 to Z=1056)
 CAP_THK     = 5.0
 CAP_W       = 80.0
 CAP_D       = 40.0
@@ -561,10 +564,8 @@ CAP_D       = 40.0
 NEMA_PCD    = 47.14      # mm
 NEMA_BOLT   = 5.5        # mm M5 clearance
 NEMA_CENTER = 23.0       # mm shaft bore
-# Motor center is at Z=1040. Plate bottom is at Z=960.
-# Motor center offset from plate bottom = 1040-960 = 80mm.
-# From plate center (Z=1011): motor center is at +29mm.
-MOTOR_CTR_FROM_CENTER = 29.0  # mm above plate center
+# Motor center at Z=1028.2. Plate center at Z=960+48=1008.
+MOTOR_CTR_FROM_CENTER = 20.2  # mm above plate center (1028.2 - 1008)
 
 # Build combined plate (in XZ plane, centered at origin)
 _zmount = (cq.Workplane("XZ")
@@ -595,7 +596,7 @@ _z_corners = [
 n_zmounts = 0
 for post_x, plate_y, post_y in _z_corners:
     plate = _zmount.translate((0, 0, 0))
-    plate_z = 960.0 + PLATE_H / 2.0  # center of 102mm plate starting at Z=960
+    plate_z = 960.0 + PLATE_H / 2.0  # center of 96mm plate starting at Z=960
     assy.add(plate, name=f"zmount_{n_zmounts}", color=MOUNT_COLOR,
              loc=Location((post_x, plate_y, plate_z)))
     assy.add(_zcap, name=f"zcap_{n_zmounts}", color=CAP_COLOR,
@@ -604,25 +605,100 @@ for post_x, plate_y, post_y in _z_corners:
     n[0] += 2
 print(f"  {n_zmounts} combined motor-mount/spacer plates (orange) + caps")
 
-# Y-motor brackets removed — motors mount directly to frame via
-# printed brackets (designed separately, placed in Fusion).
+# --- Combined bottom spacer/idler-mount plates (orange) ---
+# Same concept as the top Z-motor mounts: single 4mm plate on the Y-face
+# of each bottom corner Z-post, extending upward to include the idler
+# axle mounting area. Replaces both the bottom shim AND the idler bracket.
+BOT_PLATE_H = 100.0   # mm: Z=0 to Z=100 (covers shim zone 0-40 + idler zone ~60-90)
+IDLER_HOLE_Z = 37.0   # mm above plate center (center = Z=50, idler at Z=87)
+IDLER_HOLE_D = 8.5     # mm (8mm axle clearance)
 
-# --- Idler axle support brackets (small flat plate behind each idler) ---
-# Each idler gets a 30 x 5 x 30 plate behind it (anchored to the C-beam face
-# the idler bolts to). For simplicity, plate is in Y-Z plane (X-thick).
+_bot_mount = (cq.Workplane("XZ")
+              .box(PLATE_W, BOT_PLATE_H, PLATE_THK)
+              .faces(">Y").workplane()
+              .transformed(offset=(0, IDLER_HOLE_Z, 0))
+              .hole(IDLER_HOLE_D))
+
+_SY_F = Y_RAIL_START - SHIM_THK / 2.0
+_SY_R = Y_RAIL_END   + SHIM_THK / 2.0
+_bot_corners = [
+    (0.0,       _SY_F + PLATE_THK/2),  # front-left
+    (NX_RIGHT,  _SY_F + PLATE_THK/2),  # front-right
+    (0.0,       _SY_R - PLATE_THK/2),  # rear-left
+    (NX_RIGHT,  _SY_R - PLATE_THK/2),  # rear-right
+]
+n_botmounts = 0
+for bx, by in _bot_corners:
+    assy.add(_bot_mount.translate((0, 0, 0)),
+             name=f"bot_spacer_idler_{n_botmounts}", color=MOUNT_COLOR,
+             loc=Location((bx, by, BOT_PLATE_H / 2.0)))
+    n_botmounts += 1
+    n[0] += 1
+print(f"  {n_botmounts} bottom spacer/idler-mount plates (orange)")
+
+# Remaining idler brackets: only the center-frame idler (not at a corner post)
+# keeps its separate bracket. Corner idlers are now part of the bottom plates.
 n_idlerbrk = 0
 idler_brk = cq.Workplane("YZ").box(5, 30, 30)
 for wbb in idler_bbs:
     cx = (wbb[0] + wbb[1]) / 2.0
+    cz = (wbb[4] + wbb[5]) / 2.0
+    # Skip corner idlers at bottom of Z-posts (integrated into bottom plates).
+    # Corner idlers are at Z < 150 AND at the corner post X positions.
+    # Mid-frame idler is at Z~370 (mid-height on Y-rail), keep it.
+    if cz < 150 and (cx < 100 or cx > NX_RIGHT - 100):
+        continue
     cy = (wbb[2] + wbb[3]) / 2.0
     cz = (wbb[4] + wbb[5]) / 2.0
-    # Push outward in X (left or right edge of frame)
     nx = cx + (-15 if cx < FRAME_CTR[0] else +15)
     assy.add(idler_brk, name=f"bracket_idler_{n_idlerbrk}", color=IDL_BRK_COLOR,
              loc=Location((nx, cy, cz)))
     n_idlerbrk += 1
     n[0] += 1
-print(f"  {n_idlerbrk} idler axle brackets")
+print(f"  {n_idlerbrk} remaining idler brackets (mid-frame)")
+
+# --- Y-motor adapter plate (flat, dual hole pattern) ---
+# Simple plate with NEMA23 holes on one side and extrusion-slot mounting
+# holes on the other. Y-motors bolt through this plate to the C-beam face.
+YMOUNT_W = 80.0
+YMOUNT_H = 80.0
+YMOUNT_THK = 4.0
+SLOT_HOLE_D = 5.5     # M5 for T-nuts
+SLOT_SPACING = 20.0   # 20mm V-slot centerlines
+
+_ymount = (cq.Workplane("XY")
+           .box(YMOUNT_W, YMOUNT_H, YMOUNT_THK)
+           # NEMA23 bolt pattern (center)
+           .faces(">Z").workplane()
+           .pushPoints([
+               (NEMA_PCD/2 * _math.cos(_math.radians(a)),
+                NEMA_PCD/2 * _math.sin(_math.radians(a)))
+               for a in [45, 135, 225, 315]])
+           .hole(NEMA_BOLT)
+           .faces(">Z").workplane()
+           .hole(NEMA_CENTER)
+           # Extrusion mounting holes (4x, wider spacing for T-nut access)
+           .faces(">Z").workplane()
+           .pushPoints([(-30, -30), (30, -30), (-30, 30), (30, 30)])
+           .hole(SLOT_HOLE_D))
+
+# Place Y-motor adapter plates (2x, one per Y-motor)
+YMOUNT_COLOR = Color(1.0, 0.5, 0.0)
+n_ymounts = 0
+for wbb in ymotor_bbs:
+    cx = (wbb[0] + wbb[1]) / 2.0
+    cy = (wbb[2] + wbb[3]) / 2.0
+    cz = (wbb[4] + wbb[5]) / 2.0
+    is_left = cx < FRAME_CTR[0]
+    # Plate sits between motor face and C-beam, on the X-face
+    plate_x = cx + (-YMOUNT_THK if is_left else +YMOUNT_THK)
+    ymount = _ymount.translate((0, 0, 0))
+    ymount = ymount.rotate((0, 0, 0), (0, 1, 0), 90)  # rotate to YZ plane
+    assy.add(ymount, name=f"ymount_{n_ymounts}", color=YMOUNT_COLOR,
+             loc=Location((plate_x, cy, cz)))
+    n_ymounts += 1
+    n[0] += 1
+print(f"  {n_ymounts} Y-motor adapter plates (orange)")
 
 print(f"\n  {n[0]} parts total")
 print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
