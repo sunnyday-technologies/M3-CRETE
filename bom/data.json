@@ -1,6 +1,6 @@
 {
-  "version": "2.5.0",
-  "generated": "2026-04-18T12:00:00Z",
+  "version": "2.5.1",
+  "generated": "2026-04-18T08:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -39,6 +39,15 @@
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/",
           "notes": "20-series internal joining plate",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1300,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/joining-strip/",
+          "notes": "Internal connectors, 20-series compatible",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -90,6 +99,15 @@
           "supplier_name": "Amazon",
           "product_url": "https://amazon.com",
           "notes": "M5 T-nut 100-pack (20-series 6mm slot)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1301,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/tee-nuts/",
+          "notes": "M5 drop-in T-nuts, 20-series",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -321,6 +339,15 @@
           "sku": "B01CL24CAI",
           "step_url": null,
           "approved": true
+        },
+        {
+          "id": 1302,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/gt2-pulley/",
+          "notes": "GT2 20-tooth pulley, 8mm bore",
+          "sku": null,
+          "step_url": null,
+          "approved": true
         }
       ]
     },
@@ -351,15 +378,6 @@
           "supplier_name": "Self-Manufacture",
           "product_url": "",
           "notes": "3D Printed Carbon Fiber Nylon",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 41,
-          "supplier_name": "SendCutSend",
-          "product_url": "https://sendcutsend.com",
-          "notes": "Water-jet cut steel",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -551,15 +569,6 @@
           "approved": true
         },
         {
-          "id": 56,
-          "supplier_name": "SendCutSend",
-          "product_url": "https://sendcutsend.com",
-          "notes": "Laser cut steel",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
           "id": 196,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/vs80-1/",
@@ -704,15 +713,6 @@
           "approved": true
         },
         {
-          "id": 71,
-          "supplier_name": "SendCutSend",
-          "product_url": "https://sendcutsend.com",
-          "notes": "Laser cut steel",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
           "id": 198,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/vs80-1/",
@@ -759,6 +759,15 @@
           "supplier_name": "Amazon",
           "product_url": "https://www.amazon.com/s?k=NEMA+23+L+bracket+stepper",
           "notes": "Generic NEMA23 alloy steel L-brackets are widely available. Verify dimensions match ST-M2 (65 x 69 x 69 mm).",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1303,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/nema23-bracket/",
+          "notes": "NEMA23 L-bracket mount",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -1727,15 +1736,6 @@
           "approved": true
         },
         {
-          "id": 144,
-          "supplier_name": "SendCutSend",
-          "product_url": "https://sendcutsend.com",
-          "notes": "CNC-machined aluminum end plates and motor mount. Upload DXF/STEP from repo.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
           "id": 145,
           "supplier_name": "Self-Manufacture",
           "product_url": "",
@@ -1857,15 +1857,6 @@
           "supplier_name": "Local Machine Shop",
           "product_url": "",
           "notes": "Stainless steel nozzle",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 157,
-          "supplier_name": "SendCutSend",
-          "product_url": "https://sendcutsend.com",
-          "notes": "Replaceable tip design",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2445,7 +2436,17 @@
       "mpn": null,
       "substitute_ok": false,
       "exclude_from_kit": false,
-      "suppliers": []
+      "suppliers": [
+        {
+          "id": 1275,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). STL generated from CadQuery script.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     },
     {
       "id": 77,
@@ -2459,7 +2460,17 @@
       "mpn": null,
       "substitute_ok": false,
       "exclude_from_kit": false,
-      "suppliers": []
+      "suppliers": [
+        {
+          "id": 1277,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). STL generated from CadQuery script.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     },
     {
       "id": 78,
@@ -2497,7 +2508,17 @@
       "mpn": null,
       "substitute_ok": false,
       "exclude_from_kit": false,
-      "suppliers": []
+      "suppliers": [
+        {
+          "id": 1279,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). STL generated from CadQuery script.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     },
     {
       "id": 80,
@@ -2511,7 +2532,17 @@
       "mpn": null,
       "substitute_ok": false,
       "exclude_from_kit": false,
-      "suppliers": []
+      "suppliers": [
+        {
+          "id": 1280,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). STL generated from CadQuery script.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     }
   ],
   "notes": "v2.0: C-Beam Z-post upgrade, belt width reconciliation (Z/Y=10mm, X=6mm), wheel count 36->24, pulley count 20->7, removed out-of-scope pump/extruder parts"
