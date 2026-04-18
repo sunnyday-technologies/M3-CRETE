@@ -47,10 +47,11 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (4.0, 80.0, 96.0):    'zmount',
+    (4.0, 68.0, 80.0):    'zmount',
     (5.0, 40.0, 80.0):    'zcap',
     (4.0, 80.0, 100.0):   'bot-mount',
     (4.0, 80.0, 80.0):    'ymount',
+    (4.0, 80.0, 120.0):   'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
 
@@ -78,12 +79,13 @@ EXPECTED = {
     'pulley': 6,
     'idler': 5,
     'plate': 6,
-    'shim': 2,             # only 2 mid-frame shims remain
+    'shim': 6,             # 4 top corners + 2 mid-frame
     'zmount': 4,
     'zcap': 4,
     'idler-brk': 1,        # only 1 mid-frame idler bracket remains
     'bot-mount': 4,
     'ymount': 2,
+    'tbracket': 2,
     'belt': 12,
 }
 problems = []
