@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>We Built the Testing Framework CAD Never Had | M3-CRETE</title>
+  <meta name="description" content="CAD Harness: open-source automated testing for STEP assemblies. Caught 53 interferences, reduced STEP from 70MB to 13MB, validated 150+ design changes." />
+  <meta property="og:title" content="We Built the Testing Framework CAD Never Had" />
+  <meta property="og:description" content="CAD Harness: 53 interferences caught. 70MB to 13MB. 500 lines of Python. Open source." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://m3-crete.com/blog/cad-harness-launch/" />
+  <meta property="og:image" content="https://m3-crete.com/images/M3-CRETE_render.jpg" />
+  <meta property="article:published_time" content="2026-04-18" />
+  <meta property="article:author" content="Nick Sonnentag" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://m3-crete.com/blog/cad-harness-launch/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:       #060d14;
+      --charcoal:    #0b1824;
+      --graphite:    #0f2035;
+      --border:      #1a3350;
+      --mid:         #2a4d6e;
+      --muted:       #6a8faa;
+      --light:       #c2d4e0;
+      --white:       #f0f4f7;
+      --accent:      #97D700;
+      --accent-dim:  #5c8400;
+      --brand-blue:  #013A73;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      background-image: linear-gradient(160deg, #011f3f 0%, #060d14 60%);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .logo a { text-decoration: none; }
+
+    .logo-mark {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding-left: 0.75rem;
+      border-left: 1px solid var(--border);
+    }
+
+    nav a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    /* ARTICLE HEADER */
+    .article-header {
+      position: relative;
+      z-index: 10;
+      padding: 5rem 3rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .article-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .article-label::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--accent-dim);
+    }
+
+    .article-header h1 {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.0;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+    }
+
+    .article-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .article-meta span { color: var(--light); }
+
+    /* HERO IMAGE */
+    .article-hero {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+    }
+
+    .article-hero img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+
+    /* ARTICLE BODY */
+    .article-body {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 3rem 4rem;
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.02rem;
+      line-height: 1.75;
+      color: var(--light);
+    }
+
+    .article-body h2 {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-top: 3rem;
+      margin-bottom: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .article-body h2:first-child {
+      margin-top: 0;
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .article-body p {
+      margin-bottom: 1.25rem;
+    }
+
+    .article-body p:first-of-type {
+      font-size: 1.15rem;
+      color: var(--white);
+      font-weight: 400;
+    }
+
+    .article-body a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-dim);
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .article-body a:hover {
+      color: var(--white);
+      border-bottom-color: var(--white);
+    }
+
+    .article-body strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .article-body em {
+      color: var(--light);
+      font-style: italic;
+    }
+
+    .article-body ul {
+      margin: 1rem 0 1.5rem 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .article-body li {
+      margin-bottom: 0.85rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .article-body li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.9em;
+    }
+
+    .article-body code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.88em;
+      color: var(--accent);
+      background: rgba(151, 215, 0, 0.08);
+      padding: 0.1em 0.4em;
+      border-radius: 2px;
+      border: 1px solid rgba(151, 215, 0, 0.15);
+    }
+
+    .article-body hr {
+      margin: 3rem 0 1.5rem 0;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .article-body .post-footer {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-left a {
+      color: var(--accent-dim);
+      text-decoration: none;
+    }
+
+    .footer-left a:hover { color: var(--accent); }
+
+    .footer-right {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .article-header { animation: fadeUp 0.6s ease both; animation-delay: 0.1s; }
+    .article-body { animation: fadeUp 0.7s ease both; animation-delay: 0.25s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header { padding: 1.25rem 1.5rem; }
+      .logo-sub { display: none; }
+      .article-header { padding: 3rem 1.5rem 1.5rem; }
+      .article-hero { padding: 0 1.5rem; }
+      .article-body { padding: 1.5rem 1.5rem 3rem; font-size: 0.98rem; }
+      .article-body h2 { font-size: 1.25rem; }
+
+      footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <a href="/"><span class="logo-mark">M3-CRETE</span></a>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav>
+      <a href="/bom/">BOM</a> &nbsp;&nbsp;
+      <a href="/blog/">Blog</a> &nbsp;&nbsp;
+      <a href="/press/">Press</a> &nbsp;&nbsp;
+      <a href="https://sunn3d.com" target="_blank" rel="noopener">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <!-- ARTICLE HEADER -->
+  <section class="article-header">
+    <div class="article-label">Build Log #2</div>
+    <h1>We Built the Testing Framework CAD Never Had</h1>
+    <div class="article-meta">
+      <div><span>2026-04-18</span></div>
+      <div>by <span>Nick Sonnentag</span></div>
+      <div>MIT License</div>
+    </div>
+  </section>
+
+  <!-- HERO IMAGE -->
+  <section class="article-hero">
+    <img src="/images/M3-CRETE_render.jpg" alt="M3-CRETE M3-2 concrete 3D printer — full CAD assembly render" loading="eager" />
+  </section>
+
+  <!-- ARTICLE BODY -->
+  <article class="article-body">
+
+    <p>I spent three days staring at a 99-part assembly in Fusion 360, orbiting around every corner, convinced it was clean. It wasn't.</p>
+
+    <h2>The Problem</h2>
+
+    <p>A motor bracket was buried 27,000 mm&sup3; inside an aluminum extrusion. Twenty-four joining plates were clipping beams by fractions of a millimeter. A motor mount had quietly drifted 600mm from its motor during an auto-placement update. None of it visible at screen scale. All of it structurally wrong.</p>
+
+    <p>I only found out because I got tired of looking and wrote a script to look for me. That script became <strong>CAD Harness</strong> &mdash; an open-source testing framework for STEP assemblies. The testing layer mechanical engineering never had.</p>
+
+    <h2>The Gap Nobody Talks About</h2>
+
+    <p>Software developers have had automated testing for decades. Write code, write tests, run CI. If something breaks, you know before it ships. Shipping code without tests is considered unprofessional.</p>
+
+    <p>In mechanical CAD? You open the file. You orbit around. You squint at intersections. You zoom into corners. That's it. That's the quality assurance process for most hardware teams. Including ours.</p>
+
+    <p>For our project &mdash; <a href="https://github.com/sunnyday-technologies/M3-CRETE">M3-CRETE</a>, an open-source concrete 3D printer with 17 aluminum extrusions, 6 stepper motors, 24 V-wheels, and dozens of brackets, plates, and belts &mdash; visual inspection stopped scaling around part 50. By part 99, we were guessing.</p>
+
+    <h2>Five Gates</h2>
+
+    <p><strong>Inventory.</strong> Every mechanical part has a dimensional fingerprint. A NEMA23 motor is always 56.4 &times; 56.4 &times; 76.6 mm. Always. The harness labels parts by their bounding-box signature, counts them, and tells you if something's missing before you notice it's gone.</p>
+
+    <p><strong>Interference.</strong> Not bounding-box approximation &mdash; exact solid-solid boolean intersection using OpenCascade. Reports overlap volume in cubic millimeters. If a plate clips a beam by half a mm&sup3;, you see it. Your eyes never would.</p>
+
+    <p><strong>Adjacency.</strong> &ldquo;Is every motor within 50mm of its bracket?&rdquo; When you auto-place 99 parts, one ends up in the right assembly at the wrong address. This gate catches it in zero seconds.</p>
+
+    <p><strong>Dimensional.</strong> Did that <code>box()</code> call swap two arguments and produce an 80mm slab instead of a 4mm plate? The &ldquo;typo catcher&rdquo; for geometry.</p>
+
+    <p><strong>Kinematics.</strong> Our gantry beam &mdash; two 1-meter C-beams spliced to span 2 meters &mdash; was sagging 0.9mm at center under a 3kg printhead.</p>
+
+    <p>Try holding your fingers apart by 0.5mm. That's our tolerance target. Now imagine that deviation compounding across a 2-meter concrete print, layer after layer after layer. The wall curves. The layers drift. The print fails.</p>
+
+    <p>The kinematics gate flagged it. We added two carbon fiber tubes epoxied into the beam channels &mdash; 200 grams, $60 &mdash; and the sag dropped to 0.42mm. Problem solved before we ever cut aluminum.</p>
+
+    <h2>The Numbers</h2>
+
+    <ul>
+      <li><strong>70 MB &rarr; 13 MB</strong> STEP file. The harness identified that imported supplier geometry &mdash; beautiful filleted edges, countersunk holes, NURBS surfaces &mdash; was 80% of the file size. Replaced with parametric geometry. Same assembly. Five times smaller.</li>
+      <li><strong>53 solid-solid interferences</strong> caught in one three-second run. Plates clipping beams. A bracket 27,000 mm&sup3; deep inside a beam. My eyes missed all 53.</li>
+      <li><strong>Motor mount 600mm from motor.</strong> The adjacency gate caught it immediately.</li>
+      <li><strong>150+ design changes validated</strong> across 15 sessions without opening a CAD viewer.</li>
+    </ul>
+
+    <h2>What This Normally Costs</h2>
+
+    <p>CATIA with assembly validation modules: $7,500&ndash;$10,000 per seat per year. SolidWorks Professional with interference detection: $5,000&ndash;$8,000. Hiring a mechanical engineering consultant to manually review a 99-part assembly: $70&ndash;$150/hour, 40+ hours, $3,000&ndash;$6,000 &mdash; and they still might miss what a boolean intersection check finds in 3 seconds.</p>
+
+    <p>We wrote 500 lines of Python and got better results. Then we open-sourced it.</p>
+
+    <h2>The Human-AI Part</h2>
+
+    <p>This framework was built during a collaboration between me and an AI (Claude). I design in Fusion 360. The AI reads the STEP geometry, generates parametric replacements, validates the assembly. The harness sits between us.</p>
+
+    <p>I catch things the AI can't &mdash; &ldquo;that bracket needs to clear the belt path&rdquo; requires physical intuition. The AI catches things I can't &mdash; &ldquo;plate 17 overlaps C-beam 4 by 1,003 mm&sup3; at coordinates (2102, 18, 20)&rdquo; requires checking 4,800 part pairs in 3 seconds.</p>
+
+    <p>Neither of us is the quality gate. The harness is. <em>If the harness passes, the geometry is coherent.</em> Both of us trust it. Both of us are accountable to it.</p>
+
+    <h2>Try It</h2>
+
+    <ul>
+      <li><strong>CAD Harness:</strong> <a href="https://github.com/sunnyday-technologies/cad-harness">github.com/sunnyday-technologies/cad-harness</a></li>
+      <li><strong>M3-CRETE printer:</strong> <a href="https://github.com/sunnyday-technologies/M3-CRETE">github.com/sunnyday-technologies/M3-CRETE</a></li>
+      <li><strong>Interactive BOM:</strong> <a href="https://m3-crete.com/bom">m3-crete.com/bom</a></li>
+    </ul>
+
+    <p>MIT license. Python + CadQuery. No commercial CAD software required. 17 passing tests across 3 tiers of fixture complexity.</p>
+
+    <p>If you've ever spent an afternoon squinting at an assembly wondering if something's clipping &mdash; this exists now.</p>
+
+    <hr/>
+
+    <div class="post-footer">
+      CAD Harness is developed by Sunnyday Technologies, Appleton, Wisconsin.<br/>
+      License: MIT &nbsp;&middot;&nbsp; M3-CRETE: CERN-OHL-W-2.0<br/>
+      <span style="opacity: 0.75;">Every mechanical part has a dimensional fingerprint. Fingerprints don't lie.</span>
+    </div>
+
+  </article>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      &copy; 2026 Sunnyday Technologies LLC &nbsp;&middot;&nbsp;
+      <a href="https://sunn3d.com">sunn3d.com</a> &nbsp;&middot;&nbsp;
+      <a href="https://cemforge.ai">cemforge.ai</a> &nbsp;&middot;&nbsp;
+      <a href="https://open3dcp.org">open3dcp.org</a>
+    </div>
+    <div class="footer-right">
+      CERN-OHL-W-2.0 &middot; MIT
+    </div>
+  </footer>
+
+</body>
+</html>
