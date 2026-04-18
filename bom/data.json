@@ -1,6 +1,6 @@
 {
-  "version": "2.4.0",
-  "generated": "2026-04-17T07:00:00Z",
+  "version": "2.5.0",
+  "generated": "2026-04-18T12:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2434,43 +2434,10 @@
       ]
     },
     {
-      "id": 74,
-      "category": "Frame Hardware & Brackets",
-      "name": "Idler Axle Support Bracket (30x30x5mm)",
-      "description": "Small flat bracket behind each belt idler, anchors idler axle to C-beam face. 30x30x5mm aluminum or steel. 5 needed (4 Z-bottom + 1 X-end). Can be fabricated (CNC or waterjet) or sourced as generic small angle bracket.",
-      "qty": 5,
-      "unit": "brackets",
-      "mfg_type": "buy",
-      "sort_order": 33,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 1130,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/angle-bracket/",
-          "notes": "Generic small angle bracket, verify 30mm size.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1131,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=small+aluminum+angle+bracket+30mm",
-          "notes": "Generic 30mm aluminum brackets widely available.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 75,
       "category": "3D-Printed Structural",
       "name": "Z-Motor Mount/Spacer Plate (4mm, combined, 3D printed)",
-      "description": "Combined motor-mount and Y-rail spacer plate. Single 4mm x 80mm x 102mm printed part replaces BOTH the old 4mm shim AND the L-bracket at each Z-post corner. NEMA23 bolt pattern in upper section, T-nut mounting in lower section. Print in PETG (prototype) or CCF (production). CAD: integrated into m3_2_assembly.py (parametric).",
+      "description": "Combined motor-mount and Y-rail spacer plate. 4mm x 80mm x 68mm printed part on the Y-face of each Z-post corner. NEMA23 bolt pattern in upper section, sits between the shim below (Z=960-1000) and motor above (Z=1005). Motor rests on the 5mm post cap. Sunnyday green. Print in PETG (prototype) or CCF (production).",
       "qty": 4,
       "unit": "pieces",
       "mfg_type": "print",
@@ -2517,6 +2484,34 @@
           "approved": true
         }
       ]
+    },
+    {
+      "id": 79,
+      "category": "3D-Printed Structural",
+      "name": "Bottom Spacer/Idler Mount (4mm, combined, 3D printed)",
+      "description": "Combined bottom spacer and idler axle mount. 4mm x 80mm x 100mm plate on the Y-face of each bottom Z-post corner. Includes 8mm idler axle hole. Replaces both the bottom 4mm shim and the separate idler bracket. Sunnyday green. Print in PETG or CCF.",
+      "qty": 4,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 38,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": []
+    },
+    {
+      "id": 80,
+      "category": "3D-Printed Structural",
+      "name": "T-Bracket (center spreader junction, 3D printed)",
+      "description": "T-bracket at center Y-spreader / X-rail T-junctions. 120mm x 80mm x 4mm with 6 bolt holes. Straddles the junction, bolting to both spreader and X-rail. Sunnyday green. 2 needed (front + rear T-junctions). Print in PETG or CCF.",
+      "qty": 2,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 39,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": []
     }
   ],
   "notes": "v2.0: C-Beam Z-post upgrade, belt width reconciliation (Z/Y=10mm, X=6mm), wheel count 36->24, pulley count 20->7, removed out-of-scope pump/extruder parts"
