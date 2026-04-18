@@ -74,19 +74,29 @@ Firmware configurations are maintained separately:
 
 ## Repository Structure
 
-> This project is under active development. Contents will expand as the design is finalized for the first build-it-yourself kit release.
-
 ```
 M3-CRETE/
-├── README.md
-├── DISCLAIMER.md
-├── LICENSES/            # CERN-OHL-W-2.0 license files
-├── docs/
-│   └── bom/             # Bill of materials
-├── .gitignore
+├── CAD/
+│   ├── M3-2_Assembly.step       # Full assembly (99 parts, 13.5 MB via LFS)
+│   ├── m3_2_assembly.py         # CadQuery assembly generator (source of truth)
+│   ├── self_check.py            # 5-gate automated validation harness
+│   ├── kinematics_eval.py       # Structural analysis (deflection, torque, belts)
+│   ├── Custom/                  # 3D-printable brackets (STEP + STL)
+│   ├── Components/              # OpenBuilds parts library (CC BY-SA 4.0)
+│   └── Advanced/                # Extended parts (C-beam, joining plates)
+├── bom/
+│   ├── data.json                # BOM source of truth (62 parts, v2.5.0)
+│   └── index.html               # Interactive BOM viewer (m3-crete.com/bom)
+├── firmware/                    # Klipper configs (kinematics, steppers)
+├── blog/                        # Build logs and project updates
+└── config.js                    # Model variants (M3-1, M3-2, M3-4)
 ```
 
-Planned additions: CAD files, printed part STLs, assembly documentation, wiring diagrams, and reference images.
+### AI-Assisted CAD Workflow
+
+This project uses [CAD Harness](https://github.com/sunnyday-technologies/cad-harness) — an automated validation framework for STEP assemblies developed during this project. The assembly script generates geometry, the self-check harness validates it (inventory, interference, adjacency, dimensions), and the kinematics module analyzes structural performance. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
+
+See the [CAD Harness repo](https://github.com/sunnyday-technologies/cad-harness) for the generalized, reusable framework.
 
 ---
 
@@ -137,8 +147,9 @@ See [LICENSES/](LICENSES/) for full license texts.
 |----------|-------------|
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
 | [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Kit details, design philosophy, and contact for early access |
+| [CAD Harness](https://github.com/sunnyday-technologies/cad-harness) | Automated STEP assembly validation — extracted from this project |
 | [CEMFORGE™](https://cemforge.ai/concrete-printers/) | AI-powered concrete formulation platform by Sunnyday Technologies |
-| [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Marlin/Klipper |
+| [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Klipper |
 
 ---
 
