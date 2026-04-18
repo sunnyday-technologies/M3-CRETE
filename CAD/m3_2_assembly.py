@@ -347,8 +347,12 @@ if os.path.exists(_stock_path):
     _SZ_B = 20.0                             # 20  — bot   shim Z center
     _SX_TM = NX_RIGHT / 2.0                  # 1040 — top mid Y rail X center
     shim_specs = [
-        # Top Y flat rails: 2 mid shims only (4 corner shims replaced by
-        # combined motor-mount plates in post-loop section)
+        # Top Y flat rails: 4 corner shims + 2 mid shims
+        # (corner shims coexist with motor-mount plates above them)
+        ("top_L_front",   0.0,      _SY_F, _SZ_T, shim_4080_flat),
+        ("top_R_front",   NX_RIGHT, _SY_F, _SZ_T, shim_4080_flat),
+        ("top_L_rear",    0.0,      _SY_R, _SZ_T, shim_4080_flat),
+        ("top_R_rear",    NX_RIGHT, _SY_R, _SZ_T, shim_4080_flat),
         ("topmid_front",  _SX_TM,   _SY_F, _SZ_T, shim_4080_flat),
         ("topmid_rear",   _SX_TM,   _SY_R, _SZ_T, shim_4080_flat),
         # Bottom 4 corner shims removed — replaced by combined bottom
@@ -388,22 +392,23 @@ for s in solids:
     # ============================================================
     fix_dx = fix_dy = fix_dz = 0.0
 
-    # 1. Z-motor corner stack — drop all motors flush onto post top (Z=1000)
+    # 1. Z-motor corner stack — motors rest on 5mm cap (zmin ≈ 1005)
+    #    Source non-RR motors already at correct Z (zmin=1005.1). No Z fixup.
+    #    Source RR motor is higher (zmin=1011.9), fix down to match.
+    #    Verified against Nick's Fusion placement: M3-2_Ass_3dbrak.step
     if cz > 900 and dims in {(56.4, 56.4, 76.6), (65.0, 69.0, 69.0)}:
         is_left  = cx < 1040
         is_front = cy < 520
         is_RR    = (not is_left) and (not is_front)
         if is_RR:
-            # RR source is at different Z than the others
             if dims == (56.4, 56.4, 76.6):
-                fix_dz = -11.9  # 1000 - 1011.9
+                fix_dz = -6.9   # 1005 - 1011.9 (match cap top)
         else:
             sign_x = -1.0 if is_left  else +1.0
             sign_y = +1.0 if is_front else -1.0
             fix_dx = 4.25 * sign_x
             fix_dy = 12.0 * sign_y
-            if dims == (56.4, 56.4, 76.6):
-                fix_dz = -5.25  # 1000 - 1005.25
+            # No Z fixup — source motors already at correct height
 
     # 2. Gantry plates (mid-height, signature 3x88x127)
     #    — Corner Z-gantry plates snap to an ABSOLUTE Y target so all 4
@@ -514,7 +519,7 @@ for s in solids:
 # POST-LOOP additions: corner connectors, Y-motor brackets, idler brackets
 # ============================================================
 CONN_COLOR  = Color(0.45, 0.45, 0.50)   # steel grey
-IDL_BRK_COLOR = Color(0.45, 0.45, 0.50)
+IDL_BRK_COLOR = Color(0.59, 0.84, 0.00)  # green (printed part)
 FRAME_CTR = (NX_RIGHT / 2.0, (Y_POST_F + Y_POST_R) / 2.0, NZ_TOP / 2.0)
 
 def _cbeam_axis(b):
@@ -549,14 +554,15 @@ def _bbs_touch(a, b, tol=5.0):
 # Plus a 5mm cap on top of each Z-post.
 import math as _math
 HERE = os.path.dirname(__file__)
-MOUNT_COLOR = Color(1.0, 0.5, 0.0)       # orange — highlight the new part
-CAP_COLOR   = Color(0.30, 0.30, 0.35)
+PRINT_COLOR = Color(0.59, 0.84, 0.00)    # Sunnyday trademark green (matches belts)
+CAP_COLOR   = Color(0.59, 0.84, 0.00)   # green caps too
 
 PLATE_THK   = 4.0        # mm (Y-direction thickness)
 PLATE_W     = 80.0       # mm (X-direction, matches post 80mm face)
-# Motor now flush on post top: body bottom at Z=1000, center at Z=1028.2
-# Plate from Z=960 (shim start) to Z=1056 (motor top) = 96mm
-PLATE_H     = 96.0       # mm (Z-direction: from Z=960 to Z=1056)
+# Motor rests on 5mm cap (zmin=1005, center=1033). Plate from Z=994 to Z=1062.
+# Verified: Nick's Fusion placement M3-2_Ass_3dbrak.step, front-right corner.
+PLATE_H     = 68.0       # mm (Z-direction: Z=994 to Z=1062)
+PLATE_Z_BOT = 994.0      # mm (plate bottom Z)
 CAP_THK     = 5.0
 CAP_W       = 80.0
 CAP_D       = 40.0
@@ -564,8 +570,8 @@ CAP_D       = 40.0
 NEMA_PCD    = 47.14      # mm
 NEMA_BOLT   = 5.5        # mm M5 clearance
 NEMA_CENTER = 23.0       # mm shaft bore
-# Motor center at Z=1028.2. Plate center at Z=960+48=1008.
-MOTOR_CTR_FROM_CENTER = 20.2  # mm above plate center (1028.2 - 1008)
+# Motor center Z=1033. Plate center Z=994+34=1028. Offset = +5mm.
+MOTOR_CTR_FROM_CENTER = 5.0  # mm above plate center
 
 # Build combined plate (in XZ plane, centered at origin)
 _zmount = (cq.Workplane("XZ")
@@ -596,8 +602,8 @@ _z_corners = [
 n_zmounts = 0
 for post_x, plate_y, post_y in _z_corners:
     plate = _zmount.translate((0, 0, 0))
-    plate_z = 960.0 + PLATE_H / 2.0  # center of 96mm plate starting at Z=960
-    assy.add(plate, name=f"zmount_{n_zmounts}", color=MOUNT_COLOR,
+    plate_z = PLATE_Z_BOT + PLATE_H / 2.0  # center of 68mm plate starting at Z=994
+    assy.add(plate, name=f"zmount_{n_zmounts}", color=PRINT_COLOR,
              loc=Location((post_x, plate_y, plate_z)))
     assy.add(_zcap, name=f"zcap_{n_zmounts}", color=CAP_COLOR,
              loc=Location((post_x, post_y, NZ_TOP + CAP_THK / 2.0)))
@@ -630,7 +636,7 @@ _bot_corners = [
 n_botmounts = 0
 for bx, by in _bot_corners:
     assy.add(_bot_mount.translate((0, 0, 0)),
-             name=f"bot_spacer_idler_{n_botmounts}", color=MOUNT_COLOR,
+             name=f"bot_spacer_idler_{n_botmounts}", color=PRINT_COLOR,
              loc=Location((bx, by, BOT_PLATE_H / 2.0)))
     n_botmounts += 1
     n[0] += 1
@@ -683,7 +689,7 @@ _ymount = (cq.Workplane("XY")
            .hole(SLOT_HOLE_D))
 
 # Place Y-motor adapter plates (2x, one per Y-motor)
-YMOUNT_COLOR = Color(1.0, 0.5, 0.0)
+YPRINT_COLOR = Color(0.59, 0.84, 0.00)  # green
 n_ymounts = 0
 for wbb in ymotor_bbs:
     cx = (wbb[0] + wbb[1]) / 2.0
@@ -694,11 +700,47 @@ for wbb in ymotor_bbs:
     plate_x = cx + (-YMOUNT_THK if is_left else +YMOUNT_THK)
     ymount = _ymount.translate((0, 0, 0))
     ymount = ymount.rotate((0, 0, 0), (0, 1, 0), 90)  # rotate to YZ plane
-    assy.add(ymount, name=f"ymount_{n_ymounts}", color=YMOUNT_COLOR,
+    assy.add(ymount, name=f"ymount_{n_ymounts}", color=YPRINT_COLOR,
              loc=Location((plate_x, cy, cz)))
     n_ymounts += 1
     n[0] += 1
-print(f"  {n_ymounts} Y-motor adapter plates (orange)")
+print(f"  {n_ymounts} Y-motor adapter plates (green)")
+
+# --- T-brackets at center Y-spreader / X-rail T-junctions ---
+# The center Y-spreader (X=1000-1080) meets the front and rear top X-rails
+# at T-junctions. A 3D-printed T-bracket straddles the junction, bolting
+# to both the spreader end and the X-rail face.
+# Bracket: 120mm wide (along X-rail), 80mm tall (along spreader), 4mm thick
+TBRACKET_W = 120.0     # mm along X-rail
+TBRACKET_H = 80.0      # mm along Y-spreader
+TBRACKET_T = 4.0
+_SX_MID = (1000.0 + 1080.0) / 2.0  # center of spreader = X=1040
+
+_tbracket = (cq.Workplane("XY")
+             .box(TBRACKET_W, TBRACKET_H, TBRACKET_T)
+             # 6 bolt holes: 4 into X-rail slots, 2 into spreader slots
+             .faces(">Z").workplane()
+             .pushPoints([
+                 (-40, 0), (0, 0), (40, 0),      # 3 along X-rail
+                 (0, -25), (0, 25),               # 2 along spreader
+                 (-40, 25),                        # 1 more for triangulation
+             ])
+             .hole(SLOT_HOLE_D))
+
+# Front T-junction: spreader meets front X-rail at Y≈18 (shim face), Z=980
+# Rear T-junction: spreader meets rear X-rail at Y≈1022, Z=980
+_t_junctions = [
+    (_SX_MID, _SY_F, _SZ_T),   # front, on the shim face
+    (_SX_MID, _SY_R, _SZ_T),   # rear
+]
+n_tbrackets = 0
+for tx, ty, tz in _t_junctions:
+    tb = _tbracket.translate((0, 0, 0))
+    assy.add(tb, name=f"tbracket_{n_tbrackets}", color=PRINT_COLOR,
+             loc=Location((tx, ty, tz)))
+    n_tbrackets += 1
+    n[0] += 1
+print(f"  {n_tbrackets} T-brackets at center spreader (green)")
 
 print(f"\n  {n[0]} parts total")
 print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
