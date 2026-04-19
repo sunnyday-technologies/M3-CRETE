@@ -1,6 +1,6 @@
 {
-  "version": "2.5.1",
-  "generated": "2026-04-18T08:00:00Z",
+  "version": "2.6.0",
+  "generated": "2026-04-19T04:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2427,8 +2427,8 @@
     {
       "id": 75,
       "category": "3D-Printed Structural",
-      "name": "Z-Motor Mount/Spacer Plate (4mm, combined, 3D printed)",
-      "description": "Combined motor-mount and Y-rail spacer plate. 4mm x 80mm x 68mm printed part on the Y-face of each Z-post corner. NEMA23 bolt pattern in upper section, sits between the shim below (Z=960-1000) and motor above (Z=1005). Motor rests on the 5mm post cap. Sunnyday green. Print in PETG (prototype) or CCF (production).",
+      "name": "Combined Corner Bracket (motor mount + cap + spacer + belt slot, 3D printed)",
+      "description": "Single printed part at each Z-post corner. Combines motor mount plate, post cap, and Y-rail spacer into one piece. Includes 12x22mm belt slot for GT2 belt clearance through the cap section. NEMA23 bolt pattern. 80x44x102mm. Print in PETG (prototype) or CCF (production). CAD: CAD/Custom/Corner_Bracket_Combined.step",
       "qty": 4,
       "unit": "pieces",
       "mfg_type": "print",
@@ -2451,8 +2451,8 @@
     {
       "id": 77,
       "category": "3D-Printed Structural",
-      "name": "X-Splice T-Bracket (gantry beam butt joint)",
-      "description": "T-shaped bracket spans the butt joint where two 1000mm C-beams splice to form the 2m X-axis gantry beam. Top plate + 30mm drop flange into C-channel. 120x80x36mm, 12x M5 bolt holes. Works WITH CF reinforcement rods and standard bar inserts. Print in PETG or CCF. CAD source: CAD/Custom/X_Splice_T_Bracket.step",
+      "name": "Expanded Center T-Bracket (spreader junction, 3D printed)",
+      "description": "Large T-bracket at center Y-spreader / X-rail junctions. 280x160x4mm, 17 M5 holes aligned to C-beam slot centerlines. Grabs both the spreader end and the adjacent X-rail sections for full junction rigidity. CAD: CAD/Custom/Center_T_Bracket_Expanded.step",
       "qty": 2,
       "unit": "pieces",
       "mfg_type": "print",
@@ -2521,23 +2521,23 @@
       ]
     },
     {
-      "id": 80,
+      "id": 81,
       "category": "3D-Printed Structural",
-      "name": "T-Bracket (center spreader junction, 3D printed)",
-      "description": "T-bracket at center Y-spreader / X-rail T-junctions. 120mm x 80mm x 4mm with 6 bolt holes. Straddles the junction, bolting to both spreader and X-rail. Sunnyday green. 2 needed (front + rear T-junctions). Print in PETG or CCF.",
+      "name": "Y-Motor Adapter Plate (NEMA23, 3D printed)",
+      "description": "Flat adapter plate between Y-axis NEMA23 motor and C-beam face. 80x80x4mm with dual hole pattern: NEMA23 bolt pattern (47.14mm PCD) and 4x M5 extrusion slot mounting holes. Print in PETG or CCF.",
       "qty": 2,
       "unit": "pieces",
       "mfg_type": "print",
-      "sort_order": 39,
+      "sort_order": 40,
       "mpn": null,
       "substitute_ok": false,
       "exclude_from_kit": false,
       "suppliers": [
         {
-          "id": 1280,
+          "id": 1281,
           "supplier_name": "Self-Manufacture",
           "product_url": null,
-          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). STL generated from CadQuery script.",
+          "notes": "3D print in PETG or CCF.",
           "sku": null,
           "step_url": null,
           "approved": true
