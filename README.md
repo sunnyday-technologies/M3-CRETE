@@ -94,9 +94,9 @@ M3-CRETE/
 
 ### AI-Assisted CAD Workflow
 
-This project uses [CAD Harness](https://github.com/sunnyday-technologies/cad-harness) — an automated validation framework for STEP assemblies developed during this project. The assembly script generates geometry, the self-check harness validates it (inventory, interference, adjacency, dimensions), and the kinematics module analyzes structural performance. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
+This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) — an automated validation framework for STEP assemblies developed during this project. The assembly script generates geometry, the self-check harness validates it (inventory, interference, adjacency, dimensions), and the kinematics module analyzes structural performance. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
 
-See the [CAD Harness repo](https://github.com/sunnyday-technologies/cad-harness) for the generalized, reusable framework.
+See the [CADCLAW repo](https://github.com/sunnyday-technologies/CADCLAW) for the generalized, reusable framework.
 
 ---
 
@@ -147,7 +147,7 @@ See [LICENSES/](LICENSES/) for full license texts.
 |----------|-------------|
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
 | [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Kit details, design philosophy, and contact for early access |
-| [CAD Harness](https://github.com/sunnyday-technologies/cad-harness) | Automated STEP assembly validation — extracted from this project |
+| [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) | Automated STEP assembly validation — extracted from this project |
 | [CEMFORGE™](https://cemforge.ai/concrete-printers/) | AI-powered concrete formulation platform by Sunnyday Technologies |
 | [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Klipper |
 
