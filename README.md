@@ -6,6 +6,8 @@ M3-CRETE is an open-source hardware project for building a concrete 3D printer f
 
 **M³** = **M**obile · **M**odular · **M**eter³
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19647436.svg)](https://doi.org/10.5281/zenodo.19647436)
+
 Developed by [Sunnyday Technologies](https://sunn3d.com).
 
 | Spec | Value |
