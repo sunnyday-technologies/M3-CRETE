@@ -459,17 +459,33 @@ for s in solids:
                 if cz > 900:
                     template = _cbeam_xrail_chanYp if cy < 520 else _cbeam_xrail_chanYn
                     kind = "Xtop"
+                elif 300 < cz < 600 and 400 < cy < 640:
+                    # X-gantry beam (moving): mid-Y, mid-Z. Source is flat;
+                    # we rotate to tall (80 mm vertical) for bending
+                    # resistance — 2 m span simply-supported, 5 kg mid-load
+                    # gives δ = 0.225 mm bare vs 0.727 mm flat.
+                    template = _cbeam_xrail_chanYp
+                    kind = "Xgantry"
                 else:
                     template = _cbeam_xrail_flat
                     kind = "Xmid"
             else:
                 raise RuntimeError(f"unexpected C-beam dims {dims}")
             tbb = template.val().BoundingBox()
+            if kind == "Xgantry":
+                # Center-align because flat source bbox (80 in Y) differs
+                # from the tall template bbox (80 in Z). Corner-align would
+                # offset the beam by the mismatch.
+                tcx = (tbb.xmin + tbb.xmax) / 2.0
+                tcy = (tbb.ymin + tbb.ymax) / 2.0
+                tcz = (tbb.zmin + tbb.zmax) / 2.0
+                loc_vec = (cx - tcx, cy - tcy, cz - tcz)
+            else:
+                loc_vec = (bb.xmin - tbb.xmin,
+                           bb.ymin - tbb.ymin,
+                           bb.zmin - tbb.zmin)
             assy.add(template, name=f"cbeam_{kind}_{replaced_cbeams}",
-                     color=DRK,
-                     loc=Location((bb.xmin - tbb.xmin,
-                                    bb.ymin - tbb.ymin,
-                                    bb.zmin - tbb.zmin)))
+                     color=DRK, loc=Location(loc_vec))
             cbeam_bbs.append((bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
             replaced_cbeams += 1
             n[0] += 1
@@ -747,7 +763,9 @@ print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
 print(f"  {replaced_brackets} L-brackets replaced with generic parametric")
 print(f"  Generation time: {time.time()-t0:.1f}s")
 
-out = os.path.join(os.path.dirname(__file__), "M3-2_Assembly.step")
+# Write to a distinct filename so CADQuery regen never clobbers a Fusion
+# export living at CAD/M3-2_Assembly.step. Renders can point at either.
+out = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_cadquery.step")
 print(f"\nExporting {n[0]} parts to STEP...")
 t1 = time.time()
 assy.save(out)
