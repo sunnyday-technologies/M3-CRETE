@@ -29,7 +29,12 @@ exclude:
   - docs/session-2026-04-13-bom-audit.md
   - docs/m3crete-hackaday-prompt.md
   - docs/PREVIEW_HARNESS_NOTES.md
-  - bom/data.json         # large JSON, not a page
+  # NOTE: bom/data.json is intentionally NOT excluded — the BOM viewer at
+  # /bom/ fetches it at runtime via `fetch('data.json')`. Excluding it from
+  # Jekyll's output causes the live site to return 404 and the viewer falls
+  # back to an error toast ("Failed to load BOM data — check data.json").
+  # Broke m3-crete.com/bom on 2026-04-21; fixed by removing this exclusion.
+  # DO NOT re-add "- bom/data.json" to this list.
   - .claude/
   - "*.py"
   - "*.step"
