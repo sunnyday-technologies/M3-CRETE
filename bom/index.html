@@ -1291,7 +1291,7 @@ function getPartDisplay(part) {
 function renderBOM() {
     const container = document.getElementById('bomContent');
     if (!App.parts.length) {
-        container.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary)">No parts found. Check your Supabase connection and config.</p>';
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary)">No parts found. The <code>data.json</code> file at <code>/bom/data.json</code> failed to load or is empty. If this is m3-crete.com, check that <code>_config.yml</code> does NOT have <code>bom/data.json</code> in its Jekyll <code>exclude</code> list — that was the 2026-04-21 regression.</p>';
         return;
     }
 
