@@ -120,3 +120,11 @@ Publications/
 # Consolidated history archive — raw Claude transcripts, VICTORiA cross-refs,
 # doc snapshots. Local-only, never publish. Refresh via _archive/refresh.sh.
 _archive/
+
+# Per-serial-number build BOM analysis and order records — local/personal.
+# These capture Nick's actual purchasing history (vendor prices, order
+# numbers, shipping addresses) and stay off GitHub. The public repo keeps
+# only the template: bom/index.html (viewer) + bom/data.json (parts spec).
+bom/M3-CRETE_*_build_bom.xlsx
+bom/build_bom_*.py
+bom/orders/
