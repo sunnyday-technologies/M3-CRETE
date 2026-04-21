@@ -758,6 +758,30 @@ for tx, ty, tz in _t_junctions:
     n[0] += 1
 print(f"  {n_tbrackets} T-brackets at center spreader (green)")
 
+# --- X-gantry carriage: 8 V-wheels ------------------------------------
+# Source AllC.step has Y-carriage wheels at the two gantry ends (X=21,
+# X=2059) but lacks the 8 X-carriage wheels that ride on the gantry
+# beam itself. Pattern: "same positioning rules as Y/Z carriages, just
+# doubled" — 2 wheels along X (spacing) × 2 Y × 2 Z = 8 wheels.
+#
+# Positions taken from the Fusion M3-2_Assembly.step authored design at
+# the X-carriage parked position (X~1496, mid-gantry). Shape here is a
+# parametric cylinder placeholder at nominal wheel OD/thickness — exact
+# V-race profile comes through when the source re-exports with wheels.
+X_CARR_X  = [1468.7, 1524.1]   # 55.4 mm spacing along gantry axis
+X_CARR_Y  = [508.6, 528.4]     # ±9.9 from gantry centerline Y=520
+X_CARR_Z  = [325.0, 408.3]     # ±41.65 from gantry centerline Z=369.5
+_xcarr_wheel = cq.Workplane("XZ").cylinder(10.2, 23.9 / 2.0)
+n_xcarr_wheels = 0
+for wx in X_CARR_X:
+    for wy in X_CARR_Y:
+        for wz in X_CARR_Z:
+            assy.add(_xcarr_wheel, name=f"vwheel_xcarr_{n_xcarr_wheels}",
+                     color=GRN, loc=Location((wx, wy, wz)))
+            n_xcarr_wheels += 1
+            n[0] += 1
+print(f"  {n_xcarr_wheels} X-carriage V-wheels (green)")
+
 print(f"\n  {n[0]} parts total")
 print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
 print(f"  {replaced_brackets} L-brackets replaced with generic parametric")
