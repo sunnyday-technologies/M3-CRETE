@@ -1,0 +1,30 @@
+{
+  "title": "M3-CRETE: Open-Source Concrete 3D Printer",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Sonnentag, Nicholas",
+      "affiliation": "Sunnyday Technologies"
+    }
+  ],
+  "description": "An open-source, buildable, field-serviceable concrete 3D printer. Includes full CAD, bill-of-materials, firmware configuration, and validation tooling. Designed for teams that need to replicate, maintain, and scale independently of proprietary industrial systems.",
+  "license": "CERN-OHL-W-2.0",
+  "keywords": [
+    "3D printing",
+    "concrete",
+    "construction",
+    "CNC",
+    "open hardware",
+    "DIY",
+    "3DCP",
+    "additive manufacturing"
+  ],
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/sunnyday-technologies/M3-CRETE",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
