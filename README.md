@@ -155,9 +155,27 @@ See [LICENSES/](LICENSES/) for full license texts.
 
 ---
 
+## Author
+
+**Nicholas Sonnentag** — mechanical engineer, founder of [Sunnyday Technologies](https://sunn3d.com). M3-CRETE is designed and maintained by Nick; CAD iteration is AI-assisted (Claude, Anthropic) but the engineering judgment, component selection, build decisions, and direction are his.
+
+- LinkedIn: [Nicholas Sonnentag](https://www.linkedin.com/in/nicholas-sonnentag)
+- Email: `nickworks@sunn3d.com`
+
+## Citation
+
+If you use M3-CRETE designs in research, a build, or derivative work, please cite:
+
+```
+Sonnentag, N. (2026). M3-CRETE: Open-Source Concrete 3D Printer.
+Sunnyday Technologies.
+https://github.com/sunnyday-technologies/M3-CRETE
+```
+
+A [`CITATION.cff`](CITATION.cff) file is included for automated citation tooling.
+
 ## Contributing
 
 We welcome issues, pull requests, and design feedback. If you're building a concrete printer or working with cementitious extrusion, your field experience is valuable — open an issue or start a [discussion](https://github.com/sunnyday-technologies/M3-CRETE/discussions).
 
 **Contact:** info@sunn3d.com
-**LinkedIn:** [Nicholas Sonnentag](https://www.linkedin.com/in/nicholas-sonnentag)

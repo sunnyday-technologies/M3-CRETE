@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use M3-CRETE designs in research or a build, please cite it as below."
+title: "M3-CRETE: Open-Source Concrete 3D Printer"
+abstract: >-
+  M3-CRETE is an open-source, buildable, field-serviceable concrete 3D
+  printer designed for teams that need to replicate, maintain, and scale
+  independently of proprietary industrial systems. Includes CAD,
+  bill-of-materials, firmware configuration, and validation tooling.
+type: software
+authors:
+  - family-names: Sonnentag
+    given-names: Nicholas
+    email: nickworks@sunn3d.com
+    affiliation: Sunnyday Technologies
+license: CERN-OHL-W-2.0
+license-url: "https://cern.ch/cern-ohl"
+repository-code: "https://github.com/sunnyday-technologies/M3-CRETE"
+url: "https://m3-crete.com"
+keywords:
+  - 3D-printing
+  - concrete
+  - construction
+  - CNC
+  - open-hardware
+  - DIY
+  - 3DCP
+  - additive-manufacturing
