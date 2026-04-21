@@ -262,6 +262,7 @@ replaced_brackets = 0
 cbeam_bbs   = []   # for joint detection
 ymotor_bbs  = []   # for Y-motor bracket placement
 idler_bbs   = []   # for idler axle bracket placement
+_vwheel_template_shape = None  # populated from first loaded V-wheel; cloned for X-carriage
 
 # Generic brackets built per-instance (each needs correct axle orientation)
 
@@ -520,6 +521,11 @@ for s in solids:
     assy.add(wp, name=f"{name_prefix}_{n[0]}", color=color,
              loc=Location((fcx - cx, fcy - cy, fcz - cz)))
 
+    # Capture a V-wheel shape once for post-loop X-carriage cloning so
+    # added wheels share the real V-profile instead of a plain cylinder.
+    if dims == (10.2, 23.9, 23.9) and _vwheel_template_shape is None:
+        _vwheel_template_shape = s
+
     # Track parts that need post-loop bracket additions (in WORLD coords
     # = source coords + fixup delta, since SXY=SZ=1).
     wbb = (bb.xmin + (fcx-cx), bb.xmax + (fcx-cx),
@@ -727,27 +733,31 @@ print(f"  {n_ymounts} Y-motor adapter plates (green)")
 # at T-junctions. A 3D-printed T-bracket straddles the junction, bolting
 # to both the spreader end and the X-rail face.
 # Bracket: 120mm wide (along X-rail), 80mm tall (along spreader), 4mm thick
-TBRACKET_W = 120.0     # mm along X-rail
-TBRACKET_H = 80.0      # mm along Y-spreader
+TBRACKET_W = 280.0     # mm along X-rail (matches Fusion 280 long dim)
+TBRACKET_H = 160.0     # mm along Y-spreader (matches Fusion 160 wide dim)
 TBRACKET_T = 4.0
 _SX_MID = (1000.0 + 1080.0) / 2.0  # center of spreader = X=1040
 
 _tbracket = (cq.Workplane("XY")
              .box(TBRACKET_W, TBRACKET_H, TBRACKET_T)
-             # 6 bolt holes: 4 into X-rail slots, 2 into spreader slots
+             # Bolt holes: 6 along X-rail axis, 4 along Y-spreader axis
              .faces(">Z").workplane()
              .pushPoints([
-                 (-40, 0), (0, 0), (40, 0),      # 3 along X-rail
-                 (0, -25), (0, 25),               # 2 along spreader
-                 (-40, 25),                        # 1 more for triangulation
+                 (-100, 0), (-40, 0), (0, 0), (40, 0), (100, 0),  # X-rail row
+                 (0, -60), (0, 60),                                 # Y-spreader
+                 (-60, -40), (60, -40), (-60, 40), (60, 40),        # corner bolts
              ])
              .hole(SLOT_HOLE_D))
 
-# Front T-junction: spreader meets front X-rail at Y≈18 (shim face), Z=980
-# Rear T-junction: spreader meets rear X-rail at Y≈1022, Z=980
+# Front T-junction at Y≈58, Z=1002 (above top X-rail, inside frame face)
+# Rear T-junction at Y≈982, Z=1002. Positions match Fusion authored design
+# for the semi-triangular-profile gussets that join the top X-rails to the
+# center Y-spreader. CADQuery renders them as rectangular plates of the
+# Fusion bbox dims (280 × 160 × 4); exact triangular profile comes through
+# when AllC source re-exports with these gussets.
 _t_junctions = [
-    (_SX_MID, _SY_F, _SZ_T),   # front, on the shim face
-    (_SX_MID, _SY_R, _SZ_T),   # rear
+    (_SX_MID, 58.0,  1002.0),   # front
+    (_SX_MID, 982.0, 1002.0),   # rear
 ]
 n_tbrackets = 0
 for tx, ty, tz in _t_junctions:
@@ -771,16 +781,46 @@ print(f"  {n_tbrackets} T-brackets at center spreader (green)")
 X_CARR_X  = [1468.7, 1524.1]   # 55.4 mm spacing along gantry axis
 X_CARR_Y  = [508.6, 528.4]     # ±9.9 from gantry centerline Y=520
 X_CARR_Z  = [325.0, 408.3]     # ±41.65 from gantry centerline Z=369.5
-_xcarr_wheel = cq.Workplane("XZ").cylinder(10.2, 23.9 / 2.0)
 n_xcarr_wheels = 0
-for wx in X_CARR_X:
-    for wy in X_CARR_Y:
-        for wz in X_CARR_Z:
-            assy.add(_xcarr_wheel, name=f"vwheel_xcarr_{n_xcarr_wheels}",
-                     color=GRN, loc=Location((wx, wy, wz)))
-            n_xcarr_wheels += 1
-            n[0] += 1
-print(f"  {n_xcarr_wheels} X-carriage V-wheels (green)")
+if _vwheel_template_shape is not None:
+    _wbb = _vwheel_template_shape.BoundingBox()
+    _wtcx = (_wbb.xmin + _wbb.xmax) / 2.0
+    _wtcy = (_wbb.ymin + _wbb.ymax) / 2.0
+    _wtcz = (_wbb.zmin + _wbb.zmax) / 2.0
+    _wheel_wp = cq.Workplane().add(_vwheel_template_shape)
+    for wx in X_CARR_X:
+        for wy in X_CARR_Y:
+            for wz in X_CARR_Z:
+                assy.add(_wheel_wp, name=f"vwheel_xcarr_{n_xcarr_wheels}",
+                         color=GRN,
+                         loc=Location((wx - _wtcx, wy - _wtcy, wz - _wtcz)))
+                n_xcarr_wheels += 1
+                n[0] += 1
+    print(f"  {n_xcarr_wheels} X-carriage V-wheels (cloned from source, green)")
+else:
+    # Fallback: no V-wheel in source to clone — use parametric cylinder
+    _fallback_wheel = cq.Workplane("XZ").cylinder(10.2, 23.9 / 2.0)
+    for wx in X_CARR_X:
+        for wy in X_CARR_Y:
+            for wz in X_CARR_Z:
+                assy.add(_fallback_wheel, name=f"vwheel_xcarr_{n_xcarr_wheels}",
+                         color=GRN, loc=Location((wx, wy, wz)))
+                n_xcarr_wheels += 1
+                n[0] += 1
+    print(f"  {n_xcarr_wheels} X-carriage V-wheels (fallback cylinder, green)")
+
+# --- X-carriage gantry plates (2x) ------------------------------------
+# 3 mm polycarbonate plates (88 × 127) on each ±Y face of the gantry beam
+# holding the X-carriage wheels. Dims + positions match Fusion authored
+# design at X-carriage parked location X=1496.4.
+_xcarr_plate = cq.Workplane("XZ").box(127.0, 88.0, 3.0)  # X:127 Z:88 Y:3
+n_xcarr_plates = 0
+for py in (496.0, 541.0):   # -Y and +Y faces of the gantry beam
+    assy.add(_xcarr_plate, name=f"plate_xcarr_{n_xcarr_plates}",
+             color=PLATE, loc=Location((1496.4, py, 366.7)))
+    n_xcarr_plates += 1
+    n[0] += 1
+print(f"  {n_xcarr_plates} X-carriage gantry plates")
 
 print(f"\n  {n[0]} parts total")
 print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
