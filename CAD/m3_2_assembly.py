@@ -772,24 +772,61 @@ _tbracket = (cq.Workplane("XY")
              ])
              .hole(SLOT_HOLE_D))
 
-# Front T-junction at Y≈58, Z=1002 (above top X-rail, inside frame face)
-# Rear T-junction at Y≈982, Z=1002. Positions match Fusion authored design
-# for the semi-triangular-profile gussets that join the top X-rails to the
-# center Y-spreader. CADQuery renders them as rectangular plates of the
-# Fusion bbox dims (280 × 160 × 4); exact triangular profile comes through
-# when AllC source re-exports with these gussets.
-_t_junctions = [
-    (_SX_MID, 58.0,  1002.0),   # front
-    (_SX_MID, 982.0, 1002.0),   # rear
-]
+# T-gussets at the top-rail / Y-spreader junctions.
+# Strategy: prefer the *authored* Fusion gussets from M3-2_Assembly.step
+# so we preserve the full polygon profile + real bolt-grid pattern that
+# CADQuery can't economically re-author parametrically. Fall back to the
+# trapezoidal approximation if the Fusion file is unavailable or missing
+# the gussets (e.g. Fusion visibility-toggle bug ate them).
+_FUSION_REF = os.path.join(os.path.dirname(__file__), "M3-2_Assembly.step")
+_authored_gussets = []
+if os.path.exists(_FUSION_REF):
+    try:
+        _ref_compound = cq.importers.importStep(_FUSION_REF).val()
+        _ref_solids = list(_ref_compound.Solids()) + list(_ref_compound.Shells())
+        _seen = set()
+        for _s in _ref_solids:
+            _bb = _s.BoundingBox()
+            _dx = round(_bb.xmax - _bb.xmin, 1)
+            _dy = round(_bb.ymax - _bb.ymin, 1)
+            _dz = round(_bb.zmax - _bb.zmin, 1)
+            _sig = tuple(sorted([_dx, _dy, _dz]))
+            # Fusion's gusset signature: 4 mm thick, 160 × 280 envelope
+            if _sig == (4.0, 160.0, 280.0):
+                _cx = round((_bb.xmin + _bb.xmax) / 2.0, 1)
+                _cy = round((_bb.ymin + _bb.ymax) / 2.0, 1)
+                _cz = round((_bb.zmin + _bb.zmax) / 2.0, 1)
+                _ckey = (_cx, _cy, _cz)
+                if _ckey not in _seen:
+                    _seen.add(_ckey)
+                    _authored_gussets.append(_s)
+    except Exception as _e:
+        print(f"  [warn] could not import authored gussets: {_e}")
+
 n_tbrackets = 0
-for tx, ty, tz in _t_junctions:
-    tb = _tbracket.translate((0, 0, 0))
-    assy.add(tb, name=f"tbracket_{n_tbrackets}", color=PRINT_COLOR,
-             loc=Location((tx, ty, tz)))
-    n_tbrackets += 1
-    n[0] += 1
-print(f"  {n_tbrackets} T-brackets at center spreader (green)")
+if len(_authored_gussets) >= 2:
+    # Use the real Fusion-authored gussets — full polygon + bolt grid.
+    for _g in _authored_gussets:
+        _wp = cq.Workplane().add(_g)
+        assy.add(_wp, name=f"tbracket_{n_tbrackets}", color=PRINT_COLOR)
+        n_tbrackets += 1
+        n[0] += 1
+    print(f"  {n_tbrackets} T-gussets imported from Fusion "
+          f"(full detail, real hole pattern)")
+else:
+    # Fallback: parametric trapezoid at the design-intent positions.
+    _t_junctions = [
+        (_SX_MID, 58.0,  1002.0),
+        (_SX_MID, 982.0, 1002.0),
+    ]
+    for tx, ty, tz in _t_junctions:
+        tb = _tbracket.translate((0, 0, 0))
+        assy.add(tb, name=f"tbracket_{n_tbrackets}", color=PRINT_COLOR,
+                 loc=Location((tx, ty, tz)))
+        n_tbrackets += 1
+        n[0] += 1
+    print(f"  {n_tbrackets} T-brackets at center spreader "
+          f"(parametric trapezoid fallback — authored Fusion gussets not found)")
 
 # --- X-gantry carriage: 8 V-wheels ------------------------------------
 # Source AllC.step has Y-carriage wheels at the two gantry ends (X=21,
