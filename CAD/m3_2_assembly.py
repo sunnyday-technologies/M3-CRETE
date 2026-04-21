@@ -736,16 +736,39 @@ print(f"  {n_ymounts} Y-motor adapter plates (green)")
 TBRACKET_W = 280.0     # mm along X-rail (matches Fusion 280 long dim)
 TBRACKET_H = 160.0     # mm along Y-spreader (matches Fusion 160 wide dim)
 TBRACKET_T = 4.0
+# Pentagon/trapezoid approximation of the Fusion semi-triangular gusset:
+# - Long base along the X-rail (Y=0 side): full 280 mm.
+# - Narrower top at the Y-spreader side (Y=TBRACKET_H): tapers to 100 mm.
+# - Two angled corners chamfered to give the "home plate" pentagon profile.
+# Bolt pattern simplified to a 5×3 grid; real design has more holes.
+TBRACKET_TOP_W = 100.0   # narrower top edge (toward spreader)
 _SX_MID = (1000.0 + 1080.0) / 2.0  # center of spreader = X=1040
 
+# Pentagon gusset profile (isoceles trapezoid, CCW in XY plane):
+#   Y=-TBRACKET_H/2 is the long base along the X-rail.
+#   Y=+TBRACKET_H/2 is the short top edge along the Y-spreader.
+_tb_half_base = TBRACKET_W / 2.0      # 140
+_tb_half_top  = TBRACKET_TOP_W / 2.0  # 50
+_tb_half_h    = TBRACKET_H / 2.0      # 80
+_tb_profile = [
+    (-_tb_half_base, -_tb_half_h),
+    ( _tb_half_base, -_tb_half_h),
+    ( _tb_half_top,   _tb_half_h),
+    (-_tb_half_top,   _tb_half_h),
+]
 _tbracket = (cq.Workplane("XY")
-             .box(TBRACKET_W, TBRACKET_H, TBRACKET_T)
-             # Bolt holes: 6 along X-rail axis, 4 along Y-spreader axis
+             .polyline(_tb_profile).close()
+             .extrude(TBRACKET_T)
+             # 5x3 bolt grid: 5 along X-rail (base), 3 rows Y-ward (base, mid, top).
+             # Rows scale their X-spread to stay inside the tapering polygon.
              .faces(">Z").workplane()
              .pushPoints([
-                 (-100, 0), (-40, 0), (0, 0), (40, 0), (100, 0),  # X-rail row
-                 (0, -60), (0, 60),                                 # Y-spreader
-                 (-60, -40), (60, -40), (-60, 40), (60, 40),        # corner bolts
+                 # base row (Y = -60)
+                 (-120, -60), (-60, -60), (0, -60), (60, -60), (120, -60),
+                 # middle row (Y = 0)
+                 (-90, 0), (-30, 0), (30, 0), (90, 0),
+                 # top row (Y = 60)
+                 (-30, 60), (0, 60), (30, 60),
              ])
              .hole(SLOT_HOLE_D))
 
