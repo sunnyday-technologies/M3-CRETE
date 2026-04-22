@@ -207,7 +207,11 @@ with open(os.path.join(HERE, "BOM_README.md"), "w") as f:
     f.write("- Belt clamps (per user: will be added inline as pin joints)\n")
     f.write("- Pulley grub screws (pre-installed from supplier)\n")
     f.write("- X-axis rack-and-pinion drivetrain (not yet modeled)\n")
-    f.write("- Cable management, end-stops, leveling feet, enclosure panels\n")
+    f.write("- Cable management (covered by drag chain + sleeving + glands in main BOM)\n")
+    f.write("- Mechanical endstops / limit switches — NO endstops on this machine: "
+            "StallGuard4 sensorless homing via TMC5160. See .claude/CLAUDE.md 'Design Exclusions'.\n")
+    f.write("- Leveling feet — using bed-probe leveling, not mechanical M16 feet (2026-04-21)\n")
+    f.write("- Enclosure panels / HEPA / LED / carbon fiber — per Nick's explicit exclusions\n")
     f.write("- Power supply, electronics, wiring\n")
 
 print(f"BOM generation complete:")
