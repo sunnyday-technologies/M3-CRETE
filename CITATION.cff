@@ -10,7 +10,7 @@ type: software
 authors:
   - family-names: Sonnentag
     given-names: Nicholas
-    email: nickworks@sunn3d.com
+    email: info@sunn3d.com
     affiliation: Sunnyday Technologies
 license: CERN-OHL-W-2.0
 license-url: "https://cern.ch/cern-ohl"
