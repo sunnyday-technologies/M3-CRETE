@@ -1,14 +1,14 @@
 {
-  "version": "2.6.1",
-  "generated": "2026-04-20T13:45:00Z",
+  "version": "2.6.2",
+  "generated": "2026-04-22T12:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
       "id": 5,
       "category": "Frame Hardware & Brackets",
       "name": "Straight Line Internal Connectors (20-Series)",
-      "description": "Splice connectors for modular X-axis extension. 4 connectors per splice joint (one per T-slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws. M3-2 default: 4 splice joints Ã— 4 connectors = 16. Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0 (skip splice).",
-      "qty": 16,
+      "description": "Splice connectors for modular X-axis extension. 4 connectors per splice joint (one per T-slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws. M3-2 (2026-04-22): THREE 2m spans splice end-to-end (2 top frame members + 1 X-gantry) -> 3 joints x 4 connectors = 12. Starting with all 4 per joint for full alignment; may reduce to 2-3 per joint later if flex tolerance allows. X-gantry splice also gets the internal 2040 bonded reinforcement (id 65); frame top members get optional 6mm backup plate (id 82). Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0 (skip splice).",
+      "qty": 12,
       "unit": "pieces",
       "mfg_type": "buy",
       "sort_order": 15,
@@ -118,8 +118,8 @@
       "id": 7,
       "category": "Frame Hardware & Brackets",
       "name": "Eccentric Spacers (V-Slot)",
-      "description": "Required for V-wheel preload adjustment on all motion axes (X, Y, and Z). Each V-wheel carriage uses eccentric spacers on the bottom wheels to tension against the rail. Without these, wheels cannot be properly preloaded and will be loose on the rail.",
-      "qty": 24,
+      "description": "One per wheel, all 32 positions (2026-04-23: eccentric on every wheel for maximum preload adjustability on prototype). 6mm tall, 10mm OD, 6mm bore, off-center. Adds 6mm of axial offset along the bolt axis only — zero protrusion in the travel direction. Stack per wheel: M5 bolt -> plate -> eccentric spacer (6mm) -> V-wheel -> 6mm plain spacer (id 83) -> washer -> lock nut. NOTE: check all wheels for inner bearing spacer between the two 625ZZ races — missing inner spacer causes axial wheel slop.",
+      "qty": 32,
       "unit": "pieces",
       "mfg_type": "buy",
       "sort_order": 25,
@@ -499,7 +499,7 @@
       "id": 17,
       "category": "Dual Y-Axis Motion System",
       "name": "V-Groove Wheels (Polycarbonate)",
-      "description": "More wheels = better load distribution on the gantry beam carriages. Polycarbonate (Xtreme/Solid) for heavy gantry loads. Includes X-gantry carriage wheels (8 wheels per full-featured X-axis carriage).",
+      "description": "32 total confirmed from SN 001 physical assembly (2026-04-23). Breakdown: Z 4x4=16 + Y 2x4=8 + X double-plate 2x4=8. Polycarbonate (Xtreme/Solid) for heavy gantry loads.",
       "qty": 32,
       "unit": "wheels",
       "mfg_type": "buy",
@@ -2207,9 +2207,9 @@
     },
     {
       "id": 65,
-      "category": "Frame - Extrusions",
-      "name": "Frame Stiffener â€” Long Span Reinforcement",
-      "description": "Required for 2m spans in M3-2 (and proportionally more in M3-4). Drop one 1m 2040 aluminum extrusion into each 4080 C-beam channel and secure with M5 screws through the C-opening. M3-2 (default): THREE 2m spans: 2 top frame members (X-direction front + rear) + 1 X-gantry, so qty 3 bars. Prior spec (qty 4) assumed a 2-rail x 2-bar bonded-tube layup; replaced 2026-04-21 with the simpler 1-per-span channel fill. M3-1: not required (no 2m spans).",
+      "category": "Frame - Reinforcement",
+      "name": "X-Gantry Internal Reinforcement (2040 V-slot, bonded)",
+      "description": "Three 1m 2040 V-slot bars inserted inside the X-gantry 4080 C-beam channel and bonded with structural adhesive (West System G/flex 655, JB Weld, or equivalent). Staggered so the center bar bridges the splice 500mm each side of the butt joint, giving triple reinforcement in the center zone and single reinforcement at the ends. No 2m section needed - existing 1m stock (Maker Store LR-2040-B-1000) covers this. Required because the X-carriage is 2-sided: V-wheels ride on top AND bottom of the gantry beam exterior, so no external reinforcement can protrude past the 40mm top/bottom faces. Frame top members (non-gantry 2m spans) use the optional 6mm backup plate (id 82) instead - cheaper, no carriage constraint. M3-1: not required. M3-2/M3-4: qty 3 (X-gantry only).",
       "qty": 3,
       "unit": "bars (1.0m each)",
       "mfg_type": "buy",
@@ -2220,36 +2220,36 @@
       "suppliers": [
         {
           "id": 209,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=aluminum+rectangular+tube+1x2+inch+6063",
-          "notes": "Aluminum rectangular tube 25x50x2mm 6063-T5",
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "2040 V-slot aluminum extrusion, custom 2m cut - US warehouse",
           "sku": null,
           "step_url": null,
           "approved": true
         },
         {
           "id": 210,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/KARBXON-Carbon-Pultruded-Planes-Drones-Projects/dp/B09Q7V4FLY",
-          "notes": "KARBXON CF flat bar 20x4mm pultruded - lightweight alternative",
-          "sku": "B09Q7V4FLY",
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "2040 V-slot factory-direct, custom 2m cut",
+          "sku": null,
           "step_url": null,
           "approved": true
         },
         {
           "id": 211,
-          "supplier_name": "McMaster-Carr",
-          "product_url": "https://mcmaster.com",
-          "notes": "Aluminum rectangular tube 6063-T52",
+          "supplier_name": "ZYLtech",
+          "product_url": "https://www.zyltech.com/",
+          "notes": "2040 V-slot custom length, US warehouse",
           "sku": null,
           "step_url": null,
           "approved": true
         },
         {
           "id": 212,
-          "supplier_name": "Metals Depot",
-          "product_url": "https://www.metalsdepot.com/",
-          "notes": "Aluminum rectangular tube - cut to length, ships from Kentucky",
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=JB+Weld+Steel+Reinforced+Epoxy",
+          "notes": "Structural adhesive consumable - JB Weld Steel-Reinforced Epoxy or West System G/flex 655 (owner-supplied)",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2352,8 +2352,8 @@
     {
       "id": 69,
       "category": "Motion - Plates",
-      "name": "V-Slot Gantry Plate 20-80mm (OpenBuilds)",
-      "description": "6 total: 4x Z-corner carriage plates + 2x X-carriage plates. 127x88x3mm with standard wheel mounting pattern.",
+      "name": "Gantry Plate Standard (Z-axis and Y-axis carriages)",
+      "description": "Z-axis and Y-axis carriages only (2026-04-23). 127x88x3mm standard V-slot gantry plate. 4x Z-corner + 2x Y-gantry = 6 total. Torque load is divided across multiple carriages on these axes so the smaller plate is acceptable. X-axis uses the larger XLarge plate (id 84) because load is undivided on the single gantry beam. Trial fit on Z-axis first — if 88mm width is insufficient for 4080 C-beam wheel span, upgrade to XLarge across all axes.",
       "qty": 6,
       "unit": "pc",
       "mfg_type": "buy",
@@ -2365,8 +2365,8 @@
         {
           "id": 1107,
           "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/v-slot-4080/",
-          "notes": "Factory-direct, lowest bulk pricing",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "Standard gantry plate, 127x88x3mm, M5 wheel pattern",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2374,7 +2374,7 @@
         {
           "id": 1108,
           "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/c-beam/",
+          "product_url": "https://makerstore.cc/",
           "notes": "US warehouse, domestic shipping",
           "sku": null,
           "step_url": null,
@@ -2383,41 +2383,32 @@
       ]
     },
     {
-      "id": 72,
-      "category": "Frame Hardware & Brackets",
-      "name": "5-Hole 90-Degree Joining Plate (X-axis splice reinforcement)",
-      "description": "5-hole joining plate bolted across each 1000mm-to-1000mm C-beam splice to reinforce the butt joint. M3-2 (per 2026-04-21 CAD clarification): THREE 2m X-axis spans — 2 top frame members + 1 X-gantry — each made of 2x 1000mm C-beams spliced end-to-end. qty 3 plates = 1 per splice joint (minimal starting stiffness; incrementally upgrade to 2 plates per joint or add bonded-tube reinforcement (id 65) if flex tolerance is inadequate in practice). The X-axis gantry is NOT doubled (not front+rear pair) — single beam, matching the 2026-04-14 CAD. Other frame corners use 3D-printed brackets (see Combined Corner Bracket id 75).",
-      "qty": 3,
-      "unit": "plates",
+      "id": 84,
+      "category": "Motion - Plates",
+      "name": "C-Beam Gantry Plate XLarge (X-axis carriage only)",
+      "description": "X-axis double-plate carriage only (2026-04-23). Larger plate required because X-axis torque is undivided — single gantry beam carries full printhead load. 2 plates total (double-plate sandwich on the 2m gantry beam, 4 wheels each = 8 X-axis wheels). 125x125x6mm square. Z-axis and Y-axis use standard plate (id 69). NOT ordered yet for SN 001 — check what hardware is bundled with the incoming C-beam gantry plate kit before ordering separately.",
+      "qty": 2,
+      "unit": "pc",
       "mfg_type": "buy",
-      "sort_order": 30,
-      "mpn": "PLATE-90-5",
+      "sort_order": 11,
+      "mpn": null,
       "substitute_ok": true,
       "exclude_from_kit": false,
       "suppliers": [
         {
-          "id": 1118,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/5-hole-joining-plate/",
-          "notes": "5-hole 90-degree joining plate, PLATE-90-5.",
-          "sku": "PLATE-90-5",
-          "step_url": null,
-          "approved": true
-        },
-        {
-          "id": 1119,
+          "id": 1288,
           "supplier_name": "Bulkman3D",
-          "product_url": "https://bulkman3d.com/product/5-hole-90-degree-joining-plate/",
-          "notes": "5-Hole 90-Degree Joining Plate, 2020 series, black anodized.",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "C-Beam Gantry Plate XLarge, ~125x170x6mm — verify SKU against 4080 C-beam wheel hole pattern",
           "sku": null,
           "step_url": null,
           "approved": true
         },
         {
-          "id": 1120,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=5+hole+joining+plate+2020+aluminum+extrusion",
-          "notes": "Generic 5-hole T-plates for 20-series extrusion widely available.",
+          "id": 1289,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "C-Beam Gantry Plate XLarge, US warehouse",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2473,30 +2464,6 @@
       ]
     },
     {
-      "id": 78,
-      "category": "Frame - Reinforcement",
-      "name": "Carbon Fiber Reinforcement Rod (12mm OD pultruded tube)",
-      "description": "12mm OD / 10mm ID pultruded carbon fiber tubes, epoxied into top and bottom C-beam channels of the 2m gantry beam. Two rods span the full 2m continuously (bridging the splice joint). Provides 2.2x stiffness increase, reduces center sag from 0.9mm to 0.42mm. ~200g total weight penalty. E=230 GPa (3.3x aluminum). Bond with structural epoxy (West System or JB Weld).",
-      "qty": 2,
-      "unit": "rods (2m each)",
-      "mfg_type": "buy",
-      "sort_order": 12,
-      "mpn": null,
-      "substitute_ok": true,
-      "exclude_from_kit": false,
-      "suppliers": [
-        {
-          "id": 1140,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=12mm+carbon+fiber+tube+pultruded+2m",
-          "notes": "Pultruded CF tubes widely available. Verify 12mm OD, 10mm ID.",
-          "sku": null,
-          "step_url": null,
-          "approved": true
-        }
-      ]
-    },
-    {
       "id": 79,
       "category": "3D-Printed Structural",
       "name": "Bottom Spacer/Idler Mount (4mm, combined, 3D printed)",
@@ -2538,6 +2505,90 @@
           "supplier_name": "Self-Manufacture",
           "product_url": null,
           "notes": "3D print in PETG or CCF.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "category": "Frame - Reinforcement",
+      "name": "Frame Splice Backup Plate (6mm aluminum, optional)",
+      "description": "OPTIONAL backup reinforcement for the two non-gantry 2m frame top members (front + rear X-direction). 6mm aluminum flat plate mounted underneath each splice - spans the joint on the exterior bottom face with through-bolts into the C-beam T-slots (M5 cap screws + T-nuts). Only required IF the slot-linking kit alone has insufficient rigidity for a given build or load. Cheaper than the internal 2040 approach (id 65) and allowed here because these frame members have no carriage-clearance constraint - external protrusion is fine on the underside. Do NOT use on the X-gantry beam (id 65 covers that; the 2-sided carriage precludes any external reinforcement). Suggested dimensions: ~200x80x6mm to provide >=60mm of bolt engagement on each side of the splice. M3-1: not needed (no 2m spans). M3-2: qty 2 (optional). M3-4: qty per spliced frame section.",
+      "qty": 2,
+      "unit": "plates",
+      "mfg_type": "buy",
+      "sort_order": 16,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": true,
+      "suppliers": [
+        {
+          "id": 1282,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://www.mcmaster.com/products/aluminum-sheets/thickness~6-mm/",
+          "notes": "6mm aluminum flat stock 6061-T6, cut to ~200x80mm",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1283,
+          "supplier_name": "Metals Depot",
+          "product_url": "https://www.metalsdepot.com/",
+          "notes": "6mm (1/4 in nominal) aluminum flat bar, cut to length, ships from Kentucky",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1284,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=6mm+aluminum+flat+plate+6061",
+          "notes": "6061-T6 aluminum flat plate, various stock sizes",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "category": "Frame Hardware & Brackets",
+      "name": "V-Wheel Axle Spacers 6mm (plain cylindrical)",
+      "description": "One per wheel, outboard of wheel between wheel face and washer/lock nut. 6mm tall, ~10mm OD, 5.1mm bore (M5 clearance). Measured on SN 001 assembly 2026-04-23: 5mm to reach track + 1mm running gap = 6mm required. Full wheel stack: M5 bolt -> plate -> eccentric spacer (id 7, 6mm) -> V-wheel -> THIS spacer (6mm) -> washer -> lock nut. All 32 wheel positions. 60 ordered for SN 001 (surplus covers spares and inner bearing spacers if needed).",
+      "qty": 32,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 26,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1285,
+          "supplier_name": "Bulkman3D",
+          "product_url": "https://bulkman3d.com/",
+          "notes": "V-Slot standard spacer 6mm, M5 bore — matches eccentric spacer OD",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1286,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Standard 6mm spacer, M5 bore, matches V-wheel assembly kit",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1287,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=M5+aluminum+spacer+6mm+V-slot",
+          "notes": "M5 bore aluminum standoff spacer 6mm length — verify 10mm OD to match wheel assembly",
           "sku": null,
           "step_url": null,
           "approved": true
