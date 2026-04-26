@@ -47,11 +47,12 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (4.0, 68.0, 80.0):    'zmount',
-    (5.0, 40.0, 80.0):    'zcap',
+    (4.0, 80.0, 107.0):   'zmount',
     (4.0, 80.0, 100.0):   'bot-mount',
-    (4.0, 80.0, 80.0):    'ymount',
-    (4.0, 80.0, 120.0):   'tbracket',
+    # ymount: TODO update signature when user adds 4mm spacer plate to source STEP
+    # (Y-motors will mount directly into extrusion via T-nuts, with a 4mm spacer
+    # to keep the motor body clear of the C-beam channel)
+    (4.0, 160.0, 280.0):  'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
 
@@ -75,16 +76,16 @@ EXPECTED = {
     'cbeam': 17,
     'bracket': 0,          # all L-brackets removed
     'motor': 6,            # 4 Z + 2 Y
-    'vwheel': 24,
+    'vwheel': 32,
     'pulley': 6,
-    'idler': 5,
-    'plate': 6,
-    'shim': 6,             # 4 top corners + 2 mid-frame
+    'idler': 7,             # 5 from source STEP + 2 Y-axis return idlers
+    'plate': 8,
+    'shim': 2,             # 2 mid-frame only; top corners superseded by zmount
     'zmount': 4,
-    'zcap': 4,
+    'zcap': 0,
     'idler-brk': 1,        # only 1 mid-frame idler bracket remains
     'bot-mount': 4,
-    'ymount': 2,
+    'ymount': 0,            # user-supplied 4mm spacer in source STEP (TBD)
     'tbracket': 2,
     'belt': 12,
 }
@@ -100,7 +101,7 @@ for k in sorted(set(list(inv.keys()) + list(EXPECTED.keys()))):
         problems.append(f"inventory: {k} got {got}, expected {want}")
 
 # ---------- CHECK 2: combined motor-mount/spacer sanity ----------
-# Each zmount should be ~4 x 80 x 102 mm; each zcap ~5 x 40 x 80 mm.
+# Each zmount should be ~4 x 80 x 107 mm.
 for s in parts:
     lbl = label_of(s)
     if lbl == 'zmount':
@@ -108,15 +109,18 @@ for s in parts:
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
         if dims[0] > 6:
             problems.append(f"zmount dims {dims} — thinnest axis > 6mm")
+        if not (78 <= dims[1] <= 82 and 105 <= dims[2] <= 109):
+            problems.append(f"zmount dims {dims} - expected roughly 4 x 80 x 107")
     elif lbl == 'zcap':
         bb = s.BoundingBox()
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
         if dims[0] > 8:
             problems.append(f"zcap dims {dims} — thinnest axis > 8mm")
 
-# ---------- CHECK 3: motors attached to brackets (within 50 mm) ----------
+    # ymount dimension check removed — user-supplied 4mm spacer in source STEP (TBD)
+
+# ---------- CHECK 3: Z motors attached to printed mount/spacer plates ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
-brackets = [s for s in parts if label_of(s) == 'bracket']
 def center(s):
     bb = s.BoundingBox()
     return ((bb.xmin + bb.xmax) / 2, (bb.ymin + bb.ymax) / 2, (bb.zmin + bb.zmax) / 2)
