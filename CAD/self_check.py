@@ -49,9 +49,14 @@ LABELS = {
     (4.0, 40.0, 80.0):    'shim',
     (4.0, 80.0, 107.0):   'zmount',
     (4.0, 80.0, 100.0):   'bot-mount',
-    (4.0, 80.0, 90.0):    'ymount',     # 4mm spacer authored in M3-2_xCar.step
+    (4.0, 80.0, 90.0):    'ymount',     # 4mm spacer authored in source STEP
     (4.0, 160.0, 280.0):  'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
+    # X-carriage authored hardware (M3-2_nudge.step)
+    (5.0, 16.0, 16.0):    'xcarr_bolt',     # M5 SHCS heads (carriage hardware)
+    (9.0, 9.0, 31.5):     'xcarr_axle',     # V-wheel axle / shoulder bolt
+    (1.0, 10.0, 10.0):    'xcarr_washer',   # thin washer
+    (3.2, 10.0, 10.0):    'xcarr_spacer',   # 6mm spacer (sorted dims as 3.2x10x10 due to import)
 }
 
 def sig(s):
@@ -72,21 +77,25 @@ def label_of(s):
 inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
-    'bracket': 0,          # all L-brackets removed
-    'motor': 7,            # 4 Z + 2 Y + 1 X (X-axis motor in M3-2_xCar.step)
-    'vwheel': 29,          # X-carriage wheels TBD
+    'bracket': 0,
+    'motor': 7,            # 4 Z + 2 Y + 1 X
+    'vwheel': 28,          # source-authored
     'pulley': 7,           # 4 Z + 2 Y + 1 X
-    'idler': 10,           # source idlers + Y-axis return idlers
-    'plate': 7,            # gantry plates (X-carriage WIP)
-    'shim': 2,             # 2 mid-frame only; top corners superseded by zmount
-    'zmount': 4,           # authored in source STEP
+    'idler': 10,
+    'plate': 7,
+    'shim': 2,
+    'zmount': 4,
     'zcap': 0,
-    'idler-brk': 3,        # mid-frame + Y-rail idler brackets
-    'bot-mount': 2,        # 2 of 4 corner bot-mount plates removed by user; will be remade
-    'ymount': 1,            # 1 of 2 spacers authored so far (right Y-motor); left TBD
+    'idler-brk': 3,
+    'bot-mount': 0,        # user removed; will be remade via simple modification
+    'ymount': 0,           # user removed; will be remade
     'tbracket': 2,
-    'belt': 12,            # 8 vertical Z-belt segments + 2 left Y + 2 right Y
-    'other': 32,           # X-carriage + pinion-belt details (not yet labeled individually)
+    'belt': 12,            # 8 Z + 2 left-Y + 2 right-Y
+    'xcarr_bolt': 8,       # M5 SHCS at X-carriage
+    'xcarr_axle': 4,       # V-wheel axles (one carriage side modeled)
+    'xcarr_washer': 4,
+    'xcarr_spacer': 4,     # 6mm wheel spacers (one side)
+    'other': 12,           # remaining X-carriage hardware not yet labeled
 }
 problems = []
 print(f"Total parts: {len(parts)}")
@@ -116,13 +125,7 @@ for s in parts:
         if dims[0] > 8:
             problems.append(f"zcap dims {dims} — thinnest axis > 8mm")
 
-    elif lbl == 'ymount':
-        bb = s.BoundingBox()
-        dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
-        # Authored 4mm spacer between Y NEMA23 motor and C-beam (motor rotated
-        # ~45° so bolts align with V-slots). Dim envelope ~4 x 80 x 90.
-        if not (3 <= dims[0] <= 5 and 78 <= dims[1] <= 82 and 88 <= dims[2] <= 92):
-            problems.append(f"ymount dims {dims} - expected roughly 4 x 80 x 90")
+    # ymount dimension check disabled while user re-authors the Y-motor spacers
 
 # ---------- CHECK 3: Z motors attached to printed mount/spacer plates ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
