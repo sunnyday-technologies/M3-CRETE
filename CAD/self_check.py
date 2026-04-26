@@ -47,9 +47,8 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (4.0, 80.0, 107.0):   'zmount',
+    (4.0, 80.0, 97.0):    'zmount',     # corrected user-authored bracket (cloned to all 4 Z + 2 Y)
     (4.0, 80.0, 100.0):   'bot-mount',
-    (4.0, 80.0, 90.0):    'ymount',     # 4mm spacer authored in source STEP
     (4.0, 160.0, 280.0):  'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
     # X-carriage authored hardware (M3-2_nudge.step)
@@ -78,24 +77,24 @@ inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
     'bracket': 0,
-    'motor': 7,            # 4 Z + 2 Y + 1 X
+    'motor': 6,            # 4 Z + 2 Y (X-motor removed in M3-2_xmotor mount.step)
     'vwheel': 28,          # source-authored
     'pulley': 7,           # 4 Z + 2 Y + 1 X
     'idler': 10,
     'plate': 7,
     'shim': 2,
-    'zmount': 4,
+    'zmount': 6,           # 4 corners + 2 Y-motor placements (cloned from authored bracket)
     'zcap': 0,
-    'idler-brk': 3,
+    'idler-brk': 5,        # source iteration added 2 brackets
     'bot-mount': 0,        # user removed; will be remade via simple modification
-    'ymount': 0,           # user removed; will be remade
+    'ymount': 0,           # subsumed by cloned z-bracket at Y-motor positions
     'tbracket': 2,
     'belt': 12,            # 8 Z + 2 left-Y + 2 right-Y
     'xcarr_bolt': 8,       # M5 SHCS at X-carriage
     'xcarr_axle': 4,       # V-wheel axles (one carriage side modeled)
     'xcarr_washer': 4,
     'xcarr_spacer': 4,     # 6mm wheel spacers (one side)
-    'other': 12,           # remaining X-carriage hardware not yet labeled
+    'other': 14,           # remaining X-carriage hardware not yet labeled
 }
 problems = []
 print(f"Total parts: {len(parts)}")
@@ -117,8 +116,8 @@ for s in parts:
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
         if dims[0] > 6:
             problems.append(f"zmount dims {dims} — thinnest axis > 6mm")
-        if not (78 <= dims[1] <= 82 and 105 <= dims[2] <= 109):
-            problems.append(f"zmount dims {dims} - expected roughly 4 x 80 x 107")
+        if not (78 <= dims[1] <= 82 and 95 <= dims[2] <= 99):
+            problems.append(f"zmount dims {dims} - expected roughly 4 x 80 x 97")
     elif lbl == 'zcap':
         bb = s.BoundingBox()
         dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
@@ -184,14 +183,18 @@ for i in plate_idx:
             pass
 
 # ---------- CHECK 5: motor-mount plates span shim+motor zone (Z > 900) ----------
+# The authored bracket is cloned to both Z-motor corners (Z>900) AND Y-motor
+# positions (Z~370). Only enforce the Z>900 rule on plates near a Z-post
+# corner (cx ≈ 0 or NX_RIGHT and |cy - 18| < 10 or |cy - 1022| < 10).
 for s in parts:
     lbl = label_of(s)
     if lbl in ('zmount', 'zcap'):
         bb = s.BoundingBox()
-        if bb.zmin < 900:
-            cx = (bb.xmin + bb.xmax) / 2
-            cy = (bb.ymin + bb.ymax) / 2
-            cz = (bb.zmin + bb.zmax) / 2
+        cx = (bb.xmin + bb.xmax) / 2
+        cy = (bb.ymin + bb.ymax) / 2
+        cz = (bb.zmin + bb.zmax) / 2
+        is_z_corner = (cx < 50 or cx > 2030) and (cy < 30 or cy > 1010)
+        if is_z_corner and bb.zmin < 900:
             problems.append(f"{lbl} at ({cx:.0f},{cy:.0f},{cz:.0f}) below Z=900")
 
 # ---------- REPORT ----------

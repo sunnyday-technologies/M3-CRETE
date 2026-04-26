@@ -18,7 +18,7 @@ from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GCPnts import GCPnts_TangentialDeflection
 import os, time, math
 
-USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_nudge.step")
+USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_xmotor mount.step")
 
 # ============================================================
 # Frame: 1000mm C-beam extrusions (shipping constraint).
@@ -264,6 +264,8 @@ cbeam_bbs   = []   # for joint detection
 ymotor_bbs  = []   # for Y-motor bracket placement
 idler_bbs   = []   # for idler axle bracket placement
 _vwheel_template_shape = None  # populated from first loaded V-wheel; cloned for X-carriage
+_z_bracket_template = None     # captured from the user-authored (4,80,97) plate; cloned to all 4 Z corners + 2 Y motors
+_z_bracket_src_ctr = None      # world-frame source center of the captured bracket
 FRAME_CTR = (NX_RIGHT / 2.0, (Y_POST_F + Y_POST_R) / 2.0, NZ_TOP / 2.0)
 
 # Generic brackets built per-instance (each needs correct axle orientation)
@@ -532,11 +534,19 @@ for s in solids:
             continue
 
     # ============================================================
-    # L-BRACKET — REMOVED. Skip the legacy bracket signatures only.
-    # All other plates (zmount, bot-mount, ymount/spacer) now flow
-    # through from the source STEP — no parametric overrides.
+    # L-BRACKET — REMOVED. Skip the legacy bracket signatures.
+    # OLD zmount geometry (4 x 80 x 107) — superseded by the user-
+    # authored (4 x 80 x 97) bracket; skip and let the post-loop
+    # cloner place the corrected bracket at all 4 corners.
+    # The new (4 x 80 x 97) bracket is captured once and skipped here;
+    # the post-loop places exactly 4 clones (Z) + 2 (Y) instances.
     # ============================================================
-    if dims in {(65.0, 69.0, 69.0), (44.0, 80.0, 102.0)}:
+    if dims in {(65.0, 69.0, 69.0), (44.0, 80.0, 102.0), (4.0, 80.0, 107.0)}:
+        continue
+    if dims == (4.0, 80.0, 97.0):
+        if _z_bracket_template is None:
+            _z_bracket_template = s
+            _z_bracket_src_ctr = (cx, cy, cz)
         continue
 
     # ============================================================
@@ -605,18 +615,73 @@ def _bbs_touch(a, b, tol=5.0):
             a[2] - tol <= b[3] and b[2] - tol <= a[3] and
             a[4] - tol <= b[5] and b[4] - tol <= a[5])
 
-# --- Z-motor mount + bottom spacer/idler plates: NOT generated parametrically ---
-# Earlier parametric generation here produced plates with hole patterns that
-# didn't line up with the actual motor / idler positions. The user-authored
-# source STEP (M3-2_xCar.step) carries these plates with correct geometry.
-# CADCLAW's job is placement and interference checking, not part generation.
-# Constants kept for downstream references (T-bracket bolt grid).
+# --- Z-motor + Y-motor mount placement (cloned from authored bracket) ---
+# The user-authored bracket at signature (4 x 80 x 97) carries the correct
+# hole pattern + center cutout for the NEMA23 motor. Captured during the
+# source loop and cloned here to all 4 Z corners and both Y-motor positions.
+# Pure placement — no part generation.
 import math as _math
 HERE = os.path.dirname(__file__)
-PRINT_COLOR = Color(0.59, 0.84, 0.00)    # Sunnyday trademark green (matches belts)
+PRINT_COLOR = Color(0.59, 0.84, 0.00)    # Sunnyday trademark green
 NEMA_PCD    = 47.14
 NEMA_BOLT   = 5.5
 NEMA_CENTER = 23.0
+
+if _z_bracket_template is not None and _z_bracket_src_ctr is not None:
+    src_x, src_y, src_z = _z_bracket_src_ctr
+
+    # Z-motor corners. Source bracket is at front-right (X=NX_RIGHT, Y=18).
+    # Front pair: bracket faces +Y (motor inside frame).
+    # Rear pair:  bracket faces -Y (motor inside frame) — needs 180° flip about Z.
+    Z_CORNERS = [
+        ("FL", 0.0,       18.0,   src_z, False),
+        ("FR", NX_RIGHT,  18.0,   src_z, False),
+        ("RL", 0.0,       1022.0, src_z, True ),
+        ("RR", NX_RIGHT,  1022.0, src_z, True ),
+    ]
+    n_zbrk = 0
+    for name, tx, ty, tz, flip_y in Z_CORNERS:
+        wp = cq.Workplane().add(_z_bracket_template)
+        if flip_y:
+            # 180° rotation about Z axis through the source center: motor face -> -Y
+            wp = wp.rotate((src_x, src_y, src_z),
+                           (src_x, src_y, src_z + 1.0),
+                           180)
+        dx = tx - src_x
+        dy = ty - src_y
+        dz = tz - src_z
+        assy.add(wp, name=f"zmount_{name}", color=PRINT_COLOR,
+                 loc=Location((dx, dy, dz)))
+        n_zbrk += 1
+        n[0] += 1
+    print(f"  {n_zbrk} Z-motor brackets cloned to corners (from authored source)")
+
+    # Y-motor placements. Bracket rotated 90° about Z so plate is perpendicular
+    # to X axis (faces along ±X toward the C-beam Y-rail face).
+    # Y-motors live at cz~370, cy~985 (rear of frame), cx={left, right rail}.
+    Y_PLACEMENTS = [
+        ("Yleft",  23.4, 985.0, 370.8, +1),
+        ("Yright", 2056.6, 985.0, 370.8, -1),
+    ]
+    n_ybrk = 0
+    for name, tx, ty, tz, x_dir in Y_PLACEMENTS:
+        wp = cq.Workplane().add(_z_bracket_template)
+        # ±90° rotation about Z axis at the source center: plate's normal
+        # rotates from ±Y to ±X, ready to bolt against the rail's X-face.
+        wp = wp.rotate((src_x, src_y, src_z),
+                       (src_x, src_y, src_z + 1.0),
+                       90 * x_dir)
+        dx = tx - src_x
+        dy = ty - src_y
+        dz = tz - src_z
+        assy.add(wp, name=f"ymount_{name}", color=PRINT_COLOR,
+                 loc=Location((dx, dy, dz)))
+        n_ybrk += 1
+        n[0] += 1
+    print(f"  {n_ybrk} Y-motor brackets cloned (rotated 90° from Z-bracket template)")
+else:
+    print(f"  WARNING: no (4,80,97) bracket template captured from source — "
+          f"Z and Y mounts will be missing")
 
 # Remaining idler brackets: only the center-frame idler (not at a corner post)
 # keeps its separate bracket. Corner idlers are now part of the bottom plates.
