@@ -1,20 +1,25 @@
 item,qty,size,notes
-L-corner plate (5-hole 4080),24,5-hole 4080 series,Perpendicular C-beam joints (modeled in CAD)
-Inline splice plate (5-hole 4080),3,5-hole 4080 series,Parallel C-beams meeting end-to-end (e.g. top X rails at center)
+L-corner plate (5-hole 4080),0,5-hole 4080 series,Perpendicular C-beam joints (modeled in CAD)
+Inline splice plate (5-hole 4080),27,5-hole 4080 series,Parallel C-beams meeting end-to-end (e.g. top X rails at center)
 M5 button-head SHCS,135,M5 x 10 mm,C-beam joint screws (5 per joint)
 M5 drop-in T-nut,135,"M5, 4080 series",Mating T-nuts in C-beam slots
-M5 SHCS,24,M5 x 40 mm,V-wheel axle bolt
-M5 nyloc nut,24,M5,V-wheel axle nut
-M5 flat washer,48,M5,Each side of v-wheel stack
-"Eccentric spacer 6mm (1/4 "")",12,6 mm OAL,ONE side of each wheel pair (12 total)
-Standard precision spacer 6mm,12,6 mm OAL,OTHER side of each wheel pair
-M5 SHCS,5,M5 x 30 mm,Smooth idler axle
-M5 nyloc nut,5,M5,Idler axle nut
-M5 flat washer,10,M5,Each side of idler
-M5 SHCS,10,M5 x 10 mm,Idler axle bracket to C-beam
-M5 drop-in T-nut,10,"M5, 4080 series",Mating T-nuts for idler bracket
+M5 SHCS,32,M5 x 40 mm,V-wheel axle bolt
+M5 nyloc nut,32,M5,V-wheel axle nut
+M5 flat washer,64,M5,Each side of v-wheel stack
+"Eccentric spacer 6mm (1/4 "")",16,6 mm OAL,ONE side of each wheel pair (12 total)
+Standard precision spacer 6mm,16,6 mm OAL,OTHER side of each wheel pair
+M5 SHCS,7,M5 x 30 mm,Smooth idler axle
+M5 nyloc nut,7,M5,Idler axle nut
+M5 flat washer,14,M5,Each side of idler
+M5 SHCS,2,M5 x 10 mm,Idler axle bracket to C-beam
+M5 drop-in T-nut,2,"M5, 4080 series",Mating T-nuts for idler bracket
 M5 SHCS,24,M5 x 10 mm,NEMA23 face mounting (4 per motor)
-M5 SHCS,24,M5 x 10 mm,Bracket rail face
-M5 drop-in T-nut,24,"M5, 4080 series",Mating T-nuts for bracket rail face
-M5 SHCS,10,M5 x 16 mm,Through C-beam web into shim/Z-post
-M5 drop-in T-nut,10,"M5, 4080 series",Anchor in Z-post slot
+M5 nut,16,M5,Back-side nuts for pass-through NEMA23 motor holes
+M5 SHCS,16,M5 x 16 mm,Printed motor plate to extrusion slots
+M5 drop-in T-nut,16,"M5, 4080 series",Mating T-nuts for printed motor plates
+M5 SHCS,8,M5 x 16 mm,Bottom spacer/idler mount to Z-post
+M5 drop-in T-nut,8,"M5, 4080 series",Mating T-nuts for bottom spacer/idler mounts
+M5 SHCS,0,M5 x 10 mm,Bracket rail face
+M5 drop-in T-nut,0,"M5, 4080 series",Mating T-nuts for bracket rail face
+M5 SHCS,2,M5 x 16 mm,Through C-beam web into shim/Z-post
+M5 drop-in T-nut,2,"M5, 4080 series",Anchor in Z-post slot

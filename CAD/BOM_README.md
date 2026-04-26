@@ -5,7 +5,7 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 121).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 101).
 
 See `bom_structural.csv`.
 
@@ -22,44 +22,44 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
-- cbeam_177 <-> cbeam_178
-- cbeam_177 <-> cbeam_186
-- cbeam_177 <-> cbeam_191
-- cbeam_177 <-> cbeam_193
+- cbeam_169 <-> cbeam_170
+- cbeam_169 <-> cbeam_178
+- cbeam_169 <-> cbeam_183
+- cbeam_169 <-> cbeam_185
+- cbeam_170 <-> cbeam_172
+- cbeam_170 <-> cbeam_173
+- cbeam_170 <-> cbeam_185
+- cbeam_171 <-> cbeam_182
+- cbeam_172 <-> cbeam_173
+- cbeam_172 <-> cbeam_179
+- cbeam_172 <-> cbeam_183
+- cbeam_173 <-> cbeam_175
+- cbeam_173 <-> cbeam_177
+- cbeam_174 <-> cbeam_176
+- cbeam_174 <-> cbeam_178
+- cbeam_174 <-> cbeam_180
+- cbeam_174 <-> cbeam_181
+- cbeam_175 <-> cbeam_185
+- cbeam_176 <-> cbeam_184
+- cbeam_177 <-> cbeam_185
 - cbeam_178 <-> cbeam_180
-- cbeam_178 <-> cbeam_181
-- cbeam_178 <-> cbeam_193
-- cbeam_179 <-> cbeam_190
-- cbeam_180 <-> cbeam_181
-- cbeam_180 <-> cbeam_187
-- cbeam_180 <-> cbeam_191
-- cbeam_181 <-> cbeam_183
-- cbeam_181 <-> cbeam_185
-- cbeam_182 <-> cbeam_184
-- cbeam_182 <-> cbeam_186
-- cbeam_182 <-> cbeam_188
-- cbeam_182 <-> cbeam_189
-- cbeam_183 <-> cbeam_193
-- cbeam_184 <-> cbeam_192
-- cbeam_185 <-> cbeam_193
-- cbeam_186 <-> cbeam_188
-- cbeam_186 <-> cbeam_191
-- cbeam_187 <-> cbeam_188
-- cbeam_187 <-> cbeam_191
-- cbeam_187 <-> cbeam_192
-- cbeam_188 <-> cbeam_192
-- cbeam_189 <-> cbeam_192
+- cbeam_178 <-> cbeam_183
+- cbeam_179 <-> cbeam_180
+- cbeam_179 <-> cbeam_183
+- cbeam_179 <-> cbeam_184
+- cbeam_180 <-> cbeam_184
+- cbeam_181 <-> cbeam_184
 
 ### V-wheels
 
-24 wheels. Each: 1× M5×40 SHCS, 1× M5 nyloc, 2× M5 washer.
-Half (12) get eccentric spacers (one side per wheel pair),
-the other half (12) get standard precision spacers.
+32 wheels. Each: 1× M5×40 SHCS, 1× M5 nyloc, 2× M5 washer.
+Half (16) get eccentric spacers (one side per wheel pair),
+the other half (16) get standard precision spacers.
 
-### Motors / brackets
+### Motors / printed mounts
 
 6 motors × 4 NEMA23 face screws (M5×10) = 24 screws.
-6 brackets × 4 rail-face screws (M5×10) + T-nuts = 24 pairs.
+0 brackets × 4 rail-face screws (M5×10) + T-nuts = 0 pairs.
 Note: Y-motor brackets and the rack-and-pinion X-motor mounting are
 not yet modeled — add them when the X-axis lands.
 
@@ -67,18 +67,21 @@ not yet modeled — add them when the X-axis lands.
 
 | Item | Qty |
 |---|---|
-| M5 T-nut | 179 |
-| M5 flat washer | 58 |
-| M5 nyloc nut | 29 |
-| M5 x 10 mm | 193 |
-| M5 x 16 mm | 10 |
-| M5 x 30 mm | 5 |
-| M5 x 40 mm | 24 |
+| M5 T-nut | 163 |
+| M5 flat washer | 78 |
+| M5 nyloc nut | 39 |
+| M5 x 10 mm | 161 |
+| M5 x 16 mm | 26 |
+| M5 x 30 mm | 7 |
+| M5 x 40 mm | 32 |
 
 ### Things NOT in this BOM (intentionally)
 
 - Belt clamps (per user: will be added inline as pin joints)
 - Pulley grub screws (pre-installed from supplier)
 - X-axis rack-and-pinion drivetrain (not yet modeled)
-- Cable management, end-stops, leveling feet, enclosure panels
+- Cable management (covered by drag chain + sleeving + glands in main BOM)
+- Mechanical endstops / limit switches — NO endstops on this machine: StallGuard4 sensorless homing via TMC5160. See .claude/CLAUDE.md 'Design Exclusions'.
+- Leveling feet — using bed-probe leveling, not mechanical M16 feet (2026-04-21)
+- Enclosure panels / HEPA / LED / carbon fiber — per Nick's explicit exclusions
 - Power supply, electronics, wiring
