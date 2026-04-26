@@ -17,8 +17,10 @@ conversation-summary.md
 
 # Python virtual environments
 cad_venv/
+.cadclaw_venv/
 .venv/
 __pycache__/
+.cad_venv_freeze_pre_rebuild_*.txt
 
 # NemoCrete — proprietary pump system (separate project)
 NEMA_CRETE/
