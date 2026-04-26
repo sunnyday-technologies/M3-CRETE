@@ -7,7 +7,7 @@
       "id": 5,
       "category": "Frame Hardware & Brackets",
       "name": "Straight Line Internal Connectors (20-Series)",
-      "description": "Splice connectors for modular X-axis extension. 4 connectors per splice joint (one per T-slot) for maximum rigidity and V-groove alignment. 100mm long, M5 set screws. M3-2 (2026-04-22): THREE 2m spans splice end-to-end (2 top frame members + 1 X-gantry) -> 3 joints x 4 connectors = 12. Starting with all 4 per joint for full alignment; may reduce to 2-3 per joint later if flex tolerance allows. X-gantry splice also gets the internal 2040 bonded reinforcement (id 65); frame top members get optional 6mm backup plate (id 82). Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0 (skip splice).",
+      "description": "In-slot connector bars for modular X-direction 2m members. M3-2 uses 3 butt joints x 4 connector bars per joint = 12 total. Bars fit inside the top and bottom V-slots across each joint and clamp with two set screws on either side. These are alignment aids, not the primary stiffness or centering method: SN 001 can flex this joint under gravity with connector bars alone. Each 2m X-direction splice is therefore centered and reinforced by a 1000mm 2040 insert friction-fit inside the 4080 C-Beam and held with printed retainers (id 65/id 85). The 2040 insert also avoids relying on steel set screws as the primary centering feature, reducing galvanic-corrosion concern at the joint. Stagger splice locations across parallel rails to avoid aligned weak planes. For M3-1: qty 0.",
       "qty": 12,
       "unit": "pieces",
       "mfg_type": "buy",
@@ -20,7 +20,7 @@
           "id": 14,
           "supplier_name": "Amazon",
           "product_url": "https://amazon.com",
-          "notes": "20-series straight line connector 100mm with M5 screws â€” 4-pack or 12-pack",
+          "notes": "20-series straight line connector bar, 100mm, with M5 set screws. Alignment aid only; 2040 insert provides primary centering/stiffness.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -29,7 +29,7 @@
           "id": 15,
           "supplier_name": "Amazon",
           "product_url": "https://amazon.com",
-          "notes": "PZRT 2020 series straight line connector bracket",
+          "notes": "2020/20-series straight connector bar. Use 4 per 2m X-direction joint.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -38,7 +38,7 @@
           "id": 16,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/",
-          "notes": "20-series internal joining plate",
+          "notes": "20-series internal connector bar. Use 4 per 2m X-direction joint.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -47,7 +47,7 @@
           "id": 1300,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/product/joining-strip/",
-          "notes": "Internal connectors, 20-series compatible",
+          "notes": "Internal connector bars, 20-series compatible. Use 4 per 2m X-direction joint.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -455,9 +455,9 @@
     },
     {
       "id": 15,
-      "category": "Dual Y-Axis Motion System",
+      "category": "X-Axis Motion System",
       "name": "GT2 Timing Belt 6mm (X-axis, 1x ~2.4m fixed strand)",
-      "description": "X-axis belt-pinion drive, 6mm width fits within 20-slot",
+      "description": "X-axis belt-pinion drive. Uses 6mm GT2 because the X belt must fit inside the gantry slot; do not substitute the 10mm belt used on Y/Z here.",
       "qty": 1,
       "unit": "meters",
       "mfg_type": "buy",
@@ -470,7 +470,7 @@
           "id": 45,
           "supplier_name": "McMaster-Carr",
           "product_url": "https://mcmaster.com",
-          "notes": "Gates PowerGrip GT2 10mm",
+          "notes": "Source 6mm GT2 for X-axis only; 10mm stock is for Y/Z belts.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -479,7 +479,7 @@
           "id": 46,
           "supplier_name": "Amazon",
           "product_url": "https://amazon.com",
-          "notes": "Fiberglass core GT2 10mm",
+          "notes": "Source 6mm GT2 for X-axis only; 10mm stock is for Y/Z belts.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -488,7 +488,7 @@
           "id": 47,
           "supplier_name": "StepperOnline US",
           "product_url": "https://www.omc-stepperonline.com",
-          "notes": "Standard rubber GT2 10mm",
+          "notes": "Source 6mm GT2 for X-axis only; 10mm stock is for Y/Z belts.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -541,7 +541,7 @@
       "id": 18,
       "category": "Dual Y-Axis Motion System",
       "name": "Y-Axis Gantry Plates",
-      "description": "Connects gantry beam to Y-rail carriages. Must span 4080 C-beam rail width. Print saves $160+.",
+      "description": "Connects gantry beam to Y-rail carriages. Current design target is the same 125x125mm C-Beam gantry plate geometry used across Y/Z/X where practical; 3D-print prototype allowed. Common plate standard reduces SKU count and supports component swaps.",
       "qty": 2,
       "unit": "plates",
       "mfg_type": "print",
@@ -643,7 +643,7 @@
       "id": 20,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "GT2 Timing Belt 10mm (Z-axis, 4x ~2.5m loops)",
-      "description": "Belt-driven Z â€” same GT2 10mm belt as X/Y axes. ~3m per Z corner (up + down run + tensioner), 12m total for 4 independent Z drives. Belts shed concrete splatters unlike lead screw threads.",
+      "description": "Belt-driven Z - same GT2 10mm belt as Y-axis; X-axis remains 6mm to fit the gantry slot. ~3m per Z corner (up + down run + tensioner), 12m total for 4 independent Z drives. Belts shed concrete splatters unlike lead screw threads.",
       "qty": 4,
       "unit": "meters",
       "mfg_type": "buy",
@@ -656,7 +656,7 @@
           "id": 60,
           "supplier_name": "McMaster-Carr",
           "product_url": "https://mcmaster.com",
-          "notes": "Gates PowerGrip GT2 10mm â€” same as X/Y",
+          "notes": "Gates PowerGrip GT2 10mm - same as Y; X uses 6mm.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -685,7 +685,7 @@
       "id": 23,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Z-Axis Carriage Plates",
-      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Must mount V-wheels + belt clamp. Print saves $60+.",
+      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Current design target is the same 125x125mm C-Beam gantry plate geometry used across Y/Z/X where practical; must mount V-wheels + belt clamp.",
       "qty": 4,
       "unit": "plates",
       "mfg_type": "print",
@@ -735,42 +735,42 @@
     {
       "id": 24,
       "category": "Quad Z-Axis System (Self-Tramming)",
-      "name": "Z-Axis Motor Mount (NEMA23 Angled L-Bracket)",
-      "description": "NEMA 23 alloy steel angled L-bracket, mounted on top of the M3-2 frame at each post corner with the motor shaft oriented parallel to the X-axis. Replaces the flat motor mount plate used in earlier revisions. Doubles as corner reinforcement for the top X-rail / post junction. Cannot be easily 3D-printed at this load rating, so single source from OMC StepperOnline.",
+      "name": "Z-Axis Motor Mounts (integrated 3D-printed corner brackets)",
+      "description": "No purchased Z motor brackets in the current reference design. Z motor mounting is integrated into the printed combined corner bracket/post cap/spacer with belt clearance (see id 75). Print in PETG for prototype or CCF for production.",
       "qty": 4,
       "unit": "mounts",
-      "mfg_type": "buy",
+      "mfg_type": "print",
       "sort_order": 60,
-      "mpn": "ST-M2",
+      "mpn": null,
       "substitute_ok": true,
       "exclude_from_kit": false,
       "suppliers": [
         {
           "id": 72,
-          "supplier_name": "OMC StepperOnline",
-          "product_url": "https://www.omc-stepperonline.com/nema-23-bracket-for-stepper-motor-and-geared-stepper-motor-alloy-steel-bracket-st-m2",
-          "notes": "ST-M2 NEMA 23 alloy steel bracket. 4 per M3-2 build. Mounts on top of frame; motor shaft parallel to X-axis.",
-          "sku": "ST-M2",
-          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Vendor/StepperOnline/N23_angled_mount.STEP",
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "Print as part of the combined corner bracket. Do not purchase metal NEMA23 L-brackets for SN 001.",
+          "sku": null,
+          "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Custom/Corner_Bracket_Combined.step",
           "approved": true
         },
         {
           "id": 73,
           "supplier_name": "Amazon",
           "product_url": "https://www.amazon.com/s?k=NEMA+23+L+bracket+stepper",
-          "notes": "Generic NEMA23 alloy steel L-brackets are widely available. Verify dimensions match ST-M2 (65 x 69 x 69 mm).",
+          "notes": "Legacy reference only; current design prints the mounts.",
           "sku": null,
           "step_url": null,
-          "approved": true
+          "approved": false
         },
         {
           "id": 1303,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/product/nema23-bracket/",
-          "notes": "NEMA23 L-bracket mount",
+          "notes": "Legacy reference only; current design prints the mounts.",
           "sku": null,
           "step_url": null,
-          "approved": true
+          "approved": false
         }
       ]
     },
@@ -2208,8 +2208,8 @@
     {
       "id": 65,
       "category": "Frame - Reinforcement",
-      "name": "X-Gantry Internal Reinforcement (2040 V-slot, bonded)",
-      "description": "Three 1m 2040 V-slot bars inserted inside the X-gantry 4080 C-beam channel and bonded with structural adhesive (West System G/flex 655, JB Weld, or equivalent). Staggered so the center bar bridges the splice 500mm each side of the butt joint, giving triple reinforcement in the center zone and single reinforcement at the ends. No 2m section needed - existing 1m stock (Maker Store LR-2040-B-1000) covers this. Required because the X-carriage is 2-sided: V-wheels ride on top AND bottom of the gantry beam exterior, so no external reinforcement can protrude past the 40mm top/bottom faces. Frame top members (non-gantry 2m spans) use the optional 6mm backup plate (id 82) instead - cheaper, no carriage constraint. M3-1: not required. M3-2/M3-4: qty 3 (X-gantry only).",
+      "name": "X-Direction Internal Reinforcement (centered 2040 insert)",
+      "description": "One 1000mm 2040 V-slot insert is friction-fit inside each 2m 4080 C-Beam X-direction member, centered on the butt joint so it spans 500mm on either side. Printed end retainers hold the insert in place; no adhesive is required for the current SN 001 method. The insert provides the primary centering and stiffness at the splice; the smaller in-slot connector bars (id 5) remain alignment aids only and can flex under gravity by themselves. The 2040 insert doubles the central internal features of the C-Beam at the highest-risk splice zone while preserving exterior carriage clearance and reducing reliance on steel set screws at the joint. Earlier analysis claimed less than 0.5mm flex under a 5kg load; SN 001 physical validation shows actual flex is far below that conservative claim. M3-1: not required. M3-2: qty 3 for the three spliced 2m X-direction members.",
       "qty": 3,
       "unit": "bars (1.0m each)",
       "mfg_type": "buy",
@@ -2222,7 +2222,7 @@
           "id": 209,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/",
-          "notes": "2040 V-slot aluminum extrusion, custom 2m cut - US warehouse",
+          "notes": "2040 V-slot aluminum extrusion, 1000mm insert centered across each 2m C-Beam butt joint.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2231,7 +2231,7 @@
           "id": 210,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/",
-          "notes": "2040 V-slot factory-direct, custom 2m cut",
+          "notes": "2040 V-slot, 1000mm insert centered across each 2m C-Beam butt joint.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2240,16 +2240,16 @@
           "id": 211,
           "supplier_name": "ZYLtech",
           "product_url": "https://www.zyltech.com/",
-          "notes": "2040 V-slot custom length, US warehouse",
+          "notes": "2040 V-slot, 1000mm insert centered across each 2m C-Beam butt joint.",
           "sku": null,
           "step_url": null,
           "approved": true
         },
         {
           "id": 212,
-          "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=JB+Weld+Steel+Reinforced+Epoxy",
-          "notes": "Structural adhesive consumable - JB Weld Steel-Reinforced Epoxy or West System G/flex 655 (owner-supplied)",
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "Printed end retainers hold the friction-fit 2040 insert in position; adhesive is not part of the current method.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2260,10 +2260,10 @@
       "id": 66,
       "category": "X-Axis Motion System",
       "name": "Idler Pulley Mounting Plate",
-      "description": "Mounts smooth idler pulleys at belt return ends. One per belt return point: X-axis: 2, Y-axis: 4 (2 per side), Z-axis: 8 (2 per corner). 14 total. OpenBuilds Idler Pulley Plate allows belt tension adjustment via slotted mounting holes. Alternatively, can be 3D printed or the Linear Actuator End Mount plate works for end-of-rail positions. CRITICAL: Without these, belts have nothing to wrap around at the return end.",
-      "qty": 7,
+      "description": "3D-printed idler plates for belt return/tension points: 4x Z-axis + 2x Y-axis = 6 total. X-axis uses the 6mm gantry belt path and does not use this common idler plate line. Printed design carries the smooth idler pulley mount and tension feature.",
+      "qty": 6,
       "unit": "plates",
-      "mfg_type": "buy",
+      "mfg_type": "print",
       "sort_order": 35,
       "mpn": null,
       "substitute_ok": true,
@@ -2273,34 +2273,34 @@
           "id": 213,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/pl0007/",
-          "notes": "Idler Pulley Plate - V-Slot and Open Rail compatible, belt tension adjustable",
+          "notes": "Reference commercial option only; SN 001 uses 3D-printed idler plates.",
           "sku": "PL0007",
           "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Components/Plates/Idler Pulley Plate.step",
-          "approved": true
+          "approved": false
         },
         {
           "id": 214,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/",
-          "notes": "Idler Pulley Plate - ships from US warehouse (Oklahoma)",
+          "notes": "Reference commercial option only; SN 001 uses 3D-printed idler plates.",
           "sku": null,
           "step_url": null,
-          "approved": true
+          "approved": false
         },
         {
           "id": 215,
           "supplier_name": "Amazon",
           "product_url": "https://www.amazon.com/s?k=V-slot+idler+pulley+plate",
-          "notes": "Search for V-slot idler pulley plate - various sellers",
+          "notes": "Reference commercial option only; SN 001 uses 3D-printed idler plates.",
           "sku": null,
           "step_url": null,
-          "approved": true
+          "approved": false
         },
         {
           "id": 216,
           "supplier_name": "Self-Manufacture",
           "product_url": null,
-          "notes": "3D printable - PETG or ABS, STL in CAD/Components/Plates/",
+          "notes": "SN 001 source of truth: print 6 total plates in PETG/CF-Nylon.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2311,7 +2311,7 @@
       "id": 67,
       "category": "Frame - Extrusions",
       "name": "C-beam 40Ã—80 Ã— 1000 mm â€” Frame Member (SDT Standard)",
-      "description": "The M3-CRETE reference frame is a single SKU: C-beam 40Ã—80 aluminum extrusion cut to 1000 mm, quantity 17 reference pieces plus 1 spare for a total order of 18. This is the SDT (Sunnyday Technologies) standard â€” no mixed V-slot profiles, no 1200 mm stock, no 1500 mm stock. The 1000 mm length is the longest extrusion that fits a standard UPS or FedEx 42-inch parcel box, which gates whether a kit can ship ground or requires pallet freight. The 17 reference pieces make up: 4 Z-posts, 3 top Y-rails (left side, right side, and 1 center cross-tie between top X rails), 2 bottom Y-skids, 2 mid-height Y-gantry rails, 4 top X-rails (2 front pair + 2 rear pair, spliced at center for the 2000 mm X-axis span), and 2 mid X cross-braces (spliced at center). Not counted here: the X-axis gantry beam that carries the printhead (TBD â€” rack-and-pinion drivetrain in progress). See https://m3-crete.com/blog/m3-2-full-cad-release/ for the full design rationale.",
+      "description": "The M3-CRETE reference frame is a single primary extrusion SKU: C-Beam 40x80 aluminum extrusion cut to 1000mm, quantity 17 reference pieces plus 1 spare for a total order of 18. This is the SDT (Sunnyday Technologies) standard: all primary frame members use 4080 C-Beam, no mixed frame extrusion profiles, no 1200mm stock, no 1500mm stock. The 1000mm length is the longest extrusion that fits a standard UPS/FedEx 42-inch parcel box, which gates whether a kit can ship ground or requires pallet freight. The 17 reference pieces make up: 4 Z-posts, 3 top Y-rails, 2 bottom Y-skids, 2 mid-height Y-gantry rails, 4 top X-rails spliced at center for the 2000mm X-direction spans, and 2 mid X cross-braces spliced at center. Spliced 2m X-direction members use the centered 2040 internal reinforcement insert and printed retainers (id 65/id 85). See https://m3-crete.com/blog/m3-2-full-cad-release/ for the full design rationale.",
       "qty": 18,
       "unit": "pieces",
       "mfg_type": "buy",
@@ -2352,8 +2352,8 @@
     {
       "id": 69,
       "category": "Motion - Plates",
-      "name": "Gantry Plate Standard (Z-axis and Y-axis carriages)",
-      "description": "Z-axis and Y-axis carriages only (2026-04-23). 127x88x3mm standard V-slot gantry plate. 4x Z-corner + 2x Y-gantry = 6 total. Torque load is divided across multiple carriages on these axes so the smaller plate is acceptable. X-axis uses the larger XLarge plate (id 84) because load is undivided on the single gantry beam. Trial fit on Z-axis first — if 88mm width is insufficient for 4080 C-beam wheel span, upgrade to XLarge across all axes.",
+      "name": "Common 125x125 C-Beam Gantry Plate (Y/Z candidate)",
+      "description": "Y/Z carriage plate candidate using the same 125x125mm C-Beam gantry plate geometry across the machine where practical. 4x Z-corner + 2x Y-gantry = 6 total. This replaces the previous smaller-standard-vs-XLarge split and is intended to reduce total part count while allowing component swaps. Fit-check on SN 001 before freezing.",
       "qty": 6,
       "unit": "pc",
       "mfg_type": "buy",
@@ -2366,7 +2366,7 @@
           "id": 1107,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/",
-          "notes": "Standard gantry plate, 127x88x3mm, M5 wheel pattern",
+          "notes": "Common 125x125mm C-Beam gantry plate candidate; avoid 125x170 XLarge unless explicitly re-approved.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2375,7 +2375,7 @@
           "id": 1108,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/",
-          "notes": "US warehouse, domestic shipping",
+          "notes": "Common 125x125mm C-Beam gantry plate candidate; verify wheel pattern before purchase.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2385,8 +2385,8 @@
     {
       "id": 84,
       "category": "Motion - Plates",
-      "name": "C-Beam Gantry Plate XLarge (X-axis carriage only)",
-      "description": "X-axis double-plate carriage only (2026-04-23). Larger plate required because X-axis torque is undivided — single gantry beam carries full printhead load. 2 plates total (double-plate sandwich on the 2m gantry beam, 4 wheels each = 8 X-axis wheels). 125x125x6mm square. Z-axis and Y-axis use standard plate (id 69). NOT ordered yet for SN 001 — check what hardware is bundled with the incoming C-beam gantry plate kit before ordering separately.",
+      "name": "Common 125x125 C-Beam Gantry Plate (X-axis pair)",
+      "description": "X-axis double-plate carriage pair using the same 125x125mm C-Beam gantry plate geometry targeted across Y/Z/X. 2 plates total (double-plate sandwich on the 2m gantry beam, 4 wheels each = 8 X-axis wheels). Do not use the 125x170mm XLarge plate path unless explicitly re-approved; the common plate strategy reduces total part count and supports component swaps.",
       "qty": 2,
       "unit": "pc",
       "mfg_type": "buy",
@@ -2399,7 +2399,7 @@
           "id": 1288,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/",
-          "notes": "C-Beam Gantry Plate XLarge, ~125x170x6mm — verify SKU against 4080 C-beam wheel hole pattern",
+          "notes": "125x125mm C-Beam gantry plate; avoid 125x170mm XLarge unless explicitly re-approved.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2408,7 +2408,7 @@
           "id": 1289,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/",
-          "notes": "C-Beam Gantry Plate XLarge, US warehouse",
+          "notes": "125x125mm C-Beam gantry plate equivalent; verify dimensions before purchase.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2514,8 +2514,8 @@
     {
       "id": 82,
       "category": "Frame - Reinforcement",
-      "name": "Frame Splice Backup Plate (6mm aluminum, optional)",
-      "description": "OPTIONAL backup reinforcement for the two non-gantry 2m frame top members (front + rear X-direction). 6mm aluminum flat plate mounted underneath each splice - spans the joint on the exterior bottom face with through-bolts into the C-beam T-slots (M5 cap screws + T-nuts). Only required IF the slot-linking kit alone has insufficient rigidity for a given build or load. Cheaper than the internal 2040 approach (id 65) and allowed here because these frame members have no carriage-clearance constraint - external protrusion is fine on the underside. Do NOT use on the X-gantry beam (id 65 covers that; the 2-sided carriage precludes any external reinforcement). Suggested dimensions: ~200x80x6mm to provide >=60mm of bolt engagement on each side of the splice. M3-1: not needed (no 2m spans). M3-2: qty 2 (optional). M3-4: qty per spliced frame section.",
+      "name": "Legacy Frame Splice Backup Plate (6mm aluminum, optional)",
+      "description": "Legacy optional external backup plate for a 2m X-direction splice. Current SN 001 method uses the centered 2040 friction-fit internal insert with printed retainers (id 65/id 85), so this exterior plate is not part of the reference kit unless a later load case explicitly requires it.",
       "qty": 2,
       "unit": "plates",
       "mfg_type": "buy",
@@ -2594,7 +2594,31 @@
           "approved": true
         }
       ]
+    },
+    {
+      "id": 85,
+      "category": "3D-Printed Structural",
+      "name": "2040 Insert End Retainers (3D printed)",
+      "description": "Printed end retainers for the centered 2040 reinforcement inserts used inside 2m 4080 C-Beam X-direction members. The 2040 insert friction-fits with light pressure; retainers prevent migration without adhesive and keep the reinforcement method field-serviceable.",
+      "qty": 6,
+      "unit": "pieces",
+      "mfg_type": "print",
+      "sort_order": 39,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1290,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "Print two retainers per reinforced 2m X-direction member; qty assumes 3 reinforced members for M3-2 and should track final spliced-member count.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     }
   ],
-  "notes": "v2.0: C-Beam Z-post upgrade, belt width reconciliation (Z/Y=10mm, X=6mm), wheel count 36->24, pulley count 20->7, removed out-of-scope pump/extruder parts"
+  "notes": "v2.2: all primary frame members use 4080 C-Beam; motor and idler mounts are printed; X-direction 2m members use centered 2040 friction-fit inserts with printed retainers; belt width reconciliation (Y/Z=10mm, X=6mm); wheel count confirmed at 32."
 }

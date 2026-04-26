@@ -1,0 +1,12 @@
+#!/bin/sh
+if command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/privacy_audit.ps1 -PrePush || exit $?
+elif command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/privacy_audit.ps1 -PrePush || exit $?
+else
+  printf >&2 "\n%s\n\n" "Privacy audit skipped: PowerShell was not found on PATH."
+  exit 2
+fi
+
+command -v git-lfs >/dev/null 2>&1 || { printf >&2 "\n%s\n\n" "This repository is configured for Git LFS but 'git-lfs' was not found on your path. Install Git LFS or disable this hook intentionally."; exit 2; }
+git lfs pre-push "$@"
