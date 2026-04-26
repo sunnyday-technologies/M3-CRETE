@@ -11,12 +11,12 @@ Standard precision spacer 6mm,14,6 mm OAL,OTHER side of each wheel pair
 M5 SHCS,10,M5 x 30 mm,Smooth idler axle
 M5 nyloc nut,10,M5,Idler axle nut
 M5 flat washer,20,M5,Each side of idler
-M5 SHCS,6,M5 x 10 mm,Idler axle bracket to C-beam
-M5 drop-in T-nut,6,"M5, 4080 series",Mating T-nuts for idler bracket
-M5 SHCS,28,M5 x 10 mm,NEMA23 face mounting (4 per motor)
-M5 nut,16,M5,Back-side nuts for pass-through NEMA23 motor holes
-M5 SHCS,16,M5 x 16 mm,Printed motor plate to extrusion slots
-M5 drop-in T-nut,16,"M5, 4080 series",Mating T-nuts for printed motor plates
+M5 SHCS,10,M5 x 10 mm,Idler axle bracket to C-beam
+M5 drop-in T-nut,10,"M5, 4080 series",Mating T-nuts for idler bracket
+M5 SHCS,24,M5 x 10 mm,NEMA23 face mounting (4 per motor)
+M5 nut,0,M5,Back-side nuts for pass-through NEMA23 motor holes
+M5 SHCS,0,M5 x 16 mm,Printed motor plate to extrusion slots
+M5 drop-in T-nut,0,"M5, 4080 series",Mating T-nuts for printed motor plates
 M5 SHCS,0,M5 x 16 mm,Bottom spacer/idler mount to Z-post
 M5 drop-in T-nut,0,"M5, 4080 series",Mating T-nuts for bottom spacer/idler mounts
 M5 SHCS,0,M5 x 10 mm,Bracket rail face
