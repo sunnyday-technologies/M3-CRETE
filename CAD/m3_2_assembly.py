@@ -18,7 +18,7 @@ from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GCPnts import GCPnts_TangentialDeflection
 import os, time, math
 
-USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_newZMM.step")
+USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_nudge.step")
 
 # ============================================================
 # Frame: 1000mm C-beam extrusions (shipping constraint).
@@ -532,13 +532,11 @@ for s in solids:
             continue
 
     # ============================================================
-    # L-BRACKET — REMOVED. Z-motor brackets replaced by combined
-    # motor-mount/spacer plates (placed in post-loop). Skip entirely.
-    # Also skip the OLD authored Y-motor adapter at (4, 80, 80) so the
-    # post-loop placeholder is the only ymount in the assembly.
+    # L-BRACKET — REMOVED. Skip the legacy bracket signatures only.
+    # All other plates (zmount, bot-mount, ymount/spacer) now flow
+    # through from the source STEP — no parametric overrides.
     # ============================================================
-    if dims in {(65.0, 69.0, 69.0), (44.0, 80.0, 102.0),
-                (4.0, 80.0, 107.0), (4.0, 80.0, 80.0)}:
+    if dims in {(65.0, 69.0, 69.0), (44.0, 80.0, 102.0)}:
         continue
 
     # ============================================================
@@ -607,89 +605,18 @@ def _bbs_touch(a, b, tol=5.0):
             a[2] - tol <= b[3] and b[2] - tol <= a[3] and
             a[4] - tol <= b[5] and b[4] - tol <= a[5])
 
-# --- Combined motor-mount/spacer plates (replaces shim + bracket) ---
-# Single 4mm plate on the Y-face of each Z-post corner. Extends from
-# Z=960 to Z=1067, giving a 107mm tall plate that acts as both the
-# Y-rail spacer AND the NEMA23
-# motor mount. No separate shim, no L-bracket — one printed part.
+# --- Z-motor mount + bottom spacer/idler plates: NOT generated parametrically ---
+# Earlier parametric generation here produced plates with hole patterns that
+# didn't line up with the actual motor / idler positions. The user-authored
+# source STEP (M3-2_xCar.step) carries these plates with correct geometry.
+# CADCLAW's job is placement and interference checking, not part generation.
+# Constants kept for downstream references (T-bracket bolt grid).
 import math as _math
 HERE = os.path.dirname(__file__)
 PRINT_COLOR = Color(0.59, 0.84, 0.00)    # Sunnyday trademark green (matches belts)
-PLATE_THK   = 4.0        # mm (Y-direction thickness)
-PLATE_W     = 80.0       # mm (X-direction, matches post 80mm face)
-# Verified: Nick's authored simplified placement in M3-2_newZMM.step, front-right corner.
-PLATE_H     = 107.0      # mm (Z-direction: Z=960 to Z=1067)
-PLATE_Z_BOT = 960.0      # mm (plate bottom Z)
-
-NEMA_PCD    = 47.14      # mm
-NEMA_BOLT   = 5.5        # mm M5 clearance
-NEMA_CENTER = 23.0       # mm shaft bore
-# Motor center Z=1028.2. Plate center Z=1013.5. Offset = +14.7mm.
-MOTOR_CTR_FROM_CENTER = 14.7  # mm above plate center
-
-# Build combined plate (in XZ plane, centered at origin)
-_zmount = (cq.Workplane("XZ")
-           .box(PLATE_W, PLATE_H, PLATE_THK)
-           .faces(">Y").workplane()
-           .pushPoints([
-               (NEMA_PCD/2 * _math.cos(_math.radians(a)),
-                NEMA_PCD/2 * _math.sin(_math.radians(a)) + MOTOR_CTR_FROM_CENTER)
-               for a in [45, 135, 225, 315]])
-           .hole(NEMA_BOLT)
-           .faces(">Y").workplane()
-           .transformed(offset=(0, MOTOR_CTR_FROM_CENTER, 0))
-           .hole(NEMA_CENTER))
-
-# 4 Z-motor corners. Plate Y = post Y-face (between post and Y-rail).
-# Front posts: plate on +Y face (Y = post_ymax = Y_POST_F + 20 = 16)
-# Rear posts:  plate on -Y face (Y = post_ymin = Y_POST_R - 20 = 1024)
-_z_corners = [
-    (0.0,       16.0  + PLATE_THK/2, Y_POST_F),   # front-left
-    (NX_RIGHT,  16.0  + PLATE_THK/2, Y_POST_F),   # front-right
-    (0.0,       1024.0 - PLATE_THK/2, Y_POST_R),   # rear-left
-    (NX_RIGHT,  1024.0 - PLATE_THK/2, Y_POST_R),   # rear-right
-]
-
-n_zmounts = 0
-for post_x, plate_y, post_y in _z_corners:
-    plate = _zmount.translate((0, 0, 0))
-    plate_z = PLATE_Z_BOT + PLATE_H / 2.0  # center of 107mm plate starting at Z=960
-    assy.add(plate, name=f"zmount_{n_zmounts}", color=PRINT_COLOR,
-             loc=Location((post_x, plate_y, plate_z)))
-    n_zmounts += 1
-    n[0] += 1
-print(f"  {n_zmounts} simplified Z motor-mount/spacer plates (green)")
-
-# --- Combined bottom spacer/idler-mount plates (green) ---
-# Same concept as the top Z-motor mounts: single 4mm plate on the Y-face
-# of each bottom corner Z-post, extending upward to include the idler
-# axle mounting area. Replaces both the bottom shim AND the idler bracket.
-BOT_PLATE_H = 100.0   # mm: Z=0 to Z=100 (covers shim zone 0-40 + idler zone ~60-90)
-IDLER_HOLE_Z = 37.0   # mm above plate center (center = Z=50, idler at Z=87)
-IDLER_HOLE_D = 8.5     # mm (8mm axle clearance)
-
-_bot_mount = (cq.Workplane("XZ")
-              .box(PLATE_W, BOT_PLATE_H, PLATE_THK)
-              .faces(">Y").workplane()
-              .transformed(offset=(0, IDLER_HOLE_Z, 0))
-              .hole(IDLER_HOLE_D))
-
-_SY_F = Y_RAIL_START - SHIM_THK / 2.0
-_SY_R = Y_RAIL_END   + SHIM_THK / 2.0
-_bot_corners = [
-    (0.0,       _SY_F + PLATE_THK/2),  # front-left
-    (NX_RIGHT,  _SY_F + PLATE_THK/2),  # front-right
-    (0.0,       _SY_R - PLATE_THK/2),  # rear-left
-    (NX_RIGHT,  _SY_R - PLATE_THK/2),  # rear-right
-]
-n_botmounts = 0
-for bx, by in _bot_corners:
-    assy.add(_bot_mount.translate((0, 0, 0)),
-             name=f"bot_spacer_idler_{n_botmounts}", color=PRINT_COLOR,
-             loc=Location((bx, by, BOT_PLATE_H / 2.0)))
-    n_botmounts += 1
-    n[0] += 1
-print(f"  {n_botmounts} bottom spacer/idler-mount plates (green)")
+NEMA_PCD    = 47.14
+NEMA_BOLT   = 5.5
+NEMA_CENTER = 23.0
 
 # Remaining idler brackets: only the center-frame idler (not at a corner post)
 # keeps its separate bracket. Corner idlers are now part of the bottom plates.
