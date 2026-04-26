@@ -261,7 +261,8 @@ replaced_brackets = 0
 # brackets, idler axle brackets) — each entry is a world bbox tuple
 # (xmin, xmax, ymin, ymax, zmin, zmax).
 cbeam_bbs   = []   # for joint detection
-ymotor_bbs  = []   # for Y-motor bracket placement
+zmotor_bbs  = []   # for Z-motor bracket placement (cz > 900)
+ymotor_bbs  = []   # for Y-motor bracket placement (cz < 600, near rail X edge)
 idler_bbs   = []   # for idler axle bracket placement
 _vwheel_template_shape = None  # populated from first loaded V-wheel; cloned for X-carriage
 _z_bracket_template = None     # captured from the user-authored (4,80,97) plate; cloned to all 4 Z corners + 2 Y motors
@@ -578,8 +579,14 @@ for s in solids:
     wbb = (bb.xmin + (fcx-cx), bb.xmax + (fcx-cx),
            bb.ymin + (fcy-cy), bb.ymax + (fcy-cy),
            bb.zmin + (fcz-cz), bb.zmax + (fcz-cz))
-    if dims == (56.4, 56.4, 76.6) and fcz < 600:
-        ymotor_bbs.append(wbb)
+    if dims == (56.4, 56.4, 76.6):
+        # Classify motor by Z and X position. X-motor sits near frame center
+        # in X (cx ~ 1496) and is excluded from the Y-motor list so it does
+        # not pick up Y-axis-only post-loop additions (return idlers, etc.).
+        if fcz > 900:
+            zmotor_bbs.append(wbb)
+        elif fcz < 600 and (fcx < 200 or fcx > NX_RIGHT - 200):
+            ymotor_bbs.append(wbb)
     elif dims == (12.7, 22.0, 22.0):
         idler_bbs.append(wbb)
     n[0] += 1
@@ -630,55 +637,74 @@ NEMA_CENTER = 23.0
 if _z_bracket_template is not None and _z_bracket_src_ctr is not None:
     src_x, src_y, src_z = _z_bracket_src_ctr
 
-    # Z-motor corners. Source bracket is at front-right (X=NX_RIGHT, Y=18).
-    # Front pair: bracket faces +Y (motor inside frame).
-    # Rear pair:  bracket faces -Y (motor inside frame) — needs 180° flip about Z.
-    Z_CORNERS = [
-        ("FL", 0.0,       18.0,   src_z, False),
-        ("FR", NX_RIGHT,  18.0,   src_z, False),
-        ("RL", 0.0,       1022.0, src_z, True ),
-        ("RR", NX_RIGHT,  1022.0, src_z, True ),
-    ]
+    # Source bracket sits at (2080, 18, 1008.5); canonical front-right
+    # Z-motor at (2079.4, 36.1, 1028.2). Bracket-relative-to-motor offset:
+    #   X: +0.6  (toward outer frame X edge — sign mirrored for left side)
+    #   Y: -18.1 (toward outer frame Y edge — sign mirrored for rear pair)
+    #   Z: -19.7 (plate center is below motor center)
+    Z_OFF_X, Z_OFF_Y, Z_OFF_Z = 0.6, 18.1, 19.7
+
+    # ---- Z-motor brackets: one per Z-motor actually present in source ----
     n_zbrk = 0
-    for name, tx, ty, tz, flip_y in Z_CORNERS:
+    for wbb in zmotor_bbs:
+        mcx = (wbb[0] + wbb[1]) / 2.0
+        mcy = (wbb[2] + wbb[3]) / 2.0
+        mcz = (wbb[4] + wbb[5]) / 2.0
+        is_front = mcy < FRAME_CTR[1]
+        is_left = mcx < FRAME_CTR[0]
+        sign_x = -1 if is_left else +1
+        sign_y = -1 if is_front else +1
+        target_x = mcx + sign_x * Z_OFF_X
+        target_y = mcy + sign_y * Z_OFF_Y
+        target_z = mcz - Z_OFF_Z
+
         wp = cq.Workplane().add(_z_bracket_template)
-        if flip_y:
-            # 180° rotation about Z axis through the source center: motor face -> -Y
+        if not is_front:
+            # 180° rotation about Z so the plate's motor-face flips to -Y
             wp = wp.rotate((src_x, src_y, src_z),
                            (src_x, src_y, src_z + 1.0),
                            180)
-        dx = tx - src_x
-        dy = ty - src_y
-        dz = tz - src_z
-        assy.add(wp, name=f"zmount_{name}", color=PRINT_COLOR,
+        dx = target_x - src_x
+        dy = target_y - src_y
+        dz = target_z - src_z
+        tag = f"{'L' if is_left else 'R'}{'F' if is_front else 'R'}"
+        assy.add(wp, name=f"zmount_{tag}", color=PRINT_COLOR,
                  loc=Location((dx, dy, dz)))
         n_zbrk += 1
         n[0] += 1
-    print(f"  {n_zbrk} Z-motor brackets cloned to corners (from authored source)")
+    print(f"  {n_zbrk} Z-motor brackets placed at actual Z-motor positions")
 
-    # Y-motor placements. Bracket rotated 90° about Z so plate is perpendicular
-    # to X axis (faces along ±X toward the C-beam Y-rail face).
-    # Y-motors live at cz~370, cy~985 (rear of frame), cx={left, right rail}.
-    Y_PLACEMENTS = [
-        ("Yleft",  23.4, 985.0, 370.8, +1),
-        ("Yright", 2056.6, 985.0, 370.8, -1),
-    ]
+    # ---- Y-motor brackets: one per Y-motor actually present (X-motor excluded) ----
+    # Bracket rotated 90° about Z; sign of rotation depends on side so that
+    # the plate's motor-face points TOWARD the motor (away from the rail).
     n_ybrk = 0
-    for name, tx, ty, tz, x_dir in Y_PLACEMENTS:
+    for wbb in ymotor_bbs:
+        mcx = (wbb[0] + wbb[1]) / 2.0
+        mcy = (wbb[2] + wbb[3]) / 2.0
+        mcz = (wbb[4] + wbb[5]) / 2.0
+        is_left = mcx < FRAME_CTR[0]
+        sign_x = -1 if is_left else +1
+        # After 90° rotation about Z, the bracket's 4mm-thick direction is X.
+        # Use the same offset magnitude as the Z-motor case; user can refine.
+        target_x = mcx + sign_x * Z_OFF_Y   # large offset along X (formerly Y)
+        target_y = mcy + Z_OFF_X            # small offset (alignment)
+        target_z = mcz - Z_OFF_Z
+
         wp = cq.Workplane().add(_z_bracket_template)
-        # ±90° rotation about Z axis at the source center: plate's normal
-        # rotates from ±Y to ±X, ready to bolt against the rail's X-face.
+        # CW rotation for left motor (motor face -> +X), CCW for right (-X)
+        rot_dir = -1 if is_left else +1
         wp = wp.rotate((src_x, src_y, src_z),
                        (src_x, src_y, src_z + 1.0),
-                       90 * x_dir)
-        dx = tx - src_x
-        dy = ty - src_y
-        dz = tz - src_z
-        assy.add(wp, name=f"ymount_{name}", color=PRINT_COLOR,
+                       90 * rot_dir)
+        dx = target_x - src_x
+        dy = target_y - src_y
+        dz = target_z - src_z
+        tag = "L" if is_left else "R"
+        assy.add(wp, name=f"ymount_{tag}", color=PRINT_COLOR,
                  loc=Location((dx, dy, dz)))
         n_ybrk += 1
         n[0] += 1
-    print(f"  {n_ybrk} Y-motor brackets cloned (rotated 90° from Z-bracket template)")
+    print(f"  {n_ybrk} Y-motor brackets placed at actual Y-motor positions")
 else:
     print(f"  WARNING: no (4,80,97) bracket template captured from source — "
           f"Z and Y mounts will be missing")

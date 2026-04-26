@@ -83,7 +83,7 @@ EXPECTED = {
     'idler': 10,
     'plate': 7,
     'shim': 2,
-    'zmount': 6,           # 4 corners + 2 Y-motor placements (cloned from authored bracket)
+    'zmount': 5,           # 3 Z-motors present in source (FR missing) + 2 Y-motor placements
     'zcap': 0,
     'idler-brk': 5,        # source iteration added 2 brackets
     'bot-mount': 0,        # user removed; will be remade via simple modification
