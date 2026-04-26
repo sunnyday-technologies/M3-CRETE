@@ -1185,7 +1185,7 @@ const App = {
 };
 
 // ────────────────────────────────────────────────────
-// Initialization (Static JSON — no Supabase)
+// Initialization
 // ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('projectTitle').textContent = BOM_CONFIG.PROJECT_TITLE;
@@ -1198,7 +1198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ────────────────────────────────────────────────────
-// Auth (GitHub link only — no Supabase)
+// Auth (GitHub link only)
 // ────────────────────────────────────────────────────
 function renderAuthArea() {
     const area = document.getElementById('authArea');
@@ -2095,7 +2095,7 @@ function showToast(msg, type = '') {
 <!-- No-JS fallback: static BOM table for crawlers, agents, and non-JS browsers -->
 <noscript>
 <div style="max-width:1400px;margin:40px auto;padding:0 20px;color:#f0f4f7;font-family:sans-serif;">
-    <h2>M3-CRETE Bill of Materials — 66 Parts</h2>
+    <h2>M3-CRETE Bill of Materials — 64 Parts</h2>
     <p style="margin:8px 0 16px;opacity:0.85;">Machine-readable JSON available at <a href="/bom/data.json" style="color:#97D700;">/bom/data.json</a></p>
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
