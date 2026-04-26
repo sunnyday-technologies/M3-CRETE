@@ -49,9 +49,7 @@ LABELS = {
     (4.0, 40.0, 80.0):    'shim',
     (4.0, 80.0, 107.0):   'zmount',
     (4.0, 80.0, 100.0):   'bot-mount',
-    # ymount: TODO update signature when user adds 4mm spacer plate to source STEP
-    # (Y-motors will mount directly into extrusion via T-nuts, with a 4mm spacer
-    # to keep the motor body clear of the C-beam channel)
+    (4.0, 80.0, 90.0):    'ymount',     # 4mm spacer authored in M3-2_xCar.step
     (4.0, 160.0, 280.0):  'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
 }
@@ -75,19 +73,20 @@ inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
     'bracket': 0,          # all L-brackets removed
-    'motor': 6,            # 4 Z + 2 Y
-    'vwheel': 32,
-    'pulley': 6,
-    'idler': 7,             # 5 from source STEP + 2 Y-axis return idlers
-    'plate': 8,
+    'motor': 7,            # 4 Z + 2 Y + 1 X (X-axis motor in M3-2_xCar.step)
+    'vwheel': 29,          # X-carriage wheels TBD
+    'pulley': 7,           # 4 Z + 2 Y + 1 X
+    'idler': 10,           # source idlers + Y-axis return idlers
+    'plate': 7,            # gantry plates (X-carriage WIP)
     'shim': 2,             # 2 mid-frame only; top corners superseded by zmount
-    'zmount': 4,
+    'zmount': 4,           # authored in source STEP
     'zcap': 0,
-    'idler-brk': 1,        # only 1 mid-frame idler bracket remains
-    'bot-mount': 4,
-    'ymount': 0,            # user-supplied 4mm spacer in source STEP (TBD)
+    'idler-brk': 3,        # mid-frame + Y-rail idler brackets
+    'bot-mount': 2,        # 2 of 4 corner bot-mount plates removed by user; will be remade
+    'ymount': 1,            # 1 of 2 spacers authored so far (right Y-motor); left TBD
     'tbracket': 2,
-    'belt': 12,
+    'belt': 12,            # 8 vertical Z-belt segments + 2 left Y + 2 right Y
+    'other': 32,           # X-carriage + pinion-belt details (not yet labeled individually)
 }
 problems = []
 print(f"Total parts: {len(parts)}")
@@ -117,7 +116,13 @@ for s in parts:
         if dims[0] > 8:
             problems.append(f"zcap dims {dims} — thinnest axis > 8mm")
 
-    # ymount dimension check removed — user-supplied 4mm spacer in source STEP (TBD)
+    elif lbl == 'ymount':
+        bb = s.BoundingBox()
+        dims = sorted([bb.xmax-bb.xmin, bb.ymax-bb.ymin, bb.zmax-bb.zmin])
+        # Authored 4mm spacer between Y NEMA23 motor and C-beam (motor rotated
+        # ~45° so bolts align with V-slots). Dim envelope ~4 x 80 x 90.
+        if not (3 <= dims[0] <= 5 and 78 <= dims[1] <= 82 and 88 <= dims[2] <= 92):
+            problems.append(f"ymount dims {dims} - expected roughly 4 x 80 x 90")
 
 # ---------- CHECK 3: Z motors attached to printed mount/spacer plates ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
