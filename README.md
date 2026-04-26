@@ -21,7 +21,7 @@ Developed by [Sunnyday Technologies](https://sunn3d.com).
 
 ## Why M3-CRETE
 
-Most concrete 3D printers are either proprietary industrial systems or one-off research machines tied to specific institutions. M3-CRETE targets the space between — a buildable, field-serviceable, production-capable printer that teams can replicate, maintain, and scale independently.
+Most concrete 3D printers are either proprietary industrial systems or one-off research machines tied to specific institutions. M3-CRETE targets the space between — an open, buildable, field-serviceable printer design that teams can replicate, maintain, validate, and scale independently.
 
 ### Target Applications
 
@@ -106,7 +106,7 @@ See the [CADCLAW repo](https://github.com/sunnyday-technologies/CADCLAW) for the
 
 M3-CRETE is a hardware platform — it does not prescribe a specific concrete mix. The system is designed to work with a range of cementitious formulations optimized for layered extrusion, including OPC, LC3, and specialty blends.
 
-For AI-driven mix design optimized for 3D printing, see [CEMFORGE™](https://cemforge.ai/concrete-printers/) — a machine learning formulation engine trained exclusively on 3D-printed cementitious specimen data, designed to generate printable concrete mixes with target performance characteristics.
+For AI-driven mix design optimized for 3D printing, see [CEMFORGE™](https://cemforge.ai/concrete-printers/) — a machine learning formulation engine trained on validated 3D-printed cementitious specimen data, designed to generate candidate mixes and supported performance predictions where sufficient data exists.
 
 ---
 

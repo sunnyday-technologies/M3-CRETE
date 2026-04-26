@@ -2108,30 +2108,30 @@ function showToast(msg, type = '') {
             </tr>
         </thead>
         <tbody>
-            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>4080 C-Beam Aluminum Extrusion (1000mm)</td><td>12 lengths</td><td>Buy</td><td>Primary frame structure: Z-posts, Y-gantry rails, X-rails. C opening faces inward. All 1000mm standard lengths.</td></tr>
-            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>Frame Stiffener — Long Span Reinforcement</td><td>4 bars (1m each)</td><td>Buy</td><td>Aluminum rectangular tube for X-axis spans exceeding 1.5m (M3-2 and M3-4). Not steel — galvanic corrosion risk.</td></tr>
+            <tr><td>Frame &amp; Structure - Aluminum Extrusions</td><td>4080 C-Beam Aluminum Extrusion (1000mm)</td><td>18 lengths</td><td>Buy</td><td>Primary frame structure. Current reference uses 4080 C-Beam throughout the frame standard, with 1000mm kit-friendly lengths.</td></tr>
+            <tr><td>Frame - Reinforcement</td><td>X-Direction Internal Reinforcement (centered 2040 insert)</td><td>3 bars (1m each)</td><td>Buy</td><td>2040 insert friction-fits inside each 2m 4080 C-Beam X-direction member, centered 500mm each side of the butt joint. Printed retainers hold it in place.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>5-Hole 90-Degree Joining Plate</td><td>27 pieces</td><td>Buy</td><td>T-plate or L-plate corner connectors at every 4080-to-4080 junction. 5 screws per corner.</td></tr>
-            <tr><td>Frame Hardware &amp; Brackets</td><td>Straight Line Internal Connectors (20-Series)</td><td>16 pieces</td><td>Buy</td><td>Splice connectors for modular X-axis extension.</td></tr>
+            <tr><td>Frame Hardware &amp; Brackets</td><td>Straight Line Internal Connectors (20-Series)</td><td>12 pieces</td><td>Buy</td><td>4 connector bars per 2m X-direction joint, 3 joints total. Used for top/bottom slot alignment; centered 2040 inserts provide primary centering and stiffness.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>T-Slot Drop-In Nuts M5 (20-Series)</td><td>3 packs of 100</td><td>Buy</td><td>300 total. Spring-loaded drop-in style recommended.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>Eccentric Spacers</td><td>28 pieces</td><td>Buy</td><td>Required for V-wheel preload adjustment on all motion axes.</td></tr>
             <tr><td>Frame Hardware &amp; Brackets</td><td>Adjustable Leveling Feet M16</td><td>4 pieces</td><td>Buy</td><td>Critical for leveling on uneven job-site floors. 1000lb-rated per foot.</td></tr>
             <tr><td>X-Axis Motion System</td><td>NEMA23 Stepper Motor (X-axis, 8mm shaft)</td><td>1 motor</td><td>Buy</td><td>8mm shaft variant. TMC5160 StallGuard for sensorless homing. 3Nm minimum.</td></tr>
-            <tr><td>X-Axis Motion System</td><td>GT2 Timing Belt 10mm (Reinforced)</td><td>8 meters</td><td>Buy</td><td>X-axis drive belt. Gates PowerGrip GT3 preferred.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>GT2 Timing Belt 6mm (X-axis)</td><td>1 meter</td><td>Buy</td><td>X-axis belt-pinion drive. Uses 6mm belt because it must fit inside the gantry slot; Y/Z remain 10mm.</td></tr>
             <tr><td>X-Axis Motion System</td><td>GT2 Pulley 20-Tooth (8mm Bore)</td><td>4 pulleys</td><td>Buy</td><td>Drive and idler pulleys. Must match 8mm motor shaft.</td></tr>
-            <tr><td>X-Axis Motion System</td><td>Idler Pulley Mounting Plate</td><td>14 plates</td><td>Buy</td><td>Mounts smooth idler pulleys at belt return ends.</td></tr>
+            <tr><td>X-Axis Motion System</td><td>Idler Pulley Mounting Plate</td><td>6 plates</td><td>3D Print</td><td>Printed idler plates: 4x Z-axis + 2x Y-axis. No purchased idler mounts in the reference kit.</td></tr>
             <tr><td>X-Axis Motion System</td><td>V-Groove Delrin Wheels (Polycarbonate)</td><td>8 wheels</td><td>Buy</td><td>Dust-resistant, critical for concrete environment.</td></tr>
             <tr><td>X-Axis Motion System</td><td>X-Axis Carriage Plate Assembly</td><td>1 assembly</td><td>3D Print</td><td>Carries the 1.5kg printhead. Print saves $70+ with CF-Nylon/ABS.</td></tr>
             <tr><td>Dual Y-Axis Motion System</td><td>NEMA23 Stepper Motor (Y-axis, 8mm shaft)</td><td>2 motors</td><td>Buy</td><td>Dual motors for anti-racking. TMC5160 StallGuard compatible.</td></tr>
             <tr><td>Dual Y-Axis Motion System</td><td>GT2 Timing Belt 10mm (Reinforced)</td><td>8 meters</td><td>Buy</td><td>Dual Y-axis belts. ~3m each side, 6m total.</td></tr>
             <tr><td>Dual Y-Axis Motion System</td><td>GT2 Pulley 20-Tooth (8mm Bore)</td><td>8 pulleys</td><td>Buy</td><td>Multiple pulleys for dual Y system. 8mm bore.</td></tr>
-            <tr><td>Dual Y-Axis Motion System</td><td>V-Groove Wheels (Polycarbonate)</td><td>16 wheels</td><td>Buy</td><td>Better load distribution on gantry beam carriages.</td></tr>
-            <tr><td>Dual Y-Axis Motion System</td><td>Y-Axis Gantry Plates</td><td>2 plates</td><td>3D Print</td><td>Connects gantry beam to Y-rail carriages. Print saves $160+.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>V-Groove Wheels (Polycarbonate)</td><td>32 total wheels</td><td>Buy</td><td>Confirmed total: Z 4x4=16 + Y 2x4=8 + X double-plate 2x4=8.</td></tr>
+            <tr><td>Dual Y-Axis Motion System</td><td>Y-Axis Gantry Plates</td><td>2 plates</td><td>3D Print</td><td>Uses common 125x125 C-Beam gantry plate geometry where practical.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>NEMA23 Stepper Motor (Z-axis, 8mm shaft)</td><td>4 motors</td><td>Buy</td><td>Four independent motors for auto-tramming via Klipper Z_TILT_ADJUST.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>GT2 Timing Belt 10mm (Z-axis)</td><td>12 meters</td><td>Buy</td><td>Belt-driven Z. ~3m per Z corner, 12m total.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>GT2 Pulley 20-Tooth (8mm Bore, Z-axis)</td><td>8 pulleys</td><td>Buy</td><td>Drive + idler pulleys for belt Z. Full parts commonality with X/Y.</td></tr>
-            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>V-Groove Wheels (Z-axis Carriages)</td><td>12 wheels</td><td>Buy</td><td>3 wheels per corner carriage on 4080 C-beam posts.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>V-Groove Wheels (Z-axis Carriages)</td><td>16 wheels</td><td>Buy</td><td>4 wheels per Z-post carriage on 4080 C-Beam posts.</td></tr>
             <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Carriage Plates</td><td>4 plates</td><td>3D Print</td><td>Connects gantry frame to V-wheel carriages on vertical posts.</td></tr>
-            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Motor Mounts</td><td>4 mounts</td><td>3D Print</td><td>Print saves $90. Interfaces NEMA23 to 4080 C-beam post.</td></tr>
+            <tr><td>Quad Z-Axis System (Self-Tramming)</td><td>Z-Axis Motor Mounts</td><td>4 mounts</td><td>3D Print</td><td>Integrated into printed combined corner brackets; no purchased motor mounts in the reference kit.</td></tr>
             <tr><td>Electronics &amp; Control System</td><td>BTT Kraken Mainboard</td><td>1 board</td><td>Buy</td><td>8x TMC5160 stepper drivers. X + 2Y + 4Z + Extruder.</td></tr>
             <tr><td>Electronics &amp; Control System</td><td>Raspberry Pi 5 (8GB RAM)</td><td>1 computer</td><td>Buy</td><td>Runs Klipper firmware. 8GB for large print files.</td></tr>
             <tr><td>Electronics &amp; Control System</td><td>7-inch Touchscreen Display</td><td>1 display</td><td>Buy</td><td>User interface via KlipperScreen.</td></tr>
@@ -2171,7 +2171,7 @@ function showToast(msg, type = '') {
             <tr><td>Optional Upgrades</td><td>LED Work Lighting</td><td>1 kit</td><td>Buy</td><td>Work area illumination — 24V LED strips.</td></tr>
             <tr><td>Optional Upgrades</td><td>Camera Module for Monitoring</td><td>1 camera</td><td>Buy</td><td>Remote print monitoring via KlipperScreen or Mainsail.</td></tr>
             <tr><td>Optional Upgrades</td><td>HEPA Air Filtration</td><td>1 system</td><td>Buy</td><td>Concrete dust particle capture for indoor operation.</td></tr>
-            <tr><td>Optional Upgrades</td><td>Carbon Fiber Stiffener Bar (4080 C-Beam)</td><td>4 bars (2m each)</td><td>Buy</td><td>20-30% additional stiffness on long spans. Structural epoxy bond to 4080 C-beam.</td></tr>
+            <tr><td>3D-Printed Structural</td><td>2040 Insert End Retainers</td><td>6 pieces</td><td>3D Print</td><td>Printed retainers hold the friction-fit 2040 inserts in the 4080 C-Beam channels without adhesive.</td></tr>
         </tbody>
     </table>
 </div>
