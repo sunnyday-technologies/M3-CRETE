@@ -2418,8 +2418,8 @@
     {
       "id": 75,
       "category": "3D-Printed Structural",
-      "name": "Combined Corner Bracket (motor mount + cap + spacer + belt slot, 3D printed)",
-      "description": "Single printed part at each Z-post corner. Combines motor mount plate, post cap, and Y-rail spacer into one piece. Includes 12x22mm belt slot for GT2 belt clearance through the cap section. NEMA23 bolt pattern. 80x44x102mm. Print in PETG (prototype) or CCF (production). CAD: CAD/Custom/Corner_Bracket_Combined.step",
+      "name": "Z Motor Mount / Y-Spacer Plate (3D printed)",
+      "description": "Simple printed plate at each Z-post corner: one 80x107x4mm NEMA23 motor mount plate that also provides the Y-rail spacer. Replaces the legacy metal L-bracket, separate top shim, and earlier cap set. NEMA23 clearance bolt pattern; motor fasteners pass through and use M5 nuts on the back side. Print in PETG (prototype) or CCF (production).",
       "qty": 4,
       "unit": "pieces",
       "mfg_type": "print",
@@ -2490,8 +2490,8 @@
     {
       "id": 81,
       "category": "3D-Printed Structural",
-      "name": "Y-Motor Adapter Plate (NEMA23, 3D printed)",
-      "description": "Flat adapter plate between Y-axis NEMA23 motor and C-beam face. 80x80x4mm with dual hole pattern: NEMA23 bolt pattern (47.14mm PCD) and 4x M5 extrusion slot mounting holes. Print in PETG or CCF.",
+      "name": "Y-Motor 4mm Spacer (3D printed)",
+      "description": "4mm spacer plate between Y-axis NEMA23 motor flange and C-beam 80mm face. Motor is rotated ~45 degrees about its shaft axis so the 4 mounting bolts align with the V-slot centerlines, allowing direct T-nut mounting into the extrusion. The spacer prevents the motor body from intruding into the C-beam channel. Geometry TBD (small NEMA23 mounting footprint with bolt pattern). PETG or CCF.",
       "qty": 2,
       "unit": "pieces",
       "mfg_type": "print",
