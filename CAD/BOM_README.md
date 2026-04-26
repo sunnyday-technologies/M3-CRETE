@@ -5,7 +5,7 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 136).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 135).
 
 See `bom_structural.csv`.
 
@@ -22,33 +22,33 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
+- cbeam_257 <-> cbeam_258
+- cbeam_257 <-> cbeam_266
+- cbeam_257 <-> cbeam_271
+- cbeam_257 <-> cbeam_273
+- cbeam_258 <-> cbeam_259
+- cbeam_258 <-> cbeam_260
+- cbeam_258 <-> cbeam_273
 - cbeam_259 <-> cbeam_260
-- cbeam_259 <-> cbeam_268
-- cbeam_259 <-> cbeam_273
-- cbeam_259 <-> cbeam_275
-- cbeam_260 <-> cbeam_261
+- cbeam_259 <-> cbeam_267
+- cbeam_259 <-> cbeam_271
 - cbeam_260 <-> cbeam_262
-- cbeam_260 <-> cbeam_275
-- cbeam_261 <-> cbeam_262
+- cbeam_260 <-> cbeam_265
+- cbeam_261 <-> cbeam_263
+- cbeam_261 <-> cbeam_266
+- cbeam_261 <-> cbeam_268
 - cbeam_261 <-> cbeam_269
-- cbeam_261 <-> cbeam_273
-- cbeam_262 <-> cbeam_264
-- cbeam_262 <-> cbeam_267
-- cbeam_263 <-> cbeam_265
-- cbeam_263 <-> cbeam_268
-- cbeam_263 <-> cbeam_270
-- cbeam_263 <-> cbeam_271
-- cbeam_264 <-> cbeam_275
-- cbeam_265 <-> cbeam_274
-- cbeam_266 <-> cbeam_272
-- cbeam_267 <-> cbeam_275
-- cbeam_268 <-> cbeam_270
-- cbeam_268 <-> cbeam_273
-- cbeam_269 <-> cbeam_270
-- cbeam_269 <-> cbeam_273
-- cbeam_269 <-> cbeam_274
-- cbeam_270 <-> cbeam_274
-- cbeam_271 <-> cbeam_274
+- cbeam_262 <-> cbeam_273
+- cbeam_263 <-> cbeam_272
+- cbeam_264 <-> cbeam_270
+- cbeam_265 <-> cbeam_273
+- cbeam_266 <-> cbeam_268
+- cbeam_266 <-> cbeam_271
+- cbeam_267 <-> cbeam_268
+- cbeam_267 <-> cbeam_271
+- cbeam_267 <-> cbeam_272
+- cbeam_268 <-> cbeam_272
+- cbeam_269 <-> cbeam_272
 
 ### V-wheels
 
