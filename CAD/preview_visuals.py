@@ -1,11 +1,16 @@
 """Render an explode view and a 360 rotating GIF of the assembly.
 
 Outputs:
-  CAD/_preview/explode.png    (~3MB, single isometric frame, parts displaced)
-  CAD/_preview/rotate_360.gif (~5-10MB, 24 frames, full assembly)
+  CAD/_preview/explode.png    (~100KB, single isometric frame, parts displaced)
+  CAD/_preview/rotate_360.gif (~500KB, 24 frames, full assembly)
 
 Bbox-based: each part rendered as its colored bounding-box solid.
 Headless via matplotlib Agg + Pillow GIF assembly. No VTK, no GL.
+
+SIZE CAP: Anthropic image input is 5 MB; files above that break Claude
+Code's ability to read them back. We target 4 MB as a hard ceiling so
+the tool-result envelope has headroom. If you tune dpi/figsize/frames
+upward, watch the post-save report and stay under the cap.
 """
 import os, sys, importlib.util, io, contextlib
 from pathlib import Path
@@ -19,6 +24,20 @@ import numpy as np
 HERE = Path(__file__).parent
 OUT = HERE / "_preview"
 OUT.mkdir(exist_ok=True)
+
+SIZE_CAP_MB = 4.0
+SIZE_CAP_BYTES = int(SIZE_CAP_MB * 1024 * 1024)
+
+def check_size(path):
+    sz = os.path.getsize(path)
+    mb = sz / (1024 * 1024)
+    if sz > SIZE_CAP_BYTES:
+        print(f"  {path.name}: {mb:.2f} MB  *** OVER {SIZE_CAP_MB:.1f} MB CAP ***")
+        print(f"  WARNING: Claude Code may fail to read this file back.")
+        print(f"  Reduce dpi, figsize, or frame count and re-render.")
+    else:
+        print(f"  {path.name}: {mb:.2f} MB  (under {SIZE_CAP_MB:.1f} MB cap)")
+    return sz <= SIZE_CAP_BYTES
 
 # ---------------------------------------------------------------------------
 # Load assembly (silent)
@@ -133,9 +152,10 @@ def fig_to_image(fig):
 # ---------------------------------------------------------------------------
 print("Rendering explode view...")
 fig = render(parts_data, azim=-60, elev=22, explode=0.30, size=(10, 10), zoom=0.95)
-fig.savefig(OUT / "explode.png", dpi=150, bbox_inches="tight", facecolor="white")
+explode_path = OUT / "explode.png"
+fig.savefig(explode_path, dpi=150, bbox_inches="tight", facecolor="white")
 plt.close(fig)
-print(f"  Wrote {OUT / 'explode.png'}")
+check_size(explode_path)
 
 # ---------------------------------------------------------------------------
 # 2) 360 rotating GIF (24 frames, 15 deg each)
@@ -159,5 +179,4 @@ frames[0].save(
     loop=0,
     optimize=True,
 )
-print(f"  Wrote {gif_path}")
-print(f"  Size: {os.path.getsize(gif_path) / 1024:.0f} KB")
+check_size(gif_path)
