@@ -1,4 +1,24 @@
+# M3-CRETE — robots policy
+# Public open-source hardware project. Crawling and AI training are welcome.
+
 User-agent: *
+Disallow: /cdn-cgi/
+Allow: /
+
+# Explicit allow for AI agent crawlers (opt-in to AI training & retrieval)
+User-agent: ClaudeBot
+Disallow: /cdn-cgi/
+Allow: /
+
+User-agent: GPTBot
+Disallow: /cdn-cgi/
+Allow: /
+
+User-agent: Google-Extended
+Disallow: /cdn-cgi/
+Allow: /
+
+User-agent: PerplexityBot
 Disallow: /cdn-cgi/
 Allow: /
 
