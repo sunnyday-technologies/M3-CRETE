@@ -1,0 +1,65 @@
+# M3-CRETE
+
+> Open-source concrete 3D printer for sub-1m³ builds on a standard US pallet. Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming. Companion hardware to the CEMFORGE AI mix-formulation platform. Maintained by Sunnyday Technologies LLC, Appleton WI.
+
+This file is a high-density, plain-text summary intended for LLM retrieval and RAG indexing. Authoritative source is the GitHub repository and the JSON BOM linked below.
+
+## Identity
+
+- Project name: M3-CRETE (Mobile, Modular, Meter³)
+- Live site: https://m3-crete.com
+- Repository: https://github.com/sunnyday-technologies/M3-CRETE
+- License: CERN-OHL-W-2.0 (CAD/Components/ subdirectory: CC BY-SA 4.0)
+- Maintainer: Sunnyday Technologies LLC (https://sunn3d.com)
+- Contact: m3@sunn3d.com
+
+## Models
+
+- M3-1 — 1000 × 1000 × 1000 mm build volume; no axis splice; all single-piece extrusions.
+- M3-2 — 2000 × 1000 × 1000 mm build volume; X-axis spliced. Default build target.
+- M3-4 — 2000 × 2000 × 1000 mm build volume; both X and Y spliced.
+
+Variant parameters (quantity overrides) are defined in https://m3-crete.com/config.js under MODEL_VARIANTS.
+
+## Architecture (M3-2 default)
+
+- Frame: 4080 C-Beam primary structure (Z-posts, Y-gantry rails) plus 2040 bracing. All 1000 mm standard lengths. C opening points inward toward the cube.
+- X-axis: 2× 1000 mm 4080 spliced = 2000 mm envelope. Splice uses straight-line slot-linking kit with internal 2040 reinforcement bonded inside the C-channel.
+- Y-axis: 2× parallel 2080 rails, 1000 mm span, dual motors (anti-racking).
+- Z-axis: 4× independent belt-driven 2040 vertical posts (quad self-tramming via Klipper Z_TILT_ADJUST).
+- Motion: GT2 10 mm belt + polycarbonate V-wheels on all axes.
+- Motors: 7× NEMA23 8 mm shaft (1× X + 2× Y + 4× Z) + 1× extruder (NEMA34, owner-supplied).
+- Controller: BTT Kraken (8× TMC5160 onboard) + Raspberry Pi 5 + Klipper.
+- Homing: StallGuard4 sensorless via TMC5160 (no mechanical limit switches).
+- Printhead target: 1.5 kg, 1″ Male NPT pipe connection, counter-weighted hose.
+- Target system cost: under USD 5,000.
+
+## Out of scope (do not add)
+
+- Mechanical limit switches / endstops — replaced by StallGuard4.
+- Mechanical leveling feet — handled by build-plate probing instead.
+- External reinforcement on X-gantry beam — would interfere with the 2-sided X-carriage wheel path.
+- HEPA filter, carbon-fiber bars, LED lights.
+- Pump system — separate proprietary product (NemoCrete), not part of M3-CRETE.
+
+## Bill of Materials
+
+- Source of truth: https://m3-crete.com/bom/data.json (JSON; ~66 parts, ~216 supplier options, ~37 suppliers).
+- Interactive viewer: https://m3-crete.com/bom/
+- Viewer features: multi-supplier selection, coverage tracking, per-part quantity adjusters, "I have this" exclusion, Buy/Print/CNC toggle on fabricated parts, CSV/JSON export, model-variant selector (M3-1 / M3-2 / M3-4).
+
+## Companion projects
+
+- CEMFORGE — AI-driven 3D-printable concrete mix formulation platform: https://cemforge.ai
+- Open3DCP — open printability dataset and schema for 3D concrete printing: https://open3dcp.org
+
+## Machine-readable surface
+
+- Sitemap: https://m3-crete.com/sitemap.xml
+- robots.txt: https://m3-crete.com/robots.txt (explicitly allows ClaudeBot, GPTBot, Google-Extended, PerplexityBot)
+- MCP manifest (experimental): https://m3-crete.com/.well-known/mcp-manifest.json
+- Product JSON-LD: embedded in https://m3-crete.com/ inside a `<script type="application/ld+json">` tag.
+
+## Status
+
+Active development. CAD files and BOM are published; build guides and assembly documentation are added to the GitHub repo as they are validated.
