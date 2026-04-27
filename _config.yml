@@ -14,6 +14,11 @@ title: M3-CRETE
 description: Open-source meter-scale concrete 3D printer by Sunnyday Technologies.
 url: https://m3-crete.com
 
+# Force-include dotfile-prefixed paths Jekyll otherwise hides
+# (.well-known/ holds the experimental MCP manifest for AI agents)
+include:
+  - .well-known
+
 # Do not process these paths as Jekyll content
 exclude:
   - CAD/

@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1-draft",
+  "_note": "Experimental site-level Model Context Protocol manifest. Schema is a community draft (see https://modelcontextprotocol.io). This site is a static, public, read-only documentation surface — listed resources are GET-only.",
+  "name": "M3-CRETE",
+  "description": "Open-source concrete 3D printer hardware. Static documentation site with machine-readable Bill of Materials.",
+  "publisher": {
+    "name": "Sunnyday Technologies LLC",
+    "url": "https://sunn3d.com/"
+  },
+  "url": "https://m3-crete.com/",
+  "license": "https://ohwr.org/cern_ohl_w_v2.txt",
+  "documentation": [
+    {
+      "name": "LLM-friendly summary",
+      "url": "https://m3-crete.com/llms.txt",
+      "media_type": "text/plain"
+    },
+    {
+      "name": "Sitemap",
+      "url": "https://m3-crete.com/sitemap.xml",
+      "media_type": "application/xml"
+    },
+    {
+      "name": "GitHub repository",
+      "url": "https://github.com/sunnyday-technologies/M3-CRETE"
+    }
+  ],
+  "resources": [
+    {
+      "name": "GetBOM",
+      "description": "Bill of Materials as JSON. Source of truth for parts, quantities, and supplier coverage. ~66 parts, ~216 supplier options across ~37 suppliers.",
+      "method": "GET",
+      "url": "https://m3-crete.com/bom/data.json",
+      "media_type": "application/json"
+    },
+    {
+      "name": "GetPrinterSpecs",
+      "description": "Site index page with embedded Product JSON-LD (build volume, models, license, brand). Parse the application/ld+json script tag for structured data.",
+      "method": "GET",
+      "url": "https://m3-crete.com/",
+      "media_type": "text/html",
+      "structured_data": "Product (schema.org)"
+    },
+    {
+      "name": "ListVariants",
+      "description": "Model variants and their parameter overrides (M3-1, M3-2, M3-4) as a JavaScript module. The MODEL_VARIANTS export contains build volume and quantity overrides.",
+      "method": "GET",
+      "url": "https://m3-crete.com/config.js",
+      "media_type": "application/javascript"
+    },
+    {
+      "name": "ViewBOM",
+      "description": "Human-friendly interactive BOM viewer (HTML).",
+      "method": "GET",
+      "url": "https://m3-crete.com/bom/",
+      "media_type": "text/html"
+    }
+  ],
+  "related": {
+    "cemforge.ai": "AI mix-formulation platform — generate printable concrete formulations to run on M3-CRETE",
+    "open3dcp.org": "Open3DCP — printability dataset and schema covering this hardware class"
+  },
+  "contact": "m3@sunn3d.com"
+}
