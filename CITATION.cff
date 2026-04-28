@@ -16,6 +16,10 @@ license: CERN-OHL-W-2.0
 license-url: "https://cern.ch/cern-ohl"
 repository-code: "https://github.com/sunnyday-technologies/M3-CRETE"
 url: "https://m3-crete.com"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.19647436
+    description: Zenodo concept DOI (all versions)
 keywords:
   - 3D-printing
   - concrete
