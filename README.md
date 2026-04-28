@@ -157,7 +157,7 @@ See [LICENSES/](LICENSES/) for full license texts.
 
 ## Author
 
-**Nicholas Sonnentag** — mechanical engineer, founder of [Sunnyday Technologies](https://sunn3d.com). M3-CRETE is designed and maintained by Nick; CAD iteration is AI-assisted (Claude, Anthropic) but the engineering judgment, component selection, build decisions, and direction are his.
+**Nicholas Sonnentag** ([ORCID 0009-0002-1897-384X](https://orcid.org/0009-0002-1897-384X)) — mechanical engineer, founder of [Sunnyday Technologies](https://sunn3d.com). M3-CRETE is designed and maintained by Nick; CAD iteration is LLM-assisted but the engineering judgment, component selection, build decisions, and direction are his.
 
 - LinkedIn: [Nicholas Sonnentag](https://www.linkedin.com/in/nicholas-sonnentag)
 - Email: `info@sunn3d.com`
