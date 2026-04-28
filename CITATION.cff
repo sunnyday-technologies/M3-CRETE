@@ -12,6 +12,7 @@ authors:
     given-names: Nicholas
     email: info@sunn3d.com
     affiliation: Sunnyday Technologies
+    orcid: "https://orcid.org/0009-0002-1897-384X"
 license: CERN-OHL-W-2.0
 license-url: "https://cern.ch/cern-ohl"
 repository-code: "https://github.com/sunnyday-technologies/M3-CRETE"
