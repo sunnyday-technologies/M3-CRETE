@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow</title>
+  <meta name="description" content="M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut. CERN-OHL-W-2.0. Sub-meter, pallet-scale build envelope. Low-five-figure target system cost." />
+  <!-- Open Graph -->
+  <meta property="og:title" content="How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow" />
+  <meta property="og:description" content="M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut. CERN-OHL-W-2.0. Sub-meter, pallet-scale build envelope. Low-five-figure target system cost." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://m3-crete.com/build-guide/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow" />
+  <meta name="twitter:description" content="M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut. CERN-OHL-W-2.0. Sub-meter, pallet-scale build envelope. Low-five-figure target system cost." />
+  <link rel="canonical" href="https://m3-crete.com/build-guide/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:       #060d14;
+      --charcoal:    #0b1824;
+      --graphite:    #0f2035;
+      --border:      #1a3350;
+      --mid:         #2a4d6e;
+      --muted:       #6a8faa;
+      --light:       #c2d4e0;
+      --white:       #f0f4f7;
+      --accent:      #97D700;
+      --accent-dim:  #5c8400;
+      --brand-blue:  #013A73;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      background-image: linear-gradient(160deg, #011f3f 0%, #060d14 60%);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* — noise texture overlay — */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    /* — HEADER — */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .logo-mark {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding-left: 0.75rem;
+      border-left: 1px solid var(--border);
+    }
+
+    nav a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    /* — HERO — */
+    .hero {
+      position: relative;
+      z-index: 10;
+      padding: 8rem 3rem 6rem;
+      max-width: 1100px;
+    }
+
+    .hero-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hero-label::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: var(--accent-dim);
+    }
+
+    h1 {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      line-height: 0.92;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 2.5rem;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--light);
+      max-width: 560px;
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 3.5rem;
+    }
+
+    /* — SPEC STRIP — */
+    .spec-strip {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 0 3rem;
+      overflow: hidden;
+    }
+
+    .spec-item {
+      flex: 1;
+      padding: 1.5rem 2rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .spec-item:last-child { border-right: none; }
+
+    .spec-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .spec-value {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.6rem;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    .spec-unit {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-left: 0.3rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* — MAIN CONTENT — */
+    .content {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 5rem 3rem;
+      border: 1px solid var(--border);
+    }
+
+    .content-block {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .content-block:last-child { border-right: none; }
+
+    .block-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--accent-dim);
+      letter-spacing: 0.3em;
+      margin-bottom: 1.5rem;
+    }
+
+    .block-title {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .block-body {
+      font-size: 0.9rem;
+      color: var(--light);
+      line-height: 1.75;
+      font-weight: 300;
+      font-family: 'Raleway', sans-serif;
+    }
+
+    /* — CTA — */
+    .cta-section {
+      position: relative;
+      z-index: 10;
+      margin: 0 3rem 6rem;
+      padding: 3.5rem;
+      border: 1px solid var(--border);
+      background: #0b1e33;
+    }
+
+    .cta-columns {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .cta-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .cta-col-word {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: var(--white);
+    }
+
+    .cta-col-word-sub {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a.cta-col-word-sub:hover { color: #aae800; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 1.1rem 2rem;
+      width: 100%;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--brand-blue);
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background: #aae800;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--light);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* github icon */
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* — FOOTER — */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-left a {
+      color: var(--accent-dim);
+      text-decoration: none;
+    }
+
+    .footer-left a:hover { color: var(--accent); }
+
+    .footer-right {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+
+    /* — ANIMATIONS — */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-label  { animation: fadeUp 0.6s ease both; animation-delay: 0.1s; }
+    h1           { animation: fadeUp 0.7s ease both; animation-delay: 0.2s; }
+    .hero-desc   { animation: fadeUp 0.7s ease both; animation-delay: 0.35s; }
+    .spec-strip  { animation: fadeUp 0.7s ease both; animation-delay: 0.45s; }
+    .content     { animation: fadeUp 0.7s ease both; animation-delay: 0.55s; }
+    .cta-section { animation: fadeUp 0.7s ease both; animation-delay: 0.65s; }
+
+    /* — RESPONSIVE — */
+    @media (max-width: 768px) {
+      header { padding: 1.25rem 1.5rem; }
+      .logo-sub { display: none; }
+
+      .hero { padding: 5rem 1.5rem 4rem; }
+
+      .spec-strip {
+        margin: 0 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .spec-item {
+        flex: 1 1 45%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+        margin: 3rem 1.5rem;
+      }
+
+      .content-block {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 2rem 1.5rem;
+      }
+
+      .content-block:last-child { border-bottom: none; }
+
+      .cta-section {
+        margin: 0 1.5rem 4rem;
+        padding: 2rem 1.5rem;
+      }
+
+      .cta-columns { flex-direction: column; }
+      .cta-col { width: 100%; }
+
+      footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+    }
+  </style>
+
+  <!-- Structured data: Product + Organization (schema.org JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "@id": "https://m3-crete.com/#product",
+        "name": "M3-CRETE",
+        "alternateName": "Mobile Modular Meter³ Concrete 3D Printer",
+        "description": "Open-source concrete 3D printer for sub-1m³ builds on a standard US pallet. Modular, mobile, designed for field deployment and companion to the CEMFORGE AI mix-formulation platform.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Sunnyday Technologies"
+        },
+        "model": ["M3-1", "M3-2", "M3-4"],
+        "category": "Industrial 3D Printer / Construction Equipment",
+        "manufacturer": {
+          "@id": "https://sunn3d.com/#organization"
+        },
+        "license": "https://ohwr.org/cern_ohl_w_v2.txt",
+        "url": "https://m3-crete.com/",
+        "image": "https://m3-crete.com/images/M3-CRETE_render.jpg",
+        "isRelatedTo": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "CEMFORGE",
+            "url": "https://cemforge.ai/",
+            "applicationCategory": "EngineeringApplication",
+            "operatingSystem": "Web"
+          },
+          {
+            "@type": "Dataset",
+            "name": "Open3DCP",
+            "url": "https://open3dcp.org/"
+          }
+        ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://sunn3d.com/#organization",
+        "name": "Sunnyday Technologies LLC",
+        "url": "https://sunn3d.com/",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Appleton",
+          "addressRegion": "WI",
+          "addressCountry": "US"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+  /* scoped pillar-page typography (article-style content) */
+  main.pillar-content {
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 5rem;
+    position: relative;
+    z-index: 1;
+    line-height: 1.7;
+    font-size: 1rem;
+  }
+  main.pillar-content h1 {
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    line-height: 1.15;
+    margin: 0 0 1.5rem;
+    letter-spacing: -0.01em;
+  }
+  main.pillar-content h2 {
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    margin: 2.5rem 0 1rem;
+    letter-spacing: -0.005em;
+  }
+  main.pillar-content h3 {
+    font-size: 1.15rem;
+    margin: 1.75rem 0 0.75rem;
+    letter-spacing: 0;
+  }
+  main.pillar-content p { margin: 0 0 1.1rem; }
+  main.pillar-content ul, main.pillar-content ol { margin: 0 0 1.2rem 1.5rem; }
+  main.pillar-content li { margin-bottom: 0.4rem; }
+  main.pillar-content blockquote {
+    margin: 1.5rem 0;
+    padding: 0.5rem 1.25rem;
+    border-left: 3px solid currentColor;
+    opacity: 0.92;
+    font-style: italic;
+  }
+  main.pillar-content code {
+    font-family: 'IBM Plex Mono', 'Consolas', monospace;
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    background: rgba(127,127,127,0.12);
+    border-radius: 3px;
+  }
+  main.pillar-content pre {
+    overflow-x: auto;
+    padding: 1rem 1.1rem;
+    background: rgba(0,0,0,0.35);
+    border-radius: 4px;
+    margin: 1rem 0 1.4rem;
+    font-size: 0.85rem;
+  }
+  main.pillar-content pre code { background: transparent; padding: 0; }
+  main.pillar-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0 1.5rem;
+    font-size: 0.92rem;
+  }
+  main.pillar-content th, main.pillar-content td {
+    border: 1px solid rgba(127,127,127,0.35);
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  main.pillar-content th { font-weight: 600; }
+  main.pillar-content a { text-decoration: underline; text-underline-offset: 2px; }
+  main.pillar-content hr { border: 0; border-top: 1px solid rgba(127,127,127,0.35); margin: 2rem 0; }
+  main.pillar-content em { font-style: italic; }
+  main.pillar-content strong { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+      <span class="logo-mark">M3-CRETE</span>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="/bom/" aria-label="Interactive Bill of Materials viewer">BOM</a> &nbsp;&nbsp;
+      <a href="/blog/" aria-label="M3-CRETE development blog">Blog</a> &nbsp;&nbsp;
+      <a href="/press/" aria-label="M3-CRETE press and media">Press</a> &nbsp;&nbsp;
+      <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="Sunnyday Technologies parent site (opens in new tab)">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <main class="pillar-content">
+<h1 id="how-to-build-an-open-source-concrete-3d-printer-m3-crete-bom-cad-and-validation-workflow">How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow</h1>
+<blockquote>
+<p>M3-CRETE is the open-source concrete 3D printer designed to be replicated, validated, and extended by anyone with a US pallet of floor space, an aluminum extrusion supplier, and a willingness to commission a real machine. This guide is the canonical entry point for builders. Everything described here is published under <a href="https://ohwr.org/cern_ohl_w_v2.txt">CERN-OHL-W-2.0</a> for hardware and <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> for the V-slot CAD library.</p>
+</blockquote>
+<h2 id="1-why-this-exists">1. Why this exists</h2>
+<p>In 2026 the concrete 3D printing market has bifurcated into two unworkable extremes for the people who actually need a printer.</p>
+<p>On one side sit closed industrial systems with capital costs in the high six figures, proprietary slicers, single-source pump consumables, and licensing terms that prevent any university lab from publishing the geometry of the machine, let alone modifying it. These printers exist to serve precast factories and venture-funded construction startups. They are not available, in any meaningful sense, to researchers, contractors, structural engineers, makerspaces, and university labs.</p>
+<p>On the other side sit a long tail of unmaintained hobby plans built around CoreXY desktop-printer kinematics scaled up into a frame that cannot survive a real cementitious printhead. They exist as forum posts, dead Hackaday pages, and abandoned GitHub repositories. None of them are buildable today from sourceable parts.</p>
+<p><a href="https://m3-crete.com">M3-CRETE</a> by <a href="https://sunn3d.com">Sunnyday Technologies</a> exists in the gap. It is a buildable, field-serviceable, sub-meter cartesian motion system that fits on a <a href="https://m3-crete.com/">standard US pallet</a>, targets a low-five-figure system cost, runs on commodity Klipper hardware, and ships its full CAD assembly, bill of materials, firmware configuration, and validation harness as open-source artifacts. The design intent is mundane and important: enable a researcher, a contractor, a master's student, and a makerspace to all build the same machine, source parts locally where possible, modify the design to suit their work, and publish their results without permission from a vendor.</p>
+<p>This page documents how to do that. It walks the architecture, the BOM, the CAD workflow, the validation tooling, the licensing model, and the open issues. Concrete 3D printing is not a 280-character problem.</p>
+<h2 id="2-design-philosophy">2. Design philosophy</h2>
+<p>Three commitments shape every component decision in M3-CRETE.</p>
+<p>The first is <strong>pallet-scale</strong>. The machine is engineered to fit, fully assembled, on a standard US pallet, a global shipping primitive that simplifies kit logistics, lab installation, and field deployment. The default M3-2 build volume is sub-meter in two axes and pallet-scale in the long axis. We treat the pallet footprint as a feature, not a bug. The reason is sourcing reality: above the pallet boundary you start needing freight LTL shipping, gantries no longer fit through a standard doorway, and long-stock aluminum extrusions become custom-cut SKUs with multi-week lead times. The pallet boundary is a hard sourcing constraint disguised as an aesthetic preference.</p>
+<p>The second is <strong>sensorless homing via StallGuard4</strong>. Every stepper axis on the machine, including all four Z-posts and the two anti-racking Y motors, homes by detecting motor back-EMF when the carriage stalls against a hard stop. The machine has zero mechanical limit switches. The drivers are TMC5160s onboard the BTT Kraken mainboard, with StallGuard support over SPI plus a single-wire diagnostic output. Eliminating limit switches removes a substantial number of wired connections, an equal number of chances of dust contamination on a job site, and the small components that any concrete-aerosol environment will eventually destroy. A NEMA23 with a heavy-duty shaft is required, not optional, because StallGuard's torque/inductance window depends on it.</p>
+<p>The third is <strong>scope discipline</strong>. M3-CRETE is a motion system. The pump, mixer, hopper, hose management, and material chemistry are all explicitly out of scope on this repository. The pump system is a separate Sunnyday product called NemoCrete and lives behind a different brand wall. Mix design lives in <a href="https://cemforge.ai">CEMFORGE</a>, the Sunnyday AI formulation engine. Printability data lives in the <a href="https://open3dcp.org">Open3DCP</a> open standard. By refusing to bundle these subsystems into one repository we keep the machine reviewable, maintainable, and forkable.</p>
+<p>The design exclusions list is unusually explicit and worth reading verbatim:</p>
+<ul>
+<li><strong>NO mechanical limit switches or endstops</strong> on the motion system (StallGuard4 only). The only endstops in the BOM are DIN-rail end-stop clamps for the electrical panel.</li>
+<li><strong>NO leveling feet</strong>. Bed leveling is handled by measurement at the build plate, not by mechanical M16 feet on the frame.</li>
+<li><strong>NO external reinforcement on the X-gantry beam</strong>. The X-carriage is two-sided (V-wheels on both top and bottom of the gantry exterior), so any external bracket on the gantry faces would block carriage travel. All reinforcement must be internal to the C-channel.</li>
+<li><strong>NO HEPA filter, carbon fiber stiffeners, or LED enclosure lights</strong> on the canonical build. These are downstream user choices.</li>
+<li><strong>NO Supabase or other proprietary backend</strong>. The BOM viewer at <a href="https://m3-crete.com/bom">m3-crete.com/bom</a> is a static site over a JSON file.</li>
+</ul>
+<p>The exclusions section exists because the project has accreted many rounds of "have you considered adding..." suggestions over the last year and a half. Each rejection is an active engineering decision, documented so that contributors do not waste round-trips proposing rejected directions.</p>
+<h2 id="3-architecture-overview">3. Architecture overview</h2>
+<p>The default model variant is the <strong>M3-2</strong>, a pallet-scale cartesian gantry with a sub-meter working envelope. The motion system has four mechanical subsystems: a 4080 C-Beam frame, a dual-Y belt-pinion gantry, a quad-Z self-tramming Z-stage, and a printhead carriage on a spliced X-beam.</p>
+<h3 id="frame-4080-c-beam-single-length-stock">Frame: 4080 C-Beam, single-length stock</h3>
+<p>The primary structure is <strong>4080 C-Beam aluminum extrusion</strong>, used for Z-posts and Y-gantry rails, with 2040 V-slot for cross-bracing. Every structural member is cut to a single canonical length. There are no custom cuts and no mixed lengths. Single-SKU procurement is a non-negotiable for a kit business and a meaningful gift for any solo builder. The C-channel openings face inward toward the printer cube so the belt path runs inside the C, where it is shielded from concrete spray and aerosol.</p>
+<p>The X-axis is built from two stock segments spliced at center span to yield the longer build envelope. The splice uses a <strong>straight-line internal slot-linking kit</strong> that fits inside the T-slot channels and sits below the wheel path, plus three V-slot bars staggered inside the C-channel and bonded with structural adhesive. The center bar bridges the splice equally to either side; the left and right bars fill the remaining sections. No long custom-cut extrusion is required.</p>
+<p>Corner joints use 5-screw T-plate or L-plate connectors at every 4080-to-4080 junction.</p>
+<h3 id="motion-belt-pinion-drive-polycarbonate-v-wheels-gt2-belts">Motion: belt-pinion drive, polycarbonate V-wheels, GT2 belts</h3>
+<p>Every axis runs on <strong>GT2 belts</strong> and <strong>polycarbonate V-wheels</strong>. The Y-axis uses a wider belt; the X-axis carriage runs on a narrower belt that fits inside the gantry slot (a deliberate cross-axis material distinction documented in the BOM). The Z-axis is belt-driven from hub disks on the motor side and smooth idlers at the post bottom.</p>
+<p>V-wheels engage the V-groove on the narrow face of each extrusion at a specified engagement depth. This depth is encoded as a hard invariant in the validation harness; any geometry that drops the wheel out of engagement fails CI before the STEP file lands.</p>
+<h3 id="steppers-nema23-sensorless-homing">Steppers: NEMA23, sensorless homing</h3>
+<p>The motion system uses <strong>NEMA23 motors</strong> with heavy-duty shafts: one X, two Y for anti-racking, and four Z for self-tramming. An additional motor (NEMA34, owner-supplied) drives the pump, on a separate ecosystem. The shaft sizing is required for StallGuard4 sensorless homing torque compatibility, not a comfort choice.</p>
+<p>Z-axis motors straddle the top Y-brace, body above and shaft pointing down. A hub disk below the brace routes the belt over the brace and down the post to the carriage, where it terminates at the bottom idler and returns. This routing eliminates lead screw alignment as a build skill and lets each Z-corner tram independently against the others under Klipper's <code>Z_TILT_ADJUST</code> macro.</p>
+<h3 id="controller-btt-kraken-klipper-pi-5">Controller: BTT Kraken, Klipper, Pi 5</h3>
+<p>The mainboard is a <strong>BTT Kraken</strong> with onboard TMC5160 drivers configurable for SPI-mode StallGuard4. The host runs Klipper on a Raspberry Pi 5 with a touchscreen. The firmware repository lives at <a href="https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE">M3-CRETE-FIRMWARE</a> for kinematic profiles and stepper configuration.</p>
+<h3 id="specification-table-qualitative">Specification table (qualitative)</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>M3-1</th>
+<th>M3-2 (default)</th>
+<th>M3-4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build envelope</td>
+<td>Sub-meter cube</td>
+<td>Pallet-scale long, sub-meter wide and tall</td>
+<td>Pallet-scale in two axes, sub-meter tall</td>
+</tr>
+<tr>
+<td>X-axis splice</td>
+<td>None</td>
+<td>Center splice</td>
+<td>Center splice</td>
+</tr>
+<tr>
+<td>Y-axis splice</td>
+<td>None</td>
+<td>None</td>
+<td>Center splice</td>
+</tr>
+<tr>
+<td>Frame primary</td>
+<td>4080 C-Beam</td>
+<td>4080 C-Beam</td>
+<td>4080 C-Beam</td>
+</tr>
+<tr>
+<td>Stepper architecture</td>
+<td>Quad-Z self-tramming, dual-Y anti-racking</td>
+<td>Same</td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Pallet footprint</td>
+<td>One standard pallet</td>
+<td>One standard pallet</td>
+<td>One standard pallet</td>
+</tr>
+<tr>
+<td>Target system cost</td>
+<td>Low-five-figure</td>
+<td>Low-five-figure</td>
+<td>Low-five-figure</td>
+</tr>
+<tr>
+<td>License</td>
+<td>CERN-OHL-W-2.0</td>
+<td>CERN-OHL-W-2.0</td>
+<td>CERN-OHL-W-2.0</td>
+</tr>
+</tbody>
+</table>
+<p>Variants are configured in <code>config.js</code> as <code>MODEL_VARIANTS</code> with quantity overrides per part. Switching between variants in the BOM viewer is a one-click operation.</p>
+<h2 id="4-the-bill-of-materials">4. The bill of materials</h2>
+<p>The full BOM is served live at <a href="https://m3-crete.com/bom">m3-crete.com/bom</a> as a static JSON document with no backend. The viewer supports multi-supplier selection, per-part quantity overrides, fabrication-method toggles (Buy / Print / CNC), CSV and JSON export with supplier filters, model variant selection, and a "Suggest Supplier" button that opens a GitHub Issue. The privacy guard in the validation tooling explicitly suppresses vendor names, SKUs, unit costs, prices, and supplier identifiers from any audit emit path; cost data exists in the data file but is not exposed by the public report surface.</p>
+<h3 id="sourcing-reality">Sourcing reality</h3>
+<p>There is <strong>no US manufacturer of V-slot extrusion</strong>. Every V-slot bar in the BOM is imported from China through a US distributor or shipped direct. Bonnell Aluminum / TSLOTS in Niles, Michigan makes T-slot but not V-slot, and a custom V-groove die would cost a substantial domestic tooling line. We have estimated and rejected that capital line until kit volume justifies it.</p>
+<p>The supplier strategy splits the build across three procurement paths:</p>
+<ul>
+<li><strong>MakerStore USA</strong> (Atoka, OK), the US warehouse for the full V-slot ecosystem, domestic shipping, kit-friendly. Primary source for V-slot, gantry plates, V-wheels, eccentric spacers, GT2 pulleys.</li>
+<li><strong>Bulkman3D</strong>, China factory-direct, lowest unit cost, slowest shipping. Backup source where lead time tolerates it.</li>
+<li><strong>Amazon</strong>, for electronics, wiring, fasteners, M5 hardware kits, and Loctite Blue 243. A meaningful fraction of the build flows through Amazon SKUs because the alternative (specialty distributors for a single bag of M5 nuts) is not worth the friction.</li>
+</ul>
+<h3 id="cost-shape">Cost shape</h3>
+<p>The kit-business view has Sunnyday-supplied parts (frame, plates, motion components) packaged at a margin that supports continued maintenance, with the customer adding a smaller Amazon order for small hardware and electronics. The total system cost lands in the low-five-figure range inclusive of motors and electronics if the customer is sourcing fresh; meaningfully lower if the customer already owns a BTT Kraken and most of the steppers, which most of our early adopters do.</p>
+<p>The BOM surfaces all of this directly in the viewer. Click a supplier chip to assign that supplier to all matching parts; click "I have this" to exclude a row from the buy list; flip the Buy / Print / CNC toggle on a fabricated part to mark it as locally produced. Export the result as CSV for the spreadsheet, or as JSON for the AI buying-guide assistant.</p>
+<p>A short caution: supplier listings in the BOM viewer are community-contributed reference information, not endorsements. Prices and availability change. Verify each line against the live supplier page before placing an order.</p>
+<h2 id="5-cad-and-assembly">5. CAD and assembly</h2>
+<p>The full M3-2 assembly is a parametric CadQuery-driven STEP, generated from a script (<code>CAD/m3_2_assembly.py</code>) that runs against a versioned V-slot library. The STEP file lives in the repository as the human-reviewable artifact; the Python script is the source of truth.</p>
+<h3 id="llm-driven-cad-the-ai-cad-whitepaper-workflow">LLM-driven CAD: the AI-CAD whitepaper workflow</h3>
+<p>The M3-CRETE CAD workflow is documented in the <a href="https://github.com/sunnyday-technologies/M3-CRETE">Sunnyday AI-CAD whitepaper</a>, titled <em>Self-Verifying LLM-Driven Parametric CAD Assemblies: Lessons from a Meter-Scale Concrete 3D Printer</em> (Sonnentag, 2026). The headline claim of that paper is intentionally narrow: an LLM coding agent paired with CadQuery is most useful when forced to verify its own geometry against engineering invariants on every iteration, not when asked to "design a part." The harness is the artifact that matters; the agent is a means.</p>
+<p>This work sits in a longer lineage. The M3-CRETE printer is the <strong>Print</strong> stage in Sunnyday's ICME-style closed loop, in the spirit of Olson's Materials by Design framework: predict properties from composition and process, deposit the candidate, measure the result, feed the measurements back into the predictor.</p>
+<p>The whitepaper documents three layers:</p>
+<ol>
+<li><strong>Geometry library</strong>, a set of STEP files imported from the OpenBuilds ecosystem (CC BY-SA 4.0), plus extended/compatible parts in <code>CAD/Advanced/</code> and vendor-sourced models for steppers, the BTT Kraken board, and GT2 pulleys. STEP files have arbitrary native orientations, which is the single largest source of agent placement bugs. A <code>probe_steps.py</code> script reads the bounding box of any STEP file before the agent attempts to place it.</li>
+<li><strong>Assembly script</strong>, a CadQuery 2.7 script that loads the V-slot library, places every component parametrically against frame topology constants (<code>W</code>, <code>D</code>, <code>H</code>), and writes the assembled STEP. The script evolved through three major versions: a pure-parametric early build, a Phase C completion with stricter component coverage, and a v3 filter-and-replace strategy that loads a human-edited Fusion 360 export and surgically replaces specific components with parametric versions.</li>
+<li><strong>Self-verification harness</strong>, a <code>preview_assembly.py</code> that runs engineering invariants against the generated geometry, renders three orthographic projections (XY, XZ, YZ) headlessly with matplotlib, and exits non-zero on any failure.</li>
+</ol>
+<h3 id="cadclaw-extracted-as-its-own-tool">CADCLAW: extracted as its own tool</h3>
+<p>The validation harness was extracted into a generalized framework called <a href="https://cadclaw.io">CADCLAW</a> (<a href="https://doi.org/10.5281/zenodo.19647391">Zenodo DOI 10.5281/zenodo.19647391</a>), now a separable open-source project. CADCLAW is field-tested against the M3-CRETE repository on every release. The latest field-test report documents Doctor PASS at full coverage, the harness running end-to-end after one workaround, and a small set of issues identified for the next milestone. CADCLAW reads the BOM, classifies STEP solids by sorted bounding-box signature, runs BOM/CAD count cross-checks, and emits a markdown report.</p>
+<p>The privacy guard is unconditional: vendor names, SKUs, unit costs, and supplier identifiers are dropped from every emit path, regardless of whether the project's <code>cadclaw.yaml</code> declares them private. This is non-negotiable in concrete 3D printing where supply chain advantage is real and the BOM viewer is the public interface.</p>
+<h3 id="specific-design-decisions">Specific design decisions</h3>
+<p>A few CAD decisions deserve calling out because they fail in obvious ways if you do not know them:</p>
+<ul>
+<li><strong>X-gantry internal reinforcement</strong>, all reinforcement is internal to the 4080 C-channel because the X-carriage is two-sided. The slot-linking kit sits below the wheel path; V-slot bars are staggered inside the C-channel and bonded with structural adhesive, with the center bar bridging the splice equally on each side.</li>
+<li><strong>Slot-linking kit for splices</strong>, the long X-axis is achieved by splicing two stock segments using internal T-slot connectors, not external 5-hole 90-degree plates. External plates would protrude into the wheel zone and block carriage travel.</li>
+<li><strong>Multi-screw corner plates</strong>, every 4080-to-4080 corner uses a T-plate or L-plate. These are sourced from MakerStore USA or Bulkman3D.</li>
+<li><strong>Quad-Z hub disk routing</strong>, Z-motors straddle the top Y-brace; the belt routes from a hub disk under the brace, down the post, around a smooth idler at the bottom, and back up to the Z-carriage. This eliminates lead screws entirely.</li>
+<li><strong>NEMA23 mount fastening</strong>, the canonical NEMA23 motors have pass-through mounting holes, not tapped holes. Each motor uses M5 cap screws with M5 nuts (nylock or plain plus blue Loctite), and the 3D-printed motor mount is a clearance plate, not a threaded anchor.</li>
+</ul>
+<h2 id="6-mix-design-and-printability">6. Mix design and printability</h2>
+<p>M3-CRETE is a hardware platform, not a materials platform. We do not ship a recommended concrete mix in the repository. The reasons are practical: cementitious printability is a function of local aggregate, ambient humidity, fresh-state rheology, set-time targets, and structural intent. A mix that prints well in Appleton in October will not print well in Phoenix in July. Hard-coding a recipe would be a disservice.</p>
+<p>What we do ship is the <strong>Print stage in the Predict to Print to Prove loop</strong>:</p>
+<ul>
+<li><strong>Predict</strong>, <a href="https://cemforge.ai">CEMFORGE</a> is Sunnyday's machine-learning formulation engine. It is trained on validated 3D-printed cementitious specimen data and generates candidate mixes with supported performance predictions where sufficient training data exists. M3-CRETE consumes CEMFORGE-generated formulations as input. The two systems are designed to talk: CEMFORGE outputs include extrusion-relevant parameters (yield stress, plastic viscosity targets, set-time windows, water-to-binder ratio) that map directly onto Klipper extrusion settings.</li>
+<li><strong>Print</strong>, M3-CRETE deposits the mix layer by layer at controlled flow rates and toolpath velocities. Klipper macros expose extrusion multipliers, retract on travel, and per-layer Z compensation. The printhead is a 1" Male NPT pipe connection on a counter-weighted hose; pump pressure and material velocity are owned by the upstream pump system.</li>
+<li><strong>Prove</strong>, <a href="https://open3dcp.org">Open3DCP</a> is the open-data standard (<a href="https://doi.org/10.5281/zenodo.19647471">Zenodo DOI 10.5281/zenodo.19647471</a>) for capturing 3DCP printability outcomes: layer adhesion, interlayer cold joint, dimensional fidelity, time-to-buildable-height. Printer outputs feed Open3DCP records, which feed back into CEMFORGE training data, closing the loop.</li>
+</ul>
+<p>The academic literature on 3DCP printability is robust enough that a builder does not have to start from scratch. Chen et al. (2020) studied <a href="https://doi.org/10.1016/j.conbuildmat.2020.120094">the effect of printing parameters on interlayer bond strength of 3D printed limestone-calcined-clay-based cementitious materials</a> and showed how interval time and nozzle standoff drive cold-joint formation. TU Delft's set-on-demand work (2021) demonstrated chemical activation strategies that decouple pumpability from buildability. The TU Delft graded-clays study (2021) identified calcined-clay supplementary cementitious materials as a viable LC3 path for 3DCP. An, Zhang, and Yang (2024) reviewed coarse aggregate incorporation strategies in <em>Virtual and Physical Prototyping</em> (<a href="https://doi.org/10.1080/17452759.2024.2351154">DOI 10.1080/17452759.2024.2351154</a>). For limestone-blended binder fundamentals relevant to PLC-based 3DCP, Tennis et al. (2024) is the current state-of-the-art reference for limestone in cement.</p>
+<p>We do not redo the CEMFORGE pillar page here. The point of this section is to establish that the printer is one stage in a larger Predict-Print-Prove loop, and that the boundary between the printer (M3-CRETE), the formulation engine (CEMFORGE), and the data standard (Open3DCP) is intentional and clean.</p>
+<h2 id="7-license-and-contribution-model">7. License and contribution model</h2>
+<p>M3-CRETE ships under a dual-license structure that almost no one in 3D printing has bothered to read carefully, so this section is worth your time.</p>
+<h3 id="cern-ohl-w-20-for-hardware">CERN-OHL-W-2.0 for hardware</h3>
+<p>The hardware design itself (frame, motion system, custom brackets, BOM, firmware configurations) is licensed under <a href="https://ohwr.org/cern_ohl_w_v2.txt">CERN Open Hardware Licence Version 2 - Weakly Reciprocal</a>, commonly written CERN-OHL-W-2.0. CERN-OHL-W is the open-hardware analog of LGPL: derivatives of covered files must be made available under the same license, but you can integrate the design into a larger product without infecting the entire product with the license. You can build M3-CRETE printers commercially, sell them, modify the design, and ship that modified design as a kit, provided the modified design files (CAD source, BOM changes, firmware patches) remain available under CERN-OHL-W-2.0.</p>
+<p>Why CERN-OHL-W and not, say, MIT or Apache 2.0? Because hardware is not software. A permissive software license assumes that downstream users will keep contributing upstream because the marginal cost of doing so is trivial. Hardware does not work that way. A weakly reciprocal license keeps the design files open without preventing commercial integration. CERN-OHL-W is the closest the open-hardware community has to a battle-tested, lawyer-reviewed, internationally enforceable instrument for this trade-off.</p>
+<h3 id="cc-by-sa-40-for-v-slot-cad">CC BY-SA 4.0 for V-slot CAD</h3>
+<p>The V-slot component models in <code>CAD/Components/</code> derive from the <a href="https://openbuilds.com">OpenBuilds</a> ecosystem, which licensed those models under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. We preserve that license on the component files and require derivative V-slot models in our repository to remain CC BY-SA 4.0. This is a license-compatibility matter, not a preference. Note that the OpenBuilds company itself dissolved in May 2025; the CAD ecosystem is community-maintained.</p>
+<h3 id="how-to-contribute">How to contribute</h3>
+<p>Three paths, all on GitHub:</p>
+<ul>
+<li><strong>Pull request</strong>, code, CAD, BOM, or documentation changes. PRs run the CADCLAW harness in CI; failing invariants block merge.</li>
+<li><strong>Issue</strong>, bug reports, supplier suggestions (the BOM viewer's "Suggest Supplier" button opens an issue prefilled with the part), build experience reports, missing-part findings, license questions.</li>
+<li><strong>Discussion</strong>, open-ended technical questions, design RFCs, build logs from the field, requests for collaboration.</li>
+</ul>
+<p>Email <code>info@sunn3d.com</code> for kit early-access, lab partnerships, journalist inquiries, or speaker invitations.</p>
+<h2 id="8-what-we-know-thats-missing-or-open">8. What we know that's missing or open</h2>
+<p>Honest open issues are the most credible content on this page. Concrete printers are mechanical systems with hundreds of edges; pretending otherwise is a tell that the documentation has not survived a real build. Below is the current open-issues list, drawn from internal mechanical audits and the most recent CADCLAW field-test report.</p>
+<h3 id="mechanical-open-items">Mechanical open items</h3>
+<ul>
+<li><strong>Z-carriage versus cross brace clearance</strong>, needs CAD verification at maximum Z travel. The carriage geometry is correct in isolation; the question is whether at extreme top-of-travel the carriage clips the cross brace. A small running clearance is the design intent. Pending interference check against the v3 assembly.</li>
+<li><strong>Belt tensioning method</strong>, currently unspecified in the BOM. The motor mount slotted holes provide tensioning travel, but the assembly guide does not document the procedure. To be added to the assembly documentation, not the BOM.</li>
+<li><strong>Drag chain end brackets</strong>, verify whether the drag chain SKU includes end brackets or whether they need to be added separately. Three drag chains in the build (X, Y, Z); the verification is per-supplier.</li>
+<li><strong>Splice gap interferences</strong>, verify that internal connectors at the X-axis splice are flush so V-wheels ride smoothly across the gap. The slot-linking kit sits below the wheel path by design, but tolerance stack-up needs a physical check.</li>
+</ul>
+<h3 id="cad-model-gaps">CAD model gaps</h3>
+<ul>
+<li><strong>X-axis NEMA23 motor not yet modeled</strong>, the CAD assembly currently shows the four Z motors and the two Y motors; the X-axis motor is design-WIP per the project's CLAUDE.md. The X-carriage is described as a "dual plate sandwich, not yet modeled." The CADCLAW harness correctly flags this as a count mismatch, and the finding will resolve when X-carriage modeling lands. This is not a CADCLAW bug; it is a real CAD WIP.</li>
+<li><strong>C-beam spare quantity</strong>, the BOM lists reference pieces plus a spare for procurement, while the CAD model shows only the design count. The current rule schema in CADCLAW conflates design count with order count. Fix is in scope for the next CADCLAW milestone via <code>expected_design_qty</code> plus <code>spare_qty</code> rule fields. Rule-level workaround: skip the count check for this label until the new fields land.</li>
+<li><strong>Sandwich vs. butt-joint distinction</strong>, the validation harness checks dimensions and positions, not mechanical intent. The distinction between "plate sandwiches the rail" and "plate butts against the rail end-face" is structural, not geometric. The human declares intent; the agent executes. This is a documented limitation in the AI-CAD whitepaper.</li>
+</ul>
+<h3 id="cadclaw-false-positives-already-triaged">CADCLAW false-positives (already triaged)</h3>
+<p>The latest field test surfaced a small set of false-positives on the M3-CRETE BOM that are scheduled for the next CADCLAW milestone:</p>
+<ul>
+<li><code>forbidden_terms</code> substring matching catches negations and educational mentions. The M3-CRETE BOM legitimately says <em>"do not substitute the belt used on Y/Z here"</em> on the X-belt entry; the substring match flags it despite the negation.</li>
+<li><code>claim_audit.stale_terms</code> does not distinguish required attribution from stale claims. The README's CC BY-SA 4.0 attribution to OpenBuilds was flagged as a stale-term violation; deleting that attribution would be a license violation.</li>
+<li><code>claim.forbidden_absolute "validated"</code> is too aggressive for the default rule. The README's mention of CEMFORGE's training data ("validated 3D-printed cementitious specimen data") was flagged; the sentence describes a third-party service, not M3-CRETE.</li>
+<li><code>cad.count_mismatch</code> reports per-rule against the same label, producing redundant findings (separate failures for <code>motor_nema23</code> instead of one aggregated finding).</li>
+</ul>
+<p>These are CADCLAW issues, not M3-CRETE issues. The fact that they exist in the current release is documented in the field-test report; the fact that they are not yet fixed is also documented.</p>
+<h3 id="material-and-process-variability">Material and process variability</h3>
+<ul>
+<li><strong>Cure-time variability</strong>, layer cycle times depend on mix design, ambient temperature, and humidity. Closed-loop print speed control from in-situ rheometry is on the roadmap, not in the canonical build.</li>
+<li><strong>Nozzle clogging recovery</strong>, the current procedure on a partial clog is to pause, manually clear, and resume. There is no automated clog detection.</li>
+<li><strong>No FEA round-trip</strong>, current FEA is a one-way flow: generate STEP in CadQuery, import to Fusion 360, run FEA manually. A round-trip workflow where FEA results feed back into the parametric script is future work.</li>
+</ul>
+<p>We document these openly because builders should know what they are signing up for. Closed-source competitors hide identical issues behind support contracts.</p>
+<h2 id="9-get-started">9. Get started</h2>
+<p>Three reader profiles, three paths.</p>
+<h3 id="path-a-i-just-want-to-read-the-bom">Path A: I just want to read the BOM</h3>
+<p>Open the <a href="https://m3-crete.com/bom">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1, M3-2, or M3-4). Export a CSV when you want to take it to a spreadsheet. No GitHub login required, no Supabase account, no email gate. The viewer is a static site.</p>
+<p>If you want the underlying data, <code>bom/data.json</code> is the source of truth and is human-editable. The schema is documented in <code>config.js</code>.</p>
+<h3 id="path-b-i-want-to-actually-build-one">Path B: I want to actually build one</h3>
+<ol>
+<li>Read this page in full. Yes, all of it.</li>
+<li>Read the project <a href="https://github.com/sunnyday-technologies/M3-CRETE">README on GitHub</a> and the <code>AGENTS.md</code> file in the repository root, which captures every design exclusion the project has accreted.</li>
+<li>Decide which model variant fits your floor space. Default is M3-2 unless your application demands the larger M3-4 or you want a quick prototype on M3-1.</li>
+<li>Export the BOM as CSV from the viewer. Reconcile against parts you already own.</li>
+<li>Place the V-slot order with MakerStore USA or Bulkman3D first. Lead time is the bottleneck.</li>
+<li>Place the Amazon order for fasteners and electronics in parallel.</li>
+<li>Clone the GitHub repository and run the CADCLAW harness against the assembly to confirm everything is current.</li>
+<li>Print the 3D-printed brackets while the V-slot is in transit.</li>
+<li>Build the frame. Tram the Z-axis. Wire the BTT Kraken. Flash Klipper. Calibrate StallGuard4.</li>
+<li>Pair with a pump system. M3-CRETE itself is motion-only; the <a href="mailto:info@sunn3d.com">NemoCrete</a> pump is one option, but you can run any peristaltic or screw pump capable of feeding a 1" Male NPT line at the pressure your mix requires.</li>
+<li>Pair with a mix design. <a href="https://cemforge.ai">CEMFORGE</a> generates printability-targeted formulations, but you can also start with a published recipe and tune.</li>
+<li>Print. Capture data. Publish to <a href="https://open3dcp.org">Open3DCP</a>.</li>
+</ol>
+<p>If you get stuck, open a <a href="https://github.com/sunnyday-technologies/M3-CRETE/discussions">GitHub Discussion</a>. Build experience reports are some of the most valuable contributions the project receives.</p>
+<h3 id="path-c-i-want-to-contribute">Path C: I want to contribute</h3>
+<p>Easiest first issues:</p>
+<ul>
+<li>Run the CADCLAW harness against your local clone and report any new findings.</li>
+<li>Suggest a supplier through the BOM viewer's "Suggest Supplier" button, which opens a prefilled GitHub Issue.</li>
+<li>Submit a build log as a Discussion: photos, timing, what broke, what worked.</li>
+<li>Pick an open invariant gap from the AI-CAD whitepaper's Appendix A and add it to <code>preview_assembly.py</code>.</li>
+<li>Improve a 3D-printable bracket model and PR the STEP plus STL.</li>
+</ul>
+<p>Email <code>info@sunn3d.com</code> for partnership conversations or speaker invitations. Sunnyday Technologies is based in Appleton, Wisconsin, and we travel for conference talks where it makes sense.</p>
+<h2 id="10-citations-and-further-reading">10. Citations and further reading</h2>
+<h3 id="sunnyday-technologies-stack">Sunnyday Technologies stack</h3>
+<ul>
+<li>M3-CRETE repository, <a href="https://github.com/sunnyday-technologies/M3-CRETE">github.com/sunnyday-technologies/M3-CRETE</a>, CERN-OHL-W-2.0.</li>
+<li>M3-CRETE live site, <a href="https://m3-crete.com">m3-crete.com</a>.</li>
+<li>M3-CRETE interactive BOM, <a href="https://m3-crete.com/bom">m3-crete.com/bom</a>.</li>
+<li>CEMFORGE AI formulation engine, <a href="https://cemforge.ai">cemforge.ai</a>.</li>
+<li>CADCLAW automated CAD validation framework, <a href="https://cadclaw.io">cadclaw.io</a>, <a href="https://doi.org/10.5281/zenodo.19647391">Zenodo DOI 10.5281/zenodo.19647391</a>.</li>
+<li>Open3DCP open data standard for 3D concrete printing, <a href="https://open3dcp.org">open3dcp.org</a>, <a href="https://doi.org/10.5281/zenodo.19647471">Zenodo DOI 10.5281/zenodo.19647471</a>.</li>
+<li>Sonnentag, N. (2026). <em>Self-Verifying LLM-Driven Parametric CAD Assemblies: Lessons from a Meter-Scale Concrete 3D Printer</em>. Sunnyday Technologies AI-CAD whitepaper, CC BY 4.0.</li>
+<li>Sunnyday Technologies parent site, <a href="https://sunn3d.com">sunn3d.com</a>.</li>
+</ul>
+<h3 id="selected-academic-literature">Selected academic literature</h3>
+<ul>
+<li>Chen, Y., Jansen, K., Zhang, H., Romero Rodriguez, C., Gan, Y., Copuroglu, O., and Schlangen, E. (2020). Effect of printing parameters on interlayer bond strength of 3D printed limestone-calcined-clay-based cementitious materials: An experimental and numerical study. <em>Construction and Building Materials</em>, 262, Article 120094. <a href="https://doi.org/10.1016/j.conbuildmat.2020.120094">DOI 10.1016/j.conbuildmat.2020.120094</a>.</li>
+<li>An, D., Zhang, Y. X., and Yang, R. (2024). Incorporating coarse aggregates into 3D concrete printing from mixture design and process control to structural behaviours and practical applications: a review. <em>Virtual and Physical Prototyping</em>. <a href="https://doi.org/10.1080/17452759.2024.2351154">DOI 10.1080/17452759.2024.2351154</a>.</li>
+<li>Sharma, A., Sirotiak, T., Wang, X., Taylor, P., Angadi, P., and Payne, S. (2021). Portland limestone cement for reduced shrinkage and enhanced durability of concrete. <em>Magazine of Concrete Research</em>. <a href="https://doi.org/10.1680/jmacr.19.00165">DOI 10.1680/jmacr.19.00165</a>.</li>
+<li>Tennis, P. D., Thomas, M. D. A., Weiss, W. J., Farny, J. A., and Giannini, E. R. (2024). <em>State-of-the-Art Report on Use of Limestone in Cements at Levels of up to 15%</em>. Portland Cement Association R&amp;D Bulletin SN3148.</li>
+<li>Hooton, R. D. and Riding, K. A. (2025). Type IL cement use in precast, prestressed concrete. <em>PCI Journal</em>. <a href="https://doi.org/10.15554/pcij70.2-04">DOI 10.15554/pcij70.2-04</a>.</li>
+<li>Adu-Amankwah, S., Black, L., and Zajac, M. (2015). Effect of Limestone Addition on the Early Age Hydration and Microstructure Evolution of Composite Slag Cements. <em>14th International Congress on the Chemistry of Cement, Beijing</em>.</li>
+</ul>
+<h3 id="open-hardware-tooling">Open-hardware tooling</h3>
+<ul>
+<li>CadQuery 2.7, Apache 2.0, <a href="https://github.com/CadQuery/cadquery">github.com/CadQuery/cadquery</a>.</li>
+<li>build123d (planned migration target), Apache 2.0, <a href="https://github.com/gumyr/build123d">github.com/gumyr/build123d</a>.</li>
+<li>Klipper firmware, <a href="https://www.klipper3d.org">klipper3d.org</a>.</li>
+<li>BTT Kraken mainboard, BIGTREETECH.</li>
+<li>OpenBuilds V-slot CAD ecosystem, CC BY-SA 4.0 (community-maintained as of May 2025).</li>
+</ul>
+<hr />
+<h2 id="cite-this-work">Cite this work</h2>
+<pre><code class="language-yaml">cff-version: 1.2.0
+message: &quot;If you use M3-CRETE designs in research or a build, please cite it as below.&quot;
+title: &quot;M3-CRETE: Open-Source Concrete 3D Printer&quot;
+abstract: &gt;-
+  M3-CRETE is an open-source, buildable, field-serviceable concrete 3D
+  printer designed for teams that need to replicate, maintain, and scale
+  independently of proprietary industrial systems. Includes CAD,
+  bill-of-materials, firmware configuration, and validation tooling.
+type: software
+authors:
+  - family-names: Sonnentag
+    given-names: Nicholas
+    email: info@sunn3d.com
+    affiliation: Sunnyday Technologies
+license: CERN-OHL-W-2.0
+license-url: &quot;https://cern.ch/cern-ohl&quot;
+repository-code: &quot;https://github.com/sunnyday-technologies/M3-CRETE&quot;
+url: &quot;https://m3-crete.com&quot;
+keywords:
+  - 3D-printing
+  - concrete
+  - construction
+  - CNC
+  - open-hardware
+  - DIY
+  - 3DCP
+  - additive-manufacturing
+</code></pre>
+<blockquote>
+<p><strong>Zenodo DOI:</strong> A concept DOI for the M3-CRETE project is currently being set up on Zenodo. Once minted, it will appear here and at <a href="https://github.com/sunnyday-technologies/M3-CRETE">github.com/sunnyday-technologies/M3-CRETE</a> as the citable identifier for the canonical release. Until then, cite the GitHub repository and the version tag.</p>
+</blockquote>
+<hr />
+<hr />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow",
+  "description": "M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut.",
+  "author": {
+    "@type": "Person",
+    "name": "Nicholas Sonnentag",
+    "affiliation": {
+      "@type": "Organization",
+      "name": "Sunnyday Technologies",
+      "url": "https://sunn3d.com"
+    }
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sunnyday Technologies",
+    "url": "https://sunn3d.com"
+  },
+  "datePublished": "2026-04-27",
+  "dateModified": "2026-04-27",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://m3-crete.com/build-guide/"
+  },
+  "keywords": "open source concrete 3D printer, DIY 3D concrete printer, M3-CRETE, build a concrete 3D printer, CERN-OHL concrete printer, pallet-scale 3DCP, sub-meter concrete printer, concrete 3D printer BOM",
+  "isAccessibleForFree": true,
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "M3-CRETE",
+      "url": "https://m3-crete.com"
+    },
+    {
+      "@type": "Thing",
+      "name": "Open-Source Hardware",
+      "sameAs": "https://en.wikipedia.org/wiki/Open-source_hardware"
+    },
+    {
+      "@type": "Thing",
+      "name": "Concrete 3D Printing",
+      "sameAs": "https://en.wikipedia.org/wiki/3D_concrete_printing"
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">...</script>
+
+  </main>
+
+<footer>
+    <div class="footer-left">
+      © 2026 Sunnyday Technologies LLC &nbsp;·&nbsp;
+      <a href="https://sunn3d.com">sunn3d.com</a> &nbsp;·&nbsp;
+      <a href="https://cemforge.ai">cemforge.ai</a> &nbsp;·&nbsp;
+      <span id="_em" style="color:#97D700;cursor:pointer" onclick="window.location.href=atob(this.dataset.h)" data-h="bWFpbHRvOm0zQHN1bm4zZC5jb20=">m<span style="display:none">REMOVE</span>3&#64;sunn&#51;d&#46;com</span>
+    </div>
+  </footer>
+
+</body>
+</html>
