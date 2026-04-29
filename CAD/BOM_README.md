@@ -5,7 +5,7 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 135).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 146).
 
 See `bom_structural.csv`.
 
@@ -22,39 +22,39 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
-- cbeam_257 <-> cbeam_258
-- cbeam_257 <-> cbeam_266
-- cbeam_257 <-> cbeam_271
-- cbeam_257 <-> cbeam_273
-- cbeam_258 <-> cbeam_259
-- cbeam_258 <-> cbeam_260
-- cbeam_258 <-> cbeam_273
-- cbeam_259 <-> cbeam_260
-- cbeam_259 <-> cbeam_267
-- cbeam_259 <-> cbeam_271
-- cbeam_260 <-> cbeam_262
-- cbeam_260 <-> cbeam_265
-- cbeam_261 <-> cbeam_263
-- cbeam_261 <-> cbeam_266
-- cbeam_261 <-> cbeam_268
-- cbeam_261 <-> cbeam_269
-- cbeam_262 <-> cbeam_273
-- cbeam_263 <-> cbeam_272
-- cbeam_264 <-> cbeam_270
-- cbeam_265 <-> cbeam_273
-- cbeam_266 <-> cbeam_268
-- cbeam_266 <-> cbeam_271
-- cbeam_267 <-> cbeam_268
-- cbeam_267 <-> cbeam_271
-- cbeam_267 <-> cbeam_272
-- cbeam_268 <-> cbeam_272
-- cbeam_269 <-> cbeam_272
+- cbeam_284 <-> cbeam_285
+- cbeam_284 <-> cbeam_293
+- cbeam_284 <-> cbeam_298
+- cbeam_284 <-> cbeam_300
+- cbeam_285 <-> cbeam_286
+- cbeam_285 <-> cbeam_287
+- cbeam_285 <-> cbeam_300
+- cbeam_286 <-> cbeam_287
+- cbeam_286 <-> cbeam_294
+- cbeam_286 <-> cbeam_298
+- cbeam_287 <-> cbeam_289
+- cbeam_287 <-> cbeam_292
+- cbeam_288 <-> cbeam_290
+- cbeam_288 <-> cbeam_293
+- cbeam_288 <-> cbeam_295
+- cbeam_288 <-> cbeam_296
+- cbeam_289 <-> cbeam_300
+- cbeam_290 <-> cbeam_299
+- cbeam_291 <-> cbeam_297
+- cbeam_292 <-> cbeam_300
+- cbeam_293 <-> cbeam_295
+- cbeam_293 <-> cbeam_298
+- cbeam_294 <-> cbeam_295
+- cbeam_294 <-> cbeam_298
+- cbeam_294 <-> cbeam_299
+- cbeam_295 <-> cbeam_299
+- cbeam_296 <-> cbeam_299
 
 ### V-wheels
 
-28 wheels. Each: 1× M5×40 SHCS, 1× M5 nyloc, 2× M5 washer.
-Half (14) get eccentric spacers (one side per wheel pair),
-the other half (14) get standard precision spacers.
+32 wheels. Each: 1× M5×40 SHCS, 1× M5 nyloc, 2× M5 washer.
+Half (16) get eccentric spacers (one side per wheel pair),
+the other half (16) get standard precision spacers.
 
 ### Motors / printed mounts
 
@@ -67,13 +67,13 @@ not yet modeled — add them when the X-axis lands.
 
 | Item | Qty |
 |---|---|
-| M5 T-nut | 147 |
-| M5 flat washer | 76 |
-| M5 nyloc nut | 38 |
-| M5 x 10 mm | 169 |
-| M5 x 16 mm | 2 |
-| M5 x 30 mm | 10 |
-| M5 x 40 mm | 28 |
+| M5 T-nut | 161 |
+| M5 flat washer | 82 |
+| M5 nyloc nut | 41 |
+| M5 x 10 mm | 167 |
+| M5 x 16 mm | 18 |
+| M5 x 30 mm | 9 |
+| M5 x 40 mm | 32 |
 
 ### Things NOT in this BOM (intentionally)
 

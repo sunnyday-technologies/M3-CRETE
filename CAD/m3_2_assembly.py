@@ -18,7 +18,7 @@ from OCP.BRepAdaptor import BRepAdaptor_Curve
 from OCP.GCPnts import GCPnts_TangentialDeflection
 import os, time, math
 
-USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_xmotor mount.step")
+USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_V1.0.step")
 
 # ============================================================
 # Frame: 1000mm C-beam extrusions (shipping constraint).
@@ -264,6 +264,7 @@ cbeam_bbs   = []   # for joint detection
 zmotor_bbs  = []   # for Z-motor bracket placement (cz > 900)
 ymotor_bbs  = []   # for Y-motor bracket placement (cz < 600, near rail X edge)
 idler_bbs   = []   # for idler axle bracket placement
+xaxle_bbs   = []   # for X-carriage V-wheel placement at authored axle positions (sig 9x9x31.5)
 _vwheel_template_shape = None  # populated from first loaded V-wheel; cloned for X-carriage
 _z_bracket_template = None     # captured from the user-authored (4,80,97) plate; cloned to all 4 Z corners + 2 Y motors
 _z_bracket_src_ctr = None      # world-frame source center of the captured bracket
@@ -548,7 +549,12 @@ for s in solids:
         if _z_bracket_template is None:
             _z_bracket_template = s
             _z_bracket_src_ctr = (cx, cy, cz)
-        continue
+        # 2026-04-29: do NOT skip. The authored (4,80,97) bracket sits at
+        # the FR Z-corner position in source; the source has only 3 of 4
+        # Z-motors, so the post-loop cloner places only 3 zmounts on
+        # zmotor_bbs entries. Letting the template pass through here
+        # places the bracket at its authored FR position, completing the
+        # 4-corner Z mount set. Result: 4 Z + 2 Y = 6 zmounts total.
 
     # ============================================================
     # DEFAULT pass-through — translate by corner fixup delta only.
@@ -589,6 +595,9 @@ for s in solids:
             ymotor_bbs.append(wbb)
     elif dims == (12.7, 22.0, 22.0):
         idler_bbs.append(wbb)
+    elif dims == (9.0, 9.0, 31.5):
+        # X-carriage V-wheel axles — capture for post-loop wheel placement
+        xaxle_bbs.append(wbb)
     n[0] += 1
 
 # ============================================================
@@ -634,7 +643,13 @@ NEMA_PCD    = 47.14
 NEMA_BOLT   = 5.5
 NEMA_CENTER = 23.0
 
-if _z_bracket_template is not None and _z_bracket_src_ctr is not None:
+# 2026-04-29: M3-2_V1.0.step authors all needed motor mounts in source —
+# 2× z_motor_mount at Y-motor positions, 4× bot_spacer_idler at top Z-corners
+# (which serve as Z-motor mounts in the V1.0 design). Cloner disabled to
+# prevent double-placement; source is the source of truth.
+_RUN_ZMOUNT_CLONER = False  # V1.0: source has all motor mounts authored
+
+if _RUN_ZMOUNT_CLONER and _z_bracket_template is not None and _z_bracket_src_ctr is not None:
     src_x, src_y, src_z = _z_bracket_src_ctr
 
     # Source bracket sits at (2080, 18, 1008.5); canonical front-right
@@ -705,6 +720,8 @@ if _z_bracket_template is not None and _z_bracket_src_ctr is not None:
         n_ybrk += 1
         n[0] += 1
     print(f"  {n_ybrk} Y-motor brackets placed at actual Y-motor positions")
+elif not _RUN_ZMOUNT_CLONER:
+    print(f"  zmount cloner disabled — source has 2 z_motor_mount + 8 bot_spacer_idler authored")
 else:
     print(f"  WARNING: no (4,80,97) bracket template captured from source — "
           f"Z and Y mounts will be missing")
@@ -867,46 +884,14 @@ else:
     print(f"  {n_tbrackets} T-brackets at center spreader "
           f"(parametric trapezoid fallback — authored Fusion gussets not found)")
 
-# --- X-gantry carriage: 8 V-wheels ------------------------------------
-# Source AllC.step has Y-carriage wheels at the two gantry ends (X=21,
-# X=2059) but lacks the 8 X-carriage wheels that ride on the gantry
-# beam itself. Pattern: "same positioning rules as Y/Z carriages, just
-# doubled" — 2 wheels along X (spacing) × 2 Y × 2 Z = 8 wheels.
-#
-# Positions taken from the Fusion M3-2_Assembly.step authored design at
-# the X-carriage parked position (X~1496, mid-gantry). Shape here is a
-# parametric cylinder placeholder at nominal wheel OD/thickness — exact
-# V-race profile comes through when the source re-exports with wheels.
-X_CARR_X  = []                  # M3-2_newZMM.step already includes X-carriage wheels
-X_CARR_Y  = [508.6, 528.4]     # ±9.9 from gantry centerline Y=520
-X_CARR_Z  = [325.0, 408.3]     # ±41.65 from gantry centerline Z=369.5
+# --- X-carriage V-wheels ----------------------------------------------
+# 2026-04-29: as of M3-2_V1.0.step, V-wheels at the X-carriage axle
+# positions are AUTHORED in source (32 vwheels total = 16 Z + 8 Y + 8 X).
+# Script-side placement disabled — would double-place wheels.
+# Re-enable by detecting "no wheel near axle" if a future source revision
+# drops them again.
 n_xcarr_wheels = 0
-if _vwheel_template_shape is not None:
-    _wbb = _vwheel_template_shape.BoundingBox()
-    _wtcx = (_wbb.xmin + _wbb.xmax) / 2.0
-    _wtcy = (_wbb.ymin + _wbb.ymax) / 2.0
-    _wtcz = (_wbb.zmin + _wbb.zmax) / 2.0
-    _wheel_wp = cq.Workplane().add(_vwheel_template_shape)
-    for wx in X_CARR_X:
-        for wy in X_CARR_Y:
-            for wz in X_CARR_Z:
-                assy.add(_wheel_wp, name=f"vwheel_xcarr_{n_xcarr_wheels}",
-                         color=GRN,
-                         loc=Location((wx - _wtcx, wy - _wtcy, wz - _wtcz)))
-                n_xcarr_wheels += 1
-                n[0] += 1
-    print(f"  {n_xcarr_wheels} X-carriage V-wheels (cloned from source, green)")
-else:
-    # Fallback: no V-wheel in source to clone — use parametric cylinder
-    _fallback_wheel = cq.Workplane("XZ").cylinder(10.2, 23.9 / 2.0)
-    for wx in X_CARR_X:
-        for wy in X_CARR_Y:
-            for wz in X_CARR_Z:
-                assy.add(_fallback_wheel, name=f"vwheel_xcarr_{n_xcarr_wheels}",
-                         color=GRN, loc=Location((wx, wy, wz)))
-                n_xcarr_wheels += 1
-                n[0] += 1
-    print(f"  {n_xcarr_wheels} X-carriage V-wheels (fallback cylinder, green)")
+print(f"  {n_xcarr_wheels} X-carriage V-wheels (authored in source — script placement disabled)")
 
 # --- X-carriage gantry plates (2x) ------------------------------------
 # 3 mm polycarbonate plates (88 × 127) on each ±Y face of the gantry beam
@@ -920,6 +905,12 @@ for py in ():   # M3-2_newZMM.step already includes X-carriage plates
     n_xcarr_plates += 1
     n[0] += 1
 print(f"  {n_xcarr_plates} X-carriage gantry plates")
+
+# --- Internal 2040 V-slot reinforcement inserts ---------------------------
+# 2026-04-29: as of M3-2_V1.0.step, the 3× 1m 2040 inserts are authored in
+# source (pattern B+b: 1 centered insert per X-direction member, no 6mm
+# plate). Script-side placement disabled — would double-place.
+print(f"  0 2040 V-slot inserts script-placed (3 authored in source)")
 
 print(f"\n  {n[0]} parts total")
 print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
