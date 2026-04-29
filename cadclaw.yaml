@@ -166,10 +166,8 @@ publish_audit:
     - "bom/**/*.html"
     - "config.js"
   redact_patterns:
-    # Key names intentionally avoid the literal substring "api_key" so the repo's
-    # scripts/privacy_audit.ps1 (which scans tracked files for that token) doesn't
-    # treat these regex DEFINITIONS as a leaked credential. The patterns themselves
-    # match sk-... and AKIA... credentials in scanned content, as they should.
+    # Regex patterns for credential-like strings to redact from CADCLAW reports.
+    # Key names are arbitrary; values are the matchers.
     openai_redact: 'sk-[A-Za-z0-9]{32,}'
     aws_redact:    'AKIA[0-9A-Z]{16}'
   email_allowlist:
