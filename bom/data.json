@@ -1,6 +1,6 @@
 {
-  "version": "2.6.2",
-  "generated": "2026-04-22T12:00:00Z",
+  "version": "2.7.0",
+  "generated": "2026-04-29T18:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -2629,5 +2629,5 @@
       ]
     }
   ],
-  "notes": "v2.2: all primary frame members use 4080 C-Beam; motor and idler mounts are printed; X-direction 2m members use centered 2040 friction-fit inserts with printed retainers; belt width reconciliation (Y/Z=10mm, X=6mm); wheel count confirmed at 32."
+  "notes": "v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing."
 }
