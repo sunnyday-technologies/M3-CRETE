@@ -268,6 +268,8 @@ xaxle_bbs   = []   # for X-carriage V-wheel placement at authored axle positions
 _vwheel_template_shape = None  # populated from first loaded V-wheel; cloned for X-carriage
 _z_bracket_template = None     # captured from the user-authored (4,80,97) plate; cloned to all 4 Z corners + 2 Y motors
 _z_bracket_src_ctr = None      # world-frame source center of the captured bracket
+_motor_template_shape = None   # captured from first standard NEMA23; cloned to FR Z-corner to replace variant
+_motor_template_src_ctr = None # world-frame source center of the captured motor
 FRAME_CTR = (NX_RIGHT / 2.0, (Y_POST_F + Y_POST_R) / 2.0, NZ_TOP / 2.0)
 
 # Generic brackets built per-instance (each needs correct axle orientation)
@@ -545,6 +547,12 @@ for s in solids:
     # ============================================================
     if dims in {(65.0, 69.0, 69.0), (44.0, 80.0, 102.0), (4.0, 80.0, 107.0)}:
         continue
+    # 2026-04-29: FR Z-motor in M3-2_V1.0 source uses a different NEMA23 STEP
+    # (sig 56 x 56.4 x 56.4 — shorter body, no encoder cup). Skip the variant
+    # here; the post-loop cloner places a standard NEMA23 (captured below) at
+    # the symmetric FR corner instead, giving 7 sig-consistent motors total.
+    if dims == (56.0, 56.4, 56.4):
+        continue
     if dims == (4.0, 80.0, 97.0):
         if _z_bracket_template is None:
             _z_bracket_template = s
@@ -579,6 +587,12 @@ for s in solids:
     # added wheels share the real V-profile instead of a plain cylinder.
     if dims == (10.2, 23.9, 23.9) and _vwheel_template_shape is None:
         _vwheel_template_shape = s
+    # Capture a standard NEMA23 motor shape once so the post-loop cloner
+    # can place a sig-consistent motor at the FR Z-corner (replacing the
+    # shorter-body variant skipped above).
+    if dims == (56.4, 56.4, 76.6) and _motor_template_shape is None:
+        _motor_template_shape = s
+        _motor_template_src_ctr = (cx, cy, cz)
 
     # Track parts that need post-loop bracket additions (in WORLD coords
     # = source coords + fixup delta, since SXY=SZ=1).
@@ -883,6 +897,25 @@ else:
         n[0] += 1
     print(f"  {n_tbrackets} T-brackets at center spreader "
           f"(parametric trapezoid fallback — authored Fusion gussets not found)")
+
+# --- FR Z-motor: clone standard NEMA23 to replace shorter-body variant -----
+# 2026-04-29: V1.0 source has FR motor at sig (56, 56.4, 56.4) — different
+# NEMA23 STEP than the other 6 motors. The variant was skipped during the
+# source loop above; clone the standard motor template to the symmetric FR
+# Z-corner so all 7 motors share sig (56.4, 56.4, 76.6). Pure placement.
+n_fr_motors = 0
+if _motor_template_shape is not None and _motor_template_src_ctr is not None:
+    src_mx, src_my, src_mz = _motor_template_src_ctr
+    # Symmetric FR position: mirror FL Z-motor (0.6, 36.1, 1028.2) across X-frame.
+    # The 3 standard Z-motors land at (0.6, 36.1, 1028), (0.6, 1004, 1028),
+    # (2079.4, 1004, 1028). FR is the missing fourth corner.
+    fr_x, fr_y, fr_z = NX_RIGHT - 0.6, 36.1, 1028.2
+    motor_wp = cq.Workplane().add(_motor_template_shape)
+    assy.add(motor_wp, name="motor_z_FR_cloned", color=MTR,
+             loc=Location((fr_x - src_mx, fr_y - src_my, fr_z - src_mz)))
+    n_fr_motors += 1
+    n[0] += 1
+print(f"  {n_fr_motors} FR Z-motor (standard NEMA23 cloned to symmetric corner)")
 
 # --- X-carriage V-wheels ----------------------------------------------
 # 2026-04-29: as of M3-2_V1.0.step, V-wheels at the X-carriage axle
