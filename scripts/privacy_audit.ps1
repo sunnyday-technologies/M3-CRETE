@@ -91,7 +91,11 @@ foreach ($pattern in $patterns) {
         ":(exclude)bom/orders/**",
         ":(exclude)_archive/**",
         ":(exclude).gitignore",
-        ":(exclude)scripts/privacy_audit.ps1"
+        ":(exclude)scripts/privacy_audit.ps1",
+        # cadclaw.yaml's redact_patterns block contains regex DEFINITIONS for
+        # finding credentials in scanned content — by design it looks like
+        # what the audit hunts for. Excluded to avoid self-tripping.
+        ":(exclude)cadclaw.yaml"
     )
     foreach ($file in $matches) {
         [void]$matchedFiles.Add($file)
