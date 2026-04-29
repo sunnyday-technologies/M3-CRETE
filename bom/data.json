@@ -111,6 +111,15 @@
           "sku": null,
           "step_url": null,
           "approved": true
+        },
+        {
+          "id": 1304,
+          "supplier_name": "JLCMC",
+          "product_url": "https://jlcmc.com/product/s/T02/TPAA/m3-m4-m5-t-nut-20-series-aluminum-profile-fasteners",
+          "notes": "M3/M4/M5 T-nut for 20-series aluminum profile (6mm slot) — same SKU family covers M3 and M4 as well",
+          "sku": null,
+          "step_url": null,
+          "approved": true
         }
       ]
     },
