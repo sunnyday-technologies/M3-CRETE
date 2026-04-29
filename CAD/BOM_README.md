@@ -22,33 +22,33 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
-- cbeam_284 <-> cbeam_285
-- cbeam_284 <-> cbeam_293
-- cbeam_284 <-> cbeam_298
-- cbeam_284 <-> cbeam_300
-- cbeam_285 <-> cbeam_286
-- cbeam_285 <-> cbeam_287
-- cbeam_285 <-> cbeam_300
-- cbeam_286 <-> cbeam_287
-- cbeam_286 <-> cbeam_294
-- cbeam_286 <-> cbeam_298
-- cbeam_287 <-> cbeam_289
-- cbeam_287 <-> cbeam_292
+- cbeam_279 <-> cbeam_280
+- cbeam_279 <-> cbeam_288
+- cbeam_279 <-> cbeam_293
+- cbeam_279 <-> cbeam_295
+- cbeam_280 <-> cbeam_281
+- cbeam_280 <-> cbeam_282
+- cbeam_280 <-> cbeam_295
+- cbeam_281 <-> cbeam_282
+- cbeam_281 <-> cbeam_289
+- cbeam_281 <-> cbeam_293
+- cbeam_282 <-> cbeam_284
+- cbeam_282 <-> cbeam_287
+- cbeam_283 <-> cbeam_285
+- cbeam_283 <-> cbeam_288
+- cbeam_283 <-> cbeam_290
+- cbeam_283 <-> cbeam_291
+- cbeam_284 <-> cbeam_295
+- cbeam_285 <-> cbeam_294
+- cbeam_286 <-> cbeam_292
+- cbeam_287 <-> cbeam_295
 - cbeam_288 <-> cbeam_290
 - cbeam_288 <-> cbeam_293
-- cbeam_288 <-> cbeam_295
-- cbeam_288 <-> cbeam_296
-- cbeam_289 <-> cbeam_300
-- cbeam_290 <-> cbeam_299
-- cbeam_291 <-> cbeam_297
-- cbeam_292 <-> cbeam_300
-- cbeam_293 <-> cbeam_295
-- cbeam_293 <-> cbeam_298
-- cbeam_294 <-> cbeam_295
-- cbeam_294 <-> cbeam_298
-- cbeam_294 <-> cbeam_299
-- cbeam_295 <-> cbeam_299
-- cbeam_296 <-> cbeam_299
+- cbeam_289 <-> cbeam_290
+- cbeam_289 <-> cbeam_293
+- cbeam_289 <-> cbeam_294
+- cbeam_290 <-> cbeam_294
+- cbeam_291 <-> cbeam_294
 
 ### V-wheels
 
@@ -58,7 +58,7 @@ the other half (16) get standard precision spacers.
 
 ### Motors / printed mounts
 
-6 motors × 4 NEMA23 face screws (M5×10) = 24 screws.
+7 motors × 4 NEMA23 face screws (M5×10) = 28 screws.
 0 brackets × 4 rail-face screws (M5×10) + T-nuts = 0 pairs.
 Note: Y-motor brackets and the rack-and-pinion X-motor mounting are
 not yet modeled — add them when the X-axis lands.
@@ -70,7 +70,7 @@ not yet modeled — add them when the X-axis lands.
 | M5 T-nut | 161 |
 | M5 flat washer | 82 |
 | M5 nyloc nut | 41 |
-| M5 x 10 mm | 167 |
+| M5 x 10 mm | 171 |
 | M5 x 16 mm | 18 |
 | M5 x 30 mm | 9 |
 | M5 x 40 mm | 32 |
