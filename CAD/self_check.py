@@ -42,7 +42,6 @@ LABELS = {
     (40.0, 80.0, 1000.0): 'cbeam',
     (65.0, 69.0, 69.0):   'bracket',
     (56.4, 56.4, 76.6):   'motor',
-    (56.0, 56.4, 56.4):   'motor',     # FR Z-motor variant (part_118:1) — shorter body, no encoder
     (10.2, 23.9, 23.9):   'vwheel',
     (14.0, 15.0, 15.0):   'pulley',
     (12.7, 22.0, 22.0):   'idler',
@@ -80,7 +79,7 @@ inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
     'bracket': 0,
-    'motor': 7,            # 4 Z (FL, FR, RL, RR) + 2 Y + 1 X. FR has variant sig (56,56.4,56.4)
+    'motor': 7,            # 4 Z (FL, FR cloned, RL, RR) + 2 Y + 1 X — all share sig (56.4, 56.4, 76.6)
     'vwheel': 32,          # all authored in M3-2_V1.0.step (16 Z + 8 Y + 8 X)
     'pulley': 7,           # 4 Z + 2 Y + 1 X
     'idler': 9,            # V1.0: removed extras (was 10, removed 1 floating mid-frame idler)
