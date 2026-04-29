@@ -1,0 +1,184 @@
+schema_version: "0.7"
+
+meta:
+  project: m3-crete
+  description: "M3-CRETE — real rule file for CAD/M3-2_Assembly.step + bom/data.json (v0.7, 2026-04-26)"
+  step: CAD/M3-2_Assembly.step
+  bom: bom/data.json
+
+labels:
+  vwheel:           [10.2, 23.9, 23.9]
+  cbeam:            [40.0, 80.0, 1000.0]
+  motor_nema23:     [56.4, 56.4, 76.6]
+  plate:            [3.0, 88.0, 127.0]
+  pulley:           [14.0, 15.0, 15.0]
+  smooth_idler:     [12.7, 22.0, 22.0]
+  z_motor_mount:    [4.0, 80.0, 97.0]   # corrected — was 107; user-authored sig is 97 (cloned to all 4 Z + 2 Y in assembly)
+  bot_spacer_idler: [4.0, 80.0, 100.0]
+  t_gusset:         [4.0, 160.0, 280.0]
+  idler_bracket:    [5.0, 30.0, 30.0]
+  # 2026-04-29 additions (promoted from CAD/self_check.py LABELS)
+  shim:             [4.0, 40.0, 80.0]
+  xcarr_bolt:       [5.0, 16.0, 16.0]   # M5 SHCS heads on X-carriage
+  xcarr_axle:       [9.0, 9.0, 31.5]    # V-wheel axles
+  xcarr_washer:     [1.0, 10.0, 10.0]
+  xcarr_spacer:     [3.2, 10.0, 10.0]
+  2040_insert:      [20.0, 40.0, 1000.0]   # internal X-direction 4080 reinforcement (B+b)
+
+belt_heuristic: true
+
+expected_inventory: {}
+
+bom_audit:
+  bom_path: bom/data.json
+  # AGENTS.md: fastener accounting is text-based (BOM line items), not bbox-based.
+  # The xcarr_* + shim labels are placement/inventory tracking only — no BOM rule needed.
+  ignore_labels: [other, belt, shim, xcarr_bolt, xcarr_axle, xcarr_washer, xcarr_spacer]
+  # v0.7 / LOW-6: drop noise from items that aren't expected to have CAD
+  # geometry (electronics, fasteners, consumables, optional upgrades).
+  # Case-insensitive substring match against each item's `category` field.
+  exempt_categories:
+    - "Electronics"
+    - "Fasteners"
+    - "Optional"
+    - "Concrete Extrusion"
+  rules:
+    - id: 5
+      expected_qty: 12
+      expected_mfg_type: buy
+      forbidden_terms:
+        - "maximum rigidity"
+        - "primary stiffness"
+    - id: 9
+      expected_qty: 1
+      expected_mfg_type: buy
+      expected_label: motor_nema23
+    - id: 10
+      expected_qty: 2
+      expected_mfg_type: buy
+      required_terms: ["10mm"]
+      forbidden_terms: ["6mm"]
+    - id: 14
+      expected_qty: 2
+      expected_mfg_type: buy
+      expected_label: motor_nema23
+    - id: 15
+      expected_qty: 1
+      expected_mfg_type: buy
+      required_terms: ["6mm"]
+      forbidden_terms: ["10mm"]
+    - id: 17
+      expected_qty: 32
+      expected_mfg_type: buy
+      expected_label: vwheel
+    - id: 19
+      expected_qty: 4
+      expected_mfg_type: buy
+      expected_label: motor_nema23
+    - id: 20
+      expected_qty: 4
+      expected_mfg_type: buy
+      required_terms: ["10mm"]
+      # "6mm" intentionally not forbidden: BOM description for the Z-axis
+      # belt cross-references the X-axis 6mm belt for context. v0.7 / MED-2
+      # negation lookback doesn't help since the cross-reference isn't
+      # negated. Either edit description, switch to use_regex with a
+      # lookbehind, or accept the cross-reference (chosen here).
+    - id: 24
+      expected_qty: 4
+      expected_mfg_type: print
+      forbidden_terms:
+        - "aluminum"
+        - "machined"
+        - "purchased"
+        - "L-bracket"
+        - "steel"
+    - id: 65
+      expected_qty: 3
+      expected_unit: "bars (1.0m each)"
+      expected_mfg_type: buy
+      expected_label: 2040_insert    # 2026-04-29: linked to placed insert geometry
+      forbidden_terms:
+        - "JB Weld"
+        - "West System"
+        - "bonded"
+        - "custom 2m cut"
+    - id: 67
+      # v0.7 / MED-6: design qty (CAD) and order qty (BOM) are now separate.
+      # CAD has 17 reference pieces; BOM orders 18 (+1 spare per description).
+      expected_design_qty: 17
+      spare_qty: 1
+      expected_mfg_type: buy
+      expected_label: cbeam
+    - id: 75
+      expected_qty: 2   # 2026-04-29 V1.0: only Y-motors use this plate; Z-motors use bot_spacer_idler
+      expected_mfg_type: print
+      expected_label: z_motor_mount
+    - id: 77
+      expected_qty: 2
+      expected_mfg_type: print
+      expected_label: t_gusset
+    - id: 79
+      expected_qty: 8   # 2026-04-29 V1.0: 4 corners × top+bottom (top = Z-motor mount)
+      expected_mfg_type: print
+      expected_label: bot_spacer_idler
+    - id: 81
+      expected_qty: 0   # 2026-04-29 V1.0: deprecated, role moved to id 75
+      expected_mfg_type: print
+      expected_label: ymount
+    - id: 83
+      expected_qty: 32
+      expected_mfg_type: buy
+
+claim_audit:
+  scan_paths:
+    - README.md
+    - docs/
+    - bom/index.html
+  stale_terms:
+    - "JB Weld"
+    - "West System"
+    - "custom 2m cut"
+    - "production-ready"
+    - "production ready"
+    - "OpenBuilds"
+    - "Supabase"
+
+publish_audit:
+  ignore_globs:
+    - ".env*"
+    - ".cadclaw_venv/**"
+    - "cad_venv/**"
+    - "bom/build_bom_*.py"
+    - "bom/M3-CRETE_*_build_bom.xlsx"
+    - "bom/orders/**"
+    - "_archive/**"
+    - "Publications/**"
+    - "NEMA_CRETE/**"
+    - ".claude/**"
+    - "conversation-summary.md"
+    - "**/*.f3d"
+    - "**/__pycache__/**"
+  scan_globs:
+    - "README.md"
+    - "docs/**/*.md"
+    - "bom/**/*.json"
+    - "bom/**/*.html"
+    - "config.js"
+  redact_patterns:
+    api_key: 'sk-[A-Za-z0-9]{32,}'
+    aws_key: 'AKIA[0-9A-Z]{16}'
+  email_allowlist:
+    - "info@sunn3d.com"
+    - "noreply@anthropic.com"
+    - "nickworks@sunn3d.com"
+
+confidence_budget:
+  not_checked:
+    - thread engagement (bbox signatures only)
+    - belt slip under dynamic load
+    - native-CAD hidden/suppressed parts
+    - vendor stock and pricing
+  assumptions:
+    - all parts are rigid bodies
+    - mm units throughout
