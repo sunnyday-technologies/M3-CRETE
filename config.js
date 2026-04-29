@@ -1,8 +1,8 @@
 // ============================================================
 // BOM Viewer Configuration
-// Update these values for your Supabase project and GitHub repo.
-// This file is safe to commit — the anon key is a public key.
-// All security is enforced via Supabase RLS policies.
+// Static-JSON BOM viewer (m3-crete.com/bom). Loads bom/data.json,
+// renders by category, links to GitHub for supplier-suggestion issues.
+// No backend, no auth, no PII — safe to commit.
 // ============================================================
 
 const BOM_CONFIG = {
