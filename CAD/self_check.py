@@ -42,6 +42,7 @@ LABELS = {
     (40.0, 80.0, 1000.0): 'cbeam',
     (65.0, 69.0, 69.0):   'bracket',
     (56.4, 56.4, 76.6):   'motor',
+    (56.0, 56.4, 56.4):   'motor',     # FR Z-motor variant (part_118:1) — shorter body, no encoder
     (10.2, 23.9, 23.9):   'vwheel',
     (14.0, 15.0, 15.0):   'pulley',
     (12.7, 22.0, 22.0):   'idler',
@@ -56,6 +57,8 @@ LABELS = {
     (9.0, 9.0, 31.5):     'xcarr_axle',     # V-wheel axle / shoulder bolt
     (1.0, 10.0, 10.0):    'xcarr_washer',   # thin washer
     (3.2, 10.0, 10.0):    'xcarr_spacer',   # 6mm spacer (sorted dims as 3.2x10x10 due to import)
+    # 2040 V-slot reinforcement inserts (2026-04-29; B+b pattern)
+    (20.0, 40.0, 1000.0): '2040_insert',    # 1m centered in each X-direction 4080 (3 total)
 }
 
 def sig(s):
@@ -77,24 +80,25 @@ inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
     'bracket': 0,
-    'motor': 6,            # 4 Z + 2 Y (X-motor removed in M3-2_xmotor mount.step)
-    'vwheel': 28,          # source-authored
+    'motor': 7,            # 4 Z (FL, FR, RL, RR) + 2 Y + 1 X. FR has variant sig (56,56.4,56.4)
+    'vwheel': 32,          # all authored in M3-2_V1.0.step (16 Z + 8 Y + 8 X)
     'pulley': 7,           # 4 Z + 2 Y + 1 X
-    'idler': 10,
-    'plate': 7,
+    'idler': 9,            # V1.0: removed extras (was 10, removed 1 floating mid-frame idler)
+    'plate': 8,            # V1.0: +1 plate over previous source
     'shim': 2,
-    'zmount': 5,           # 3 Z-motors present in source (FR missing) + 2 Y-motor placements
+    'zmount': 2,           # V1.0: 2 source-authored at Y-motor positions (cloner disabled)
     'zcap': 0,
-    'idler-brk': 5,        # source iteration added 2 brackets
-    'bot-mount': 0,        # user removed; will be remade via simple modification
-    'ymount': 0,           # subsumed by cloned z-bracket at Y-motor positions
+    'idler-brk': 4,        # V1.0: 1 fewer idler-bracket pair (was 5, removed 1)
+    'bot-mount': 8,        # V1.0: re-authored as 8 (4 corners × top+bottom; tops also serve as Z-motor mounts)
+    'ymount': 0,           # subsumed by z_motor_mount at Y-motor positions
     'tbracket': 2,
     'belt': 12,            # 8 Z + 2 left-Y + 2 right-Y
     'xcarr_bolt': 8,       # M5 SHCS at X-carriage
     'xcarr_axle': 4,       # V-wheel axles (one carriage side modeled)
     'xcarr_washer': 4,
     'xcarr_spacer': 4,     # 6mm wheel spacers (one side)
-    'other': 14,           # remaining X-carriage hardware not yet labeled
+    '2040_insert': 3,      # 1m 2040 V-slot inserts (B+b pattern, all authored in V1.0)
+    'other': 13,           # remaining X-carriage hardware + X-belt strand (FR motor moved to 'motor')
 }
 problems = []
 print(f"Total parts: {len(parts)}")
@@ -126,7 +130,7 @@ for s in parts:
 
     # ymount dimension check disabled while user re-authors the Y-motor spacers
 
-# ---------- CHECK 3: Z motors attached to printed mount/spacer plates ----------
+# ---------- CHECK 3: Z-motors attached to a top-corner mount plate ----------
 motors  = [s for s in parts if label_of(s) == 'motor']
 def center(s):
     bb = s.BoundingBox()
@@ -134,21 +138,25 @@ def center(s):
 def dist(a, b):
     return ((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2) ** 0.5
 
-# Z-motors should have a zmount plate nearby (not a bracket — brackets removed).
-# Y-motors mount directly to frame, skip them.
-zmounts = [s for s in parts if label_of(s) == 'zmount']
+# 2026-04-29 (V1.0): Z-motors mount via bot_spacer_idler at top corners
+# (the same plate used at the bottom of each Z-post). Zmounts are now
+# only used for Y-motors. Y-motors skipped (mount directly to frame).
+top_corner_mounts = [s for s in parts
+                     if label_of(s) == 'bot-mount' and center(s)[2] > 900]
 for m in motors:
     mc = center(m)
     if mc[2] < 900:
         continue  # Y-motor, skip
-    nearest = min(zmounts, key=lambda b: dist(mc, center(b)), default=None)
+    if 1000 < mc[0] < 2000:
+        continue  # X-motor (mid-gantry, mounts directly to gantry beam)
+    nearest = min(top_corner_mounts, key=lambda b: dist(mc, center(b)), default=None)
     if nearest is None:
-        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) has no zmount plate")
+        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) has no top-corner mount")
         continue
     d = dist(mc, center(nearest))
-    if d > 100:  # wider tolerance — plate spans 102mm from Z=960 to Z=1062
+    if d > 100:
         problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) "
-                        f"nearest zmount is {d:.0f} mm away (> 100 mm)")
+                        f"nearest top-corner mount is {d:.0f} mm away (> 100 mm)")
 
 # ---------- CHECK 4: plate vs cbeam interference (catches clipping) ----------
 from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
