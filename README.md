@@ -147,6 +147,7 @@ See [LICENSES/](LICENSES/) for full license texts.
 
 | Resource | Description |
 |----------|-------------|
+| [Convergence Engineering whitepaper](https://doi.org/10.5281/zenodo.19863080) | Methodology paper that uses M3-CRETE as a public case study; introduces the *time to silence* metric. CC BY 4.0 preprint, Zenodo. |
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
 | [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Kit details, design philosophy, and contact for early access |
 | [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) | Automated STEP assembly validation — extracted from this project |
@@ -169,7 +170,15 @@ If you use M3-CRETE designs in research, a build, or derivative work, please cit
 ```
 Sonnentag, N. (2026). M3-CRETE: Open-Source Concrete 3D Printer.
 Sunnyday Technologies.
-https://github.com/sunnyday-technologies/M3-CRETE
+https://doi.org/10.5281/zenodo.19647436
+```
+
+For the methodology paper that uses M3-CRETE as a public case study, cite:
+
+```
+Sonnentag, N. (2026). Convergence Engineering: Commissioning Autonomous
+Software by Measuring the Rate at Which Novel Failures Trend Toward Zero.
+Sunnyday Technologies. https://doi.org/10.5281/zenodo.19863080
 ```
 
 A [`CITATION.cff`](CITATION.cff) file is included for automated citation tooling.
