@@ -4,7 +4,8 @@
   "creators": [
     {
       "name": "Sonnentag, Nicholas",
-      "affiliation": "Sunnyday Technologies"
+      "affiliation": "Sunnyday Technologies",
+      "orcid": "0009-0002-1897-384X"
     }
   ],
   "description": "An open-source, buildable, field-serviceable concrete 3D printer. Includes full CAD, bill-of-materials, firmware configuration, and validation tooling. Designed for teams that need to replicate, maintain, and scale independently of proprietary industrial systems.",
