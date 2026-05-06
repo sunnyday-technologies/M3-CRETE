@@ -3,5 +3,7 @@
 # https://docs.github.com/en/repositories/working-with-files/managing-large-files
 CAD/*.step filter=lfs diff=lfs merge=lfs -text
 CAD/*.STEP filter=lfs diff=lfs merge=lfs -text
+CAD/*.3mf filter=lfs diff=lfs merge=lfs -text
+CAD/*.3MF filter=lfs diff=lfs merge=lfs -text
 CAD/Components/**/*.step filter=lfs diff=lfs merge=lfs -text
 CAD/Components/**/*.STEP filter=lfs diff=lfs merge=lfs -text
