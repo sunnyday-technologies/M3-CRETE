@@ -590,7 +590,7 @@
 <li><strong>NO leveling feet</strong>. Bed leveling is handled by measurement at the build plate, not by mechanical M16 feet on the frame.</li>
 <li><strong>NO external reinforcement on the X-gantry beam</strong>. The X-carriage is two-sided (V-wheels on both top and bottom of the gantry exterior), so any external bracket on the gantry faces would block carriage travel. All reinforcement must be internal to the C-channel.</li>
 <li><strong>NO HEPA filter, carbon fiber stiffeners, or LED enclosure lights</strong> on the canonical build. These are downstream user choices.</li>
-<li><strong>NO Supabase or other proprietary backend</strong>. The BOM viewer at <a href="https://m3-crete.com/bom">m3-crete.com/bom</a> is a static site over a JSON file.</li>
+<li><strong>Static JSON architecture</strong>. The BOM viewer at <a href="https://m3-crete.com/bom">m3-crete.com/bom</a> is a client-side application that runs entirely in your browser, with no backend infrastructure to provision or maintain.</li>
 </ul>
 <p>The exclusions section exists because the project has accreted many rounds of "have you considered adding..." suggestions over the last year and a half. Each rejection is an active engineering decision, documented so that contributors do not waste round-trips proposing rejected directions.</p>
 <h2 id="3-architecture-overview">3. Architecture overview</h2>
@@ -765,7 +765,7 @@
 <h2 id="9-get-started">9. Get started</h2>
 <p>Three reader profiles, three paths.</p>
 <h3 id="path-a-i-just-want-to-read-the-bom">Path A: I just want to read the BOM</h3>
-<p>Open the <a href="https://m3-crete.com/bom">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1, M3-2, or M3-4). Export a CSV when you want to take it to a spreadsheet. No GitHub login required, no Supabase account, no email gate. The viewer is a static site.</p>
+<p>Open the <a href="https://m3-crete.com/bom">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1, M3-2, or M3-4). Export a CSV when you want to take it to a spreadsheet. No login required &mdash; the viewer is a static site that runs entirely in your browser.</p>
 <p>If you want the underlying data, <code>bom/data.json</code> is the source of truth and is human-editable. The schema is documented in <code>config.js</code>.</p>
 <h3 id="path-b-i-want-to-actually-build-one">Path B: I want to actually build one</h3>
 <ol>
