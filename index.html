@@ -425,6 +425,57 @@
       }
 
     }
+    /* 2026-05-07: Sunnyday open-source family refresh.
+       Same brand system as Sunn3D/CEMFORGE, with a looser project-hub tone. */
+    :root {
+      --black: #f7f8f5;
+      --charcoal: #ffffff;
+      --graphite: #e6e9e7;
+      --border: #d9dfdf;
+      --muted: #5c6670;
+      --light: #4b5560;
+      --white: #071421;
+      --accent: #97d700;
+      --accent-dim: #6b7b2f;
+      --brand-blue: #013a73;
+    }
+    body {
+      background-color: #f7f8f5;
+      background-image: linear-gradient(180deg, #ffffff 0%, #f7f8f5 58%, #e6e9e7 100%);
+      color: #071421;
+    }
+    body::before { opacity: 0.08; }
+    header {
+      background: rgba(255,255,255,.92);
+      border-bottom-color: #d9dfdf;
+      backdrop-filter: blur(10px);
+    }
+    .logo-mark, h1, .spec-value, .block-title, .cta-col-word {
+      color: #013a73;
+      text-shadow: none;
+    }
+    h1 span, .hero-label, nav a:hover, .spec-unit, footer a {
+      color: #97d700;
+    }
+    .hero-desc, .block-body, footer, .footer-left span {
+      color: #4b5560;
+    }
+    .spec-strip, .content, .standards-strip, .cta-section {
+      background: rgba(255,255,255,.72);
+      border-color: #d9dfdf;
+    }
+    .spec-item, .content-block, .standards-strip, .cta-col {
+      border-color: #d9dfdf;
+    }
+    .btn-primary {
+      background: #97d700;
+      color: #071421;
+    }
+    .btn-secondary {
+      background: #ffffff;
+      color: #013a73;
+      border-color: #d9dfdf;
+    }
   </style>
 
   <!-- Structured data: Product + Organization (schema.org JSON-LD) -->
