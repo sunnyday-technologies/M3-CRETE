@@ -480,57 +480,39 @@
 
   <!-- Structured data: Product + Organization (schema.org JSON-LD) -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Product",
-        "@id": "https://m3-crete.com/#product",
-        "name": "M3-CRETE",
-        "alternateName": "Mobile Modular Meter³ Concrete 3D Printer",
-        "description": "Open-source concrete 3D printer for meter-scale builds — over 1 meter on the long axis. Modular, mobile, designed for field deployment. Open-hardware (CERN-OHL-W-2.0) — full bill of materials and build guide are published, so anyone can source the parts and assemble the printer themselves. Companion to the CEMFORGE AI mix-formulation platform.",
-        "brand": {
-          "@type": "Brand",
-          "name": "Sunnyday Technologies"
-        },
-        "model": ["M3-1", "M3-2", "M3-4"],
-        "category": "Industrial 3D Printer / Construction Equipment",
-        "manufacturer": {
-          "@id": "https://sunn3d.com/#organization"
-        },
-        "license": "https://ohwr.org/cern_ohl_w_v2.txt",
-        "url": "https://m3-crete.com/",
-        "image": "https://m3-crete.com/images/M3-CRETE_render.jpg",
-        "isRelatedTo": [
-          {
-            "@type": "SoftwareApplication",
-            "name": "CEMFORGE",
-            "url": "https://cemforge.ai/",
-            "applicationCategory": "EngineeringApplication",
-            "operatingSystem": "Web"
-          },
-          {
-            "@type": "Dataset",
-            "name": "Open3DCP",
-            "url": "https://open3dcp.org/"
-          }
-        ]
-      },
-      {
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      "@id": "https://m3-crete.com/#open-hardware-design",
+      "name": "M3-CRETE",
+      "alternateName": "Mobile Modular Meter-Cubed Concrete 3D Printer",
+      "description": "M3-CRETE is an open-source concrete 3D printer hardware design published for research, education, and development use. The public project includes CAD, bill of materials, firmware references, and build documentation for a field-serviceable concrete-printing motion platform.",
+      "url": "https://m3-crete.com/",
+      "license": "https://ohwr.org/cern_ohl_w_v2.txt",
+      "creator": {
         "@type": "Organization",
         "@id": "https://sunn3d.com/#organization",
-        "name": "Sunnyday Technologies LLC",
-        "url": "https://sunn3d.com/",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Appleton",
-          "addressRegion": "WI",
-          "addressCountry": "US"
-        }
+        "name": "Sunnyday Technologies LLC"
+      },
+      "image": "https://m3-crete.com/images/M3-CRETE_render.jpg"
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://sunn3d.com/#organization",
+      "name": "Sunnyday Technologies LLC",
+      "url": "https://sunn3d.com/",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Appleton",
+        "addressRegion": "WI",
+        "addressCountry": "US"
       }
-    ]
-  }
-  </script>
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
