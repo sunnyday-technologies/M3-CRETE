@@ -173,7 +173,6 @@ publish_audit:
   email_allowlist:
     - "info@sunn3d.com"
     - "noreply@anthropic.com"
-    - "info@sunn3d.com"
 
 confidence_budget:
   not_checked:
