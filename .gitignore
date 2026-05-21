@@ -22,7 +22,7 @@ cad_venv/
 __pycache__/
 .cad_venv_freeze_pre_rebuild_*.txt
 
-# NemoCrete — proprietary pump system (separate project)
+# Adjacent project directories that may appear in a shared parent folder
 NEMA_CRETE/
 
 # Build artifacts
@@ -115,18 +115,23 @@ docs/step-files-needed.md
 # CAD session screenshots
 images/Claude_CAD/
 
-# Publications — local-only drafts, whitepapers, blog posts, session archives
-# Pulls data from private M3 discussions; never publish via this repo
+# Publications — local-only drafts and whitepapers, published separately
 Publications/
 
-# Consolidated history archive — raw Claude transcripts, VICTORiA cross-refs,
-# doc snapshots. Local-only, never publish. Refresh via _archive/refresh.sh.
+# Local history / archive directory
 _archive/
 
-# Per-serial-number build BOM analysis and order records — local/personal.
-# These capture Nick's actual purchasing history (vendor prices, order
-# numbers, shipping addresses) and stay off GitHub. The public repo keeps
-# only the template: bom/index.html (viewer) + bom/data.json (parts spec).
+# Per-build BOM analysis and order records — local-only.
+# The public repo keeps only the template: bom/index.html + bom/data.json
 bom/M3-CRETE_*_build_bom.xlsx
 bom/build_bom_*.py
 bom/orders/
+
+# Secrets / environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519
