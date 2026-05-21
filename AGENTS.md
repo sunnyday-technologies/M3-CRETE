@@ -4,15 +4,10 @@
 - **Name:** M3-CRETE (Mobile, Modular, Meter³)
 - **Type:** Open-source concrete 3D printer motion system
 - **License:** CERN-OHL-W-2.0 (CAD/Components/ is CC BY-SA 4.0)
-- **Repo:** `[local-path-redacted] → `github.com/sunnyday-technologies/M3-CRETE`
+- **Repo:** `github.com/sunnyday-technologies/M3-CRETE`
 - **Live site:** m3-crete.com (GitHub Pages)
 - **BOM viewer:** m3-crete.com/bom (static JSON, client-side rendering)
 - **Parent company:** Sunnyday Technologies, Appleton WI
-
-## Adjacent Projects (same parent directory)
-- `[local-path-redacted] — Business operating system (separate git, local only)
-- `[local-path-redacted] — Proprietary pump system (NO git, never publish)
-- `[local-path-redacted] — This project (public GitHub)
 
 ## M3-2 Specifications (Default Build)
 - **Build volume:** 2000 x 1000 x 1000mm
@@ -45,13 +40,10 @@
 | `supabase-schema.sql` | Historical — Supabase removed, kept as reference |
 
 ## CadQuery Environment
-- **Venv (laptop, canonical 2026-04-15):** `[home-path-redacted] (Python 3.11.9 + CadQuery 2.7.0, gitignored)
-- **Underlying Python:** `[home-path-redacted]
-- **Assembly output:** `CAD/M3-2_Assembly.step` (101 components, 6.1MB, v0.2.0 — model verified current as of 2026-04-22)
+- **Venv:** `cad_venv/` (gitignored, Python 3.11 + CadQuery 2.7.0)
+- **Assembly output:** `CAD/M3-2_Assembly.step` (101 components, ~6 MB)
 - **Probe script:** `CAD/probe_steps.py` (bounding box inspector for STEP files)
 - **Self-check harness:** `CAD/self_check.py` (interference / layout audit — run before and after any model changes)
-- **Nick also has:** Fusion 360, Rhino 3D
-- **Deprecated venv locations:** `[local-path-redacted] (never re-map Z:), `[local-path-redacted] (network, stale), `D:/m3crete_fix/` (old temp clone)
 
 ## BOM Viewer Features (shipped 2026-03-31)
 - Multi-supplier selection (click chips to toggle suppliers on/off)
@@ -82,16 +74,13 @@
 - **Bonnell Aluminum / TSLOTS** (Niles, MI — 3hrs from Appleton) makes T-slot. Custom V-groove die possible (~$1,500 tooling)
 - **MakerStore USA** (Atoka, OK) — US warehouse, full V-slot ecosystem, domestic shipping
 - **Bulkman3D** — China factory-direct, best bulk pricing, bad shipping costs
-- **Amazon** — electronics, wiring, fasteners (~$700 of the build)
-- Kit strategy: $675 COGS → $1,500 kit price (55% margin), customer adds ~$700 Amazon
+- **Amazon** — electronics, wiring, fasteners (sourcing channel for the SKUs Amazon does well)
 
 ## Product Decisions
-- **Pump system is OUT OF SCOPE** — separate product called NemoCrete (proprietary, `[local-path-redacted]
-- M3-CRETE focuses on safe, accessible motion system only
+- **Pump system is OUT OF SCOPE** — M3-CRETE focuses on the motion system; the printhead connects to any commercial or community pump capable of feeding a 1" Male NPT line at the required pressure.
 - Commercial pump references kept as informational in BOM (MAI, M-Tec, StoneFlower)
 - Frame stiffener for 2m+ spans: aluminum rectangular tube recommended (not steel — galvanic corrosion)
-- Nick has NEMA34 for pump drive (not geared NEMA23)
-- Nick already owns: BTT Kraken, 7" touchscreen, 6 of 7 NEMA23 steppers
+- Extruder/pump motor: NEMA34 recommended (owner-supplied; not in the kit)
 
 ## Out of Scope for This Build
 - No HEPA filter, carbon fiber bars, or LED lights on this build
@@ -156,11 +145,10 @@
 - Verify no volume intersections
 - BOM cross-reference final audit
 
-## Design Exclusions (READ BEFORE SUGGESTING ADDITIONS)
+## Design Exclusions
 
-Explicit non-requirements for M3-CRETE, documented here so every session
-stops re-proposing them. Nick has re-stated these 12+ times as of
-2026-04-21 — each re-proposal wastes a round-trip.
+Explicit non-requirements for M3-CRETE. Documented to keep design
+discussions focused on the in-scope motion system.
 
 ### ❌ NO mechanical limit switches / endstops
 
@@ -276,14 +264,3 @@ the plastic mount is a CLEARANCE plate, not a threaded anchor.
 - **Self-check harness** — reinstate before making further model changes (explicitly cited as "the best progression we had in past sessions")
 - **Git history** — Nick decided NOT to rewrite (leave legacy .step blobs in history despite ~100MB bloat)
 
-## Canonical Paths (2026-04-15)
-- **Laptop canonical:** `[home-path-redacted] (moved from `[local-path-redacted] on 2026-04-15 to survive network-drive remount failures across reboots)
-- **Publications nested inside** at `Publications/` — gitignored, local only, never published via this repo
-- **Desktop canonical:** still `[local-path-redacted] (per-machine session history, Syncthing pairing pending)
-- **Old session transcripts** live under `[home-path-redacted] across multiple path-hash folders — grep on demand
-
-## Context Window Note
-This project was bootstrapped in a VICTORiA session (2026-03-31) that shipped 10 commits
-in a single session. If context about prior decisions is needed, the VICTORiA session
-covered: BOM audit, supplier research, Supabase removal, STEP library import, mechanical
-red-team audit, kit business case, and US manufacturing research (Bonnell/TSLOTS).
