@@ -5,11 +5,18 @@
 - **Type:** Open-source concrete 3D printer motion system
 - **License:** CERN-OHL-W-2.0 (CAD/Components/ is CC BY-SA 4.0)
 - **Repo:** `github.com/sunnyday-technologies/M3-CRETE`
-- **Live site:** m3-crete.com (GitHub Pages)
-- **BOM viewer:** m3-crete.com/bom (static JSON, client-side rendering)
+- **Live site:** m3-crete.com (commercial Cloudflare site)
+- **BOM viewer:** bom.m3-crete.com/bom (static JSON, client-side rendering)
 - **Parent company:** Sunnyday Technologies, Appleton WI
 
 ## M3-2 Specifications (Default Build)
+
+> **For the gate-verified assembly geometry (part family per interface, profiles,
+> orientation, tolerances), the authority is the CADCLAW spec + canon:
+> `../CADCLAW/docs/M3_FRAME_CANON.md` and `../CADCLAW/examples/m3_crete/`.** Some
+> lines in this section are dated/contradictory (e.g. "4080 Y-gantry rails" vs
+> "Y-axis: 2x 2080 rails"); when they disagree with the canon, the canon wins.
+
 - **Build volume:** 2000 x 1000 x 1000mm
 - **Frame (2026-04-14 update):** **4080 C-Beam** primary structure (Z-posts, Y-gantry rails) + 2040 bracing. **ALL 1000mm standard lengths** — shipping-constrained, single-SKU procurement. C opening points **inward** toward the printer cube (belt path runs inside the C). Supersedes the 2080/2040 + 1200mm plan from 2026-04-07.
 - **X-axis:** 2x 1000mm 4080 spliced = 2000mm build envelope. Splice uses the **straight-line slot-linking kit** (internal T-slot connectors, sits below wheel path) **+ 3× 1m 2040 V-slot bars staggered inside the C-channel with structural adhesive** (center bar bridges 500mm each side of splice; existing 1m stock covers this — no 2m section needed; bom/data.json id 65). Corner joints use T-plate or L-plate 5-screw connectors at every 4080 junction. **NO external reinforcement on the X-gantry beam** — the X-carriage is 2-sided (V-wheels on top AND bottom of exterior), so any protrusion past the 40mm faces blocks carriage travel.
@@ -211,7 +218,7 @@ reinforcement, and external is fine on these members because no
 carriage rides past them.
 
 ### ❌ NO HEPA filter, carbon fiber bars, or LED lights
-### ✅ Static JSON architecture (no third-party backend; see m3-crete.com/bom)
+### ✅ Static JSON architecture (no third-party backend; see bom.m3-crete.com/bom)
 ### ✅ Custom plates: source from Bulkman3D or Maker Store
 ### ✅ V-Slot ecosystem: community-maintained as of May 2025 (CC BY-SA 4.0)
 
