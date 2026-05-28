@@ -1,6 +1,6 @@
 // ============================================================
 // BOM Viewer Configuration
-// Static-JSON BOM viewer (m3-crete.com/bom). Loads bom/data.json,
+// Static-JSON BOM viewer (bom.m3-crete.com/bom/). Loads bom/data.json,
 // renders by category, links to GitHub for supplier-suggestion issues.
 // No backend, no auth, no PII — safe to commit.
 // ============================================================
