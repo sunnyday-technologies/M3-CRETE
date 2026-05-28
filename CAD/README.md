@@ -123,4 +123,4 @@ STEP directly.
 3. Place in the appropriate directory (`Components/`, `Custom/`, or `Advanced/`)
 4. Submit a Pull Request
 
-Models are linked to the [BOM Viewer](https://m3-crete.com/bom/) via the `step_url` field in `bom/data.json`.
+Models are linked to the [BOM Viewer](https://bom.m3-crete.com/bom/) via the `step_url` field in `bom/data.json`.

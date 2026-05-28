@@ -2,7 +2,7 @@
 
 ## How It Works
 
-1. **Configure your build** in the [BOM Viewer](https://m3-crete.com/bom):
+1. **Configure your build** in the [BOM Viewer](https://bom.m3-crete.com/bom/):
    - Select your **model variant** (M3 / M3-2 / M3-4)
    - Check **I have this** on parts you already own (they'll be excluded)
    - Toggle **Buy / Print / CNC** on each fabricated part
