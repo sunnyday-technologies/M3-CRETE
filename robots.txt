@@ -22,4 +22,4 @@ User-agent: PerplexityBot
 Disallow: /cdn-cgi/
 Allow: /
 
-Sitemap: https://m3-crete.com/sitemap.xml
+Sitemap: https://bom.m3-crete.com/sitemap.xml

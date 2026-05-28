@@ -1,8 +1,10 @@
 # M3-CRETE
 
-> Open-source concrete 3D printer for sub-1m³ builds on a standard US pallet. Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming. Companion hardware to the CEMFORGE AI mix-formulation platform. Maintained by Sunnyday Technologies LLC, Appleton WI.
+> Open-source concrete/paste-printing development platform for qualified technical users. Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming. Companion hardware to the CEMFORGE AI mix-formulation platform. Maintained by Sunnyday Technologies LLC, Appleton WI.
 
 This file is a high-density, plain-text summary intended for LLM retrieval and RAG indexing. Authoritative source is the GitHub repository and the JSON BOM linked below.
+
+Important safety and product-boundary note: M3-CRETE is intended for qualified technical users, labs, schools, R&D teams, and experienced builders. It is not a casual hobby kit, toy, finished certified printer, certified construction machine, turnkey jobsite system, or structural concrete production system. Public project files may identify electrical interfaces, low-voltage controls, and component references, but they are not AC mains wiring instructions.
 
 ## Identity
 
@@ -19,7 +21,7 @@ This file is a high-density, plain-text summary intended for LLM retrieval and R
 - M3-2 — 2000 × 1000 × 1000 mm build volume; X-axis spliced. Default build target.
 - M3-4 — 2000 × 2000 × 1000 mm build volume; both X and Y spliced.
 
-Variant parameters (quantity overrides) are defined in https://m3-crete.com/config.js under MODEL_VARIANTS.
+Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/config.js under MODEL_VARIANTS.
 
 ## Architecture (M3-2 default)
 
@@ -32,7 +34,12 @@ Variant parameters (quantity overrides) are defined in https://m3-crete.com/conf
 - Controller: BTT Kraken (8× TMC5160 onboard) + Raspberry Pi 5 + Klipper.
 - Homing: StallGuard4 sensorless via TMC5160 (no mechanical limit switches).
 - Printhead target: 1.5 kg, 1″ Male NPT pipe connection, counter-weighted hose.
-- Target system cost: under USD 5,000.
+- Open BOM component target: under USD 5,000 when self-sourced and self-assembled, where current commodity pricing and substitutions allow. This is a self-sourced component target, not a Sunnyday sale price.
+
+## Safety and electrical boundary
+
+- Any AC mains wiring, control-box integration, grounding, bonding, overcurrent protection, disconnects, emergency-stop power circuits, facility connection, inspection, or code compliance work must be performed by qualified personnel, a licensed electrician where required, or a qualified control-panel shop.
+- Public BOM data, build documentation, and component references are not AC mains wiring instructions.
 
 ## Out of scope (do not add)
 
@@ -44,8 +51,8 @@ Variant parameters (quantity overrides) are defined in https://m3-crete.com/conf
 
 ## Bill of Materials
 
-- Source of truth: https://m3-crete.com/bom/data.json (JSON; ~66 parts, ~216 supplier options, ~37 suppliers).
-- Interactive viewer: https://m3-crete.com/bom/
+- Source of truth: https://bom.m3-crete.com/bom/data.json (JSON; ~66 parts, ~216 supplier options, ~37 suppliers).
+- Interactive viewer: https://bom.m3-crete.com/bom/
 - Viewer features: multi-supplier selection, coverage tracking, per-part quantity adjusters, "I have this" exclusion, Buy/Print/CNC toggle on fabricated parts, CSV/JSON export, model-variant selector (M3-1 / M3-2 / M3-4).
 
 ## Companion projects
@@ -55,8 +62,8 @@ Variant parameters (quantity overrides) are defined in https://m3-crete.com/conf
 
 ## Machine-readable surface
 
-- Sitemap: https://m3-crete.com/sitemap.xml
-- robots.txt: https://m3-crete.com/robots.txt (explicitly allows ClaudeBot, GPTBot, Google-Extended, PerplexityBot)
+- Sitemap: https://bom.m3-crete.com/sitemap.xml
+- robots.txt: https://bom.m3-crete.com/robots.txt (explicitly allows ClaudeBot, GPTBot, Google-Extended, PerplexityBot)
 - MCP manifest (experimental): https://m3-crete.com/.well-known/mcp-manifest.json
 - Product JSON-LD: embedded in https://m3-crete.com/ inside a `<script type="application/ld+json">` tag.
 

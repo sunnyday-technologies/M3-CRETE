@@ -17,7 +17,7 @@
       "@type": "Dataset",
       "name": "M3-CRETE Bill of Materials",
       "description": "Complete bill of materials for the M3-CRETE open-source concrete 3D printer by Sunnyday Technologies. 66 parts across 9 categories: frame, motion, electronics, extrusion, and hardware.",
-      "url": "https://m3-crete.com/bom/",
+      "url": "https://bom.m3-crete.com/bom/",
       "license": "https://ohwr.org/cern_ohl_w_v2.txt",
       "creator": {
         "@type": "Organization",
@@ -28,7 +28,7 @@
         {
           "@type": "DataDownload",
           "encodingFormat": "application/json",
-          "contentUrl": "https://m3-crete.com/bom/data.json"
+          "contentUrl": "https://bom.m3-crete.com/bom/data.json"
         }
       ],
       "keywords": ["3D printing", "concrete", "construction", "open-source", "bill of materials", "BOM", "3DCP"],
@@ -1033,6 +1033,22 @@
             line-height: 1.6;
         }
 
+        .safety-callout {
+            background: rgba(255, 204, 2, 0.08);
+            border: 1px solid rgba(255, 204, 2, 0.45);
+            border-left: 4px solid #ffcc02;
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .safety-callout strong {
+            color: #ffcc02;
+        }
+
         /* ── Responsive ───────────────────────────────── */
         @media (max-width: 768px) {
             .header-inner { flex-direction: column; text-align: center; }
@@ -1062,6 +1078,15 @@
     <div class="specs-bar" id="specsBar"></div>
 
     <div class="model-selector" id="modelSelector"></div>
+
+    <div class="safety-callout">
+        <strong>Qualified technical use only.</strong>
+        M3-CRETE is a development platform, not a casual hobby kit or finished certified printer.
+        Electrical parts shown in this BOM are reference components, not AC mains wiring instructions.
+        Any AC mains wiring, control-box integration, grounding, disconnects, emergency-stop power circuits,
+        facility connection, inspection, or code compliance work must be performed by qualified personnel,
+        a licensed electrician where required, or a qualified control-panel shop.
+    </div>
 
     <div class="toolbar">
         <input type="text" id="searchInput" placeholder="Search parts or suppliers..." oninput="handleSearch()">
@@ -1134,6 +1159,7 @@
 
     <div class="bom-disclaimer">
         Supplier listings are community-contributed reference information, not endorsements. Prices, availability, and specifications may change. Verify all details before purchasing.
+        M3-CRETE is intended for qualified technical users. Public BOM data is not AC mains wiring guidance.
     </div>
 </div>
 

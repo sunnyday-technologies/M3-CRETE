@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow</title>
-  <meta name="description" content="M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut. CERN-OHL-W-2.0. Sub-meter, pallet-scale build envelope. Low-five-figure target system cost." />
+  <meta name="description" content="M3-CRETE is an open-source concrete/paste-printing development platform. This build guide covers the design philosophy, bill of materials, CadQuery CAD workflow, and CADCLAW validation harness. CERN-OHL-W-2.0. Self-sourced BOM component target under $5,000 where current pricing allows." />
   <!-- Open Graph -->
   <meta property="og:title" content="How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow" />
-  <meta property="og:description" content="M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut. CERN-OHL-W-2.0. Sub-meter, pallet-scale build envelope. Low-five-figure target system cost." />
+  <meta property="og:description" content="M3-CRETE is an open-source concrete/paste-printing development platform. Build guide, BOM, CAD workflow, and validation harness under CERN-OHL-W-2.0. Self-sourced BOM component target under $5,000 where current pricing allows." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://m3-crete.com/build-guide/" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow" />
-  <meta name="twitter:description" content="M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut. CERN-OHL-W-2.0. Sub-meter, pallet-scale build envelope. Low-five-figure target system cost." />
+  <meta name="twitter:description" content="M3-CRETE build guide, BOM, CAD workflow, and validation harness. Self-sourced BOM component target under $5,000 where current pricing allows." />
   <link rel="canonical" href="https://m3-crete.com/build-guide/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -555,11 +555,14 @@
 <blockquote>
 <p>M3-CRETE is the open-source concrete 3D printer designed to be replicated, validated, and extended by anyone with a US pallet of floor space, an aluminum extrusion supplier, and a willingness to commission a real machine. This guide is the canonical entry point for builders. Everything described here is published under <a href="https://ohwr.org/cern_ohl_w_v2.txt">CERN-OHL-W-2.0</a> for hardware and <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> for the V-slot CAD library.</p>
 </blockquote>
+<blockquote>
+<p><strong>Safety boundary:</strong> M3-CRETE is intended for qualified technical users, labs, schools, R&amp;D teams, and experienced builders. It is not a casual hobby kit or finished certified printer. Any AC mains wiring, control-box integration, grounding, disconnects, emergency-stop power circuits, facility connection, inspection, or code compliance work must be performed by qualified personnel, a licensed electrician where required, or a qualified control-panel shop. Public project files identify interfaces and components; they are not AC mains wiring instructions.</p>
+</blockquote>
 <h2 id="1-why-this-exists">1. Why this exists</h2>
 <p>In 2026 the concrete 3D printing market has bifurcated into two unworkable extremes for the people who actually need a printer.</p>
 <p>On one side sit closed industrial systems with capital costs in the high six figures, proprietary slicers, single-source pump consumables, and licensing terms that prevent any university lab from publishing the geometry of the machine, let alone modifying it. These printers exist to serve precast factories and venture-funded construction startups. They are not available, in any meaningful sense, to researchers, contractors, structural engineers, makerspaces, and university labs.</p>
 <p>On the other side sit a long tail of unmaintained hobby plans built around CoreXY desktop-printer kinematics scaled up into a frame that cannot survive a real cementitious printhead. They exist as forum posts, dead Hackaday pages, and abandoned GitHub repositories. None of them are buildable today from sourceable parts.</p>
-<p><a href="https://m3-crete.com">M3-CRETE</a> by <a href="https://sunn3d.com">Sunnyday Technologies</a> exists in the gap. It is a buildable, field-serviceable, sub-meter cartesian motion system that fits on a <a href="https://m3-crete.com/">standard US pallet</a>, targets a low-five-figure system cost, runs on commodity Klipper hardware, and ships its full CAD assembly, bill of materials, firmware configuration, and validation harness as open-source artifacts. The design intent is mundane and important: enable a researcher, a contractor, a master's student, and a makerspace to all build the same machine, source parts locally where possible, modify the design to suit their work, and publish their results without permission from a vendor.</p>
+<p><a href="https://m3-crete.com">M3-CRETE</a> by <a href="https://sunn3d.com">Sunnyday Technologies</a> exists in the gap. It is a buildable, field-serviceable, sub-meter cartesian motion system that fits on a <a href="https://m3-crete.com/">standard US pallet</a>, targets an open BOM component cost under $5,000 when self-sourced and self-assembled where current commodity pricing allows, runs on commodity Klipper hardware, and ships its full CAD assembly, bill of materials, firmware configuration, and validation harness as open-source artifacts. The design intent is mundane and important: enable a researcher, a contractor, a master's student, and a makerspace to all build the same machine, source parts locally where possible, modify the design to suit their work, and publish their results without permission from a vendor.</p>
 <p>This page documents how to do that. It walks the architecture, the BOM, the CAD workflow, the validation tooling, the licensing model, and the open issues. Concrete 3D printing is not a 280-character problem.</p>
 <h2 id="2-design-philosophy">2. Design philosophy</h2>
 <p>Three commitments shape every component decision in M3-CRETE.</p>
@@ -572,7 +575,7 @@
 <li><strong>NO leveling feet</strong>. Bed leveling is handled by measurement at the build plate, not by mechanical M16 feet on the frame.</li>
 <li><strong>NO external reinforcement on the X-gantry beam</strong>. The X-carriage is two-sided (V-wheels on both top and bottom of the gantry exterior), so any external bracket on the gantry faces would block carriage travel. All reinforcement must be internal to the C-channel.</li>
 <li><strong>NO HEPA filter, carbon fiber stiffeners, or LED enclosure lights</strong> on the canonical build. These are downstream user choices.</li>
-<li><strong>Static JSON architecture</strong>. The BOM viewer at <a href="https://m3-crete.com/bom">m3-crete.com/bom</a> is a client-side application that runs entirely in your browser, with no backend infrastructure to provision or maintain.</li>
+<li><strong>Static JSON architecture</strong>. The BOM viewer at <a href="https://bom.m3-crete.com/bom/">bom.m3-crete.com/bom</a> is a client-side application that runs entirely in your browser, with no backend infrastructure to provision or maintain.</li>
 </ul>
 <p>The exclusions section exists because the project has accreted many rounds of "have you considered adding..." suggestions over the last year and a half. Each rejection is an active engineering decision, documented so that contributors do not waste round-trips proposing rejected directions.</p>
 <h2 id="3-architecture-overview">3. Architecture overview</h2>
@@ -637,10 +640,10 @@
 <td>One standard pallet</td>
 </tr>
 <tr>
-<td>Target system cost</td>
-<td>Low-five-figure</td>
-<td>Low-five-figure</td>
-<td>Low-five-figure</td>
+<td>Open BOM component target</td>
+<td>Under $5,000 self-sourced where current pricing allows</td>
+<td>Under $5,000 self-sourced where current pricing allows</td>
+<td>Under $5,000 self-sourced where current pricing allows</td>
 </tr>
 <tr>
 <td>License</td>
@@ -652,7 +655,7 @@
 </table>
 <p>Variants are configured in <code>config.js</code> as <code>MODEL_VARIANTS</code> with quantity overrides per part. Switching between variants in the BOM viewer is a one-click operation.</p>
 <h2 id="4-the-bill-of-materials">4. The bill of materials</h2>
-<p>The full BOM is served live at <a href="https://m3-crete.com/bom">m3-crete.com/bom</a> as a static JSON document with no backend. The viewer supports multi-supplier selection, per-part quantity overrides, fabrication-method toggles (Buy / Print / CNC), CSV and JSON export with supplier filters, model variant selection, and a "Suggest Supplier" button that opens a GitHub Issue. The privacy guard in the validation tooling explicitly suppresses vendor names, SKUs, unit costs, prices, and supplier identifiers from any audit emit path; cost data exists in the data file but is not exposed by the public report surface.</p>
+<p>The full BOM is served live at <a href="https://bom.m3-crete.com/bom/">bom.m3-crete.com/bom</a> as a static JSON document with no backend. The viewer supports multi-supplier selection, per-part quantity overrides, fabrication-method toggles (Buy / Print / CNC), CSV and JSON export with supplier filters, model variant selection, and a "Suggest Supplier" button that opens a GitHub Issue. The privacy guard in the validation tooling explicitly suppresses vendor names, SKUs, unit costs, prices, and supplier identifiers from any audit emit path; cost data exists in the data file but is not exposed by the public report surface.</p>
 <h3 id="sourcing-reality">Sourcing reality</h3>
 <p>There is <strong>no US manufacturer of V-slot extrusion</strong>. Every V-slot bar in the BOM is imported from China through a US distributor or shipped direct. Bonnell Aluminum / TSLOTS in Niles, Michigan makes T-slot but not V-slot, and a custom V-groove die would cost a substantial domestic tooling line. We have estimated and rejected that capital line until kit volume justifies it.</p>
 <p>The supplier strategy splits the build across three procurement paths:</p>
@@ -662,14 +665,15 @@
 <li><strong>Amazon</strong>, for electronics, wiring, fasteners, M5 hardware kits, and Loctite Blue 243. A meaningful fraction of the build flows through Amazon SKUs because the alternative (specialty distributors for a single bag of M5 nuts) is not worth the friction.</li>
 </ul>
 <h3 id="cost-shape">Cost shape</h3>
-<p>The kit-business view has Sunnyday-supplied parts (frame, plates, motion components) packaged at a margin that supports continued maintenance, with the customer adding a smaller Amazon order for small hardware and electronics. The total system cost lands in the low-five-figure range inclusive of motors and electronics if the customer is sourcing fresh; meaningfully lower if the customer already owns a BTT Kraken and most of the steppers, which most of our early adopters do.</p>
+<p>The open-source BOM target is a self-sourced component target, not a sale price. The BOM is intended to keep self-sourced component cost under $5,000 where current commodity pricing and substitutions allow. The total build cost can be meaningfully lower if the builder already owns a BTT Kraken and most of the steppers, which many early adopters do.</p>
 <p>The BOM surfaces all of this directly in the viewer. Click a supplier chip to assign that supplier to all matching parts; click "I have this" to exclude a row from the buy list; flip the Buy / Print / CNC toggle on a fabricated part to mark it as locally produced. Export the result as CSV for the spreadsheet, or as JSON for the AI buying-guide assistant.</p>
 <p>A short caution: supplier listings in the BOM viewer are community-contributed reference information, not endorsements. Prices and availability change. Verify each line against the live supplier page before placing an order.</p>
+<p>A safety caution: electrical parts shown in the BOM are reference components for a development platform. The BOM is not an instruction to perform AC mains wiring. Any AC wiring, enclosure integration, grounding, disconnects, E-stop power circuit, or facility connection must be performed by qualified personnel, a licensed electrician where required, or a qualified control-panel shop.</p>
 <h2 id="5-cad-and-assembly">5. CAD and assembly</h2>
 <p>The full M3-2 assembly is a parametric CadQuery-driven STEP, generated from a script (<code>CAD/m3_2_assembly.py</code>) that runs against a versioned V-slot library. The STEP file lives in the repository as the human-reviewable artifact; the Python script is the source of truth.</p>
 <h3 id="llm-driven-cad-the-ai-cad-whitepaper-workflow">LLM-driven CAD: the AI-CAD whitepaper workflow</h3>
 <p>The M3-CRETE CAD workflow is documented in the <a href="https://github.com/sunnyday-technologies/M3-CRETE">Sunnyday AI-CAD whitepaper</a>, titled <em>Self-Verifying LLM-Driven Parametric CAD Assemblies: Lessons from a Meter-Scale Concrete 3D Printer</em> (Sonnentag, 2026). The headline claim of that paper is intentionally narrow: an LLM coding agent paired with CadQuery is most useful when forced to verify its own geometry against engineering invariants on every iteration, not when asked to "design a part." The harness is the artifact that matters; the agent is a means.</p>
-<p>This work sits in a longer lineage. The M3-CRETE printer is the <strong>Print</strong> stage in Sunnyday's ICME-style closed loop, in the spirit of Olson's Materials by Design framework: predict properties from composition and process, deposit the candidate, measure the result, feed the measurements back into the predictor.</p>
+<p>This work sits in a longer lineage. The M3-CRETE printer is the <strong>Print</strong> stage in Sunnyday's ICME-style closed loop, in the spirit of Olson's Materials by Design framework: predict properties from composition and process, place the candidate material, measure the result, feed the measurements back into the predictor.</p>
 <p>The whitepaper documents three layers:</p>
 <ol>
 <li><strong>Geometry library</strong>, a set of STEP files imported from the OpenBuilds ecosystem (CC BY-SA 4.0), plus extended/compatible parts in <code>CAD/Advanced/</code> and vendor-sourced models for steppers, the BTT Kraken board, and GT2 pulleys. STEP files have arbitrary native orientations, which is the single largest source of agent placement bugs. A <code>probe_steps.py</code> script reads the bounding box of any STEP file before the agent attempts to place it.</li>
@@ -693,7 +697,7 @@
 <p>What we do ship is the <strong>Print stage in the Predict to Print to Prove loop</strong>:</p>
 <ul>
 <li><strong>Predict</strong>, <a href="https://cemforge.ai">CEMFORGE</a> is Sunnyday's machine-learning formulation engine. It is trained on validated 3D-printed cementitious specimen data and generates candidate mixes with supported performance predictions where sufficient training data exists. M3-CRETE consumes CEMFORGE-generated formulations as input. The two systems are designed to talk: CEMFORGE outputs include extrusion-relevant parameters (yield stress, plastic viscosity targets, set-time windows, water-to-binder ratio) that map directly onto Klipper extrusion settings.</li>
-<li><strong>Print</strong>, M3-CRETE deposits the mix layer by layer at controlled flow rates and toolpath velocities. Klipper macros expose extrusion multipliers, retract on travel, and per-layer Z compensation. The printhead is a 1" Male NPT pipe connection on a counter-weighted hose; pump pressure and material velocity are owned by the upstream pump system.</li>
+<li><strong>Print</strong>, M3-CRETE extrudes the mix layer by layer at controlled flow rates and toolpath velocities. Klipper macros expose extrusion multipliers, retract on travel, and per-layer Z compensation. The printhead is a 1" Male NPT pipe connection on a counter-weighted hose; pump pressure and material velocity are owned by the upstream pump system.</li>
 <li><strong>Prove</strong>, <a href="https://open3dcp.org">Open3DCP</a> is the open-data standard (<a href="https://doi.org/10.5281/zenodo.19647471">Zenodo DOI 10.5281/zenodo.19647471</a>) for capturing 3DCP printability outcomes: layer adhesion, interlayer cold joint, dimensional fidelity, time-to-buildable-height. Printer outputs feed Open3DCP records, which feed back into CEMFORGE training data, closing the loop.</li>
 </ul>
 <p>The academic literature on 3DCP printability is robust enough that a builder does not have to start from scratch. Chen et al. (2020) studied <a href="https://doi.org/10.1016/j.conbuildmat.2020.120094">the effect of printing parameters on interlayer bond strength of 3D printed limestone-calcined-clay-based cementitious materials</a> and showed how interval time and nozzle standoff drive cold-joint formation. TU Delft's set-on-demand work (2021) demonstrated chemical activation strategies that decouple pumpability from buildability. The TU Delft graded-clays study (2021) identified calcined-clay supplementary cementitious materials as a viable LC3 path for 3DCP. An, Zhang, and Yang (2024) reviewed coarse aggregate incorporation strategies in <em>Virtual and Physical Prototyping</em> (<a href="https://doi.org/10.1080/17452759.2024.2351154">DOI 10.1080/17452759.2024.2351154</a>). For limestone-blended binder fundamentals relevant to PLC-based 3DCP, Tennis et al. (2024) is the current state-of-the-art reference for limestone in cement.</p>
@@ -712,7 +716,7 @@
 <li><strong>Issue</strong>, bug reports, supplier suggestions (the BOM viewer's "Suggest Supplier" button opens an issue prefilled with the part), build experience reports, missing-part findings, license questions.</li>
 <li><strong>Discussion</strong>, open-ended technical questions, design RFCs, build logs from the field, requests for collaboration.</li>
 </ul>
-<p>Email <code>info@sunn3d.com</code> for kit early-access, lab partnerships, journalist inquiries, or speaker invitations.</p>
+<p>Email <code>info@sunn3d.com</code> for non-repository company inquiries. Use GitHub issues or discussions for design feedback, build reports, supplier suggestions, and technical questions.</p>
 <h2 id="8-what-we-know-thats-missing-or-open">8. What we know that's missing or open</h2>
 <p>Honest open issues are the most credible content on this page. Concrete printers are mechanical systems with hundreds of edges; pretending otherwise is a tell that the documentation has not survived a real build. Below is the current open-issues list, drawn from internal mechanical audits and the most recent CADCLAW field-test report.</p>
 <h3 id="mechanical-open-items">Mechanical open items</h3>
@@ -747,7 +751,7 @@
 <h2 id="9-get-started">9. Get started</h2>
 <p>Three reader profiles, three paths.</p>
 <h3 id="path-a-i-just-want-to-read-the-bom">Path A: I just want to read the BOM</h3>
-<p>Open the <a href="https://m3-crete.com/bom">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1, M3-2, or M3-4). Export a CSV when you want to take it to a spreadsheet. No login required &mdash; the viewer is a static site that runs entirely in your browser.</p>
+<p>Open the <a href="https://bom.m3-crete.com/bom/">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1, M3-2, or M3-4). Export a CSV when you want to take it to a spreadsheet. No login required &mdash; the viewer is a static site that runs entirely in your browser.</p>
 <p>If you want the underlying data, <code>bom/data.json</code> is the source of truth and is human-editable. The schema is documented in <code>config.js</code>.</p>
 <h3 id="path-b-i-want-to-actually-build-one">Path B: I want to actually build one</h3>
 <ol>
@@ -780,7 +784,7 @@
 <ul>
 <li>M3-CRETE repository, <a href="https://github.com/sunnyday-technologies/M3-CRETE">github.com/sunnyday-technologies/M3-CRETE</a>, CERN-OHL-W-2.0.</li>
 <li>M3-CRETE live site, <a href="https://m3-crete.com">m3-crete.com</a>.</li>
-<li>M3-CRETE interactive BOM, <a href="https://m3-crete.com/bom">m3-crete.com/bom</a>.</li>
+<li>M3-CRETE interactive BOM, <a href="https://bom.m3-crete.com/bom/">bom.m3-crete.com/bom</a>.</li>
 <li>CEMFORGE AI formulation engine, <a href="https://cemforge.ai">cemforge.ai</a>.</li>
 <li>CADCLAW automated CAD validation framework, <a href="https://cadclaw.io">cadclaw.io</a>, <a href="https://doi.org/10.5281/zenodo.19647391">Zenodo DOI 10.5281/zenodo.19647391</a>.</li>
 <li>Open3DCP open data standard for 3D concrete printing, <a href="https://open3dcp.org">open3dcp.org</a>, <a href="https://doi.org/10.5281/zenodo.19647471">Zenodo DOI 10.5281/zenodo.19647471</a>.</li>
