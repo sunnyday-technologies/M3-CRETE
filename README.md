@@ -12,7 +12,7 @@ Developed by [Sunnyday Technologies](https://sunn3d.com).
 
 | Spec | Value |
 |------|-------|
-| **Target system cost** | Under $5,000 |
+| **Open BOM component target** | Under $5,000 when self-sourced and self-assembled, where current commodity pricing and substitutions allow |
 | **Build footprint** | Sub-1 m³ — fits on a standard US pallet (48×40 in) |
 | **Printhead weight** | ~1.5 kg |
 | **License** | CERN-OHL-W-2.0 |
@@ -88,7 +88,7 @@ M3-CRETE/
 │   └── Advanced/                # Extended parts (C-beam, joining plates)
 ├── bom/
 │   ├── data.json                # BOM source of truth (62 parts, v2.5.0)
-│   └── index.html               # Interactive BOM viewer (m3-crete.com/bom)
+│   └── index.html               # Interactive BOM viewer (bom.m3-crete.com/bom)
 ├── firmware/                    # Klipper configs (kinematics, steppers)
 ├── blog/                        # Build logs and project updates
 └── config.js                    # Model variants (M3-1, M3-2, M3-4)
@@ -114,18 +114,24 @@ For AI-driven mix design optimized for 3D printing, see [CEMFORGE™](https://ce
 
 M3-CRETE is in active development. Current focus areas:
 
-- Finalizing the build-it-yourself kit BOM and documentation
-- Preparing for the first production run
+- Finalizing the open BOM and build documentation
+- Validating open assembly notes and build sequence
 - Establishing firmware profiles for concrete-specific extrusion parameters
 
-Interested in early access, collaboration, or providing field feedback?
-See the **[project page →](https://sunn3d.com/m3-crete/)**
+Interested in contributing design feedback, supplier corrections, or field-build notes?
+Open an issue or start a GitHub discussion.
 
 ---
 
 ## Disclaimer
 
 M3-CRETE is provided as-is for educational and development purposes. Concrete 3D printing involves heavy machinery, cementitious materials, and electrical systems that pose safety risks. Users assume all responsibility for safe design, construction, and operation of any system built from these files. Sunnyday Technologies makes no warranties regarding fitness for any particular purpose and assumes no liability for injury, damage, or loss resulting from the use of these designs. Consult applicable local building codes, electrical codes, and safety regulations before construction or operation.
+
+### Electrical / AC Mains Boundary
+
+Any AC mains wiring, control-box integration, grounding, bonding, overcurrent protection, disconnects, emergency-stop power circuits, facility connection, inspection, or code compliance work must be performed by qualified personnel, a licensed electrician where required, or a qualified control-panel shop.
+
+The public M3-CRETE files may identify electrical interfaces, low-voltage controls, and component references, but they are not AC mains wiring instructions and are not a substitute for applicable electrical codes, authority-having-jurisdiction review, or professional electrical judgment.
 
 See [DISCLAIMER.md](DISCLAIMER.md) for full details.
 
@@ -149,7 +155,7 @@ See [LICENSES/](LICENSES/) for full license texts.
 |----------|-------------|
 | [Convergence Engineering whitepaper](https://doi.org/10.5281/zenodo.19863080) | Methodology paper that uses M3-CRETE as a public case study; introduces the *time to silence* metric. CC BY 4.0 preprint, Zenodo. |
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
-| [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Kit details, design philosophy, and contact for early access |
+| [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Hosted project overview and Sunnyday contact path |
 | [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) | Automated STEP assembly validation — extracted from this project |
 | [CEMFORGE™](https://cemforge.ai/concrete-printers/) | AI-powered concrete formulation platform by Sunnyday Technologies |
 | [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Klipper |
