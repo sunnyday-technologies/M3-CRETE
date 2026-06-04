@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title desc">
+  <title id="title">Open3DCP</title>
+  <desc id="desc">Open3DCP square mark using Nulshock-style type and printed layer bars</desc>
+  <rect x="40" y="40" width="432" height="432" rx="48" ry="48" fill="#060d14"/>
+  <rect x="62" y="62" width="388" height="388" rx="34" ry="34" fill="#0a2351" stroke="#1a3350" stroke-width="5"/>
+  <text x="256" y="150" text-anchor="middle" font-family="Nulshock, Orbitron, Raleway, Arial, sans-serif" font-weight="900" font-size="62" fill="#97d700" letter-spacing="2">OPEN</text>
+  <text x="256" y="220" text-anchor="middle" font-family="Nulshock, Orbitron, Raleway, Arial, sans-serif" font-weight="900" font-size="64" fill="#ffffff" letter-spacing="2">3DCP</text>
+  <rect x="100" y="340" width="312" height="38" rx="8" ry="8" fill="#ffffff"/>
+  <rect x="115" y="286" width="282" height="38" rx="8" ry="8" fill="#ffffff" opacity="0.86"/>
+  <rect x="130" y="232" width="252" height="38" rx="8" ry="8" fill="#ffffff" opacity="0.72"/>
+</svg>
