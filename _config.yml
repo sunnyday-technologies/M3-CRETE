@@ -21,6 +21,7 @@ include:
 
 # Do not process these paths as Jekyll content
 exclude:
+  - beta/
   - CAD/
   - cad_venv/
   - docs/session_logs/
@@ -33,6 +34,14 @@ exclude:
   - docs/step-files-needed.md
   - docs/session-2026-04-13-bom-audit.md
   - docs/m3crete-hackaday-prompt.md
+  - docs/m3-2-electronics-hardware-kit-pricing-2026-05-26.md
+  - docs/m3-2-electronics-hardware-kit-pricing-2026-05-26.html
+  - docs/m3-2-business-viability-market-analysis-2026-05-27.md
+  - docs/m3-2-business-viability-market-analysis-2026-05-27.html
+  - docs/m3-crete-control-box-rfq-2026-05-27.md
+  - docs/m3-crete-control-box-rfq-2026-05-27.html
+  - docs/m3-crete-presale-readiness-checklist-2026-05-27.md
+  - docs/m3-crete-presale-readiness-checklist-2026-05-27.html
   - docs/PREVIEW_HARNESS_NOTES.md
   # NOTE: bom/data.json is intentionally NOT excluded — the BOM viewer at
   # /bom/ fetches it at runtime via `fetch('data.json')`. Excluding it from

@@ -1,0 +1,8 @@
+# Redirects for the open-source M3-CRETE technical mirror.
+# Commercial inquiry and purchase-intent paths belong on the Cloudflare
+# commerce site, not in this GitHub-facing project.
+
+/github      https://github.com/sunnyday-technologies/M3-CRETE    302
+/repo        https://github.com/sunnyday-technologies/M3-CRETE    302
+/source      https://github.com/sunnyday-technologies/M3-CRETE    302
+/docs        /build-guide/    302
