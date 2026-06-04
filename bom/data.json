@@ -169,14 +169,14 @@
       "id": 8,
       "category": "Frame Hardware & Brackets",
       "name": "Adjustable Leveling Feet M16",
-      "description": "Critical for leveling on uneven job-site floors. 1000lb-rated per foot. NOTE: M16 thread will not fit directly into 4080 C-beam slot — requires printed or CNC base plates to interface with frame.",
+      "description": "DEPRECATED for the reference kit. Bed leveling is handled via measurement on the build plate, not mechanical M16 feet on the frame. If the frame needs foot pads, use printed or CNC base plates as a separate field option.",
       "qty": 4,
       "unit": "pieces",
       "mfg_type": "buy",
       "sort_order": 30,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 24,
@@ -2333,7 +2333,7 @@
           "id": 1101,
           "supplier_name": "Bulkman3D",
           "product_url": "https://bulkman3d.com/product/v-slot-4080/",
-          "notes": "Factory-direct from China, DDP sea freight 30-35 days. Stocks 100-1500 mm in 50 mm increments. Select 1000 mm at checkout.",
+          "notes": "Factory-direct from China, DDP sea freight 30-35 days. Stocks 100-1500 mm in 50 mm increments. Select 1000 mm on the supplier page.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2342,7 +2342,7 @@
           "id": 1102,
           "supplier_name": "MakerStore USA",
           "product_url": "https://makerstore.cc/product/c-beam/",
-          "notes": "US domestic warehouse, Atoka OK. UPS Ground ~3 days. Stocks 1000 mm, 1500 mm, and 2400 mm (2400 mm requires freight quote). Select 1000 mm Black C-Beam at checkout.",
+          "notes": "US domestic warehouse, Atoka OK. UPS Ground ~3 days. Stocks 1000 mm, 1500 mm, and 2400 mm (2400 mm requires freight quote). Select 1000 mm Black C-Beam on the supplier page.",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2351,7 +2351,7 @@
           "id": 1112,
           "supplier_name": "ZYLtech Engineering",
           "product_url": "https://www.zyltech.com/zyltech-4080c-v-groove-aluminum-extrusion-pre-cut-sizes-1000mm-and-1200mm/",
-          "notes": "Houston TX warehouse, US domestic ground ship. Stocks 1000 mm and 1200 mm pre-cut lengths. Select 1000 mm at checkout.",
+          "notes": "Houston TX warehouse, US domestic ground ship. Stocks 1000 mm and 1200 mm pre-cut lengths. Select 1000 mm on the supplier page.",
           "sku": "4080C-1000",
           "step_url": null,
           "approved": true
@@ -2627,7 +2627,58 @@
           "approved": true
         }
       ]
+    },
+    {
+      "id": 86,
+      "category": "Fasteners & Hardware",
+      "name": "M3-2 Final Assembly Hardware Pick Pack",
+      "description": "First-pass fulfillment pack for the screws, washers, nuts, spacers, connector plates, and small mechanical hardware needed to ship the M3-2 non-extrusion kit. Detailed pick list lives in bom/m3-2-final-hardware-pack.json. Quantities are derived from bom/data.json v2.7 plus CAD/BOM_README.md hardware totals; physical assembly audit is still required before production purchasing.",
+      "qty": 1,
+      "unit": "kit",
+      "mfg_type": "buy",
+      "sort_order": 5,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1291,
+          "supplier_name": "Sunnyday Technologies",
+          "product_url": null,
+          "notes": "Self-packed fulfillment kit from approved bulk fastener and spacer sources. Use bom/m3-2-final-hardware-pack.json as the editable pack manifest.",
+          "sku": "M3-2-HW-PACK-V0",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1292,
+          "supplier_name": "McMaster-Carr",
+          "product_url": "https://www.mcmaster.com/",
+          "notes": "Approved source for industrial fasteners where strength class, finish, or traceability matters.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1293,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/",
+          "notes": "Approved source for V-slot/C-beam compatible spacers, T-nuts, gantry plates, and wheel hardware.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1294,
+          "supplier_name": "Amazon",
+          "product_url": "https://amazon.com",
+          "notes": "Acceptable source for commodity packs after sample inspection; avoid relying on unverified alloy or thread quality for structural joints.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     }
   ],
-  "notes": "v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing."
+  "notes": "v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
 }

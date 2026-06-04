@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>M3-CRETE | Open-Source Concrete 3D Printer</title>
-  <meta name="description" content="Open-source concrete 3D printer for meter-scale builds. Build it yourself — full BOM and build guide published under CERN-OHL-W-2.0. By Sunnyday Technologies." />
+  <meta name="description" content="Open-source concrete/paste-printing development platform for qualified technical users. BOM and build guide published under CERN-OHL-W-2.0. By Sunnyday Technologies." />
   <!-- Open Graph -->
   <meta property="og:title" content="M3-CRETE | Open-Source Concrete 3D Printer" />
-  <meta property="og:description" content="Open-source concrete 3D printer for meter-scale builds. Build it yourself — full BOM and build guide published under CERN-OHL-W-2.0 by Sunnyday Technologies." />
+  <meta property="og:description" content="Open-source concrete/paste-printing development platform for qualified technical users. BOM and build guide published under CERN-OHL-W-2.0 by Sunnyday Technologies." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://m3-crete.com/" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="M3-CRETE | Open-Source Concrete 3D Printer" />
-  <meta name="twitter:description" content="Open-source concrete 3D printer. Meter-scale builds; build-it-yourself BOM and guide. By Sunnyday Technologies." />
+  <meta name="twitter:description" content="Open-source concrete/paste-printing development platform for qualified technical users. BOM and build guide by Sunnyday Technologies." />
   <link rel="canonical" href="https://m3-crete.com/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -218,6 +218,13 @@
     }
 
     .content-block:last-child { border-right: none; }
+
+    .content-block.safety-boundary {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--border);
+      border-right: none;
+      background: rgba(151, 215, 0, 0.04);
+    }
 
     .block-num {
       font-family: 'IBM Plex Mono', monospace;
@@ -535,7 +542,7 @@
     <div class="hero-label">Open-Source Hardware // Additive Construction</div>
     <h1>Concrete.<br/><span>Printed.</span><br/>Open.</h1>
     <p class="hero-desc">
-      M3-CRETE is an open-source concrete 3D printer for meter-scale builds —
+      M3-CRETE is an open-source concrete/paste-printing development platform for meter-scale builds —
       now over 1 meter on the long axis. Modular, mobile, and designed for field
       deployment — developed by Sunnyday Technologies as a companion to the
       CEMFORGE™ AI formulation platform. Open-hardware under CERN-OHL-W-2.0:
@@ -580,8 +587,9 @@
         A pallet-scale concrete 3D printer designed for field deployment, based on a scaled
         Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming.
         Designed for robust performance in dusty construction environments with
-        a lightweight printhead (~1.5 kg) and V-groove motion system. Target
-        system cost under $5,000.
+        a lightweight printhead (~1.5 kg) and V-groove motion system. The
+        open BOM is intended to keep self-sourced component cost under $5,000
+        where current commodity pricing and substitutions allow.
       </p>
     </div>
     <div class="content-block">
@@ -590,7 +598,7 @@
       <p class="block-body">
         The concrete 3D printing industry moves faster when hardware isn't a
         barrier. M3-CRETE is released openly so researchers, universities, and
-        contractors can build, modify, and improve on a validated CAD/BOM development baseline —
+        contractors can build, modify, and improve on a published CAD/BOM development baseline —
         while pairing with CEMFORGE™ for AI-optimized mix design.
       </p>
     </div>
@@ -611,8 +619,20 @@
       <p class="block-body">
         The project is in active development. CAD files and BOM are published,
         with build guides and documentation added to the GitHub repository as they
-        are validated. Watch the repo for updates, or contact Sunnyday Technologies
-        directly for consulting or partnership inquiries.
+        are validated. Watch the repository, open an issue, or start a discussion
+        for design feedback, build reports, or technical questions.
+      </p>
+    </div>
+    <div class="content-block safety-boundary">
+      <div class="block-num">// SAFETY</div>
+      <div class="block-title">Qualified Technical Use</div>
+      <p class="block-body">
+        M3-CRETE is not a casual hobby kit, finished certified printer, or jobsite-ready electrical product.
+        It is intended for qualified technical users, labs, schools, R&D teams, and experienced builders.
+        Any AC mains wiring, control-box integration, grounding, disconnects, emergency-stop power circuits,
+        facility connection, inspection, or code compliance work must be performed by qualified personnel,
+        a licensed electrician where required, or a qualified control-panel shop. Public project files identify
+        interfaces and components; they are not AC mains wiring instructions.
       </p>
     </div>
   </div>
