@@ -27,6 +27,7 @@ NEMA_CRETE/
 
 # Build artifacts
 build/
+.cloudflare/pages/
 *.o
 *.elf
 *.hex

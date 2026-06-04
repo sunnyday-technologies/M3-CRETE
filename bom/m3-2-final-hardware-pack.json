@@ -1,0 +1,212 @@
+{
+  "kit": "M3-2 Final Assembly Hardware Pick Pack",
+  "sku": "M3-2-HW-PACK-V0",
+  "date": "2026-05-26",
+  "status": "first-pass, needs physical audit",
+  "scope": {
+    "model": "M3-2",
+    "included": [
+      "screws",
+      "washers",
+      "nuts",
+      "T-nuts",
+      "V-wheel spacers",
+      "C-beam connector plates",
+      "small mechanical consumables"
+    ],
+    "excluded": [
+      "primary frame extrusions",
+      "2040 internal extrusion inserts",
+      "concrete pump/extruder hardware",
+      "optional enclosure panels",
+      "LED lighting",
+      "HEPA filtration",
+      "leveling feet"
+    ]
+  },
+  "basis": [
+    "bom/data.json v2.7.0 generated 2026-04-29",
+    "CAD/BOM_README.md hardware derivation totals",
+    "CAD/bom_hardware.csv first-pass line items",
+    "AGENTS.md design decisions: no leveling feet, no mechanical endstops"
+  ],
+  "pick_list": [
+    {
+      "item": "C-beam joint connector plate",
+      "spec": "5-hole 4080-compatible T-plate or L-plate",
+      "required_qty": 27,
+      "pack_qty": 30,
+      "unit": "pieces",
+      "source_basis": "CAD/BOM_README.md: 27 detected C-beam joints",
+      "confidence": "medium",
+      "notes": "Current CAD/hardware CSV calls these inline splice plates, but README describes one connector plate per detected C-beam joint. Verify plate geometry against final corner and splice locations."
+    },
+    {
+      "item": "M5 button-head socket cap screw",
+      "spec": "M5 x 10 mm",
+      "required_qty": 171,
+      "pack_qty": 200,
+      "unit": "pieces",
+      "source_basis": "135 C-beam joint screws + 28 NEMA23 face screws + 8 idler bracket screws",
+      "confidence": "medium",
+      "notes": "Use stainless or zinc-plated alloy steel after corrosion/strength decision. Button-head is preferred where carriage clearance matters."
+    },
+    {
+      "item": "M5 socket cap screw",
+      "spec": "M5 x 16 mm",
+      "required_qty": 18,
+      "pack_qty": 25,
+      "unit": "pieces",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals",
+      "confidence": "medium",
+      "notes": "Used on bottom spacer/idler mounts and through C-beam web locations."
+    },
+    {
+      "item": "M5 socket cap screw",
+      "spec": "M5 x 30 mm",
+      "required_qty": 9,
+      "pack_qty": 12,
+      "unit": "pieces",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals",
+      "confidence": "medium",
+      "notes": "Smooth idler axle hardware."
+    },
+    {
+      "item": "M5 socket cap screw",
+      "spec": "M5 x 40 mm",
+      "required_qty": 32,
+      "pack_qty": 40,
+      "unit": "pieces",
+      "source_basis": "32 V-wheel axle bolts",
+      "confidence": "medium",
+      "notes": "Verify length with final gantry plate thickness and wheel stack before bulk purchase."
+    },
+    {
+      "item": "M5 drop-in T-nut",
+      "spec": "20-series, 6 mm slot, spring-loaded preferred",
+      "required_qty": 161,
+      "pack_qty": 300,
+      "unit": "pieces",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals; covered by bom/data.json id 6",
+      "confidence": "medium",
+      "notes": "Pack quantity intentionally keeps assembly spares and field-service margin."
+    },
+    {
+      "item": "M5 flat washer",
+      "spec": "M5, stainless or zinc-plated",
+      "required_qty": 82,
+      "pack_qty": 100,
+      "unit": "pieces",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals",
+      "confidence": "medium",
+      "notes": "Used on V-wheel and idler stacks."
+    },
+    {
+      "item": "M5 nyloc nut",
+      "spec": "M5 nylon-insert lock nut",
+      "required_qty": 41,
+      "pack_qty": 50,
+      "unit": "pieces",
+      "source_basis": "32 V-wheel axle nuts + 9 idler axle nuts",
+      "confidence": "medium",
+      "notes": "Do not replace with plain nuts unless threadlocker or other locking method is specified."
+    },
+    {
+      "item": "M5 standard nut",
+      "spec": "M5 hex nut",
+      "required_qty": 28,
+      "pack_qty": 40,
+      "unit": "pieces",
+      "source_basis": "AGENTS.md NEMA23 pass-through mounting clarification",
+      "confidence": "low",
+      "notes": "CAD/bom_hardware.csv currently lists zero here, but AGENTS.md states the NEMA23 motor holes are pass-through and require back-side nuts. Verify on final motor/mount stack."
+    },
+    {
+      "item": "M5 split lock washer or wedge-lock washer",
+      "spec": "M5",
+      "required_qty": 0,
+      "pack_qty": 50,
+      "unit": "pieces",
+      "source_basis": "procurement reserve",
+      "confidence": "low",
+      "notes": "Optional vibration-control reserve. Use only where it does not disturb wheel preload or plate flatness."
+    },
+    {
+      "item": "V-wheel eccentric spacer",
+      "spec": "6 mm tall, 10 mm OD, 6 mm bore/off-center",
+      "required_qty": 32,
+      "pack_qty": 40,
+      "unit": "pieces",
+      "source_basis": "bom/data.json id 7",
+      "confidence": "medium",
+      "notes": "bom/data.json currently uses eccentric spacers on all 32 wheel positions for maximum preload adjustability. CAD/BOM_README.md still references 16, so verify against physical assembly."
+    },
+    {
+      "item": "V-wheel plain precision spacer",
+      "spec": "6 mm tall, about 10 mm OD, M5 clearance bore",
+      "required_qty": 32,
+      "pack_qty": 40,
+      "unit": "pieces",
+      "source_basis": "bom/data.json id 83",
+      "confidence": "medium",
+      "notes": "Outboard wheel spacer between V-wheel and washer/locknut per current bom/data.json wheel stack."
+    },
+    {
+      "item": "V-wheel internal bearing spacer",
+      "spec": "625ZZ inner spacer, supplier-matched",
+      "required_qty": 32,
+      "pack_qty": 40,
+      "unit": "pieces",
+      "source_basis": "bom/data.json id 7/id 83 notes",
+      "confidence": "low",
+      "notes": "Often included with wheel kits. Keep as an inspection checklist item until supplier wheel kits are frozen."
+    },
+    {
+      "item": "Threadlocker",
+      "spec": "Blue medium-strength, Loctite 243 or equivalent",
+      "required_qty": 1,
+      "pack_qty": 1,
+      "unit": "bottle",
+      "source_basis": "AGENTS.md NEMA23 motor mount fastening note",
+      "confidence": "high",
+      "notes": "Use on motor mount nuts and selected vibration-prone fasteners. Do not use where future wheel preload service requires dry adjustment."
+    },
+    {
+      "item": "Belt termination hardware",
+      "spec": "TBD clamp, pin-joint, or printed belt anchor hardware",
+      "required_qty": null,
+      "pack_qty": null,
+      "unit": "TBD",
+      "source_basis": "CAD/BOM_README.md explicitly excludes belt clamps pending inline pin-joint design",
+      "confidence": "low",
+      "notes": "This is the main remaining mechanical hardware unknown for a shippable final kit. Freeze after belt path and printed clamp geometry are physically verified."
+    },
+    {
+      "item": "M3 electronics screw assortment",
+      "spec": "M3 socket/button-head assortment",
+      "required_qty": null,
+      "pack_qty": 100,
+      "unit": "pieces",
+      "source_basis": "bom/data.json id 57",
+      "confidence": "low",
+      "notes": "Control box and electronics mounting quantities depend on enclosure/panel layout. Keep as a reserve pack until the electrical panel design is frozen."
+    },
+    {
+      "item": "Heat-set insert assortment",
+      "spec": "M3/M5 knurled brass inserts",
+      "required_qty": null,
+      "pack_qty": 200,
+      "unit": "pieces",
+      "source_basis": "bom/data.json id 59",
+      "confidence": "low",
+      "notes": "Only needed where final 3D-printed parts use inserts. Current NEMA23 mount clarification says pass-through holes do not need heat-set inserts."
+    }
+  ],
+  "audit_flags": [
+    "Physically verify whether all 32 V-wheel positions need eccentric spacers or whether 16 eccentric plus 16 plain is sufficient.",
+    "Freeze belt termination hardware; current CAD hardware notes intentionally exclude belt clamps.",
+    "Resolve the NEMA23 back-side nut conflict between AGENTS.md and CAD/bom_hardware.csv.",
+    "Confirm connector plate geometry for each of the 27 C-beam joints before buying all plates in one style.",
+    "Do not include leveling feet in the reference kit unless the design decision is reopened."
+  ]
+}

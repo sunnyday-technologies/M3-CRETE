@@ -8,6 +8,12 @@ M3-CRETE is provided as open-source hardware for experimental, educational, and 
 
 Concrete 3D printing involves heavy machinery, cementitious materials, and electrical systems that pose real safety risks. Users assume full responsibility for the safe design, construction, and operation of any system built from these files.
 
+## Electrical And AC Mains Work
+
+Any AC mains wiring, control-box integration, grounding, bonding, overcurrent protection, disconnects, emergency-stop power circuits, facility connection, inspection, or code compliance work must be performed by qualified personnel, a licensed electrician where required, or a qualified control-panel shop.
+
+The public M3-CRETE files may identify electrical interfaces, low-voltage controls, and component references, but they are not AC mains wiring instructions and are not a substitute for applicable electrical codes, authority-having-jurisdiction review, or professional electrical judgment. Do not energize any M3-CRETE-derived system unless the electrical work has been reviewed and accepted for the intended environment.
+
 ## No Warranty
 
 Sunnyday Technologies makes no representations or warranties of any kind — express or implied — regarding the fitness of these designs for any particular purpose, their completeness, accuracy, or suitability for any use. All designs are provided as-is.
@@ -19,11 +25,5 @@ Sunnyday Technologies assumes no liability for injury, property damage, loss, or
 ## Regulatory Compliance
 
 Users are solely responsible for ensuring compliance with all applicable local building codes, electrical codes, structural standards, and safety regulations before constructing or operating any system based on these files. Nothing in this repository constitutes engineering advice or regulatory approval.
-
-## Commercial Upgrades
-
-Certain performance-enhancing upgrades (including extruder and 2K accelerator injection components) are available as separate commercial add-ons from Sunnyday Technologies. The base open-source design does not include these components.
-
----
 
 By using, building, or modifying this project, you agree to these terms.
