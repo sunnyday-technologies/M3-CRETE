@@ -1,0 +1,9 @@
+{
+  "name": "m3-crete-site",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build:cloudflare": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-cloudflare-pages.ps1",
+    "deploy:cloudflare": "npm run build:cloudflare && npx wrangler@latest pages deploy .cloudflare/pages/m3-crete --project-name m3-crete-open-source --branch main --commit-dirty=true"
+  }
+}

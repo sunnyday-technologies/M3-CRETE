@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768" role="img" aria-labelledby="title desc">
+  <title id="title">Sunnyday Full Loop Mark</title>
+  <desc id="desc">A compact circular Sunnyday Technologies ecosystem mark showing data, formulation, hardware, validation, and commerce around a central Full Loop label.</desc>
+  <defs>
+    <linearGradient id="loopGradient" x1="110" y1="100" x2="658" y2="668" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#97d700"/>
+      <stop offset="0.5" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#97d700"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="16" markerHeight="16" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#97d700"/>
+    </marker>
+    <style>
+      .bg { fill: #060d14; }
+      .ring { fill: none; stroke: url(#loopGradient); stroke-width: 18; stroke-linecap: round; }
+      .ghost { fill: none; stroke: #1a3350; stroke-width: 34; opacity: 0.5; }
+      .node { fill: #0b1824; stroke: #97d700; stroke-width: 4; }
+      .node-alt { fill: #0b1824; stroke: #1a3350; stroke-width: 4; }
+      .hub { fill: #102236; stroke: #97d700; stroke-width: 5; }
+      .white { fill: #ffffff; }
+      .green { fill: #97d700; }
+      .blue { fill: #013a73; }
+      .label { fill: #ffffff; font-family: Orbitron, Raleway, Arial, sans-serif; font-size: 45px; font-weight: 900; letter-spacing: 0; }
+      .small { fill: #a7c3d8; font-family: Raleway, Inter, Arial, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: 0; }
+      .tiny { fill: #97d700; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 18px; font-weight: 700; letter-spacing: 0; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="768" height="768" rx="70"/>
+  <circle cx="384" cy="384" r="282" class="ghost"/>
+  <path class="ring" marker-end="url(#arrow)" d="M384 102C540 102 666 228 666 384C666 540 540 666 384 666C228 666 102 540 102 384C102 228 228 102 384 102"/>
+
+  <circle cx="384" cy="384" r="150" class="hub"/>
+  <text x="384" y="358" text-anchor="middle" class="tiny">SUNNYDAY</text>
+  <text x="384" y="418" text-anchor="middle" class="label">FULL</text>
+  <text x="384" y="464" text-anchor="middle" class="label">LOOP</text>
+
+  <g transform="translate(334 44)">
+    <circle class="node" cx="50" cy="50" r="50"/>
+    <text x="50" y="58" text-anchor="middle" class="tiny">DATA</text>
+  </g>
+  <g transform="translate(562 186)">
+    <circle class="node-alt" cx="50" cy="50" r="50"/>
+    <text x="50" y="58" text-anchor="middle" class="tiny">MIX</text>
+  </g>
+  <g transform="translate(562 482)">
+    <circle class="node" cx="50" cy="50" r="50"/>
+    <text x="50" y="58" text-anchor="middle" class="tiny">M3</text>
+  </g>
+  <g transform="translate(106 482)">
+    <circle class="node-alt" cx="50" cy="50" r="50"/>
+    <text x="50" y="58" text-anchor="middle" class="tiny">CAD</text>
+  </g>
+  <g transform="translate(106 186)">
+    <circle class="node" cx="50" cy="50" r="50"/>
+    <text x="50" y="58" text-anchor="middle" class="tiny">LAB</text>
+  </g>
+
+  <text x="384" y="724" text-anchor="middle" class="small">data - formulation - hardware - validation - commerce</text>
+</svg>
