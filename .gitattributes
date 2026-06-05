@@ -5,5 +5,7 @@ CAD/*.step filter=lfs diff=lfs merge=lfs -text
 CAD/*.STEP filter=lfs diff=lfs merge=lfs -text
 CAD/*.3mf filter=lfs diff=lfs merge=lfs -text
 CAD/*.3MF filter=lfs diff=lfs merge=lfs -text
+CAD/*.f3d filter=lfs diff=lfs merge=lfs -text
+CAD/*.F3D filter=lfs diff=lfs merge=lfs -text
 CAD/Components/**/*.step filter=lfs diff=lfs merge=lfs -text
 CAD/Components/**/*.STEP filter=lfs diff=lfs merge=lfs -text
