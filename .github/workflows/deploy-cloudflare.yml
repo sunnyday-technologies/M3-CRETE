@@ -20,12 +20,17 @@ on:
 permissions:
   contents: read
 
+# Force JS actions onto Node 24 so the Node 20 deprecation warning doesn't fire
+# (wrangler-action@v3 still ships on Node 20).
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   deploy:
     if: ${{ vars.CF_DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build web-only publish dir (allowlist + CAD/size/secret tripwires)
         shell: pwsh
