@@ -1,0 +1,39 @@
+name: Deploy to Cloudflare Pages
+
+# Auto-deploys m3-crete-open-source to Cloudflare Pages on push to main,
+# replacing the GitHub Pages (Jekyll) path. The site is built by the
+# allowlist + fail-loud script scripts/build-cloudflare-pages.ps1 (pwsh is
+# preinstalled on GitHub's ubuntu runners), then deployed with wrangler.
+#
+# INERT BY DEFAULT. This job is skipped until you opt in:
+#   1. Create the Pages project:  wrangler pages project create m3-crete-open-source
+#   2. Add repo secrets:          CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
+#   3. Add repo variable:         CF_DEPLOY_ENABLED = true
+#   4. Point bom.m3-crete.com DNS at the Pages project, then disable GitHub Pages.
+# See PUBLISHING_HYGIENE_ROLLOUT.md cutover runbook for the exact steps.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ vars.CF_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build web-only publish dir (allowlist + CAD/size/secret tripwires)
+        shell: pwsh
+        run: ./scripts/build-cloudflare-pages.ps1
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .cloudflare/pages/m3-crete --project-name=m3-crete-open-source --branch=main
