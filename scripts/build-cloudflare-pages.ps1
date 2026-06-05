@@ -90,6 +90,14 @@ foreach ($blocked in $blockedRoots) {
   }
 }
 
+# No CAD, nothing over Cloudflare's 25 MiB cap (the near-miss tripwire).
+$tripwireFiles = Get-ChildItem -LiteralPath $Target -Recurse -File
+$cadExt = @(".stl",".step",".stp",".3mf",".f3d",".f3z",".sldprt",".sldasm",".ipt",".iam",".iges",".igs",".x_t",".x_b",".dwg",".dxf")
+$cad = $tripwireFiles | Where-Object { $cadExt -contains $_.Extension.ToLower() }
+if ($cad) { throw "CAD file(s) reached the Cloudflare publish dir: $($cad.FullName -join ', ')" }
+$big = $tripwireFiles | Where-Object { $_.Length -gt 25MB }
+if ($big) { throw "File(s) over Cloudflare's 25 MiB limit: $(($big | ForEach-Object { $_.Name }) -join ', ')" }
+
 $secretPatterns = @(
   "AKIA[0-9A-Z]{16}",
   "-----BEGIN (RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----",

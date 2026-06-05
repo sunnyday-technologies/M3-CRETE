@@ -28,6 +28,8 @@ NEMA_CRETE/
 # Build artifacts
 build/
 .cloudflare/pages/
+.cloudflare/
+.wrangler/
 *.o
 *.elf
 *.hex
