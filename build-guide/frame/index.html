@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>M3-CRETE Frame Assembly: Build the Concrete Printer Frame Step-by-Step (Beginner Guide)</title>
+  <meta name="description" content="Part 1 of the M3-CRETE build series. A plain-language, step-by-step guide to assembling the aluminum-extrusion frame of the M3-CRETE concrete 3D printer: base, Z-posts, top brace, spliced X-beam, V-wheels, gantry, belts, and squaring." />
+  <meta property="og:title" content="M3-CRETE Frame Assembly: Build the Concrete Printer Frame Step-by-Step" />
+  <meta property="og:description" content="Plain-language guide to assembling the M3-CRETE aluminum-extrusion frame: base, Z-posts, X-beam splice, V-wheels, gantry, belts, and squaring." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://bom.m3-crete.com/build-guide/frame/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="M3-CRETE Frame Assembly: Step-by-Step" />
+  <meta name="twitter:description" content="Plain-language guide to assembling the M3-CRETE printer frame." />
+  <link rel="canonical" href="https://bom.m3-crete.com/build-guide/frame/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:#060d14; --charcoal:#0b1824; --graphite:#0f2035; --border:#1a3350;
+      --mid:#2a4d6e; --muted:#6a8faa; --light:#c2d4e0; --white:#f0f4f7;
+      --accent:#97D700; --accent-dim:#5c8400; --brand-blue:#013A73; --warn:#ffb547;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--black);
+      background-image: linear-gradient(160deg, #011f3f 0%, #060d14 60%);
+      color: var(--white); font-family: 'Raleway', sans-serif; font-weight: 300;
+      line-height: 1.6; min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content:''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.35;
+    }
+    header {
+      position: relative; z-index: 10; display: flex; align-items: center;
+      justify-content: space-between; padding: 1.5rem 3rem; border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: baseline; gap: 0.5rem; }
+    .logo-mark { font-family: Orbitron, sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; color: var(--white); line-height: 1; }
+    .logo-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; padding-left: 0.75rem; border-left: 1px solid var(--border); }
+    nav a { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    nav a:hover { color: var(--accent); }
+    footer { position: relative; z-index: 10; border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; align-items: center; justify-content: space-between; }
+    .footer-left, .footer-right { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+    .footer-left a { color: var(--accent-dim); text-decoration: none; }
+    .footer-left a:hover { color: var(--accent); }
+    @media (max-width: 768px) { header { padding: 1.25rem 1.5rem; } .logo-sub { display: none; } footer { flex-direction: column; gap: 0.75rem; padding: 1.5rem; text-align: center; } }
+    main.pillar-content { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; position: relative; z-index: 1; line-height: 1.7; font-size: 1.02rem; }
+    main.pillar-content h1 { font-family: Orbitron, sans-serif; font-size: clamp(1.9rem, 3.6vw, 2.7rem); line-height: 1.12; margin: 0 0 1.25rem; letter-spacing: 0.01em; }
+    main.pillar-content h2 { font-family: Orbitron, sans-serif; font-size: clamp(1.4rem, 2.4vw, 1.8rem); margin: 3rem 0 1rem; letter-spacing: 0.01em; color: var(--white); padding-top: 1.25rem; border-top: 1px solid var(--border); }
+    main.pillar-content h3 { font-size: 1.2rem; margin: 1.9rem 0 0.6rem; color: var(--white); }
+    main.pillar-content p { margin: 0 0 1.1rem; color: var(--light); }
+    main.pillar-content ul, main.pillar-content ol { margin: 0 0 1.2rem 1.4rem; color: var(--light); }
+    main.pillar-content li { margin-bottom: 0.5rem; }
+    main.pillar-content a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+    main.pillar-content a:hover { color: #aae800; }
+    main.pillar-content strong { font-weight: 600; color: var(--white); }
+    main.pillar-content code { font-family: 'IBM Plex Mono', 'Consolas', monospace; font-size: 0.88em; padding: 0.12em 0.4em; background: rgba(151,215,0,0.10); border: 1px solid rgba(151,215,0,0.20); border-radius: 3px; color: #d8f29a; }
+    main.pillar-content hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .lede { font-size: 1.12rem; color: var(--white); font-weight: 400; }
+    .series-rail { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 2rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; }
+    .series-step { flex: 1 1 140px; padding: 0.7rem 0.9rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); text-transform: uppercase; text-decoration: none; }
+    .series-step .n { color: var(--accent-dim); display: block; font-size: 0.62rem; margin-bottom: 0.25rem; }
+    .series-step.active { border-color: var(--accent); color: var(--white); background: rgba(151,215,0,0.07); }
+    a.series-step.done { color: var(--light); }
+    a.series-step:hover { border-color: var(--accent); }
+    .series-step.soon { opacity: 0.65; }
+    .meta-cards { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 2rem; }
+    .meta-card { flex: 1 1 150px; border: 1px solid var(--border); border-radius: 5px; padding: 1rem; background: var(--charcoal); }
+    .meta-card .k { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+    .meta-card .v { font-family: Orbitron, sans-serif; font-size: 1.05rem; color: var(--white); }
+    .callout { border-left: 3px solid var(--accent); background: rgba(151,215,0,0.06); padding: 1rem 1.25rem; margin: 1.25rem 0; border-radius: 0 5px 5px 0; }
+    .callout.warn { border-left-color: var(--warn); background: rgba(255,181,71,0.07); }
+    .callout .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.35rem; }
+    .callout.warn .tag { color: var(--warn); }
+    .callout p:last-child { margin-bottom: 0; }
+    .step { position: relative; border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.4rem 0.5rem 1.4rem; margin: 1.25rem 0; background: rgba(11,24,36,0.55); }
+    .step-head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.75rem; }
+    .step-num { flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: var(--brand-blue); font-family: Orbitron, sans-serif; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; }
+    .step-head h3 { margin: 0; font-size: 1.15rem; }
+    .glossary { border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 1.25rem; background: var(--charcoal); }
+    .glossary dt { font-weight: 600; color: var(--accent); margin-top: 0.8rem; font-size: 0.95rem; }
+    .glossary dd { margin: 0.15rem 0 0.6rem 0; color: var(--light); }
+    .checklist { list-style: none; margin-left: 0 !important; }
+    .checklist li { padding-left: 1.9rem; position: relative; }
+    .checklist li::before { content: '☐'; position: absolute; left: 0; top: -0.1rem; color: var(--accent); font-size: 1.1rem; }
+    @media (max-width: 768px) { main.pillar-content { padding: 2rem 1.2rem 4rem; } }
+    @media print { header, footer, .series-rail, body::before { display: none !important; } body { background: #fff; color: #000; } main.pillar-content { color: #000; max-width: 100%; } main.pillar-content p, main.pillar-content li, main.pillar-content ul { color: #000; } }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to assemble the M3-CRETE printer frame",
+    "description": "Step-by-step beginner guide to assembling the aluminum-extrusion frame of the M3-CRETE open-source concrete 3D printer: base, Z-posts, top brace, spliced X-beam, V-wheels, gantry, belts, and squaring.",
+    "totalTime": "PT6H",
+    "tool": [
+      {"@type": "HowToTool", "name": "Hex / Allen key set"},
+      {"@type": "HowToTool", "name": "Tape measure"},
+      {"@type": "HowToTool", "name": "Large square (framing or machinist)"},
+      {"@type": "HowToTool", "name": "Spirit level"},
+      {"@type": "HowToTool", "name": "Rubber mallet"},
+      {"@type": "HowToTool", "name": "Structural adhesive and blue threadlocker"}
+    ],
+    "publisher": {"@type": "Organization", "name": "Sunnyday Technologies", "url": "https://sunn3d.com"},
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  }
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-mark">M3-CRETE</span>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="/build-guide/" aria-label="Build guide overview">Build Guide</a> &nbsp;&nbsp;
+      <a href="/bom/" aria-label="Interactive Bill of Materials viewer">BOM</a> &nbsp;&nbsp;
+      <a href="/blog/" aria-label="M3-CRETE development blog">Blog</a> &nbsp;&nbsp;
+      <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="Sunnyday Technologies parent site (opens in new tab)">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <main class="pillar-content">
+
+    <nav class="series-rail" aria-label="Build series">
+      <span class="series-step active"><span class="n">Part 1 — you are here</span>Frame</span>
+      <span class="series-step soon"><span class="n">Part 2</span>Wiring <em>(soon)</em></span>
+      <a class="series-step done" href="/build-guide/software/"><span class="n">Part 3</span>Software</a>
+      <a class="series-step done" href="/build-guide/validation/"><span class="n">Part 4</span>Validation</a>
+    </nav>
+
+    <h1>M3-CRETE Frame Assembly</h1>
+    <p class="lede">This guide builds the printer's frame — the aluminum skeleton that everything else bolts onto. It is written in simple words so anyone can follow it, and so it is easy to translate. Go slowly. A square, solid frame is the single biggest thing that makes the printer work well later.</p>
+
+    <div class="meta-cards">
+      <div class="meta-card"><div class="k">Part</div><div class="v">1 of 4</div></div>
+      <div class="meta-card"><div class="k">Time</div><div class="v">A day</div></div>
+      <div class="meta-card"><div class="k">Difficulty</div><div class="v">Beginner</div></div>
+      <div class="meta-card"><div class="k">Helpers</div><div class="v">2 people</div></div>
+    </div>
+
+    <div class="callout warn">
+      <span class="tag">Safety</span>
+      <p>The aluminum beams are long and heavy, and cut ends can be sharp. Wear eye protection, work with a helper for the big pieces, and watch your fingers at every joint (pinch points). Use adhesive in a ventilated space.</p>
+    </div>
+
+    <h2>What you need</h2>
+    <p><strong>Tools:</strong></p>
+    <ul>
+      <li>A set of <strong>hex (Allen) keys</strong>.</li>
+      <li>A <strong>tape measure</strong> and a big <strong>square</strong> (framing or machinist square).</li>
+      <li>A <strong>spirit level</strong>.</li>
+      <li>A <strong>rubber mallet</strong> (to seat parts without marring them).</li>
+      <li><strong>Structural adhesive</strong> (for the X-beam splice) and <strong>blue threadlocker</strong> (for motor screws).</li>
+    </ul>
+    <p><strong>Parts</strong> (all from the <a href="/bom/">M3-CRETE Bill of Materials</a> — export the list and check off each item first):</p>
+    <ul>
+      <li><strong>4080 C-beam</strong> aluminum lengths (the thick main beams), all cut to the same length.</li>
+      <li><strong>2040 V-slot</strong> lengths for cross-bracing.</li>
+      <li><strong>Corner plates</strong> (5-screw T-plates or L-plates), <strong>T-nuts</strong>, and <strong>M5 screws</strong>.</li>
+      <li>The <strong>X-beam splice kit</strong> (an internal slot-link connector) plus three short V-slot bars.</li>
+      <li><strong>Polycarbonate V-wheels</strong>, <strong>eccentric spacers</strong>, and <strong>gantry plates</strong>.</li>
+      <li><strong>GT2 belts</strong> (a wider one for Y, a narrower one for X), idlers, and the Z <strong>hub disks</strong>.</li>
+      <li>The seven motion <strong>NEMA23 motors</strong> and the <strong>3D-printed brackets / motor mounts</strong>.</li>
+    </ul>
+
+    <h2>Words to know</h2>
+    <dl class="glossary">
+      <dt>Extrusion</dt><dd>An aluminum beam with slots along its sides. "4080" and "2040" are sizes.</dd>
+      <dt>C-beam</dt><dd>An extrusion shaped like the letter C. The open channel hides and protects the belt.</dd>
+      <dt>T-nut</dt><dd>A small nut that slides into the beam's slot so you can bolt things on anywhere.</dd>
+      <dt>V-wheel</dt><dd>A wheel with a V-shaped groove that rolls along the V-edge of a beam.</dd>
+      <dt>Eccentric spacer</dt><dd>A spacer with an off-center hole. Turning it pushes a wheel tighter or looser against the beam.</dd>
+      <dt>Gantry</dt><dd>The bridge that carries the print head and slides along the rails.</dd>
+      <dt>Z-post</dt><dd>An upright beam. The gantry moves up and down these.</dd>
+      <dt>Plumb / square / tram</dt><dd>Plumb = perfectly upright. Square = corners are true 90°. Tram = everything lined up flat and even.</dd>
+      <dt>GT2 belt</dt><dd>A toothed rubber belt that the motors pull to move the axes.</dd>
+      <dt>Hub disk / idler</dt><dd>Pulleys the belt wraps around to change direction (used on the Z-axis).</dd>
+    </dl>
+
+    <h2>How the frame is designed (read this first)</h2>
+    <p>A few design choices make M3-CRETE easier to build. Knowing them up front prevents mistakes:</p>
+    <ul>
+      <li><strong>One length of beam.</strong> Every main beam is cut to the same canonical length — no custom cuts. Check the BOM for the exact number.</li>
+      <li><strong>Open channels face inward.</strong> The C-beams point their open side toward the center of the printer, so the belts run inside, away from concrete spray.</li>
+      <li><strong>The long X-beam is two beams spliced in the middle.</strong> The join uses an internal connector that sits <em>below</em> the wheel path, plus bonded V-slot bars inside the channel. Nothing sticks out to block the wheels.</li>
+      <li><strong>Four Z motors, no lead screws.</strong> Each corner has its own belt-driven Z motor, so the gantry can level itself in software later.</li>
+      <li><strong>No leveling feet.</strong> Leveling is done by measurement at the print surface, not by adjustable feet.</li>
+    </ul>
+
+    <h2>Build it</h2>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">1</span><h3>Lay out and check every part</h3></div>
+      <p>Open the <a href="/bom/">BOM</a> and lay the parts out by type. Confirm every 4080 C-beam is the same length and the count matches. Finding a wrong or missing part now is much easier than after assembly.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">2</span><h3>Build the base rectangle</h3></div>
+      <p>Join the bottom beams into a rectangle using the 5-screw corner plates and T-nuts. Keep the C-channel openings facing inward. Tighten the screws only <em>snug</em> for now — we square it before final tightening.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">3</span><h3>Square the base</h3></div>
+      <p>Measure the two diagonals of the rectangle (corner to opposite corner). Gently tap with the mallet until <strong>both diagonals are equal</strong> — that means the corners are true 90°. Now tighten all corner screws firmly.</p>
+      <div class="callout"><span class="tag">Why it matters</span><p>If the base is not square, every layer the printer makes will be skewed. Five extra minutes here saves hours later.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">4</span><h3>Stand the Z-posts</h3></div>
+      <p>Bolt an upright Z-post at each corner of the base using corner plates. Use the level to make each post <strong>plumb</strong> (perfectly upright) in both directions before tightening.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">5</span><h3>Add the top brace</h3></div>
+      <p>Connect the tops of the posts with the top cross-brace. This locks the posts square and also holds the Z motors later. Re-check that the posts are still plumb after tightening.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">6</span><h3>Make the X-beam (the splice)</h3></div>
+      <p>Join the two X-beam segments end to end with the internal slot-link connector. Then slide the three short V-slot bars inside the C-channel, staggered across the join, and bond them with structural adhesive — the middle bar should sit equally over the join. Keep everything straight, let the adhesive fully cure, then run your finger across the join: it should feel smooth, with no step the wheels would bump over.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">7</span><h3>Fit the V-wheels to the gantry plates</h3></div>
+      <p>Attach the V-wheels to the gantry plates, using the eccentric spacers on one row. Set the wheels so they sit firmly in the beam's V-edge — snug enough that there is no wobble, loose enough that the wheel still spins freely. You adjust this by turning the eccentric spacers.</p>
+      <div class="callout"><span class="tag">Remember</span><p>Nothing should stick out past the gantry faces — all bracing is inside the channel. An outside bracket would block the wheels.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">8</span><h3>Mount the gantry and check the roll</h3></div>
+      <p>Place the gantry onto its rails. Roll it from one end to the other by hand. It should glide smoothly with no rocking and no tight spots. Fine-tune the eccentric spacers until the motion is even along the whole length.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">9</span><h3>Mount the motors</h3></div>
+      <p>Attach the seven NEMA23 motors with the 3D-printed mounts. The mounting holes are pass-through, so use M5 screws with M5 nuts and a drop of blue threadlocker. The four Z motors sit on the top brace (body up, shaft pointing down) with a hub disk underneath to guide the belt.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">10</span><h3>Route and lightly tension the belts</h3></div>
+      <p>Run the GT2 belts inside the C-channels — the wider belt on Y, the narrower one on X. For each Z-axis, the belt goes from the hub disk, over the brace, down the post, around an idler at the bottom, and back up to the carriage. Anchor the belt ends and take up the slack using the motor-mount slots. Leave final tensioning for the validation step; for now, just remove the slack.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">11</span><h3>Final check</h3></div>
+      <p>Re-measure the base diagonals (still equal?), confirm the posts are still plumb, and roll the gantry through its full travel once more. The frame should feel solid with no twist. You are done.</p>
+    </div>
+
+    <h2>Quick checklist</h2>
+    <p>Print this page and tick the boxes as you go.</p>
+    <ul class="checklist">
+      <li>All parts laid out and matched to the BOM.</li>
+      <li>Base rectangle built, C-channels facing inward.</li>
+      <li>Base squared — both diagonals equal — and tightened.</li>
+      <li>Four Z-posts plumb and bolted.</li>
+      <li>Top brace fitted; posts still plumb.</li>
+      <li>X-beam spliced, bonded, cured, and smooth across the join.</li>
+      <li>V-wheels fitted; gantry rolls smoothly with no wobble.</li>
+      <li>Seven motors mounted (M5 + nut + threadlocker); Z hub disks in place.</li>
+      <li>Belts routed inside the channels and slack removed.</li>
+      <li>Final square + plumb + full-travel roll re-checked.</li>
+    </ul>
+
+    <h2>If you get stuck</h2>
+    <ul>
+      <li>Check the part against the <a href="/bom/">interactive BOM</a> and the CAD on <a href="https://github.com/sunnyday-technologies/M3-CRETE" target="_blank" rel="noopener">GitHub</a>.</li>
+      <li>Ask on the <a href="https://github.com/sunnyday-technologies/M3-CRETE/discussions" target="_blank" rel="noopener">M3-CRETE Discussions</a> page — build photos help a lot.</li>
+    </ul>
+
+    <div class="callout">
+      <span class="tag">Next</span>
+      <p><strong>Part 2 — Wiring.</strong> Mount the power supply and control board and connect the motors. <em>(Coming soon.)</em> After that comes <a href="/build-guide/software/">Part 3 — Software</a>.</p>
+    </div>
+
+    <hr />
+    <p style="font-size:0.85rem;color:var(--muted);">M3-CRETE is an open-hardware development platform, not a finished certified appliance. It is meant for qualified technical users, labs, schools, and experienced builders. Hardware is published under CERN-OHL-W-2.0; this guide is CC BY 4.0.</p>
+
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      © 2026 Sunnyday Technologies LLC &nbsp;·&nbsp;
+      <a href="https://sunn3d.com">sunn3d.com</a> &nbsp;·&nbsp;
+      <a href="https://m3-crete.com">m3-crete.com</a> &nbsp;·&nbsp;
+      <a href="/build-guide/">Build Guide</a>
+    </div>
+    <div class="footer-right">Part 1 of 4 · Frame</div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>M3-CRETE Software Setup: Install Klipper Step-by-Step (Beginner Guide)</title>
+  <meta name="description" content="Part 3 of the M3-CRETE build series. A plain-language, step-by-step guide to installing all the software for the M3-CRETE concrete 3D printer: flash the Raspberry Pi, set up Klipper, Moonraker, Mainsail, and KlipperScreen, flash the BTT Kraken board, install the M3-CRETE config, and run a first motor test." />
+  <!-- Open Graph -->
+  <meta property="og:title" content="M3-CRETE Software Setup: Install Klipper Step-by-Step (Beginner Guide)" />
+  <meta property="og:description" content="Plain-language guide to installing all M3-CRETE printer software: Raspberry Pi image, Klipper, Moonraker, Mainsail, KlipperScreen, flashing the BTT Kraken, and a first motor test." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://bom.m3-crete.com/build-guide/software/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="M3-CRETE Software Setup: Install Klipper Step-by-Step" />
+  <meta name="twitter:description" content="Plain-language guide to installing all M3-CRETE printer software and running a first motor test." />
+  <link rel="canonical" href="https://bom.m3-crete.com/build-guide/software/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:       #060d14;
+      --charcoal:    #0b1824;
+      --graphite:    #0f2035;
+      --border:      #1a3350;
+      --mid:         #2a4d6e;
+      --muted:       #6a8faa;
+      --light:       #c2d4e0;
+      --white:       #f0f4f7;
+      --accent:      #97D700;
+      --accent-dim:  #5c8400;
+      --brand-blue:  #013A73;
+      --warn:        #ffb547;
+      --warn-dim:    #5a3d00;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      background-image: linear-gradient(160deg, #011f3f 0%, #060d14 60%);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    /* — HEADER — */
+    header {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: baseline; gap: 0.5rem; }
+    .logo-mark {
+      font-family: Orbitron, sans-serif; font-size: 1.6rem;
+      letter-spacing: 0.05em; color: var(--white); line-height: 1;
+    }
+    .logo-sub {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase;
+      padding-left: 0.75rem; border-left: 1px solid var(--border);
+    }
+    nav a {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* — FOOTER — */
+    footer {
+      position: relative; z-index: 10;
+      border-top: 1px solid var(--border); padding: 2rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left, .footer-right {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      color: var(--muted); letter-spacing: 0.1em;
+    }
+    .footer-left a { color: var(--accent-dim); text-decoration: none; }
+    .footer-left a:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      header { padding: 1.25rem 1.5rem; }
+      .logo-sub { display: none; }
+      footer { flex-direction: column; gap: 0.75rem; padding: 1.5rem; text-align: center; }
+    }
+
+    /* — pillar-page typography (article-style content) — */
+    main.pillar-content {
+      max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem;
+      position: relative; z-index: 1; line-height: 1.7; font-size: 1.02rem;
+    }
+    main.pillar-content h1 {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(1.9rem, 3.6vw, 2.7rem); line-height: 1.12;
+      margin: 0 0 1.25rem; letter-spacing: 0.01em;
+    }
+    main.pillar-content h2 {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(1.4rem, 2.4vw, 1.8rem); margin: 3rem 0 1rem;
+      letter-spacing: 0.01em; color: var(--white);
+      padding-top: 1.25rem; border-top: 1px solid var(--border);
+    }
+    main.pillar-content h3 { font-size: 1.2rem; margin: 1.9rem 0 0.6rem; color: var(--white); }
+    main.pillar-content p { margin: 0 0 1.1rem; color: var(--light); }
+    main.pillar-content ul, main.pillar-content ol { margin: 0 0 1.2rem 1.4rem; color: var(--light); }
+    main.pillar-content li { margin-bottom: 0.5rem; }
+    main.pillar-content a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+    main.pillar-content a:hover { color: #aae800; }
+    main.pillar-content strong { font-weight: 600; color: var(--white); }
+    main.pillar-content code {
+      font-family: 'IBM Plex Mono', 'Consolas', monospace; font-size: 0.88em;
+      padding: 0.12em 0.4em; background: rgba(151,215,0,0.10);
+      border: 1px solid rgba(151,215,0,0.20); border-radius: 3px; color: #d8f29a;
+    }
+    main.pillar-content pre {
+      overflow-x: auto; padding: 1rem 1.1rem; background: rgba(0,0,0,0.45);
+      border: 1px solid var(--border); border-radius: 5px; margin: 1rem 0 1.4rem;
+      font-size: 0.85rem; line-height: 1.55;
+    }
+    main.pillar-content pre code { background: transparent; border: 0; padding: 0; color: #cfe8a6; }
+    main.pillar-content hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+    /* — tutorial components — */
+    .lede { font-size: 1.12rem; color: var(--white); font-weight: 400; }
+
+    .series-rail {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 2rem;
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+    }
+    .series-step {
+      flex: 1 1 140px; padding: 0.7rem 0.9rem; border: 1px solid var(--border);
+      border-radius: 4px; color: var(--muted); text-transform: uppercase; text-decoration: none;
+    }
+    .series-step .n { color: var(--accent-dim); display: block; font-size: 0.62rem; margin-bottom: 0.25rem; }
+    .series-step.active { border-color: var(--accent); color: var(--white); background: rgba(151,215,0,0.07); }
+    .series-step.done { color: var(--light); }
+    .series-step.soon { opacity: 0.65; }
+
+    .meta-cards { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 2rem; }
+    .meta-card {
+      flex: 1 1 150px; border: 1px solid var(--border); border-radius: 5px; padding: 1rem;
+      background: var(--charcoal);
+    }
+    .meta-card .k {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
+    }
+    .meta-card .v { font-family: Orbitron, sans-serif; font-size: 1.05rem; color: var(--white); }
+
+    .callout {
+      border-left: 3px solid var(--accent); background: rgba(151,215,0,0.06);
+      padding: 1rem 1.25rem; margin: 1.25rem 0; border-radius: 0 5px 5px 0;
+    }
+    .callout.warn { border-left-color: var(--warn); background: rgba(255,181,71,0.07); }
+    .callout .tag {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.35rem;
+    }
+    .callout.warn .tag { color: var(--warn); }
+    .callout p:last-child { margin-bottom: 0; }
+
+    .step {
+      position: relative; border: 1px solid var(--border); border-radius: 6px;
+      padding: 1.25rem 1.4rem 0.5rem 1.4rem; margin: 1.25rem 0; background: rgba(11,24,36,0.55);
+    }
+    .step-head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.75rem; }
+    .step-num {
+      flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%;
+      background: var(--accent); color: var(--brand-blue);
+      font-family: Orbitron, sans-serif; font-weight: 700; font-size: 0.95rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-head h3 { margin: 0; font-size: 1.15rem; }
+
+    .glossary { border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 1.25rem; background: var(--charcoal); }
+    .glossary dt { font-weight: 600; color: var(--accent); margin-top: 0.8rem; font-size: 0.95rem; }
+    .glossary dd { margin: 0.15rem 0 0.6rem 0; color: var(--light); }
+
+    .checklist { list-style: none; margin-left: 0 !important; }
+    .checklist li { padding-left: 1.9rem; position: relative; }
+    .checklist li::before {
+      content: '☐'; position: absolute; left: 0; top: -0.1rem;
+      color: var(--accent); font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      main.pillar-content { padding: 2rem 1.2rem 4rem; }
+    }
+    @media print {
+      header, footer, .series-rail, body::before { display: none !important; }
+      body { background: #fff; color: #000; }
+      main.pillar-content { color: #000; max-width: 100%; }
+      main.pillar-content p, main.pillar-content li, main.pillar-content ul { color: #000; }
+    }
+  </style>
+
+  <!-- Structured data: HowTo (schema.org JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to install the M3-CRETE printer software (Klipper)",
+    "description": "Step-by-step beginner guide to installing all software for the M3-CRETE open-source concrete 3D printer: Raspberry Pi image, Klipper, Moonraker, Mainsail, KlipperScreen, flashing the BTT Kraken board, installing the M3-CRETE config, and a first motor test.",
+    "totalTime": "PT2H",
+    "tool": [
+      {"@type": "HowToTool", "name": "Raspberry Pi 5"},
+      {"@type": "HowToTool", "name": "microSD card (32 GB or larger)"},
+      {"@type": "HowToTool", "name": "BigTreeTech Kraken control board"},
+      {"@type": "HowToTool", "name": "USB cable (Pi to Kraken)"},
+      {"@type": "HowToTool", "name": "A computer with an SD card reader"}
+    ],
+    "step": [
+      {"@type": "HowToStep", "name": "Put the software on the Raspberry Pi", "url": "https://bom.m3-crete.com/build-guide/software/#part1"},
+      {"@type": "HowToStep", "name": "Turn it on and open the dashboard", "url": "https://bom.m3-crete.com/build-guide/software/#part2"},
+      {"@type": "HowToStep", "name": "Put firmware on the control board", "url": "https://bom.m3-crete.com/build-guide/software/#part3"},
+      {"@type": "HowToStep", "name": "Install the M3-CRETE settings", "url": "https://bom.m3-crete.com/build-guide/software/#part4"},
+      {"@type": "HowToStep", "name": "Check that everything is talking", "url": "https://bom.m3-crete.com/build-guide/software/#part5"},
+      {"@type": "HowToStep", "name": "Run a first motor test", "url": "https://bom.m3-crete.com/build-guide/software/#part6"}
+    ],
+    "publisher": {"@type": "Organization", "name": "Sunnyday Technologies", "url": "https://sunn3d.com"},
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  }
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-mark">M3-CRETE</span>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="/build-guide/" aria-label="Build guide overview">Build Guide</a> &nbsp;&nbsp;
+      <a href="/bom/" aria-label="Interactive Bill of Materials viewer">BOM</a> &nbsp;&nbsp;
+      <a href="/blog/" aria-label="M3-CRETE development blog">Blog</a> &nbsp;&nbsp;
+      <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="Sunnyday Technologies parent site (opens in new tab)">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <main class="pillar-content">
+
+    <!-- series progress -->
+    <nav class="series-rail" aria-label="Build series">
+      <a class="series-step done" href="/build-guide/frame/"><span class="n">Part 1</span>Frame</a>
+      <span class="series-step soon"><span class="n">Part 2</span>Wiring <em>(soon)</em></span>
+      <span class="series-step active"><span class="n">Part 3 — you are here</span>Software</span>
+      <a class="series-step done" href="/build-guide/validation/"><span class="n">Part 4</span>Validation</a>
+    </nav>
+
+    <h1>M3-CRETE Software Setup</h1>
+    <p class="lede">This guide installs every piece of software the M3-CRETE printer needs, then does a first test of the motors. It is written in simple words so anyone can follow it, and so it is easy to translate. Take your time and do the steps in order.</p>
+
+    <div class="meta-cards">
+      <div class="meta-card"><div class="k">Part</div><div class="v">3 of 4</div></div>
+      <div class="meta-card"><div class="k">Time</div><div class="v">~2 hours</div></div>
+      <div class="meta-card"><div class="k">Difficulty</div><div class="v">Beginner</div></div>
+      <div class="meta-card"><div class="k">Tools</div><div class="v">Pi + computer</div></div>
+    </div>
+
+    <div class="callout warn">
+      <span class="tag">Before you start</span>
+      <p>Finish <strong>Part 1 (Frame)</strong> and <strong>Part 2 (Wiring)</strong> first. The motors and the control board must already be wired and checked. For this guide, keep the big power supply and the pump <strong>turned off</strong> — we only need the small power for the board and the Raspberry Pi. Motors can move on their own during testing, so keep your hands and tools away from moving parts.</p>
+    </div>
+
+    <h2>What you need</h2>
+    <ul>
+      <li>A <strong>Raspberry Pi 5</strong> (the small computer that is the printer's brain).</li>
+      <li>A <strong>microSD card</strong>, 32 GB or bigger, plus a way to plug it into your computer (a card reader).</li>
+      <li>The <strong>BigTreeTech Kraken</strong> control board, already wired to the 4 Z motors (from Part 2).</li>
+      <li>A <strong>USB cable</strong> to connect the Pi to the Kraken board.</li>
+      <li>A touchscreen for the Pi (optional but recommended).</li>
+      <li>A home <strong>Wi-Fi</strong> network, and another computer or phone with a web browser.</li>
+    </ul>
+
+    <h2>Words to know</h2>
+    <dl class="glossary">
+      <dt>Raspberry Pi</dt><dd>A tiny computer. It runs the printer's main software.</dd>
+      <dt>Klipper</dt><dd>The program that tells the motors exactly how and when to move.</dd>
+      <dt>Moonraker</dt><dd>A helper program that lets web pages and screens talk to Klipper.</dd>
+      <dt>Mainsail</dt><dd>The web page you use to control the printer from any browser.</dd>
+      <dt>KlipperScreen</dt><dd>The app that runs on the printer's own touchscreen.</dd>
+      <dt>BTT Kraken</dt><dd>The control board. The motors plug into it.</dd>
+      <dt>Firmware</dt><dd>A small program that runs on the control board itself.</dd>
+      <dt>Flash</dt><dd>To copy a program onto a board or a card.</dd>
+      <dt>Config</dt><dd>The settings file that tells Klipper about <em>this</em> machine (its motors, board, and limits).</dd>
+    </dl>
+
+    <h2 id="part1">Part 1 — Put the software on the Raspberry Pi</h2>
+    <p>We will copy a ready-made printer operating system, called <strong>MainsailOS</strong>, onto the microSD card. MainsailOS already includes Klipper, Moonraker, and Mainsail.</p>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">1</span><h3>Install Raspberry Pi Imager</h3></div>
+      <p>On your computer, download and install <strong>Raspberry Pi Imager</strong> from <a href="https://www.raspberrypi.com/software/" target="_blank" rel="noopener">raspberrypi.com/software</a>. It is the tool that writes the operating system to the card.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">2</span><h3>Pick the device and the operating system</h3></div>
+      <p>Put the microSD card into your computer. Open Raspberry Pi Imager and:</p>
+      <ul>
+        <li><strong>Choose Device:</strong> Raspberry Pi 5.</li>
+        <li><strong>Choose OS:</strong> scroll to <em>Other specific-purpose OS → 3D printing → MainsailOS</em>, and pick the 64-bit version. (If you do not see it, download the MainsailOS file from <a href="https://docs.mainsail.xyz/setup/mainsail-os" target="_blank" rel="noopener">docs.mainsail.xyz</a> and use <em>Use custom</em>.)</li>
+        <li><strong>Choose Storage:</strong> your microSD card.</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">3</span><h3>Set up Wi-Fi and turn on remote access</h3></div>
+      <p>Before writing, click the <strong>gear / edit settings</strong> button. This part saves a lot of trouble later. Set:</p>
+      <ul>
+        <li><strong>Hostname:</strong> <code>m3crete</code> (this becomes the web address).</li>
+        <li><strong>Enable SSH</strong> and set a username and password. (SSH is a way to type commands into the Pi from your computer. Write the username and password down.)</li>
+        <li><strong>Wi-Fi:</strong> your network name and password.</li>
+        <li><strong>Country / time zone:</strong> your own.</li>
+      </ul>
+      <p>Then click <strong>Write</strong>. Wait for it to finish. This takes several minutes.</p>
+    </div>
+
+    <h2 id="part2">Part 2 — Turn it on and open the dashboard</h2>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">4</span><h3>Boot the Pi</h3></div>
+      <p>Put the microSD card into the Raspberry Pi. Connect the touchscreen if you have one. Power on the Pi. The first start takes a few minutes while it sets itself up.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">5</span><h3>Open Mainsail in a browser</h3></div>
+      <p>On your phone or computer (on the same Wi-Fi), open a browser and go to:</p>
+      <pre><code>http://m3crete.local/</code></pre>
+      <p>You should see the <strong>Mainsail</strong> dashboard. It will show an error like "Klipper not ready" — that is normal for now. We fix it in the next parts.</p>
+      <div class="callout">
+        <span class="tag">If that address does not work</span>
+        <p>Find the Pi's IP address (check your router, or the Pi's screen) and use that instead, like <code>http://192.168.1.50/</code>.</p>
+      </div>
+    </div>
+
+    <h2 id="part3">Part 3 — Put firmware on the control board (Kraken)</h2>
+    <p>The Kraken board needs its own small program (firmware). We build it on the Pi, then copy it to the board's microSD card.</p>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">6</span><h3>Connect to the Pi with SSH</h3></div>
+      <p>On your computer, open a terminal (on Windows, use "PowerShell" or "Windows Terminal"). Type this, using the username you chose, then press Enter and type your password:</p>
+      <pre><code>ssh youruser@m3crete.local</code></pre>
+      <p>You are now "inside" the Pi. The commands below are typed here.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">7</span><h3>Build the firmware</h3></div>
+      <p>Type these two lines, one at a time:</p>
+      <pre><code>cd ~/klipper
+make menuconfig</code></pre>
+      <p>A blue menu opens. Use the arrow keys and Enter to set these options (leave everything else as it is):</p>
+      <ul>
+        <li>Micro-controller Architecture → <strong>STMicroelectronics STM32</strong></li>
+        <li>Processor model → <strong>STM32H723</strong></li>
+        <li>Bootloader offset → <strong>128KiB bootloader</strong></li>
+        <li>Clock Reference → <strong>25 MHz crystal</strong></li>
+        <li>Communication interface → <strong>USB (on PA11/PA12)</strong></li>
+      </ul>
+      <p>Press <strong>Q</strong> to quit the menu, then <strong>Y</strong> to save. Now build it:</p>
+      <pre><code>make</code></pre>
+      <p>When it finishes, the new firmware file is at <code>~/klipper/out/klipper.bin</code>.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">8</span><h3>Copy the firmware to the Kraken</h3></div>
+      <ul>
+        <li>Take the <strong>Kraken's</strong> microSD card out and put it in your computer. Make sure it is formatted <strong>FAT32</strong> and is empty.</li>
+        <li>Copy <code>klipper.bin</code> onto the card and <strong>rename it exactly</strong> to <code>firmware.bin</code>.</li>
+        <li>Put the card back in the Kraken. Turn the board off, then on. Wait about 15–30 seconds — the board flashes itself.</li>
+      </ul>
+      <div class="callout">
+        <span class="tag">How to know it worked</span>
+        <p>Take the card out and check it on your computer. If the file is now named <code>FIRMWARE.CUR</code>, the board flashed correctly. Put the card back in the Kraken.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">9</span><h3>Connect the board to the Pi</h3></div>
+      <p>Plug the USB cable from the Kraken into the Raspberry Pi. Make sure the board has its own power (the logic power, not the big motor supply yet).</p>
+    </div>
+
+    <h2 id="part4">Part 4 — Install the M3-CRETE settings</h2>
+    <p>Now we add the M3-CRETE config (the settings for this exact machine) and the touchscreen app. One script does it all.</p>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">10</span><h3>Download and run the installer</h3></div>
+      <p>Back in the SSH window (inside the Pi), type these lines one at a time:</p>
+      <pre><code>cd ~
+git clone https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE.git
+cd M3-CRETE-FIRMWARE
+bash install.sh</code></pre>
+      <p>The installer will:</p>
+      <ul>
+        <li>Put the M3-CRETE config into place (it backs up any old one first).</li>
+        <li>Install <strong>KlipperScreen</strong> for the touchscreen.</li>
+        <li>Find your Kraken board automatically and fill in its address.</li>
+        <li>Restart everything.</li>
+      </ul>
+      <p>If you do not want the touchscreen app, run <code>bash install.sh --no-screen</code> instead.</p>
+    </div>
+
+    <h2 id="part5">Part 5 — Check that everything is talking</h2>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">11</span><h3>Look for "Ready"</h3></div>
+      <p>Go back to Mainsail in your browser (<code>http://m3crete.local/</code>) and refresh the page. At the top it should now say <strong>Klipper: Ready</strong>. That means the Pi and the board are talking. 🎉</p>
+      <div class="callout warn">
+        <span class="tag">If it does not say Ready</span>
+        <p>The most common cause is the board address. In the SSH window type <code>ls /dev/serial/by-id/</code> and copy the line that has "Klipper" in it. Then in Mainsail open <code>printer.cfg</code>, find the <code>serial:</code> line near the top, and paste your line after <code>serial: /dev/serial/by-id/</code>. Click <strong>Save &amp; Restart</strong>.</p>
+      </div>
+    </div>
+
+    <h2 id="part6">Part 6 — First motor test (the 4 Z motors)</h2>
+    <p>This is the moment of truth: making the four Z motors move. We test them one at a time, gently, at low power. Full tuning and the homing setup are covered in <strong>Part 4 (Validation)</strong>.</p>
+
+    <div class="callout warn">
+      <span class="tag">Safety</span>
+      <p>Stand clear of the machine. A motor can spin a belt or move the gantry. Keep the big motor power supply and the pump <strong>off</strong>. Have your hand near the printer's power switch so you can cut power fast if something looks wrong.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">12</span><h3>Wake up the motors</h3></div>
+      <p>In Mainsail, find the <strong>Console</strong> (the box where you can type commands). Type:</p>
+      <pre><code>ZHOLD</code></pre>
+      <p>All four Z motors should now "hold" — try to turn one by hand and it should resist. To let them go free again, type <code>ZRELEASE</code>.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">13</span><h3>Jog each motor, one at a time</h3></div>
+      <p>Type these, one at a time. Each one nudges a single motor a small amount:</p>
+      <pre><code>ZJOG MOTOR=0 DIST=5 VEL=3
+ZJOG MOTOR=1 DIST=5 VEL=3
+ZJOG MOTOR=2 DIST=5 VEL=3
+ZJOG MOTOR=3 DIST=5 VEL=3</code></pre>
+      <p>Watch each motor. You want to see two things:</p>
+      <ul>
+        <li><strong>It moves.</strong> If a motor does nothing, check its wiring and that its driver slot is correct.</li>
+        <li><strong>It moves the right way.</strong> A positive number (<code>DIST=5</code>) should raise that corner. If a corner goes <em>down</em> instead, that motor's direction needs to be flipped — note it down for Part 4.</li>
+      </ul>
+      <p>To send a corner back down, use a negative number, like <code>ZJOG MOTOR=0 DIST=-5 VEL=3</code>.</p>
+    </div>
+
+    <div class="callout">
+      <span class="tag">That's the software done</span>
+      <p>If all four motors wake up and move, your software is installed and working end-to-end. Setting the motor power, tuning the built-in stall sensing, and homing all four corners to the top is the next guide: <a href="/build-guide/validation/"><strong>Part 4 — Validation</strong></a>. Do not run a full <code>G28</code> yet — only the commands above.</p>
+    </div>
+
+    <h2>Quick checklist</h2>
+    <p>Print this page and tick the boxes as you go.</p>
+    <ul class="checklist">
+      <li>Raspberry Pi Imager installed on my computer.</li>
+      <li>MainsailOS written to the microSD card, with Wi-Fi, SSH, and hostname set.</li>
+      <li>Pi boots and Mainsail opens at <code>http://m3crete.local/</code>.</li>
+      <li>Klipper firmware built on the Pi (<code>make menuconfig</code> + <code>make</code>).</li>
+      <li>Firmware copied to the Kraken as <code>firmware.bin</code>; it became <code>FIRMWARE.CUR</code>.</li>
+      <li>Kraken connected to the Pi by USB and powered (logic power).</li>
+      <li>M3-CRETE installer run (<code>bash install.sh</code>).</li>
+      <li>KlipperScreen shows on the touchscreen (if used).</li>
+      <li>Mainsail says <strong>Klipper: Ready</strong>.</li>
+      <li><code>ZHOLD</code> makes all 4 Z motors hold.</li>
+      <li>Each motor jogs and moves the correct direction (note any that need flipping).</li>
+    </ul>
+
+    <h2>If you get stuck</h2>
+    <ul>
+      <li>Read the firmware notes in the repo: <a href="https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE" target="_blank" rel="noopener">M3-CRETE-FIRMWARE on GitHub</a>.</li>
+      <li>Ask a question on the <a href="https://github.com/sunnyday-technologies/M3-CRETE/discussions" target="_blank" rel="noopener">M3-CRETE Discussions</a> page. Build reports help everyone.</li>
+      <li>For Klipper basics, see <a href="https://www.klipper3d.org" target="_blank" rel="noopener">klipper3d.org</a> and <a href="https://docs.mainsail.xyz" target="_blank" rel="noopener">docs.mainsail.xyz</a>.</li>
+    </ul>
+
+    <div class="callout">
+      <span class="tag">Next</span>
+      <p><a href="/build-guide/validation/"><strong>Part 4 — Validation &amp; Qualification.</strong></a> Set motor current, tune the built-in stall sensing, home all four Z corners to the top brace, and run the safety checks before any printing.</p>
+    </div>
+
+    <hr />
+    <p style="font-size:0.85rem;color:var(--muted);">M3-CRETE is an open-hardware development platform, not a finished certified appliance. It is meant for qualified technical users, labs, schools, and experienced builders. Any AC mains wiring, control-box integration, grounding, disconnects, or emergency-stop power work must be done by qualified personnel or a licensed electrician where required. Hardware is published under CERN-OHL-W-2.0; this guide is CC BY 4.0.</p>
+
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      © 2026 Sunnyday Technologies LLC &nbsp;·&nbsp;
+      <a href="https://sunn3d.com">sunn3d.com</a> &nbsp;·&nbsp;
+      <a href="https://m3-crete.com">m3-crete.com</a> &nbsp;·&nbsp;
+      <a href="/build-guide/">Build Guide</a>
+    </div>
+    <div class="footer-right">Part 3 of 4 · Software</div>
+  </footer>
+
+</body>
+</html>
