@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>M3-CRETE Validation &amp; Qualification: Tune and Test the Printer Before Printing (Beginner Guide)</title>
+  <meta name="description" content="Part 4 of the M3-CRETE build series. A plain-language, step-by-step guide to validating and qualifying the M3-CRETE concrete 3D printer before printing: set motor current, fix directions, tune StallGuard sensorless homing, home and level the Z axis, and run safety checks." />
+  <meta property="og:title" content="M3-CRETE Validation &amp; Qualification: Tune and Test Before Printing" />
+  <meta property="og:description" content="Plain-language guide to validating the M3-CRETE printer: motor current, direction, StallGuard tuning, Z homing and leveling, and safety qualification." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://bom.m3-crete.com/build-guide/validation/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="M3-CRETE Validation &amp; Qualification" />
+  <meta name="twitter:description" content="Validate and qualify the M3-CRETE printer before printing." />
+  <link rel="canonical" href="https://bom.m3-crete.com/build-guide/validation/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:#060d14; --charcoal:#0b1824; --graphite:#0f2035; --border:#1a3350;
+      --mid:#2a4d6e; --muted:#6a8faa; --light:#c2d4e0; --white:#f0f4f7;
+      --accent:#97D700; --accent-dim:#5c8400; --brand-blue:#013A73; --warn:#ffb547;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--black);
+      background-image: linear-gradient(160deg, #011f3f 0%, #060d14 60%);
+      color: var(--white); font-family: 'Raleway', sans-serif; font-weight: 300;
+      line-height: 1.6; min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content:''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.35;
+    }
+    header { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 3rem; border-bottom: 1px solid var(--border); }
+    .logo { display: flex; align-items: baseline; gap: 0.5rem; }
+    .logo-mark { font-family: Orbitron, sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; color: var(--white); line-height: 1; }
+    .logo-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; padding-left: 0.75rem; border-left: 1px solid var(--border); }
+    nav a { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    nav a:hover { color: var(--accent); }
+    footer { position: relative; z-index: 10; border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; align-items: center; justify-content: space-between; }
+    .footer-left, .footer-right { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+    .footer-left a { color: var(--accent-dim); text-decoration: none; }
+    .footer-left a:hover { color: var(--accent); }
+    @media (max-width: 768px) { header { padding: 1.25rem 1.5rem; } .logo-sub { display: none; } footer { flex-direction: column; gap: 0.75rem; padding: 1.5rem; text-align: center; } }
+    main.pillar-content { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; position: relative; z-index: 1; line-height: 1.7; font-size: 1.02rem; }
+    main.pillar-content h1 { font-family: Orbitron, sans-serif; font-size: clamp(1.9rem, 3.6vw, 2.7rem); line-height: 1.12; margin: 0 0 1.25rem; letter-spacing: 0.01em; }
+    main.pillar-content h2 { font-family: Orbitron, sans-serif; font-size: clamp(1.4rem, 2.4vw, 1.8rem); margin: 3rem 0 1rem; letter-spacing: 0.01em; color: var(--white); padding-top: 1.25rem; border-top: 1px solid var(--border); }
+    main.pillar-content h3 { font-size: 1.2rem; margin: 1.9rem 0 0.6rem; color: var(--white); }
+    main.pillar-content p { margin: 0 0 1.1rem; color: var(--light); }
+    main.pillar-content ul, main.pillar-content ol { margin: 0 0 1.2rem 1.4rem; color: var(--light); }
+    main.pillar-content li { margin-bottom: 0.5rem; }
+    main.pillar-content a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+    main.pillar-content a:hover { color: #aae800; }
+    main.pillar-content strong { font-weight: 600; color: var(--white); }
+    main.pillar-content code { font-family: 'IBM Plex Mono', 'Consolas', monospace; font-size: 0.88em; padding: 0.12em 0.4em; background: rgba(151,215,0,0.10); border: 1px solid rgba(151,215,0,0.20); border-radius: 3px; color: #d8f29a; }
+    main.pillar-content pre { overflow-x: auto; padding: 1rem 1.1rem; background: rgba(0,0,0,0.45); border: 1px solid var(--border); border-radius: 5px; margin: 1rem 0 1.4rem; font-size: 0.85rem; line-height: 1.55; }
+    main.pillar-content pre code { background: transparent; border: 0; padding: 0; color: #cfe8a6; }
+    main.pillar-content hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .lede { font-size: 1.12rem; color: var(--white); font-weight: 400; }
+    .series-rail { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 2rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; }
+    .series-step { flex: 1 1 140px; padding: 0.7rem 0.9rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); text-transform: uppercase; text-decoration: none; }
+    .series-step .n { color: var(--accent-dim); display: block; font-size: 0.62rem; margin-bottom: 0.25rem; }
+    .series-step.active { border-color: var(--accent); color: var(--white); background: rgba(151,215,0,0.07); }
+    a.series-step.done { color: var(--light); }
+    a.series-step:hover { border-color: var(--accent); }
+    .series-step.soon { opacity: 0.65; }
+    .meta-cards { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 2rem; }
+    .meta-card { flex: 1 1 150px; border: 1px solid var(--border); border-radius: 5px; padding: 1rem; background: var(--charcoal); }
+    .meta-card .k { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+    .meta-card .v { font-family: Orbitron, sans-serif; font-size: 1.05rem; color: var(--white); }
+    .callout { border-left: 3px solid var(--accent); background: rgba(151,215,0,0.06); padding: 1rem 1.25rem; margin: 1.25rem 0; border-radius: 0 5px 5px 0; }
+    .callout.warn { border-left-color: var(--warn); background: rgba(255,181,71,0.07); }
+    .callout .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.35rem; }
+    .callout.warn .tag { color: var(--warn); }
+    .callout p:last-child { margin-bottom: 0; }
+    .step { position: relative; border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.4rem 0.5rem 1.4rem; margin: 1.25rem 0; background: rgba(11,24,36,0.55); }
+    .step-head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.75rem; }
+    .step-num { flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: var(--brand-blue); font-family: Orbitron, sans-serif; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; }
+    .step-head h3 { margin: 0; font-size: 1.15rem; }
+    .glossary { border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 1.25rem; background: var(--charcoal); }
+    .glossary dt { font-weight: 600; color: var(--accent); margin-top: 0.8rem; font-size: 0.95rem; }
+    .glossary dd { margin: 0.15rem 0 0.6rem 0; color: var(--light); }
+    .checklist { list-style: none; margin-left: 0 !important; }
+    .checklist li { padding-left: 1.9rem; position: relative; }
+    .checklist li::before { content: '☐'; position: absolute; left: 0; top: -0.1rem; color: var(--accent); font-size: 1.1rem; }
+    @media (max-width: 768px) { main.pillar-content { padding: 2rem 1.2rem 4rem; } }
+    @media print { header, footer, .series-rail, body::before { display: none !important; } body { background: #fff; color: #000; } main.pillar-content { color: #000; max-width: 100%; } main.pillar-content p, main.pillar-content li, main.pillar-content ul { color: #000; } }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to validate and qualify the M3-CRETE printer before printing",
+    "description": "Step-by-step beginner guide to validating the M3-CRETE open-source concrete 3D printer: set motor current, fix axis direction, tune StallGuard sensorless homing, home and level the Z axis, dry-run motion, and complete safety qualification before printing.",
+    "totalTime": "PT3H",
+    "tool": [
+      {"@type": "HowToTool", "name": "Assembled M3-CRETE with software installed (Part 3)"},
+      {"@type": "HowToTool", "name": "Tape measure or calipers"},
+      {"@type": "HowToTool", "name": "Mainsail console (web browser)"}
+    ],
+    "publisher": {"@type": "Organization", "name": "Sunnyday Technologies", "url": "https://sunn3d.com"},
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  }
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-mark">M3-CRETE</span>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="/build-guide/" aria-label="Build guide overview">Build Guide</a> &nbsp;&nbsp;
+      <a href="/bom/" aria-label="Interactive Bill of Materials viewer">BOM</a> &nbsp;&nbsp;
+      <a href="/blog/" aria-label="M3-CRETE development blog">Blog</a> &nbsp;&nbsp;
+      <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="Sunnyday Technologies parent site (opens in new tab)">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <main class="pillar-content">
+
+    <nav class="series-rail" aria-label="Build series">
+      <a class="series-step done" href="/build-guide/frame/"><span class="n">Part 1</span>Frame</a>
+      <span class="series-step soon"><span class="n">Part 2</span>Wiring <em>(soon)</em></span>
+      <a class="series-step done" href="/build-guide/software/"><span class="n">Part 3</span>Software</a>
+      <span class="series-step active"><span class="n">Part 4 — you are here</span>Validation</span>
+    </nav>
+
+    <h1>M3-CRETE Validation &amp; Qualification</h1>
+    <p class="lede">This is the last step before printing. We set the motor power, make sure each axis moves the right way, teach the printer to find its own zero using the motors' built-in stall sensing, level the gantry, and run safety checks. Do every step in order, and do not skip the safety sign-off at the end.</p>
+
+    <div class="meta-cards">
+      <div class="meta-card"><div class="k">Part</div><div class="v">4 of 4</div></div>
+      <div class="meta-card"><div class="k">Time</div><div class="v">2–3 hours</div></div>
+      <div class="meta-card"><div class="k">Difficulty</div><div class="v">Beginner+</div></div>
+      <div class="meta-card"><div class="k">Needs</div><div class="v">Parts 1–3 done</div></div>
+    </div>
+
+    <div class="callout warn">
+      <span class="tag">Safety first</span>
+      <p>Motors can move the gantry on their own. Stand clear of moving parts, keep loose clothing and tools away, and keep one hand near the power switch. Keep the big pump turned off for all of these tests. This guide covers the four Z motors — the first axis to commission; X, Y, and the extruder are validated the same way as you add them.</p>
+    </div>
+
+    <h2>What you need</h2>
+    <ul>
+      <li>A fully assembled frame (<a href="/build-guide/frame/">Part 1</a>), wired (Part 2), with software installed and showing <strong>Klipper: Ready</strong> (<a href="/build-guide/software/">Part 3</a>).</li>
+      <li>A <strong>tape measure or calipers</strong> to check the corners are level.</li>
+      <li>A browser open to <strong>Mainsail</strong> (the printer's dashboard).</li>
+      <li>Notes from Part 3 on any motor that jogged the wrong direction.</li>
+    </ul>
+
+    <h2>Words to know</h2>
+    <dl class="glossary">
+      <dt>Run current</dt><dd>How much electrical current each motor gets. More current = more force, but more heat.</dd>
+      <dt>StallGuard</dt><dd>A feature inside the motor driver that senses when a motor pushes against a hard stop ("stalls"). We use it instead of limit switches.</dd>
+      <dt>Sensorless homing</dt><dd>Finding the "zero" position by driving an axis until it gently stalls against the frame, using StallGuard.</dd>
+      <dt>SGT</dt><dd>The StallGuard sensitivity setting. Higher = less sensitive; lower = more sensitive.</dd>
+      <dt>Coplanar / level</dt><dd>All four corners of the gantry sitting at the same height.</dd>
+      <dt>Dry run</dt><dd>Moving the printer through its motions with no concrete, to check everything works.</dd>
+    </dl>
+
+    <h2>Validate the Z axis</h2>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">1</span><h3>Set the motor current</h3></div>
+      <p>In Mainsail, open <code>printer.cfg</code>. For each Z driver section (<code>[tmc5160 stepper_z]</code>, <code>stepper_z1</code>, <code>z2</code>, <code>z3</code>), find <code>run_current</code>. Start at <code>1.2</code> to confirm nothing is wrong, then raise toward <code>1.5</code>–<code>1.8</code> so the motors can lift the gantry. <strong>Never go above about 2.0</strong> for these 2.8 A motors. Click <strong>Save &amp; Restart</strong> after changes.</p>
+      <div class="callout warn"><span class="tag">Watch the heat</span><p>After a few minutes of holding, a motor should be warm, not too hot to touch. If it is too hot, lower <code>run_current</code>.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">2</span><h3>Fix any wrong directions</h3></div>
+      <p>Using your notes from Part 3: if a corner went <em>down</em> when you sent it up, that motor's direction is reversed. In <code>printer.cfg</code>, find that motor's <code>dir_pin</code> and add or remove a <code>!</code> in front of the pin name. Save &amp; Restart, then re-test with <code>ZJOG MOTOR=n DIST=5 VEL=3</code>. All four should now raise their corner with a positive number.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">3</span><h3>Tune the stall sensing (this is the careful part)</h3></div>
+      <p>Each Z motor must reliably feel when it reaches the top of the frame. Tune one driver at a time. First make sure <code>run_current</code> is already at your final value (the sensing changes if you change current later). Then adjust <code>driver_SGT</code> in that driver's section:</p>
+      <ul>
+        <li>If a motor <strong>stops too early</strong> (before reaching the top): <strong>raise</strong> <code>driver_SGT</code> by 1 (less sensitive).</li>
+        <li>If a motor <strong>crashes into the top</strong> without stopping: <strong>lower</strong> <code>driver_SGT</code> by 1 (more sensitive).</li>
+      </ul>
+      <p>Change one number, run <code>FIRMWARE_RESTART</code>, and test again. The command <code>ZSTATUS</code> shows live load numbers to help. Repeat until each corner stops cleanly and repeatably at the top.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">4</span><h3>Home all four corners</h3></div>
+      <p>In the console, type:</p>
+      <pre><code>HOME_Z</code></pre>
+      <p>All four corners drive up. You should see (and hear) <strong>four separate gentle stops</strong> as each corner meets the top, then a small back-off. Each corner sets its own zero at the point it stalled. This is how the printer levels itself without any probe.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">5</span><h3>Check the gantry is level</h3></div>
+      <p>After homing, measure the height of the gantry at each of the four corners (from the build surface, or from the base). They should all match within a couple of millimeters. If one corner is off, re-check that corner's belt tension and re-run the stall tuning for it, then <code>HOME_Z</code> again.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">6</span><h3>Dry-run the Z motion</h3></div>
+      <p>Jog the gantry up and down through its travel a few times (small moves first, then larger). Watch and listen for: smooth motion, no grinding, no slipping belts, and no corner lagging behind. The four corners should stay level as they move.</p>
+    </div>
+
+    <h2>Safety qualification (do not skip)</h2>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">7</span><h3>Test the emergency stop</h3></div>
+      <p>With the gantry moving slowly, trigger your emergency stop / power cut. The motors must stop and the machine must reach a safe, still state. Confirm it works before you ever run material. (The emergency-stop power circuit itself should be wired and verified by qualified personnel.)</p>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">8</span><h3>Final sign-off before printing</h3></div>
+      <p>Go through this gate. Every box must be ticked before any concrete enters the line.</p>
+    </div>
+
+    <h2>Pre-print sign-off checklist</h2>
+    <p>Print this page and tick each box.</p>
+    <ul class="checklist">
+      <li>Motor current set to working value and motors stay only warm, not hot.</li>
+      <li>All four Z corners jog the correct direction.</li>
+      <li>Stall sensing tuned — each corner stops cleanly and repeatably at the top.</li>
+      <li><code>HOME_Z</code> gives four clean stops and a back-off, every time.</li>
+      <li>Gantry measures level at all four corners after homing.</li>
+      <li>Z dry-run is smooth, no slipping or lagging.</li>
+      <li>Emergency stop tested and brings the machine to a safe state.</li>
+      <li>(As added) X, Y, and extruder validated the same way.</li>
+    </ul>
+
+    <h2>If you get stuck</h2>
+    <ul>
+      <li>See the per-stage commissioning notes in the firmware repo: <a href="https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE" target="_blank" rel="noopener">M3-CRETE-FIRMWARE</a>.</li>
+      <li>Ask on <a href="https://github.com/sunnyday-technologies/M3-CRETE/discussions" target="_blank" rel="noopener">M3-CRETE Discussions</a>.</li>
+      <li>Klipper sensorless-homing reference: <a href="https://www.klipper3d.org/Sensorless_Homing.html" target="_blank" rel="noopener">klipper3d.org</a>.</li>
+    </ul>
+
+    <div class="callout">
+      <span class="tag">Next</span>
+      <p>Your machine is mechanically and electrically validated. Pair it with a pump and a mix, and you are ready for first prints. Mix design and pump setup are separate from the printer itself — see <a href="https://m3-crete.com">m3-crete.com</a>.</p>
+    </div>
+
+    <hr />
+    <p style="font-size:0.85rem;color:var(--muted);">M3-CRETE is an open-hardware development platform, not a finished certified appliance. It is meant for qualified technical users, labs, schools, and experienced builders. Any AC mains wiring, control-box integration, grounding, disconnects, or emergency-stop power work must be done by qualified personnel or a licensed electrician where required. Hardware is published under CERN-OHL-W-2.0; this guide is CC BY 4.0.</p>
+
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      © 2026 Sunnyday Technologies LLC &nbsp;·&nbsp;
+      <a href="https://sunn3d.com">sunn3d.com</a> &nbsp;·&nbsp;
+      <a href="https://m3-crete.com">m3-crete.com</a> &nbsp;·&nbsp;
+      <a href="/build-guide/">Build Guide</a>
+    </div>
+    <div class="footer-right">Part 4 of 4 · Validation</div>
+  </footer>
+
+</body>
+</html>
