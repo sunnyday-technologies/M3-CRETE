@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Control Panel Layout Tool | M3-CRETE Power &amp; Control Board Planner</title>
+  <meta name="description" content="Interactive planner for the M3-CRETE power and control enclosure. Drag DIN-rail devices, PSUs and bus bars, auto-optimize for the shortest clean wiring, rotate parts, and add your own custom modules (BuckPucks, DAC/ADC converters) with custom inputs and outputs. Planning/visualization tool — not AC mains wiring instructions." />
+  <meta property="og:title" content="Control Panel Layout Tool | M3-CRETE" />
+  <meta property="og:description" content="Interactive power/control enclosure planner: drag parts, optimize wiring length, rotate, and add custom modules with your own inputs and outputs." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bom.m3-crete.com/control-panel/" />
+  <meta property="og:image" content="https://bom.m3-crete.com/images/control-panel-tool.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://bom.m3-crete.com/images/control-panel-tool.png" />
+  <meta name="twitter:title" content="Control Panel Layout Tool | M3-CRETE" />
+  <meta name="twitter:description" content="Plan the M3-CRETE control enclosure: optimize wiring, rotate parts, add custom modules." />
+  <link rel="canonical" href="https://bom.m3-crete.com/control-panel/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Mono:wght@300;400;500&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --border:#d9dfdf; --muted:#5c6670; --light:#4b5560; --white:#071421;
+      --accent:#97d700; --accent-dim:#6b7b2f; --brand-blue:#013a73;
+    }
+    html{scroll-behavior:smooth}
+    body{background:linear-gradient(180deg,#ffffff 0%,#f7f8f5 58%,#e6e9e7 100%);color:#071421;
+      font-family:'Raleway',sans-serif;font-weight:300;line-height:1.6;min-height:100vh}
+    header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;
+      border-bottom:1px solid var(--border);background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+      position:sticky;top:0;z-index:50}
+    .logo{display:flex;align-items:baseline;gap:.5rem}
+    .logo-mark{font-family:'Russo One',sans-serif;font-size:1.6rem;letter-spacing:.05em;color:var(--brand-blue)}
+    .logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.2em;
+      text-transform:uppercase;padding-left:.75rem;border-left:1px solid var(--border)}
+    nav a{font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
+      color:var(--muted);text-decoration:none;transition:color .2s;margin-left:1.4rem}
+    nav a:hover{color:var(--accent-dim)}
+    nav a[aria-current="page"]{color:var(--brand-blue);font-weight:500}
+    .wrap{max-width:1280px;margin:0 auto;padding:0 2rem}
+    .hero{padding:3rem 0 1.5rem}
+    .hero-label{font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;
+      color:var(--accent-dim);margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+    .hero-label::after{content:'';display:block;width:60px;height:1px;background:var(--border)}
+    h1{font-family:'Russo One',sans-serif;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1;color:var(--brand-blue);
+      letter-spacing:.02em;margin-bottom:1rem}
+    h1 span{color:var(--accent-dim)}
+    .lead{font-size:1rem;color:var(--light);max-width:760px}
+    .new-badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;
+      text-transform:uppercase;color:var(--brand-blue);background:var(--accent);padding:.25rem .55rem;border-radius:3px;
+      vertical-align:middle;margin-left:.6rem}
+    .toolframe{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#0e1116;
+      box-shadow:0 10px 40px rgba(1,58,115,.10);margin:1.5rem 0 2rem}
+    .toolframe iframe{display:block;width:100%;height:84vh;min-height:640px;border:0}
+    .tip{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--muted);letter-spacing:.05em;
+      padding:.6rem 1rem;border-top:1px dashed var(--border);background:#fff}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--border);
+      background:var(--border);border-radius:8px;overflow:hidden;margin:1rem 0 2.5rem}
+    .cell{background:#fff;padding:1.5rem}
+    .cell h3{font-family:'Russo One',sans-serif;font-size:1rem;color:var(--brand-blue);letter-spacing:.04em;margin-bottom:.5rem}
+    .cell p{font-size:.85rem;color:var(--light)}
+    .safety{grid-column:1/-1;background:rgba(151,215,0,.06)}
+    .safety h3{color:var(--accent-dim)}
+    footer{border-top:1px solid var(--border);margin-top:2rem;padding:2rem 3rem;color:var(--muted);
+      font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.08em}
+    footer a{color:var(--accent-dim);text-decoration:none}
+    footer a:hover{color:var(--accent)}
+    .netfooter{max-width:1180px;margin:1.25rem auto 0;padding-top:1rem;border-top:1px solid var(--border);
+      display:flex;flex-wrap:wrap;gap:.45rem 1.1rem;font-size:.7rem}
+    .netfooter a{opacity:.82}.netfooter a:hover{opacity:1;text-decoration:underline}
+    @media(max-width:820px){
+      header{padding:1rem 1.25rem;flex-wrap:wrap;gap:.5rem}.logo-sub{display:none}
+      nav a{margin-left:0;margin-right:1rem}.wrap{padding:0 1rem}
+      .grid{grid-template-columns:1fr}.toolframe iframe{height:90vh;min-height:600px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-mark">M3-CRETE</span>
+      <span class="logo-sub">by Sunnyday Technologies</span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="/bom/">BOM</a>
+      <a href="/build-guide/">Build Guide</a>
+      <a href="/control-panel/" aria-current="page">Control Panel</a>
+      <a href="/blog/">Blog</a>
+      <a href="/press/">Press</a>
+      <a href="https://sunn3d.com" target="_blank" rel="noopener">sunn3d.com</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-label">Interactive Planner // Power &amp; Control Enclosure</div>
+      <h1>Control Panel Layout <span>Optimizer</span><span class="new-badge">New</span></h1>
+      <p class="lead">
+        Plan the M3-CRETE power and control box visually. Drag DIN-rail devices, PSUs and bus bars
+        to scale; the tool routes the wiring orthogonally and tracks total wire length live. Hit
+        <strong>Optimize</strong> to let it slide and rotate parts toward the shortest, cleanest layout —
+        then add your own modules (BuckPucks, DAC/ADC converters, anything) with custom inputs and outputs.
+      </p>
+    </section>
+
+    <div class="toolframe">
+      <iframe src="tool.html" title="M3-CRETE control panel layout tool"></iframe>
+      <div class="tip">Drag to move · select a part + <b>R</b> to rotate · tap terminal → terminal to wire ·
+        <b>Del</b> to remove · Save/Load keeps your layout as JSON ·
+        <a href="tool.html" target="_blank" rel="noopener" style="color:#013a73;font-weight:700;border-bottom:1px solid #97d700">Open full-screen ↗</a>
+        <span style="opacity:.8">(best on a tablet or desktop for fine wiring)</span></div>
+    </div>
+
+    <div class="grid">
+      <div class="cell">
+        <h3>Optimize for short runs</h3>
+        <p>Simulated-annealing search slides and rotates parts to minimize total routed wire length
+          while keeping devices on the rail and off each other — press it a few times and keep the best.</p>
+      </div>
+      <div class="cell">
+        <h3>Custom modules</h3>
+        <p>Add any part by label and X-Y size, then list its inputs and outputs. Pins drop onto the
+          body (inputs left, outputs right) ready to wire. Built for the add-ons — LED BuckPucks,
+          digital-to-analog converters, sensor boards.</p>
+      </div>
+      <div class="cell">
+        <h3>Save &amp; share</h3>
+        <p>Export the whole layout — parts, positions, rotations and the netlist — to a JSON file,
+          and load it back later. Bring your own enclosure plan or fork the default M3-CRETE build.</p>
+      </div>
+      <div class="cell safety">
+        <h3>Qualified technical use — planning tool only</h3>
+        <p>This is a layout and visualization aid for qualified technical users; it is <strong>not</strong> a
+          wiring diagram, a certified schematic, or AC mains wiring instructions. Any AC mains wiring,
+          grounding, disconnects, emergency-stop power circuits, enclosure integration, and code-compliance
+          work must be performed by qualified personnel — a licensed electrician where required, or a
+          qualified control-panel shop. Verify every connection, rating, and clearance against the actual
+          components and applicable code before building. Use at your own risk under CERN-OHL-W-2.0.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Sunnyday Technologies LLC · <a href="https://sunn3d.com">sunn3d.com</a> ·
+    Open hardware under <a href="https://github.com/sunnyday-technologies/M3-CRETE/blob/main/LICENSE">CERN-OHL-W-2.0</a>
+    <nav class="netfooter" aria-label="Sunnyday Technologies network">
+      <a href="https://sunn3d.com/" rel="noopener">Sunnyday</a>
+      <a href="https://cemforge.ai/" rel="noopener">CEMFORGE</a>
+      <a href="https://m3-crete.com/" rel="noopener" aria-current="page">M3-CRETE</a>
+      <a href="https://open3dcp.org/" rel="noopener">Open3DCP</a>
+      <a href="https://cadclaw.io/" rel="noopener">CADCLAW</a>
+    </nav>
+  </footer>
+</body>
+</html>
