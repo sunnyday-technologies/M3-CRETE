@@ -68,6 +68,7 @@ $publicDirs = @(
   ".well-known",
   "blog",
   "build-guide",
+  "control-panel",
   "images",
   "press"
 )
