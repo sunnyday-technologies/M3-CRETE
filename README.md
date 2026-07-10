@@ -1,8 +1,25 @@
-# M3-CRETE — Open-Source Concrete 3D Printer
+# M3-CRETE — Experimental Open-Hardware Concrete/Paste Printing Reference
 
-**A large-format cartesian printer built for cementitious material extrusion at scale.**
+**A meter-scale cartesian motion reference for qualified technical teams working
+with cementitious material extrusion in controlled R&D, laboratory, or
+supervised institutional settings.**
 
-M3-CRETE is an open-source hardware project for building a concrete 3D printer from standard, commercially available components. The system is purpose-built for layer-by-layer extrusion of cementitious materials — no heated beds, no proprietary toolchains, no vendor lock-in.
+M3-CRETE is an experimental open-hardware reference design, not a consumer
+product, hobby kit, finished machine, certified construction printer, or
+structural concrete production system.
+
+Read first:
+
+- [Safety Notice](SAFETY_NOTICE.md)
+- [Electrical Scope Boundary](ELECTRICAL_SCOPE_BOUNDARY.md)
+- [Disclaimer](DISCLAIMER.md)
+
+The public release is limited to mechanical design information, low-voltage
+control-interface references, and software/firmware references where published.
+It does not include AC mains wiring instructions, control-panel build
+instructions, facility-connection instructions, safety-rated emergency-stop
+circuit designs, 48 V high-current distribution design, or code-compliance
+instructions.
 
 **M³** = **M**obile · **M**odular · **M**eter³
 
@@ -12,7 +29,7 @@ Developed by [Sunnyday Technologies](https://sunn3d.com).
 
 | Spec | Value |
 |------|-------|
-| **Open BOM component target** | Under $5,000 when self-sourced and self-assembled, where current commodity pricing and substitutions allow |
+| **Open BOM component target** | Under $5,000 for public mechanical/low-voltage reference components where current commodity pricing and substitutions allow; professional electrical/power-control scope is excluded |
 | **Build footprint** | Sub-1 m³ — fits on a standard US pallet (48×40 in) |
 | **Printhead weight** | ~1.5 kg |
 | **License** | CERN-OHL-W-2.0 |
@@ -21,38 +38,58 @@ Developed by [Sunnyday Technologies](https://sunn3d.com).
 
 ## Why M3-CRETE
 
-Most concrete 3D printers are either proprietary industrial systems or one-off research machines tied to specific institutions. M3-CRETE targets the space between — an open, buildable, field-serviceable printer design that teams can replicate, maintain, validate, and scale independently.
+Most concrete 3D printers are either proprietary industrial systems or one-off
+research machines tied to specific institutions. M3-CRETE targets the space
+between: an open mechanical and controls reference that qualified teams can
+study, adapt, and validate within their own controlled research or development
+programs.
 
 ### Target Applications
 
-- Hardscape and site elements
-- Agricultural and industrial processing infrastructure
-- Urban water control and drainage components
-- Construction and infrastructure parts
-- Modular elements for rapid deployment and disaster response
-- Digital formwork and precast molds
+- Non-structural research specimens
+- Process-development articles
+- Digital formwork, molds, and fixtures
+- Controlled materials and toolpath studies
+- Laboratory and supervised institutional demonstrations
+- Non-structural prototype objects where separately reviewed
 
-These are applications where repeatability, throughput, and reliability matter — and where accessible hardware can have the most immediate impact.
+Printed outputs require separate physical validation. No printed output from an
+M3-CRETE-derived system may be used for structural, load-bearing, life-safety,
+building-code, transportation, water-control, pressure-containing, occupied,
+public-access, or permanent construction use unless separately designed, tested,
+permitted, and approved by the responsible licensed professionals and
+authorities for that specific project.
 
 ---
 
 ## Design Principles
 
-### CNC Rigidity, Field Serviceability
+### Mechanical Rigidity, Serviceability
 
-The frame is engineered closer to CNC machine standards than desktop 3D printers: rigid, durable, and precise. Every structural component uses standard aluminum extrusions and commodity hardware. If something breaks on a job site, you source a replacement locally — not from a single-source vendor.
+The frame is engineered closer to CNC machine standards than desktop 3D
+printers: rigid, durable, and precise. Mechanical components use standard
+aluminum extrusions and commodity hardware where practical, so qualified teams
+can inspect, replace, and modify parts without single-source dependency.
 
-### Small Motors, Safe Envelope
+### Lower Moving Mass, Still Hazardous
 
-With an efficient frame design, the drive system uses motors comparable in size to hobbyist 3D printers while delivering sufficient torque for the full gantry. This provides a significantly safer working envelope for students, researchers, and craftsmen compared to heavy industrial machinery.
+With an efficient frame design, the drive system uses smaller motors than many
+industrial concrete-printing systems while delivering sufficient torque for the
+reference gantry. This does not make the machine safety-rated or safe for
+unsupervised use. Moving axes, pinch/crush hazards, cementitious materials,
+pressurized hoses, electrical systems, and software-controlled motion all
+require qualified review, guarding, PPE, training, and operating procedures.
 
 ### No Thermal Management
 
 Concrete cures by hydration — a chemical reaction — not by melting and cooling. This eliminates roughly 25% of the hardware cost and complexity associated with conventional FDM printers (heated beds, hot ends, cooling fans), resulting in a mechanically simpler, more energy-efficient, and more reliable machine.
 
-### Built to Multiply
+### Designed for Research Iteration
 
-Many non-structural components — brackets, guides, and enclosure parts — are designed to be 3D-printable using an existing M3-CRETE unit or any FDM printer. This reduces replication cost and simplifies field replacement. Scalability is a feature, not an afterthought.
+Some non-structural components such as brackets, guides, and enclosure parts are
+designed to be 3D-printable. Those printed parts still require inspection,
+material selection, and project-specific validation before use in a working
+machine.
 
 ---
 
@@ -104,9 +141,17 @@ See the [CADCLAW repo](https://github.com/sunnyday-technologies/CADCLAW) for the
 
 ## Material Compatibility
 
-M3-CRETE is a hardware platform — it does not prescribe a specific concrete mix. The system is designed to work with a range of cementitious formulations optimized for layered extrusion, including OPC, LC3, and specialty blends.
+M3-CRETE is a hardware reference, not a materials approval. It does not
+prescribe a construction mix, validate printed outputs, or certify any
+cementitious formulation for field use. Mixes, toolpaths, curing, durability,
+and acceptance criteria require separate physical testing and professional
+review for each use case.
 
-For AI-driven mix design optimized for 3D printing, see [CEMFORGE™](https://cemforge.ai/concrete-printers/) — a machine learning formulation engine trained on validated 3D-printed cementitious specimen data, designed to generate candidate mixes and supported performance predictions where sufficient data exists.
+For AI-driven mix-design decision support, see
+[CEMFORGE](https://cemforge.ai/concrete-printers/) — a formulation engine
+designed to generate candidate mixes and supported performance predictions where
+sufficient validated data is available. Candidate mixes require physical
+validation before any project use.
 
 ---
 
@@ -118,22 +163,37 @@ M3-CRETE is in active development. Current focus areas:
 - Validating open assembly notes and build sequence
 - Establishing firmware profiles for concrete-specific extrusion parameters
 
-Interested in contributing design feedback, supplier corrections, or field-build notes?
+Interested in contributing design feedback, supplier corrections, or controlled
+build notes?
 Open an issue or start a GitHub discussion.
 
 ---
 
 ## Disclaimer
 
-M3-CRETE is provided as-is for educational and development purposes. Concrete 3D printing involves heavy machinery, cementitious materials, and electrical systems that pose safety risks. Users assume all responsibility for safe design, construction, and operation of any system built from these files. Sunnyday Technologies makes no warranties regarding fitness for any particular purpose and assumes no liability for injury, damage, or loss resulting from the use of these designs. Consult applicable local building codes, electrical codes, and safety regulations before construction or operation.
+M3-CRETE is provided as-is for experimental, educational, and development
+purposes. Concrete/paste printing involves moving machinery, cementitious
+materials, pressurized material handling, and electrical systems that pose real
+safety risks. Users assume all responsibility for safe design, construction,
+commissioning, guarding, training, inspection, and operation of any system built
+from these files.
 
 ### Electrical / AC Mains Boundary
 
-Any AC mains wiring, control-box integration, grounding, bonding, overcurrent protection, disconnects, emergency-stop power circuits, facility connection, inspection, or code compliance work must be performed by qualified personnel, a licensed electrician where required, or a qualified control-panel shop.
+Any AC mains wiring, control-box integration, grounding, bonding, overcurrent
+protection, disconnects, emergency-stop power circuits, facility connection,
+inspection, or code compliance work must be performed by qualified personnel, a
+licensed electrician where required, or a qualified control-panel shop.
 
-The public M3-CRETE files may identify electrical interfaces, low-voltage controls, and component references, but they are not AC mains wiring instructions and are not a substitute for applicable electrical codes, authority-having-jurisdiction review, or professional electrical judgment.
+The public M3-CRETE files may identify electrical interfaces, low-voltage
+controls, and component references, but they are not AC mains wiring
+instructions, control-panel build instructions, or a substitute for applicable
+electrical codes, authority-having-jurisdiction review, or professional
+electrical judgment.
 
-See [DISCLAIMER.md](DISCLAIMER.md) for full details.
+See [SAFETY_NOTICE.md](SAFETY_NOTICE.md),
+[ELECTRICAL_SCOPE_BOUNDARY.md](ELECTRICAL_SCOPE_BOUNDARY.md), and
+[DISCLAIMER.md](DISCLAIMER.md) for full details.
 
 ---
 
@@ -171,7 +231,8 @@ See [LICENSES/](LICENSES/) for full license texts.
 
 ## Citation
 
-If you use M3-CRETE designs in research, a build, or derivative work, please cite:
+If you use M3-CRETE designs in research, a controlled build, or derivative
+work, please cite:
 
 ```
 Sonnentag, N. (2026). M3-CRETE: Open-Source Concrete 3D Printer.
@@ -191,6 +252,9 @@ A [`CITATION.cff`](CITATION.cff) file is included for automated citation tooling
 
 ## Contributing
 
-We welcome issues, pull requests, and design feedback. If you're building a concrete printer or working with cementitious extrusion, your field experience is valuable — open an issue or start a [discussion](https://github.com/sunnyday-technologies/M3-CRETE/discussions).
+We welcome issues, pull requests, and design feedback from qualified teams. If
+you are working with cementitious extrusion in a controlled technical setting,
+your experience is valuable — open an issue or start a
+[discussion](https://github.com/sunnyday-technologies/M3-CRETE/discussions).
 
 **Contact:** info@sunn3d.com
