@@ -19,7 +19,7 @@ repository-code: "https://github.com/sunnyday-technologies/M3-CRETE"
 url: "https://m3-crete.com"
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.19647436
+    value: 10.5281/zenodo.19647435
     description: Zenodo concept DOI (all versions)
 keywords:
   - 3D-printing
@@ -30,3 +30,5 @@ keywords:
   - DIY
   - 3DCP
   - additive-manufacturing
+version: "0.4.0"
+date-released: "2026-04-19"
