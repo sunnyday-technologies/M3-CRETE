@@ -682,7 +682,7 @@
 <li><strong>Self-verification harness</strong>, a <code>preview_assembly.py</code> that runs engineering invariants against the generated geometry, renders three orthographic projections (XY, XZ, YZ) headlessly with matplotlib, and exits non-zero on any failure.</li>
 </ol>
 <h3 id="cadclaw-extracted-as-its-own-tool">CADCLAW: extracted as its own tool</h3>
-<p>The validation harness was extracted into a generalized framework called <a href="https://cadclaw.io">CADCLAW</a> (<a href="https://doi.org/10.5281/zenodo.19647391">Zenodo DOI 10.5281/zenodo.19647391</a>), now a separable open-source project. CADCLAW is field-tested against the M3-CRETE repository on every release. The latest field-test report documents Doctor PASS at full coverage, the harness running end-to-end after one workaround, and a small set of issues identified for the next milestone. CADCLAW reads the BOM, classifies STEP solids by sorted bounding-box signature, runs BOM/CAD count cross-checks, and emits a markdown report.</p>
+<p>The validation harness was extracted into a generalized framework called <a href="https://cadclaw.io">CADCLAW</a> (<a href="https://doi.org/10.5281/zenodo.19647390">Zenodo DOI 10.5281/zenodo.19647390</a>), now a separable open-source project. CADCLAW is field-tested against the M3-CRETE repository on every release. The latest field-test report documents Doctor PASS at full coverage, the harness running end-to-end after one workaround, and a small set of issues identified for the next milestone. CADCLAW reads the BOM, classifies STEP solids by sorted bounding-box signature, runs BOM/CAD count cross-checks, and emits a markdown report.</p>
 <p>The privacy guard is unconditional: vendor names, SKUs, unit costs, and supplier identifiers are dropped from every emit path, regardless of whether the project's <code>cadclaw.yaml</code> declares them private. This is non-negotiable in concrete 3D printing where supply chain advantage is real and the BOM viewer is the public interface.</p>
 <h3 id="specific-design-decisions">Specific design decisions</h3>
 <p>A few CAD decisions deserve calling out because they fail in obvious ways if you do not know them:</p>
@@ -699,7 +699,7 @@
 <ul>
 <li><strong>Predict</strong>, <a href="https://cemforge.ai">CEMFORGE</a> is Sunnyday's machine-learning formulation engine. It is trained on validated 3D-printed cementitious specimen data and generates candidate mixes with supported performance predictions where sufficient training data exists. M3-CRETE consumes CEMFORGE-generated formulations as input. The two systems are designed to talk: CEMFORGE outputs include extrusion-relevant parameters (yield stress, plastic viscosity targets, set-time windows, water-to-binder ratio) that map directly onto Klipper extrusion settings.</li>
 <li><strong>Print</strong>, M3-CRETE extrudes the mix layer by layer at controlled flow rates and toolpath velocities. Klipper macros expose extrusion multipliers, retract on travel, and per-layer Z compensation. The printhead is a 1" Male NPT pipe connection on a counter-weighted hose; pump pressure and material velocity are owned by the upstream pump system.</li>
-<li><strong>Prove</strong>, <a href="https://open3dcp.org">Open3DCP</a> is the open-data standard (<a href="https://doi.org/10.5281/zenodo.19647471">Zenodo DOI 10.5281/zenodo.19647471</a>) for capturing 3DCP printability outcomes: layer adhesion, interlayer cold joint, dimensional fidelity, time-to-buildable-height. Printer outputs feed Open3DCP records, which feed back into CEMFORGE training data, closing the loop.</li>
+<li><strong>Prove</strong>, <a href="https://open3dcp.org">Open3DCP</a> is the open-data standard (<a href="https://doi.org/10.5281/zenodo.19647470">Zenodo DOI 10.5281/zenodo.19647470</a>) for capturing 3DCP printability outcomes: layer adhesion, interlayer cold joint, dimensional fidelity, time-to-buildable-height. Printer outputs feed Open3DCP records, which feed back into CEMFORGE training data, closing the loop.</li>
 </ul>
 <p>The academic literature on 3DCP printability is robust enough that a builder does not have to start from scratch. Chen et al. (2020) studied <a href="https://doi.org/10.1016/j.conbuildmat.2020.120094">the effect of printing parameters on interlayer bond strength of 3D printed limestone-calcined-clay-based cementitious materials</a> and showed how interval time and nozzle standoff drive cold-joint formation. TU Delft's set-on-demand work (2021) demonstrated chemical activation strategies that decouple pumpability from buildability. The TU Delft graded-clays study (2021) identified calcined-clay supplementary cementitious materials as a viable LC3 path for 3DCP. An, Zhang, and Yang (2024) reviewed coarse aggregate incorporation strategies in <em>Virtual and Physical Prototyping</em> (<a href="https://doi.org/10.1080/17452759.2024.2351154">DOI 10.1080/17452759.2024.2351154</a>). For limestone-blended binder fundamentals relevant to PLC-based 3DCP, Tennis et al. (2024) is the current state-of-the-art reference for limestone in cement.</p>
 <p>We do not redo the CEMFORGE pillar page here. The point of this section is to establish that the printer is one stage in a larger Predict-Print-Prove loop, and that the boundary between the printer (M3-CRETE), the formulation engine (CEMFORGE), and the data standard (Open3DCP) is intentional and clean.</p>
@@ -787,8 +787,8 @@
 <li>M3-CRETE live site, <a href="https://m3-crete.com">m3-crete.com</a>.</li>
 <li>M3-CRETE interactive BOM, <a href="https://bom.m3-crete.com/bom/">bom.m3-crete.com/bom</a>.</li>
 <li>CEMFORGE AI formulation engine, <a href="https://cemforge.ai">cemforge.ai</a>.</li>
-<li>CADCLAW automated CAD validation framework, <a href="https://cadclaw.io">cadclaw.io</a>, <a href="https://doi.org/10.5281/zenodo.19647391">Zenodo DOI 10.5281/zenodo.19647391</a>.</li>
-<li>Open3DCP open data standard for 3D concrete printing, <a href="https://open3dcp.org">open3dcp.org</a>, <a href="https://doi.org/10.5281/zenodo.19647471">Zenodo DOI 10.5281/zenodo.19647471</a>.</li>
+<li>CADCLAW automated CAD validation framework, <a href="https://cadclaw.io">cadclaw.io</a>, <a href="https://doi.org/10.5281/zenodo.19647390">Zenodo DOI 10.5281/zenodo.19647390</a>.</li>
+<li>Open3DCP open data standard for 3D concrete printing, <a href="https://open3dcp.org">open3dcp.org</a>, <a href="https://doi.org/10.5281/zenodo.19647470">Zenodo DOI 10.5281/zenodo.19647470</a>.</li>
 <li>Sonnentag, N. (2026). <em>Self-Verifying LLM-Driven Parametric CAD Assemblies: Lessons from a Meter-Scale Concrete 3D Printer</em>. Sunnyday Technologies AI-CAD whitepaper, CC BY 4.0.</li>
 <li>Sunnyday Technologies parent site, <a href="https://sunn3d.com">sunn3d.com</a>.</li>
 </ul>
@@ -831,7 +831,7 @@ repository-code: &quot;https://github.com/sunnyday-technologies/M3-CRETE&quot;
 url: &quot;https://m3-crete.com&quot;
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.19647436
+    value: 10.5281/zenodo.19647435
     description: Zenodo concept DOI (all versions)
 keywords:
   - 3D-printing
@@ -844,7 +844,7 @@ keywords:
   - additive-manufacturing
 </code></pre>
 <blockquote>
-<p><strong>Zenodo concept DOI:</strong> <a href="https://doi.org/10.5281/zenodo.19647436">10.5281/zenodo.19647436</a>, citable identifier for M3-CRETE across all versions. Each tagged GitHub release gets its own version DOI, archived automatically by Zenodo.</p>
+<p><strong>Zenodo concept DOI:</strong> <a href="https://doi.org/10.5281/zenodo.19647435">10.5281/zenodo.19647435</a>, citable identifier for M3-CRETE across all versions. Each tagged GitHub release gets its own version DOI, archived automatically by Zenodo.</p>
 </blockquote>
 <hr />
 <hr />
@@ -882,20 +882,20 @@ keywords:
     {
       "@type": "SoftwareSourceCode",
       "name": "M3-CRETE: Open-Source Concrete 3D Printer",
-      "identifier": "10.5281/zenodo.19647436",
-      "url": "https://doi.org/10.5281/zenodo.19647436"
+      "identifier": "10.5281/zenodo.19647435",
+      "url": "https://doi.org/10.5281/zenodo.19647435"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "CADCLAW: Automated validation framework for STEP-based CAD assemblies",
-      "identifier": "10.5281/zenodo.19647391",
-      "url": "https://doi.org/10.5281/zenodo.19647391"
+      "identifier": "10.5281/zenodo.19647390",
+      "url": "https://doi.org/10.5281/zenodo.19647390"
     },
     {
       "@type": "Dataset",
       "name": "Open3DCP: Open Data Standard for 3D Concrete Printing",
-      "identifier": "10.5281/zenodo.19647471",
-      "url": "https://doi.org/10.5281/zenodo.19647471",
+      "identifier": "10.5281/zenodo.19647470",
+      "url": "https://doi.org/10.5281/zenodo.19647470",
       "description": "Open3DCP is an open data schema and dataset format for 3D concrete printing research. It captures mix composition, process parameters, fresh-state behavior, hardened properties, durability measurements, and provenance so printability results can be compared and reused across projects.",
       "license": "https://www.apache.org/licenses/LICENSE-2.0",
       "creator": {
