@@ -23,15 +23,18 @@ instructions.
 
 **M³** = **M**obile · **M**odular · **M**eter³
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19647436.svg)](https://doi.org/10.5281/zenodo.19647436)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19647435.svg)](https://doi.org/10.5281/zenodo.19647435)
 
 Developed by [Sunnyday Technologies](https://sunn3d.com).
+
+- **Interactive BOM and build guide:** [bom.m3-crete.com](https://bom.m3-crete.com) — rendered from this repository
+- **Commercial early access and support:** [m3-crete.com](https://m3-crete.com)
 
 | Spec | Value |
 |------|-------|
 | **Open BOM component target** | Under $5,000 for public mechanical/low-voltage reference components where current commodity pricing and substitutions allow; professional electrical/power-control scope is excluded |
-| **Build footprint** | Sub-1 m³ — fits on a standard US pallet (48×40 in) |
-| **Printhead weight** | ~1.5 kg |
+| **Build footprint** | Sub-1 m³ — fits on a standard US pallet (48×40 in) |
+| **Printhead weight** | ~1.5 kg |
 | **License** | CERN-OHL-W-2.0 |
 
 ---
@@ -82,7 +85,9 @@ require qualified review, guarding, PPE, training, and operating procedures.
 
 ### No Thermal Management
 
-Concrete cures by hydration — a chemical reaction — not by melting and cooling. This eliminates roughly 25% of the hardware cost and complexity associated with conventional FDM printers (heated beds, hot ends, cooling fans), resulting in a mechanically simpler, more energy-efficient, and more reliable machine.
+Concrete cures by hydration — a chemical reaction — not by melting and cooling.
+The design therefore omits heated beds, hot ends, and part-cooling fans
+entirely, resulting in a mechanically simpler, thermal-free architecture.
 
 ### Designed for Research Iteration
 
@@ -106,17 +111,21 @@ M3-CRETE runs on established open-source toolchains. No proprietary software req
 
 Standard G-code workflows provide full, transparent control over toolpaths, layer heights, and extrusion parameters.
 
-Firmware configurations are maintained separately:
+A Klipper reference configuration ships in [`firmware/`](firmware/). Extended
+Klipper firmware profiles are maintained separately in
 [M3-CRETE-FIRMWARE](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE)
+(Marlin support planned).
 
 ---
 
 ## Repository Structure
 
+Key directories (not exhaustive):
+
 ```
 M3-CRETE/
 ├── CAD/
-│   ├── M3-2_Assembly.step       # Full assembly (99 parts, 13.5 MB via LFS)
+│   ├── M3-2_Assembly.step       # Full assembly (STEP, ~23 MB via Git LFS)
 │   ├── m3_2_assembly.py         # CadQuery assembly generator (source of truth)
 │   ├── self_check.py            # 5-gate automated validation harness
 │   ├── kinematics_eval.py       # Structural analysis (deflection, torque, belts)
@@ -124,16 +133,17 @@ M3-CRETE/
 │   ├── Components/              # OpenBuilds parts library (CC BY-SA 4.0)
 │   └── Advanced/                # Extended parts (C-beam, joining plates)
 ├── bom/
-│   ├── data.json                # BOM source of truth (62 parts, v2.5.0)
+│   ├── data.json                # BOM source of truth (versioned JSON)
 │   └── index.html               # Interactive BOM viewer (bom.m3-crete.com/bom)
-├── firmware/                    # Klipper configs (kinematics, steppers)
+├── build-guide/                 # Build documentation (bom.m3-crete.com/build-guide)
+├── firmware/                    # Klipper reference configs (kinematics, steppers)
 ├── blog/                        # Build logs and project updates
 └── config.js                    # Model variants (M3-1, M3-2, M3-4)
 ```
 
 ### AI-Assisted CAD Workflow
 
-This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) — an automated validation framework for STEP assemblies developed during this project. The assembly script generates geometry, the self-check harness validates it (inventory, interference, adjacency, dimensions), and the kinematics module analyzes structural performance. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
+This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) — an automated validation framework for STEP assemblies developed during this project. The assembly script generates geometry, the self-check harness validates it (inventory, interference, adjacency, dimensions), and the kinematics module analyzes structural performance. This workflow caught 53 interferences and cut the STEP export from roughly 70 MB to under 25 MB.
 
 See the [CADCLAW repo](https://github.com/sunnyday-technologies/CADCLAW) for the generalized, reusable framework.
 
@@ -147,11 +157,9 @@ cementitious formulation for field use. Mixes, toolpaths, curing, durability,
 and acceptance criteria require separate physical testing and professional
 review for each use case.
 
-For AI-driven mix-design decision support, see
-[CEMFORGE](https://cemforge.ai/concrete-printers/) — a formulation engine
-designed to generate candidate mixes and supported performance predictions where
-sufficient validated data is available. Candidate mixes require physical
-validation before any project use.
+For mix-design decision support, see
+[CEMFORGE™](https://cemforge.ai/concrete-printers/); candidate mixes require
+physical validation before any project use.
 
 ---
 
@@ -159,13 +167,14 @@ validation before any project use.
 
 M3-CRETE is in active development. Current focus areas:
 
-- Finalizing the open BOM and build documentation
+- Expanding the open BOM and [build documentation](https://bom.m3-crete.com/build-guide/)
 - Validating open assembly notes and build sequence
 - Establishing firmware profiles for concrete-specific extrusion parameters
 
 Interested in contributing design feedback, supplier corrections, or controlled
-build notes?
-Open an issue or start a GitHub discussion.
+build notes? Open an issue or start a GitHub discussion. For commercial
+inquiries or early-access qualification, see
+[m3-crete.com/early-access/](https://m3-crete.com/early-access/).
 
 ---
 
@@ -213,12 +222,14 @@ See [LICENSES/](LICENSES/) for full license texts.
 
 | Resource | Description |
 |----------|-------------|
+| [Interactive BOM & Build Guide](https://bom.m3-crete.com) | This repo's rendered documentation site — BOM viewer and build guide |
+| [M3-CRETE Commercial Site](https://m3-crete.com) | Commercial surface — early access and support inquiries |
 | [Convergence Engineering whitepaper](https://doi.org/10.5281/zenodo.19863080) | Methodology paper that uses M3-CRETE as a public case study; introduces the *time to silence* metric. CC BY 4.0 preprint, Zenodo. |
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
-| [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Hosted project overview and Sunnyday contact path |
+| [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Parent-company project overview |
 | [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) | Automated STEP assembly validation — extracted from this project |
 | [CEMFORGE™](https://cemforge.ai/concrete-printers/) | AI-powered concrete formulation platform by Sunnyday Technologies |
-| [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Klipper |
+| [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Klipper (Marlin support planned) |
 
 ---
 
@@ -237,7 +248,7 @@ work, please cite:
 ```
 Sonnentag, N. (2026). M3-CRETE: Open-Source Concrete 3D Printer.
 Sunnyday Technologies.
-https://doi.org/10.5281/zenodo.19647436
+https://doi.org/10.5281/zenodo.19647435
 ```
 
 For the methodology paper that uses M3-CRETE as a public case study, cite:
@@ -256,5 +267,7 @@ We welcome issues, pull requests, and design feedback from qualified teams. If
 you are working with cementitious extrusion in a controlled technical setting,
 your experience is valuable — open an issue or start a
 [discussion](https://github.com/sunnyday-technologies/M3-CRETE/discussions).
+Technical feedback belongs here on GitHub; commercial interest routes to
+[m3-crete.com/early-access/](https://m3-crete.com/early-access/).
 
 **Contact:** info@sunn3d.com
