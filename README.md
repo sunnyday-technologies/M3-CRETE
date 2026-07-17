@@ -23,7 +23,7 @@ instructions.
 
 **M³** = **M**obile · **M**odular · **M**eter³
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19647436.svg)](https://doi.org/10.5281/zenodo.19647436)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19647435.svg)](https://doi.org/10.5281/zenodo.19647435)
 
 Developed by [Sunnyday Technologies](https://sunn3d.com).
 
@@ -237,7 +237,7 @@ work, please cite:
 ```
 Sonnentag, N. (2026). M3-CRETE: Open-Source Concrete 3D Printer.
 Sunnyday Technologies.
-https://doi.org/10.5281/zenodo.19647436
+https://doi.org/10.5281/zenodo.19647435
 ```
 
 For the methodology paper that uses M3-CRETE as a public case study, cite:
