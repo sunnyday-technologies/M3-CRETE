@@ -81,8 +81,8 @@ const BOM_CONFIG = {
         // Wiring (both axes longer)
         'Cable Drag Chain (Sealed)': { qty: 5, unit: 'meters total (X: 2.5m + Y: 2.5m)', note: 'Both axes longer drag chain' },
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 25, unit: 'meters (2 spools)', note: 'Longer runs to X+Y motors' },
-        'Power Wire \u2014 12AWG Silicone (Red + Black)': { qty: 3, unit: 'meters each color (6m total)', note: 'Longer PSU-to-board run' },
-        'Distribution Wire \u2014 18AWG (Red + Black)': { qty: 10, unit: 'meters total (5m each color)', note: 'Longer branch distribution' },
+        'Power Wire - Professional/Private Scope': { qty: 3, unit: 'meters each color (6m total)', note: 'Longer PSU-to-board run' },
+        'Distribution Wire - Professional/Private Scope': { qty: 10, unit: 'meters total (5m each color)', note: 'Longer branch distribution' },
         'Cable Sleeving, Labels & Tie Kit': { qty: 2, unit: 'kits', note: 'More cable to manage' },
         'Frame Stiffener — Long Span Reinforcement': { qty: 8, note: 'Both X and Y axes have 2m+ spans — 2 bars per rail' }
       }
