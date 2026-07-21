@@ -1,5 +1,29 @@
 # M3-CRETE Project Context
 
+## Public Safety / Liability Boundary
+
+This repository is a public experimental open-hardware reference for M3-CRETE.
+It must not provide public AC mains wiring instructions, control-panel build
+instructions, facility-connection instructions, safety-rated E-stop circuit
+designs, structural concrete approval guidance, or certification claims.
+
+Codex and other agents must not create or modify AC mains schematics, 48 V
+high-current distribution diagrams, grounding/bonding instructions,
+contactor/breaker wiring, emergency-stop power circuits, or UL/NRTL/AHJ
+instructions unless exact approved text is supplied by the owner and the issue
+is explicitly scoped for that work.
+
+Do not introduce claims that M3-CRETE is certified, UL approved, OSHA
+compliant, safe, school-safe, jobsite-ready, turnkey, plug-and-play,
+structural, load-bearing, or code-compliant. Prefer wording that frames
+M3-CRETE as an experimental reference design for qualified technical teams in
+controlled R&D, laboratory, or supervised institutional environments.
+
+If a change touches safety, disclaimers, terms, electrical boundaries, BOM power
+components, build instructions, certification language, or structural-use
+claims, mark the PR as requiring owner review and the applicable professional
+review.
+
 ## Project Identity
 - **Name:** M3-CRETE (Mobile, Modular, Meter³)
 - **Type:** Open-source concrete 3D printer motion system
