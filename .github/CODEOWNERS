@@ -1,0 +1,20 @@
+# Public-scope, safety, electrical, legal, BOM, and marketing surfaces require owner review.
+#
+# Owner review is advisory until branch protection requires it.
+
+* @nick-sunn3dcom
+
+/README.md @nick-sunn3dcom
+/DISCLAIMER.md @nick-sunn3dcom
+/SAFETY_NOTICE.md @nick-sunn3dcom
+/ELECTRICAL_SCOPE_BOUNDARY.md @nick-sunn3dcom
+/index.html @nick-sunn3dcom
+/llms.txt @nick-sunn3dcom
+/sitemap.xml @nick-sunn3dcom
+/bom/** @nick-sunn3dcom
+/config.js @nick-sunn3dcom
+/build-guide/** @nick-sunn3dcom
+/blog/** @nick-sunn3dcom
+/press/** @nick-sunn3dcom
+/docs/commercial/** @nick-sunn3dcom
+/docs/process/** @nick-sunn3dcom

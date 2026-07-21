@@ -17,6 +17,9 @@ if (-not $Target.StartsWith($RepoRoot, [System.StringComparison]::OrdinalIgnoreC
 }
 
 if (Test-Path -LiteralPath $Target) {
+  Get-ChildItem -LiteralPath $Target -Recurse -Force | ForEach-Object {
+    $_.Attributes = [System.IO.FileAttributes]::Normal
+  }
   Remove-Item -LiteralPath $Target -Recurse -Force
 }
 New-Item -ItemType Directory -Path $Target -Force | Out-Null

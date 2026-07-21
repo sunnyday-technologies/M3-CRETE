@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "check:public-scope": "python scripts/check_public_scope_terms.py",
     "build:cloudflare": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-cloudflare-pages.ps1",
     "deploy:cloudflare": "npm run build:cloudflare && npx wrangler@latest pages deploy .cloudflare/pages/m3-crete --project-name m3-crete-open-source --branch main --commit-dirty=true"
   }
