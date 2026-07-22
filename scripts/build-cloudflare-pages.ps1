@@ -53,6 +53,7 @@ function Copy-PublicDirectory {
 
 $rootFiles = @(
   "index.html",
+  "404.html",
   "config.js",
   "favicon.svg",
   "robots.txt",
