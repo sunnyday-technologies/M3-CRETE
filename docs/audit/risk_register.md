@@ -66,7 +66,7 @@ published**:
 - `docs/electrical/controller_enclosure_outline.md`
 - `docs/electrical/professional_power_control_scope.md`
 - `docs/electrical/electrical_scope_boundary.md`
-- `docs/legal/professional_user_acknowledgement_draft.md`
+- `docs/commercial/professional_user_acknowledgement_draft.md`
 
 Rationale: every rating in the 24 V interface draft was `TBD by electrical
 reviewer` — voltage range, maximum current, connector family, pinout, branch
@@ -78,9 +78,18 @@ job these drafts were written to do.
 
 Withdrawing them removes the only content that required a licensed reviewer.
 
-The drafts are preserved in the retired `safety/public-scope-freeze` bundle
-(see `_cleanup-quarantine/`) and can be revived, but must not be published
-without qualified electrical review and owner sign-off.
+The drafts are preserved in the retired `safety/public-scope-freeze` bundle and
+can be revived, but must not be published without qualified electrical review
+and owner sign-off. The branch was never pushed to origin, so the bundle is the
+only copy:
+
+```
+_cleanup-quarantine\m3-crete-public-scope-freeze-20260721.bundle   (25 MB, commit c04fe6e)
+git init restore && cd restore && git fetch <bundle> "refs/heads/*:refs/heads/*"
+```
+
+Restore was tested on 2026-07-21 before the local branch was deleted: 262 files,
+complete history, all five withdrawn documents recoverable.
 
 ## Release blockers
 
