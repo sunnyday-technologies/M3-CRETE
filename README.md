@@ -133,7 +133,7 @@ M3-CRETE/
 
 ### AI-Assisted CAD Workflow
 
-This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) — an automated validation framework for STEP assemblies developed during this project. The assembly script generates geometry, the self-check harness validates it (inventory, interference, adjacency, dimensions), and the kinematics module analyzes structural performance. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
+This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW), an automated assembly and validation framework for STEP CAD developed during this project. A declarative assembly spec places the authored STEP parts by connector frames and datum chains and compiles the assembly, the check harness validates it (inventory, interference, adjacency, dimensions, orientation, floating), and the structural module analyzes load performance. CADCLAW places parts authored in native CAD; it does not generate geometry. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
 
 See the [CADCLAW repo](https://github.com/sunnyday-technologies/CADCLAW) for the generalized, reusable framework.
 
@@ -216,7 +216,7 @@ See [LICENSES/](LICENSES/) for full license texts.
 | [Convergence Engineering whitepaper](https://doi.org/10.5281/zenodo.19863080) | Methodology paper that uses M3-CRETE as a public case study; introduces the *time to silence* metric. CC BY 4.0 preprint, Zenodo. |
 | [Sunnyday Technologies](https://sunn3d.com) | Parent company — concrete 3D printing and engineered cementitious composites |
 | [M3-CRETE Project Page](https://sunn3d.com/m3-crete/) | Hosted project overview and Sunnyday contact path |
-| [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) | Automated STEP assembly validation — extracted from this project |
+| [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW) | Automated STEP assembly compilation and validation, extracted from this project |
 | [CEMFORGE™](https://cemforge.ai/concrete-printers/) | AI-powered concrete formulation platform by Sunnyday Technologies |
 | [M3-CRETE Firmware](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE) | Firmware configurations for Klipper |
 
