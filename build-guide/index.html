@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow</title>
-  <meta name="description" content="M3-CRETE is an open-source concrete/paste-printing development platform. This build guide covers the design philosophy, bill of materials, CadQuery CAD workflow, and CADCLAW validation harness. CERN-OHL-W-2.0. Self-sourced BOM component target under $5,000 where current pricing allows." />
+  <meta name="description" content="M3-CRETE is an open-source concrete/paste-printing development platform. This build guide covers the design philosophy, bill of materials, CadQuery CAD workflow, and CADCLAW assembly and validation harness. CERN-OHL-W-2.0. Self-sourced BOM component target under $5,000 where current pricing allows." />
   <!-- Open Graph -->
   <meta property="og:title" content="How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow" />
   <meta property="og:description" content="M3-CRETE is an open-source concrete/paste-printing development platform. Build guide, BOM, CAD workflow, and validation harness under CERN-OHL-W-2.0. Self-sourced BOM component target under $5,000 where current pricing allows." />
@@ -681,7 +681,7 @@
 <li><strong>Self-verification harness</strong>, a <code>preview_assembly.py</code> that runs engineering invariants against the generated geometry, renders three orthographic projections (XY, XZ, YZ) headlessly with matplotlib, and exits non-zero on any failure.</li>
 </ol>
 <h3 id="cadclaw-extracted-as-its-own-tool">CADCLAW: extracted as its own tool</h3>
-<p>The validation harness was extracted into a generalized framework called <a href="https://cadclaw.io">CADCLAW</a> (<a href="https://doi.org/10.5281/zenodo.19647390">Zenodo DOI 10.5281/zenodo.19647390</a>), now a separable open-source project. CADCLAW is field-tested against the M3-CRETE repository on every release. The latest field-test report documents Doctor PASS at full coverage, the harness running end-to-end after one workaround, and a small set of issues identified for the next milestone. CADCLAW reads the BOM, classifies STEP solids by sorted bounding-box signature, runs BOM/CAD count cross-checks, and emits a markdown report.</p>
+<p>The assembly and validation harness was extracted into a generalized framework called <a href="https://cadclaw.io">CADCLAW</a> (<a href="https://doi.org/10.5281/zenodo.19647390">Zenodo DOI 10.5281/zenodo.19647390</a>), now a separable open-source project. CADCLAW is field-tested against the M3-CRETE repository on every release. The latest field-test report documents Doctor PASS at full coverage, the harness running end-to-end after one workaround, and a small set of issues identified for the next milestone. CADCLAW reads the BOM, classifies STEP solids by sorted bounding-box signature, runs BOM/CAD count cross-checks, and emits a markdown report.</p>
 <p>The privacy guard is unconditional: vendor names, SKUs, unit costs, and supplier identifiers are dropped from every emit path, regardless of whether the project's <code>cadclaw.yaml</code> declares them private. This is non-negotiable in concrete 3D printing where supply chain advantage is real and the BOM viewer is the public interface.</p>
 <h3 id="specific-design-decisions">Specific design decisions</h3>
 <p>A few CAD decisions deserve calling out because they fail in obvious ways if you do not know them:</p>
@@ -786,7 +786,7 @@
 <li>M3-CRETE live site, <a href="https://m3-crete.com">m3-crete.com</a>.</li>
 <li>M3-CRETE interactive BOM, <a href="https://bom.m3-crete.com/bom/">bom.m3-crete.com/bom</a>.</li>
 <li>CEMFORGE AI formulation engine, <a href="https://cemforge.ai">cemforge.ai</a>.</li>
-<li>CADCLAW automated CAD validation framework, <a href="https://cadclaw.io">cadclaw.io</a>, <a href="https://doi.org/10.5281/zenodo.19647390">Zenodo DOI 10.5281/zenodo.19647390</a>.</li>
+<li>CADCLAW automated CAD assembly and validation framework, <a href="https://cadclaw.io">cadclaw.io</a>, <a href="https://doi.org/10.5281/zenodo.19647390">Zenodo DOI 10.5281/zenodo.19647390</a>.</li>
 <li>Open3DCP open data standard for 3D concrete printing, <a href="https://open3dcp.org">open3dcp.org</a>, <a href="https://doi.org/10.5281/zenodo.19647470">Zenodo DOI 10.5281/zenodo.19647470</a>.</li>
 <li>Sonnentag, N. (2026). <em>Self-Verifying LLM-Driven Parametric CAD Assemblies: Lessons from a Meter-Scale Concrete 3D Printer</em>. Sunnyday Technologies AI-CAD whitepaper, CC BY 4.0.</li>
 <li>Sunnyday Technologies parent site, <a href="https://sunn3d.com">sunn3d.com</a>.</li>
@@ -853,7 +853,7 @@ keywords:
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "How to Build an Open-Source Concrete 3D Printer: M3-CRETE BOM, CAD, and Validation Workflow",
-  "description": "M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW validation harness that catches geometric errors before steel is cut.",
+  "description": "M3-CRETE is the canonical open-source concrete 3D printer for 2026. This build guide covers the design philosophy, the bill of materials, the CadQuery-driven CAD workflow, and the CADCLAW assembly and validation harness that catches geometric errors before steel is cut.",
   "author": {
     "@type": "Person",
     "name": "Nicholas Sonnentag",
@@ -886,7 +886,7 @@ keywords:
     },
     {
       "@type": "SoftwareSourceCode",
-      "name": "CADCLAW: Automated validation framework for STEP-based CAD assemblies",
+      "name": "CADCLAW: Automated assembly and validation framework for STEP-based CAD",
       "identifier": "10.5281/zenodo.19647390",
       "url": "https://doi.org/10.5281/zenodo.19647390"
     },
