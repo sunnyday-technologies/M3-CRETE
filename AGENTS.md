@@ -99,7 +99,7 @@
 - **Never push without Nick's explicit approval**
 - `.gitignore` covers: `.Codex/`, `conversation-summary.md`, `cad_venv/`, `NEMA_CRETE/`
 - The temp clone at `D:\m3crete_fix\` should be deleted once CadQuery venv is moved
-- Commit messages use `Co-Authored-By: Codex Opus 4.6 (1M context) <noreply@anthropic.com>`
+- Commit messages carry no co-author trailers
 
 ## CAD Assembly Status (2026-04-07) — v0.2.0, 101 parts ⚠️ SUPERSEDED
 
