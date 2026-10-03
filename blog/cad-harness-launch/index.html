@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <title>We Built the Testing Framework CAD Never Had | M3-CRETE</title>
-  <meta name="description" content="CADCLAW: open-source automated testing for STEP assemblies. Caught 53 interferences, reduced STEP from 70MB to 13MB, validated 150+ design changes." />
-  <meta property="og:title" content="We Built the Testing Framework CAD Never Had" />
-  <meta property="og:description" content="CADCLAW: 53 interferences caught. 70MB to 13MB. 500 lines of Python. Open source." />
+  <title>CADCLAW Development Retrospective: Bounded STEP Assembly Checks | M3-CRETE</title>
+  <meta name="description" content="Historical development note on the automated STEP assembly checks that became CADCLAW, including what the software can inspect and what still requires human, engineering, and physical validation." />
+  <meta property="og:title" content="CADCLAW Development Retrospective: Bounded STEP Assembly Checks" />
+  <meta property="og:description" content="Historical development context for open-source CAD checks; not physical validation, commercial equivalence, or a substitute for engineering review." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://bom.m3-crete.com/blog/cad-harness-launch/" />
   <meta property="og:image" content="https://bom.m3-crete.com/images/M3-CRETE_render.jpg" />
@@ -355,6 +355,7 @@
     </div>
     <nav>
       <a href="/bom/">BOM</a> &nbsp;&nbsp;
+      <a href="/build-guide/">Guide</a> &nbsp;&nbsp;
       <a href="/blog/">Blog</a> &nbsp;&nbsp;
       <a href="/press/">Press</a> &nbsp;&nbsp;
       <a href="https://sunn3d.com" target="_blank" rel="noopener">sunn3d.com</a>
@@ -364,7 +365,7 @@
   <!-- ARTICLE HEADER -->
   <section class="article-header">
     <div class="article-label">Build Log #2</div>
-    <h1>We Built the Testing Framework CAD Never Had</h1>
+    <h1>CADCLAW Development Retrospective: Bounded STEP Assembly Checks</h1>
     <div class="article-meta">
       <div><span>2026-04-18</span></div>
       <div>by <span>Nick Sonnentag</span></div>
@@ -380,60 +381,54 @@
   <!-- ARTICLE BODY -->
   <article class="article-body">
 
-    <p>I spent three days staring at a 99-part assembly in Fusion 360, orbiting around every corner, convinced it was clean. It wasn't.</p>
+    <p><strong>Historical development note:</strong> this article describes an earlier M3-CRETE assembly-checking experiment that later became CADCLAW. Early numbers in working notes were not retained here as a controlled claim-to-proof record, so this revision does not present them as current validated metrics.</p>
 
     <h2>The Problem</h2>
 
-    <p>A motor bracket was buried 27,000 mm&sup3; inside an aluminum extrusion. Twenty-four joining plates were clipping beams by fractions of a millimeter. A motor mount had quietly drifted 600mm from its motor during an auto-placement update. None of it visible at screen scale. All of it structurally wrong.</p>
+    <p>Visual review of a growing assembly missed intersections, misplaced components, and dimensional drift. Software checks helped surface selected geometry-rule failures that were difficult to spot at normal screen scale. A finding identifies a model condition for review; it does not by itself establish structural consequence or physical fit.</p>
 
-    <p>I only found out because I got tired of looking and wrote a script to look for me. That script became <strong>CADCLAW</strong> &mdash; an open-source testing framework for STEP assemblies. The testing layer mechanical engineering never had.</p>
+    <p>The project scripts became <strong>CADCLAW</strong>, an open-source framework for encoding and checking selected STEP-assembly rules alongside human review.</p>
 
-    <h2>The Gap Nobody Talks About</h2>
+    <h2>The Review Gap We Were Addressing</h2>
 
     <p>Software developers have had automated testing for decades. Write code, write tests, run CI. If something breaks, you know before it ships. Shipping code without tests is considered unprofessional.</p>
 
-    <p>In mechanical CAD? You open the file. You orbit around. You squint at intersections. You zoom into corners. That's it. That's the quality assurance process for most hardware teams. Including ours.</p>
+    <p>Mechanical CAD review also depends on authored requirements, tolerances, analysis, manufacturing knowledge, inspection, and physical testing. Our immediate gap was narrower: we lacked repeatable automated checks for selected model conditions alongside visual inspection.</p>
 
-    <p>For our project &mdash; <a href="https://github.com/sunnyday-technologies/M3-CRETE">M3-CRETE</a>, an open-source concrete 3D printer with 17 aluminum extrusions, 6 stepper motors, 24 V-wheels, and dozens of brackets, plates, and belts &mdash; visual inspection stopped scaling around part 50. By part 99, we were guessing.</p>
+    <p>As the <a href="https://github.com/sunnyday-technologies/M3-CRETE">M3-CRETE</a> development assembly grew, manual visual inspection alone became insufficiently repeatable. The current BOM and model—not the historical counts in this article—are the source for present configuration review.</p>
 
     <h2>Five Gates</h2>
 
-    <p><strong>Inventory.</strong> Every mechanical part has a dimensional fingerprint. A NEMA23 motor is always 56.4 &times; 56.4 &times; 76.6 mm. Always. The harness labels parts by their bounding-box signature, counts them, and tells you if something's missing before you notice it's gone.</p>
+    <p><strong>Inventory.</strong> Configured bounding-box signatures can help classify expected model instances. Supplier variants and modeling simplifications can share or change dimensions, so signatures are heuristics tied to declared rules, not identity proof.</p>
 
-    <p><strong>Interference.</strong> Not bounding-box approximation &mdash; exact solid-solid boolean intersection using OpenCascade. Reports overlap volume in cubic millimeters. If a plate clips a beam by half a mm&sup3;, you see it. Your eyes never would.</p>
+    <p><strong>Interference.</strong> The check can run solid-solid boolean operations through OpenCascade and report modeled overlap volume. Results depend on geometry quality, tolerances, exclusions, and configuration, and still require engineering interpretation.</p>
 
-    <p><strong>Adjacency.</strong> &ldquo;Is every motor within 50mm of its bracket?&rdquo; When you auto-place 99 parts, one ends up in the right assembly at the wrong address. This gate catches it in zero seconds.</p>
+    <p><strong>Adjacency.</strong> Declared distance rules can identify components that are unexpectedly far from or close to another modeled item.</p>
 
-    <p><strong>Dimensional.</strong> Did that <code>box()</code> call swap two arguments and produce an 80mm slab instead of a 4mm plate? The &ldquo;typo catcher&rdquo; for geometry.</p>
+    <p><strong>Dimensional.</strong> Declared range checks can flag geometry whose measured bounding dimensions differ from encoded expectations.</p>
 
-    <p><strong>Kinematics.</strong> Our gantry beam &mdash; two 1-meter C-beams spliced to span 2 meters &mdash; was sagging 0.9mm at center under a 3kg printhead.</p>
+    <p><strong>Analysis inputs.</strong> Project scripts can evaluate simplified beam, belt, motor, or motion assumptions. Their outputs are sensitive to materials, joints, constraints, loads, boundary conditions, and model fidelity. They are screening calculations, not accepted structural analysis or measured machine performance. Earlier carbon-fiber concepts are not part of the current reference build.</p>
 
-    <p>Try holding your fingers apart by 0.5mm. That's our tolerance target. Now imagine that deviation compounding across a 2-meter concrete print, layer after layer after layer. The wall curves. The layers drift. The print fails.</p>
-
-    <p>The kinematics gate flagged it. We added two carbon fiber tubes epoxied into the beam channels &mdash; 200 grams, $60 &mdash; and the sag dropped to 0.42mm. Problem solved before we ever cut aluminum.</p>
-
-    <h2>The Numbers</h2>
+    <h2>What the Historical Run Demonstrated</h2>
 
     <ul>
-      <li><strong>70 MB &rarr; 13 MB</strong> STEP file. The harness identified that imported supplier geometry &mdash; beautiful filleted edges, countersunk holes, NURBS surfaces &mdash; was 80% of the file size. Replaced with parametric geometry. Same assembly. Five times smaller.</li>
-      <li><strong>53 solid-solid interferences</strong> caught in one three-second run. Plates clipping beams. A bracket 27,000 mm&sup3; deep inside a beam. My eyes missed all 53.</li>
-      <li><strong>Motor mount 600mm from motor.</strong> The adjacency gate caught it immediately.</li>
-      <li><strong>150+ design changes validated</strong> across 15 sessions without opening a CAD viewer.</li>
+      <li>Automated checks can make selected geometry-rule regressions repeatable and reviewable.</li>
+      <li>Simplified parametric replacements can reduce unnecessary imported-detail complexity, subject to provenance and fidelity review.</li>
+      <li>Interference, adjacency, inventory, and dimensional findings can direct a human to model regions that need investigation.</li>
+      <li>A passing run covers only encoded rules and never substitutes for manufacturing, tolerance, structural, safety, or physical validation.</li>
     </ul>
 
-    <h2>What This Normally Costs</h2>
+    <h2>Commercial Comparison Boundary</h2>
 
-    <p>CATIA with assembly validation modules: $7,500&ndash;$10,000 per seat per year. SolidWorks Professional with interference detection: $5,000&ndash;$8,000. Hiring a mechanical engineering consultant to manually review a 99-part assembly: $70&ndash;$150/hour, 40+ hours, $3,000&ndash;$6,000 &mdash; and they still might miss what a boolean intersection check finds in 3 seconds.</p>
-
-    <p>We wrote 500 lines of Python and got better results. Then we open-sourced it.</p>
+    <p>This project does not publish a controlled feature, price, labor, accuracy, support, or outcome comparison against commercial CAD suites or professional engineering services. CADCLAW is an open-source checking option, not a replacement claim.</p>
 
     <h2>The Human-AI Part</h2>
 
-    <p>This framework was built during a collaboration between me and an AI (Claude). I design in Fusion 360. The AI reads the STEP geometry, generates parametric replacements, validates the assembly. The harness sits between us.</p>
+    <p>This framework was developed through human CAD work, scripted geometry processing, and AI-assisted code drafting. AI output and automated check output require human review; neither validates the assembly.</p>
 
     <p>I catch things the AI can't &mdash; &ldquo;that bracket needs to clear the belt path&rdquo; requires physical intuition. The AI catches things I can't &mdash; &ldquo;plate 17 overlaps C-beam 4 by 1,003 mm&sup3; at coordinates (2102, 18, 20)&rdquo; requires checking 4,800 part pairs in 3 seconds.</p>
 
-    <p>Neither of us is the quality gate. The harness is. <em>If the harness passes, the geometry is coherent.</em> Both of us trust it. Both of us are accountable to it.</p>
+    <p>The harness is one evidence source in a larger review process. A pass means only that the evaluated model satisfied the encoded checks for that run; unencoded defects and real-world failure modes remain possible.</p>
 
     <h2>Try It</h2>
 
@@ -443,7 +438,7 @@
       <li><strong>Interactive BOM:</strong> <a href="https://bom.m3-crete.com/bom/">bom.m3-crete.com/bom</a></li>
     </ul>
 
-    <p>MIT license. Python + CadQuery. No commercial CAD software required. 17 passing tests across 3 tiers of fixture complexity.</p>
+    <p>See the current CADCLAW repository for its license, dependencies, tests, supported workflows, and known limitations; this dated article is not release documentation.</p>
 
     <p>If you've ever spent an afternoon squinting at an assembly wondering if something's clipping &mdash; this exists now.</p>
 
@@ -452,7 +447,7 @@
     <div class="post-footer">
       CADCLAW is developed by Sunnyday Technologies, Appleton, Wisconsin.<br/>
       License: MIT &nbsp;&middot;&nbsp; M3-CRETE: CERN-OHL-W-2.0<br/>
-      <span style="opacity: 0.75;">Every mechanical part has a dimensional fingerprint. Fingerprints don't lie.</span>
+      <span style="opacity: 0.75;">Encoded geometry checks support review; they do not replace engineering evidence.</span>
     </div>
 
   </article>
