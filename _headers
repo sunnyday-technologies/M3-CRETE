@@ -2,11 +2,16 @@
 # Keep this conservative: no CSP yet because the static site uses inline CSS/JS.
 
 /*
+  Link: </llms.txt>; rel="alternate"; type="text/plain"
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000
+
+/404.html
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
 
 /*.html
   Cache-Control: public, max-age=300, must-revalidate

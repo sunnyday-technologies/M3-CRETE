@@ -69,14 +69,14 @@ Frame origin `(0, 0, 0)` is at the **front-left corner of the build surface**. L
 **Homing sequence** (set in `homing.cfg`):
 
 1. **Z first** — all 4 Z posts drive UP into the top brace in parallel. Each post's StallGuard fires independently on its own driver, giving per-corner coplanarity without a physical probe.
-2. **X second** — gantry is now at safe height, X-carriage jogs left into the frame post until stall.
+2. **X second** — the development sequence assumes Z reached its configured reference position before an X-axis stall-detection move; this is not a verified safe-height guarantee.
 3. **Y last** — both Y motors drive the gantry forward into the front frame until the primary stalls (the secondary follows).
 
 ### Why Z first
 
-If X or Y homed first with Z at an unknown position, the printhead could hit an obstacle mid-frame. Z homing up to a hard mechanical stop guarantees the gantry is at maximum height before any horizontal motion — if the printhead has to pass over a touch plate, finished print, or tool tray, it's clear above it.
+If X or Y moves with Z at an unknown position, the printhead can contact an obstacle. The current development sequence attempts to establish a Z reference first, but stall sensing and a hard stop do not guarantee clearance, repeatability, safe force, or a clear path. A qualified commissioning plan must verify the actual envelope, obstructions, speeds, currents, stopping behavior, guarding, and recovery before any automated homing sequence is enabled.
 
-### Motion limits (concrete-appropriate, conservative defaults)
+### Development motion references (not validated safe limits)
 
 | Parameter | Value | Notes |
 |-----------|-------|-------|

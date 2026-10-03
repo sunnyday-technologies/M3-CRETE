@@ -61,7 +61,7 @@ review.
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `bom/data.json` | **BOM source of truth** — 66 parts, 216 supplier options, 37 suppliers |
+| `bom/data.json` | **BOM source of truth** — v2.7.0; 65 reference entries, 189 supplier options, 35 named suppliers, 12 categories |
 | `bom/index.html` | BOM viewer (static, loads data.json, multi-supplier selection) |
 | `config.js` | Model variants, category order, project metadata |
 | `CAD/Components/` | OpenBuilds STEP parts library (70 files, CC BY-SA 4.0) |
