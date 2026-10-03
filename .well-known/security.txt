@@ -1,0 +1,7 @@
+# Sunnyday Technologies security contact for M3-CRETE
+Contact: mailto:security@sunn3d.com
+Contact: mailto:info@sunn3d.com
+Canonical: https://bom.m3-crete.com/.well-known/security.txt
+Preferred-Languages: en
+Policy: https://github.com/sunnyday-technologies/M3-CRETE/security/policy
+Expires: 2027-08-11T00:00:00Z

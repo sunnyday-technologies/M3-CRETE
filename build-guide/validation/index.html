@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <title>M3-CRETE Validation &amp; Qualification: Tune and Test the Printer Before Printing (Beginner Guide)</title>
-  <meta name="description" content="Part 4 of the M3-CRETE build series. A plain-language, step-by-step guide to validating and qualifying the M3-CRETE concrete 3D printer before printing: set motor current, fix directions, tune StallGuard sensorless homing, home and level the Z axis, and run safety checks." />
-  <meta property="og:title" content="M3-CRETE Validation &amp; Qualification: Tune and Test Before Printing" />
-  <meta property="og:description" content="Plain-language guide to validating the M3-CRETE printer: motor current, direction, StallGuard tuning, Z homing and leveling, and safety qualification." />
+  <title>M3-CRETE Preliminary Motion Checkout (Not Safety Qualification)</title>
+  <meta name="description" content="Part 4 of the M3-CRETE development series: preliminary qualified-user motion checkout for current, direction, sensorless homing, and Z alignment. This is not commissioning approval, safety qualification, certification, or readiness for material printing." />
+  <meta property="og:title" content="M3-CRETE Preliminary Motion Checkout (Not Safety Qualification)" />
+  <meta property="og:description" content="Qualified-user preliminary motion checks and documented limits for an experimental open-hardware design. Not safety qualification or permission to print." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://bom.m3-crete.com/build-guide/validation/" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="M3-CRETE Validation &amp; Qualification" />
-  <meta name="twitter:description" content="Validate and qualify the M3-CRETE printer before printing." />
+  <meta name="twitter:title" content="M3-CRETE Preliminary Motion Checkout" />
+  <meta name="twitter:description" content="Preliminary qualified-user motion checks; not safety qualification, certification, or print readiness." />
   <link rel="canonical" href="https://bom.m3-crete.com/build-guide/validation/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -96,15 +96,9 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "HowTo",
-    "name": "How to validate and qualify the M3-CRETE printer before printing",
-    "description": "Step-by-step beginner guide to validating the M3-CRETE open-source concrete 3D printer: set motor current, fix axis direction, tune StallGuard sensorless homing, home and level the Z axis, dry-run motion, and complete safety qualification before printing.",
-    "totalTime": "PT3H",
-    "tool": [
-      {"@type": "HowToTool", "name": "Assembled M3-CRETE with software installed (Part 3)"},
-      {"@type": "HowToTool", "name": "Tape measure or calipers"},
-      {"@type": "HowToTool", "name": "Mainsail console (web browser)"}
-    ],
+    "@type": "TechArticle",
+    "name": "M3-CRETE preliminary motion checkout and limitations",
+    "description": "Qualified-user development notes for preliminary current, direction, sensorless-homing, and Z-alignment checks on the experimental M3-CRETE design. These checks do not establish electrical or mechanical validation, safety qualification, certification, or readiness for material printing.",
     "publisher": {"@type": "Organization", "name": "Sunnyday Technologies", "url": "https://sunn3d.com"},
     "license": "https://creativecommons.org/licenses/by/4.0/"
   }
@@ -131,22 +125,22 @@
       <a class="series-step done" href="/build-guide/frame/"><span class="n">Part 1</span>Frame</a>
       <span class="series-step soon"><span class="n">Part 2</span>Wiring <em>(soon)</em></span>
       <a class="series-step done" href="/build-guide/software/"><span class="n">Part 3</span>Software</a>
-      <span class="series-step active"><span class="n">Part 4 — you are here</span>Validation</span>
+      <span class="series-step active"><span class="n">Part 4 — you are here</span>Preliminary checkout</span>
     </nav>
 
-    <h1>M3-CRETE Validation &amp; Qualification</h1>
-    <p class="lede">This is the last step before printing. We set the motor power, make sure each axis moves the right way, teach the printer to find its own zero using the motors' built-in stall sensing, level the gantry, and run safety checks. Do every step in order, and do not skip the safety sign-off at the end.</p>
+    <h1>M3-CRETE Preliminary Motion Checkout</h1>
+    <p class="lede">These development notes cover limited current, direction, sensorless-homing, and Z-alignment observations for qualified technical teams. They are not the last step before printing and do not replace a risk assessment, engineered controls, guarding, professional electrical review, commissioning plan, or material-process validation.</p>
 
     <div class="meta-cards">
       <div class="meta-card"><div class="k">Part</div><div class="v">4 of 4</div></div>
-      <div class="meta-card"><div class="k">Time</div><div class="v">2–3 hours</div></div>
-      <div class="meta-card"><div class="k">Difficulty</div><div class="v">Beginner+</div></div>
-      <div class="meta-card"><div class="k">Needs</div><div class="v">Parts 1–3 done</div></div>
+      <div class="meta-card"><div class="k">Time</div><div class="v">Defined by test plan</div></div>
+      <div class="meta-card"><div class="k">Audience</div><div class="v">Qualified team</div></div>
+      <div class="meta-card"><div class="k">Needs</div><div class="v">Approved risk controls</div></div>
     </div>
 
     <div class="callout warn">
       <span class="tag">Safety first</span>
-      <p>Motors can move the gantry on their own. Stand clear of moving parts, keep loose clothing and tools away, and keep one hand near the power switch. Keep the big pump turned off for all of these tests. This guide covers the four Z motors — the first axis to commission; X, Y, and the extruder are validated the same way as you add them.</p>
+      <p>Software-controlled axes can move unexpectedly. Do not energize or test motion from this page alone. A qualified team must first define exclusion zones, energy isolation, guarding, stop/reset behavior, supervision, and an approved test plan. Keep all material-delivery equipment isolated during preliminary motion work.</p>
     </div>
 
     <h2>What you need</h2>
@@ -207,20 +201,20 @@
       <p>Jog the gantry up and down through its travel a few times (small moves first, then larger). Watch and listen for: smooth motion, no grinding, no slipping belts, and no corner lagging behind. The four corners should stay level as they move.</p>
     </div>
 
-    <h2>Safety qualification (do not skip)</h2>
+    <h2>Professional safety-function verification (outside this guide)</h2>
 
     <div class="step">
-      <div class="step-head"><span class="step-num">7</span><h3>Test the emergency stop</h3></div>
-      <p>With the gantry moving slowly, trigger your emergency stop / power cut. The motors must stop and the machine must reach a safe, still state. Confirm it works before you ever run material. (The emergency-stop power circuit itself should be wired and verified by qualified personnel.)</p>
+      <div class="step-head"><span class="step-num">7</span><h3>Record qualified stop-function verification</h3></div>
+      <p>Do not design or test an emergency-stop function from this public guide. A qualified controls/electrical professional must define the required stop behavior, energy removal, reset/restart controls, fault response, test method, and acceptance evidence for the actual machine and jurisdiction.</p>
     </div>
 
     <div class="step">
-      <div class="step-head"><span class="step-num">8</span><h3>Final sign-off before printing</h3></div>
-      <p>Go through this gate. Every box must be ticked before any concrete enters the line.</p>
+      <div class="step-head"><span class="step-num">8</span><h3>Route the system to a formal readiness review</h3></div>
+      <p>The observations below can support a review, but they are not a readiness gate. Printing remains blocked until responsible qualified owners approve the complete mechanical, electrical, controls, guarding, pump/pressure, material, facility, operating, and emergency-response scope.</p>
     </div>
 
-    <h2>Pre-print sign-off checklist</h2>
-    <p>Print this page and tick each box.</p>
+    <h2>Preliminary motion-check evidence</h2>
+    <p>Record these observations only within an approved test plan. Completion does not authorize material printing.</p>
     <ul class="checklist">
       <li>Motor current set to working value and motors stay only warm, not hot.</li>
       <li>All four Z corners jog the correct direction.</li>
@@ -228,8 +222,8 @@
       <li><code>HOME_Z</code> gives four clean stops and a back-off, every time.</li>
       <li>Gantry measures level at all four corners after homing.</li>
       <li>Z dry-run is smooth, no slipping or lagging.</li>
-      <li>Emergency stop tested and brings the machine to a safe state.</li>
-      <li>(As added) X, Y, and extruder validated the same way.</li>
+      <li>Qualified professional's separate stop-function verification record is identified.</li>
+      <li>Equivalent axis-specific checks are defined for X, Y, and any extruder drive; no axis is inferred from Z results.</li>
     </ul>
 
     <h2>If you get stuck</h2>
@@ -241,11 +235,11 @@
 
     <div class="callout">
       <span class="tag">Next</span>
-      <p>Your machine is mechanically and electrically validated. Pair it with a pump and a mix, and you are ready for first prints. Mix design and pump setup are separate from the printer itself — see <a href="https://m3-crete.com">m3-crete.com</a>.</p>
+      <p>Completing these limited observations does not mechanically or electrically validate the machine and does not make it ready to print. Qualified engineering, electrical, controls, guarding, pump/pressure, material, facility, and commissioning reviews remain separate requirements.</p>
     </div>
 
     <hr />
-    <p style="font-size:0.85rem;color:var(--muted);">M3-CRETE is an open-hardware development platform, not a finished certified appliance. It is meant for qualified technical users, labs, schools, and experienced builders. Any AC mains wiring, control-box integration, grounding, disconnects, or emergency-stop power work must be done by qualified personnel or a licensed electrician where required. Hardware is published under CERN-OHL-W-2.0; this guide is CC BY 4.0.</p>
+    <p style="font-size:0.85rem;color:var(--muted);">M3-CRETE is an experimental open-hardware reference, not a finished certified appliance or construction machine. It is intended for qualified technical users, R&amp;D labs, supervised institutional programs, and experienced builders. Any AC mains wiring, control-box integration, grounding, disconnects, or emergency-stop power work must be done by qualified personnel or a licensed electrician where required. Hardware is published under CERN-OHL-W-2.0; this guide is CC BY 4.0.</p>
 
   </main>
 

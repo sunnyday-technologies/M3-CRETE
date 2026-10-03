@@ -30,7 +30,7 @@ Developed by [Sunnyday Technologies](https://sunn3d.com).
 | Spec | Value |
 |------|-------|
 | **Open BOM component target** | Under $5,000 for public mechanical/low-voltage reference components where current commodity pricing and substitutions allow; professional electrical/power-control scope is excluded |
-| **Build footprint** | Sub-1 m³ — fits on a standard US pallet (48×40 in) |
+| **Configured design envelope** | Default M3-2 target: 2000 × 1000 × 1000 mm. The assembled external footprint and shipping configuration have not been physically verified here. |
 | **Printhead weight** | ~1.5 kg |
 | **License** | CERN-OHL-W-2.0 |
 
@@ -73,16 +73,16 @@ can inspect, replace, and modify parts without single-source dependency.
 
 ### Lower Moving Mass, Still Hazardous
 
-With an efficient frame design, the drive system uses smaller motors than many
-industrial concrete-printing systems while delivering sufficient torque for the
-reference gantry. This does not make the machine safety-rated or safe for
+The current drive system is sized for the reference geometry using project
+calculations and component assumptions that still require physical commissioning
+and load validation. This does not make the machine safety-rated or safe for
 unsupervised use. Moving axes, pinch/crush hazards, cementitious materials,
 pressurized hoses, electrical systems, and software-controlled motion all
 require qualified review, guarding, PPE, training, and operating procedures.
 
-### No Thermal Management
+### No Thermoplastic Melt System
 
-Concrete cures by hydration — a chemical reaction — not by melting and cooling. This eliminates roughly 25% of the hardware cost and complexity associated with conventional FDM printers (heated beds, hot ends, cooling fans), resulting in a mechanically simpler, more energy-efficient, and more reliable machine.
+Cementitious materials harden through hydration rather than thermoplastic melting and cooling, so the reference design does not use an FDM-style heated bed, hot end, or part-cooling system. That removes one class of hardware, but this repository does not establish a quantified cost, energy, or reliability advantage over other printer architectures.
 
 ### Designed for Research Iteration
 
@@ -116,7 +116,7 @@ Firmware configurations are maintained separately:
 ```
 M3-CRETE/
 ├── CAD/
-│   ├── M3-2_Assembly.step       # Full assembly (99 parts, 13.5 MB via LFS)
+│   ├── M3-2_Assembly.step       # Development STEP assembly snapshot via LFS
 │   ├── m3_2_assembly.py         # CadQuery assembly generator (source of truth)
 │   ├── self_check.py            # 5-gate automated validation harness
 │   ├── kinematics_eval.py       # Structural analysis (deflection, torque, belts)
@@ -124,7 +124,7 @@ M3-CRETE/
 │   ├── Components/              # OpenBuilds parts library (CC BY-SA 4.0)
 │   └── Advanced/                # Extended parts (C-beam, joining plates)
 ├── bom/
-│   ├── data.json                # BOM source of truth (62 parts, v2.5.0)
+│   ├── data.json                # BOM source of truth (v2.7.0; 65 reference entries)
 │   └── index.html               # Interactive BOM viewer (bom.m3-crete.com/bom)
 ├── firmware/                    # Klipper configs (kinematics, steppers)
 ├── blog/                        # Build logs and project updates
@@ -133,7 +133,7 @@ M3-CRETE/
 
 ### AI-Assisted CAD Workflow
 
-This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW), an automated assembly and validation framework for STEP CAD developed during this project. A declarative assembly spec places the authored STEP parts by connector frames and datum chains and compiles the assembly, the check harness validates it (inventory, interference, adjacency, dimensions, orientation, floating), and the structural module analyzes load performance. CADCLAW places parts authored in native CAD; it does not generate geometry. This workflow caught 53 interferences and reduced the STEP file from 70 MB to 13 MB.
+This project uses [CADCLAW](https://github.com/sunnyday-technologies/CADCLAW), an automated checking framework for STEP CAD developed during this project. A declarative assembly spec places authored STEP parts by connector frames and datum chains, while software checks inspect selected inventory, interference, adjacency, dimensional, orientation, and floating-part rules. CADCLAW places parts authored in native CAD; it does not generate geometry. These checks are bounded software evidence, not proof of manufacturability, structural performance, tolerance compliance, safety, or physical fit.
 
 See the [CADCLAW repo](https://github.com/sunnyday-technologies/CADCLAW) for the generalized, reusable framework.
 
@@ -147,11 +147,11 @@ cementitious formulation for field use. Mixes, toolpaths, curing, durability,
 and acceptance criteria require separate physical testing and professional
 review for each use case.
 
-For AI-driven mix-design decision support, see
-[CEMFORGE](https://cemforge.ai/concrete-printers/) — a formulation engine
-designed to generate candidate mixes and supported performance predictions where
-sufficient validated data is available. Candidate mixes require physical
-validation before any project use.
+For early-stage materials-evidence and mix-design decision support, see
+[CEMFORGE](https://cemforge.ai/concrete-printers/). Where sufficient source
+evidence exists, it can help organize candidate formulations for review; it does
+not establish a mix's performance or fitness. Every candidate requires physical
+testing, provenance review, and qualified approval before project use.
 
 ---
 
