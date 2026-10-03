@@ -15,6 +15,8 @@
   <meta name="twitter:title" content="M3-CRETE | Open-Source Concrete 3D Printer" />
   <meta name="twitter:description" content="Open-source concrete/paste-printing development platform for qualified technical users. BOM and build guide by Sunnyday Technologies." />
   <link rel="canonical" href="https://bom.m3-crete.com/" />
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="M3-CRETE agent-readable overview" />
+  <link rel="alternate" type="application/json" href="/.well-known/mcp-manifest.json" title="M3-CRETE experimental agent discovery manifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Mono:wght@300;400;500&family=Poppins:wght@400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -485,7 +487,7 @@
     }
   </style>
 
-  <!-- Structured data: Product + Organization (schema.org JSON-LD) -->
+  <!-- Structured data: CreativeWork + Organization (schema.org JSON-LD) -->
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -495,7 +497,7 @@
       "@id": "https://m3-crete.com/#open-hardware-design",
       "name": "M3-CRETE",
       "alternateName": "Mobile Modular Meter-Cubed Concrete 3D Printer",
-      "description": "M3-CRETE is an open-source concrete 3D printer hardware design published for research, education, and development use. The public project includes CAD, bill of materials, firmware references, and build documentation for a field-serviceable concrete-printing motion platform.",
+      "description": "M3-CRETE is an experimental open-source concrete/paste-printing motion-system design published for qualified research and development use. The public project includes development CAD, a reference bill of materials, firmware references, and work-in-progress build documentation; physical suitability requires independent review and validation.",
       "url": "https://m3-crete.com/",
       "license": "https://ohwr.org/cern_ohl_w_v2.txt",
       "creator": {
@@ -531,6 +533,7 @@
     </div>
     <nav aria-label="Primary">
       <a href="/bom/" aria-label="Interactive Bill of Materials viewer">BOM</a> &nbsp;&nbsp;
+      <a href="/build-guide/" aria-label="Experimental build reference">Guide</a> &nbsp;&nbsp;
       <a href="/blog/" aria-label="M3-CRETE development blog">Blog</a> &nbsp;&nbsp;
       <a href="/press/" aria-label="M3-CRETE press and media">Press</a> &nbsp;&nbsp;
       <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="Sunnyday Technologies parent site (opens in new tab)">sunn3d.com</a>
@@ -543,11 +546,13 @@
     <h1>Concrete.<br/><span>Printed.</span><br/>Open.</h1>
     <p class="hero-desc">
       M3-CRETE is an open-source concrete/paste-printing development platform for meter-scale builds —
-      now over 1 meter on the long axis. Modular, mobile, and designed for field
-      deployment — developed by Sunnyday Technologies as a companion to the
-      CEMFORGE™ AI formulation platform. Open-hardware under CERN-OHL-W-2.0:
-      the full bill of materials and build guide are published, so anyone can
-      source the parts and assemble the printer themselves.
+      now over 1 meter on the long axis. Modular and mobile, it is published as a
+      development baseline for controlled research and prototyping; field suitability
+      has not been established. It was developed by Sunnyday Technologies alongside
+      the CEMFORGE™ decision-support work. Open hardware under CERN-OHL-W-2.0:
+      the reference bill of materials and work-in-progress build guide are published so
+      qualified teams can inspect, source, and adapt the design. Building or operating
+      the system requires independent engineering, electrical, safety, and commissioning review.
     </p>
   </section>
 
@@ -584,12 +589,12 @@
       <div class="block-num">// 01</div>
       <div class="block-title">What It Is</div>
       <p class="block-body">
-        A pallet-scale concrete 3D printer designed for field deployment, based on a scaled
+        A pallet-scale concrete/paste-printer development design based on a scaled
         Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming.
-        Designed for robust performance in dusty construction environments with
-        a lightweight printhead (~1.5 kg) and V-groove motion system. The
-        open BOM is intended to keep self-sourced component cost under $5,000
-        where current commodity pricing and substitutions allow.
+        The published concept uses a lightweight printhead (~1.5 kg) and V-groove
+        motion system. Dust, weather, duty-cycle, guarding, electrical, and field
+        performance require independent validation. BOM prices are planning references,
+        not a guaranteed build cost.
       </p>
     </div>
     <div class="content-block">
@@ -598,19 +603,19 @@
       <p class="block-body">
         The concrete 3D printing industry moves faster when hardware isn't a
         barrier. M3-CRETE is released openly so researchers, universities, and
-        contractors can build, modify, and improve on a published CAD/BOM development baseline —
-        while pairing with CEMFORGE™ for AI-optimized mix design.
+        contractors can inspect, modify, and improve a published CAD/BOM development baseline.
+        Any build or material selection requires the builder's own safety review and validation.
       </p>
     </div>
     <div class="content-block">
       <div class="block-num">// 03</div>
       <div class="block-title">CEMFORGE™ Integration</div>
       <p class="block-body">
-        M3-CRETE is designed to run formulations generated by the CEMFORGE™
-        platform — trained on validated 3D-printed cementitious specimen data,
-        generating supported printability and mechanical property predictions where
-        sufficient data is available. The hardware and formulation platform are
-        designed to work together.
+        CEMFORGE can organize material evidence and identify gaps for controlled
+        research planning. It does not supply a production-approved M3-CRETE mix,
+        and modeled outputs do not establish pumpability, printability, buildability,
+        strength, durability, structural adequacy, or field suitability. Actual materials,
+        equipment, and conditions require independent laboratory and project review.
       </p>
     </div>
       <div class="content-block">
@@ -619,7 +624,8 @@
       <p class="block-body">
         The project is in active development. CAD files and BOM are published,
         with build guides and documentation added to the GitHub repository as they
-        are validated. Watch the repository, open an issue, or start a discussion
+        are reviewed. Publication does not mean a design has been certified or field-validated.
+        Watch the repository, open an issue, or start a discussion
         for design feedback, build reports, or technical questions.
       </p>
     </div>
@@ -628,7 +634,7 @@
       <div class="block-title">Qualified Technical Use</div>
       <p class="block-body">
         M3-CRETE is not a casual hobby kit, finished certified printer, or jobsite-ready electrical product.
-        It is intended for qualified technical users, labs, schools, R&D teams, and experienced builders.
+        It is intended for qualified technical users, R&D labs, supervised institutional programs, and experienced builders.
         Any AC mains wiring, control-box integration, grounding, disconnects, emergency-stop power circuits,
         facility connection, inspection, or code compliance work must be performed by qualified personnel,
         a licensed electrician where required, or a qualified control-panel shop. Public project files identify
@@ -666,7 +672,7 @@
       </div>
       <div class="cta-col">
         <div class="cta-col-word">Schema.</div>
-        <a class="btn btn-secondary" href="https://open3dcp.org" target="_blank" rel="noopener" aria-label="Open3DCP printability dataset and schema (opens in new tab)">
+        <a class="btn btn-secondary" href="https://open3dcp.org" target="_blank" rel="noopener" aria-label="Open3DCP public data schema (opens in new tab)">
           Open3DCP Standard &rarr;
         </a>
       </div>

@@ -14,9 +14,10 @@ Related project-scope documents:
 
 Concrete/paste printing involves moving machinery, cementitious materials,
 pressurized material handling, and electrical systems that pose real safety
-risks. Users assume full responsibility for the safe design, construction,
-commissioning, guarding, training, inspection, and operation of any system built
-from these files.
+risks. Responsibility and legal duties depend on the parties, jurisdiction, and
+actual use. Anyone considering construction or operation must identify competent
+owners for design, commissioning, guarding, training, inspection, and operation
+and obtain applicable professional and legal review.
 
 ## Electrical And AC Mains Work
 
@@ -40,7 +41,11 @@ Sunnyday Technologies makes no representations or warranties of any kind — exp
 
 ## Limitation of Liability
 
-Sunnyday Technologies assumes no liability for injury, property damage, loss, or any other harm resulting from the use, misuse, or inability to use these designs or any system built from them.
+To the maximum extent permitted by applicable law and subject to the governing
+licenses, Sunnyday Technologies disclaims liability for injury, property damage,
+loss, or other harm resulting from use, misuse, or inability to use these files
+or a system derived from them. Nothing here excludes rights or liabilities that
+cannot lawfully be excluded.
 
 ## Regulatory Compliance
 
@@ -50,4 +55,8 @@ before constructing or operating any system based on these files. Nothing in
 this repository constitutes engineering advice, professional sign-off, or
 regulatory approval.
 
-By using, building, or modifying this project, you agree to these terms.
+This notice is informational and does not create professional services,
+engineering approval, certification, or a click-through agreement. The exact
+open-source licenses govern licensed files. Obtain qualified legal advice for
+commercial distribution, workplace use, construction use, or questions about
+local obligations.

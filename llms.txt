@@ -1,10 +1,10 @@
 # M3-CRETE
 
-> Open-source concrete/paste-printing development platform for qualified technical users. Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming. Companion hardware to the CEMFORGE AI mix-formulation platform. Maintained by Sunnyday Technologies LLC, Appleton WI.
+> Experimental open-source concrete/paste-printing motion-system design for qualified technical users. Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming. Published alongside CEMFORGE materials-evidence and decision-support work; neither system establishes physical suitability without validation. Maintained by Sunnyday Technologies LLC, Appleton WI.
 
 This file is a high-density, plain-text summary intended for LLM retrieval and RAG indexing. Authoritative source is the GitHub repository and the JSON BOM linked below.
 
-Important safety and product-boundary note: M3-CRETE is intended for qualified technical users, labs, schools, R&D teams, and experienced builders. It is not a casual hobby kit, toy, finished certified printer, certified construction machine, turnkey jobsite system, or structural concrete production system. Public project files may identify electrical interfaces, low-voltage controls, and component references, but they are not AC mains wiring instructions.
+Important safety and product-boundary note: M3-CRETE is intended for qualified technical users, R&D labs, supervised institutional programs, and experienced builders. It is not a casual hobby kit, toy, finished certified printer, certified construction machine, turnkey jobsite system, or structural concrete production system. Public project files may identify electrical interfaces, low-voltage controls, and component references, but they are not AC mains wiring instructions.
 
 ## Identity
 
@@ -51,22 +51,22 @@ Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/
 
 ## Bill of Materials
 
-- Source of truth: https://bom.m3-crete.com/bom/data.json (JSON; ~66 parts, ~216 supplier options, ~37 suppliers).
+- Source of truth: https://bom.m3-crete.com/bom/data.json (JSON; current snapshot 65 parts, 189 options, 35 named suppliers; verify the live JSON because counts can change).
 - Interactive viewer: https://bom.m3-crete.com/bom/
 - Viewer features: multi-supplier selection, coverage tracking, per-part quantity adjusters, "I have this" exclusion, Buy/Print/CNC toggle on fabricated parts, CSV/JSON export, model-variant selector (M3-1 / M3-2 / M3-4).
 
 ## Companion projects
 
-- CEMFORGE — AI-driven 3D-printable concrete mix formulation platform: https://cemforge.ai
-- Open3DCP — open printability dataset and schema for 3D concrete printing: https://open3dcp.org
+- CEMFORGE — early-stage materials evidence and decision support; modeled outputs require physical validation and qualified review: https://cemforge.ai
+- Open3DCP — public draft schema for recording 3D concrete printing material, process, test, and provenance data; it is not itself a supplied dataset or ratified standard: https://open3dcp.org
 
 ## Machine-readable surface
 
 - Sitemap: https://bom.m3-crete.com/sitemap.xml
 - robots.txt: https://bom.m3-crete.com/robots.txt (explicitly allows ClaudeBot, GPTBot, Google-Extended, PerplexityBot)
-- MCP manifest (experimental): https://m3-crete.com/.well-known/mcp-manifest.json
-- Product JSON-LD: embedded in https://m3-crete.com/ inside a `<script type="application/ld+json">` tag.
+- Experimental site manifest for this BOM/documentation host: https://bom.m3-crete.com/.well-known/mcp-manifest.json
+- CreativeWork JSON-LD: embedded in https://bom.m3-crete.com/ inside a `<script type="application/ld+json">` tag.
 
 ## Status
 
-Active development. CAD files and BOM are published; build guides and assembly documentation are added to the GitHub repo as they are validated.
+Active development. Development CAD and the reference BOM are published; build guides and assembly documentation are added as they are reviewed. Publication or review does not mean the machine, assembly, electrical system, safety function, or material process has been physically validated, certified, or approved for a project.

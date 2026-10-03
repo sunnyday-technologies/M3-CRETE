@@ -62,21 +62,14 @@ OUTPUT:
 
 | Strategy | Best For | Trade-off |
 |----------|----------|-----------|
-| **Lowest Cost** | Budget builds, patient builders | 3-6 week lead time (overseas), more suppliers |
-| **Fastest Shipping** | Urgent builds | ~15-25% premium, mostly Amazon Prime |
-| **Best Value** | Most builders | US suppliers, 1-2 week delivery, balanced |
-| **Maximum Quality** | Production machines | Highest cost, best components, longest life |
+| **Lowest quoted cost** | Comparing currently available quotes | May increase lead time, supplier count, duties, returns, and quality-verification burden |
+| **Shortest verified lead time** | Schedule-sensitive research procurement | Requires live inventory and delivery confirmation; quoted speed is not guaranteed |
+| **Balanced review** | Comparing cost, evidence, support, and lead time | Buyer must define and document the weighting |
+| **Highest documented specification fit** | Evidence-focused component selection | Higher price does not establish quality, life, compatibility, or project suitability |
 
-### Typical All-In Cost Range (M3 base, excl. concrete pump)
+### Cost boundary
 
-| Strategy | Print plates | Buy CNC plates |
-|----------|-------------|----------------|
-| Lowest Cost | ~$1,900 – $2,200 | ~$2,400 – $2,700 |
-| Best Value | ~$2,200 – $2,600 | ~$2,600 – $3,100 |
-| Fastest Shipping | ~$2,400 – $2,800 | ~$2,800 – $3,300 |
-| Maximum Quality | ~$2,800 – $3,400 | ~$3,200 – $4,000 |
-
-*Ranges include parts + shipping + tax. Concrete extrusion system not included.*
+No verified all-in cost range is provided. Re-price the current BOM for the exact model, location, fabrication plan, and supplier set. Include shipping, tax, duties, returns, spares, tools, fabrication, engineering, professional electrical/control work, guarding, facility work, commissioning, material-delivery equipment, testing, maintenance, and exclusions. Any generated total is a dated planning estimate, not a quote or sale price.
 
 ---
 
