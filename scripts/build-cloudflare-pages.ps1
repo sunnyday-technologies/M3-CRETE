@@ -128,6 +128,57 @@ if ($matches.Count -gt 0) {
   throw "Potential secret-like patterns found in publish directory files: $($uniqueMatches -join ', ')"
 }
 
+# Derive BOM facts from the JSON source of truth. Part counts intentionally
+# include excluded/reference-only entries because that is what the JSON array
+# contains. Supplier counts use approved options only: the viewer and its
+# exports hide approved=false options (legacy references kept for history).
+$bomPath = Join-Path $Target "bom\data.json"
+$bomRaw = Get-Content -LiteralPath $bomPath -Raw -Encoding UTF8
+$bom = $bomRaw | ConvertFrom-Json
+# pwsh 7 (CI) turns ISO strings into DateTime; take the date from the raw text.
+$bomGeneratedMatch = [regex]::Match($bomRaw, '"generated"\s*:\s*"(\d{4}-\d{2}-\d{2})')
+if (-not $bomGeneratedMatch.Success) { throw "BOM JSON has no ISO generated date" }
+$bomGeneratedDate = $bomGeneratedMatch.Groups[1].Value
+$parts = @($bom.parts)
+$approvedOptions = @($parts | ForEach-Object { @($_.suppliers) } | Where-Object { $_.approved -eq $true })
+$optionCount = $approvedOptions.Count
+$namedSupplierCount = @(
+  $approvedOptions |
+    ForEach-Object { $_.supplier_name } |
+    Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+    Sort-Object -Unique
+).Count
+$categoryCount = @($parts | ForEach-Object { $_.category } | Sort-Object -Unique).Count
+$partCount = $parts.Count
+$bomVersion = [string]$bom.version
+
+if ($partCount -lt 1 -or $optionCount -lt 1 -or $namedSupplierCount -lt 1 -or $categoryCount -lt 1) {
+  throw "BOM fact derivation produced an empty count"
+}
+
+# Public pages state these facts as {{BOM_*}} tokens and the build fills them
+# in, so a data.json edit cannot leave a stale count in the published copies.
+$bomTokens = [ordered]@{
+  '{{BOM_VERSION}}'    = $bomVersion
+  '{{BOM_GENERATED}}'  = $bomGeneratedDate
+  '{{BOM_PARTS}}'      = [string]$partCount
+  '{{BOM_CATEGORIES}}' = [string]$categoryCount
+  '{{BOM_OPTIONS}}'    = [string]$optionCount
+  '{{BOM_SUPPLIERS}}'  = [string]$namedSupplierCount
+}
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+# Forward slashes: .NET file APIs take them on Windows and Linux alike.
+foreach ($relative in @("bom/index.html", "llms.txt", ".well-known/mcp-manifest.json")) {
+  $path = Join-Path $Target $relative
+  $text = [System.IO.File]::ReadAllText($path, $utf8NoBom)
+  foreach ($token in $bomTokens.Keys) { $text = $text.Replace($token, $bomTokens[$token]) }
+  [System.IO.File]::WriteAllText($path, $text, $utf8NoBom)
+}
+$unfilled = Get-ChildItem -LiteralPath $Target -Recurse -Force -File |
+  Select-String -SimpleMatch -Pattern '{{BOM_' -ErrorAction SilentlyContinue |
+  Select-Object -ExpandProperty Path -Unique
+if ($unfilled) { throw "Unfilled {{BOM_*}} token(s) in: $($unfilled -join ', ')" }
+
 # Parse every published JSON document. A malformed discovery or BOM resource is
 # a release failure, not a browser-only problem.
 $jsonFiles = Get-ChildItem -LiteralPath $Target -Recurse -Force -File -Filter "*.json"
@@ -316,33 +367,7 @@ foreach ($requiredPath in $requiredSitemapPaths) {
   }
 }
 
-# Derive BOM facts from the JSON source of truth and require every duplicated
-# public summary to match the same snapshot. Counts intentionally include
-# excluded/reference-only entries because that is what the JSON array contains.
-$bomPath = Join-Path $Target "bom\data.json"
-$bomRaw = Get-Content -LiteralPath $bomPath -Raw -Encoding UTF8
-$bom = $bomRaw | ConvertFrom-Json
-# pwsh 7 (CI) turns ISO strings into DateTime; take the date from the raw text.
-$bomGeneratedMatch = [regex]::Match($bomRaw, '"generated"\s*:\s*"(\d{4}-\d{2}-\d{2})')
-if (-not $bomGeneratedMatch.Success) { throw "BOM JSON has no ISO generated date" }
-$bomGeneratedDate = $bomGeneratedMatch.Groups[1].Value
-$parts = @($bom.parts)
-$optionCount = @($parts | ForEach-Object { @($_.suppliers) }).Count
-$namedSupplierCount = @(
-  $parts |
-    ForEach-Object { @($_.suppliers) } |
-    ForEach-Object { $_.supplier_name } |
-    Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
-    Sort-Object -Unique
-).Count
-$categoryCount = @($parts | ForEach-Object { $_.category } | Sort-Object -Unique).Count
-$partCount = $parts.Count
-$bomVersion = [string]$bom.version
-
-if ($partCount -lt 1 -or $optionCount -lt 1 -or $namedSupplierCount -lt 1 -or $categoryCount -lt 1) {
-  throw "BOM fact derivation produced an empty count"
-}
-
+# Require every filled-in public summary to be present with the derived facts.
 $bomPage = Get-Content -LiteralPath (Join-Path $Target "bom\index.html") -Raw -Encoding UTF8
 $llms = Get-Content -LiteralPath (Join-Path $Target "llms.txt") -Raw -Encoding UTF8
 $manifest = Get-Content -LiteralPath (Join-Path $Target ".well-known\mcp-manifest.json") -Raw -Encoding UTF8
@@ -351,7 +376,7 @@ $requiredBomSummaries = @(
   @{
     Name = "BOM metadata"
     Text = $bomPage
-    Pattern = "BOM v$([regex]::Escape($bomVersion)) contains $partCount entries across $categoryCount categories and $optionCount supplier options"
+    Pattern = "BOM v$([regex]::Escape($bomVersion)) contains $partCount entries across $categoryCount categories and $optionCount approved supplier options"
   },
   @{
     Name = "BOM no-JS fallback"
@@ -361,18 +386,18 @@ $requiredBomSummaries = @(
   @{
     Name = "LLM summary"
     Text = $llms
-    Pattern = "$partCount parts, $optionCount options, $namedSupplierCount named suppliers"
+    Pattern = "$partCount parts, $optionCount approved options, $namedSupplierCount named suppliers"
   },
   @{
     Name = "Discovery manifest"
     Text = $manifest
-    Pattern = "$partCount parts, $optionCount options, and $namedSupplierCount named suppliers"
+    Pattern = "$partCount parts, $optionCount approved options, and $namedSupplierCount named suppliers"
   }
 )
 
 foreach ($summary in $requiredBomSummaries) {
   if ($summary.Text -notmatch $summary.Pattern) {
-    throw "$($summary.Name) does not match derived BOM facts: version=$bomVersion parts=$partCount categories=$categoryCount options=$optionCount named_suppliers=$namedSupplierCount"
+    throw "$($summary.Name) does not match derived BOM facts: version=$bomVersion parts=$partCount categories=$categoryCount approved_options=$optionCount named_suppliers=$namedSupplierCount"
   }
 }
 
@@ -386,10 +411,12 @@ $blockedPublicMarkers = @(
   "mechanically and electrically validated",
   "ready for first prints",
   "canonical open-source concrete 3D printer",
+  # Old count claims are matched in their exact old wording; bare phrases such
+  # as "64 parts" would also match a legitimate generated {{BOM_*}} count.
   "66 parts across 9 categories",
-  "64 Parts",
+  "Bill of Materials $([char]0x2014) 64 Parts",
   "62 parts, v2.5.0",
-  "216 supplier options",
+  "~216 supplier options",
   "37 suppliers",
   "99 parts, 13.5 MB",
   "eliminates roughly 25%",
@@ -430,4 +457,4 @@ Write-Output "JSON documents: $($jsonFiles.Count)"
 Write-Output "JSON-LD documents: $jsonLdCount"
 Write-Output "Local hyperlinks checked: $localLinkCount"
 Write-Output "Sitemap URLs: $($sitemapLocs.Count)"
-Write-Output "BOM facts: version=$bomVersion parts=$partCount categories=$categoryCount options=$optionCount named_suppliers=$namedSupplierCount"
+Write-Output "BOM facts: version=$bomVersion parts=$partCount categories=$categoryCount approved_options=$optionCount named_suppliers=$namedSupplierCount"

@@ -8,12 +8,15 @@
     <!-- Machine-readable BOM data (agents, crawlers, non-JS clients) -->
     <link rel="alternate" type="application/json" href="/bom/data.json" title="M3-CRETE Bill of Materials (JSON)">
     <meta name="robots" content="index, follow">
-    <meta name="description" content="Interactive reference Bill of Materials for the experimental M3-CRETE motion-system design. BOM v2.7.0 contains 65 entries across 12 categories and 189 supplier options; verify the JSON before use.">
+    <!-- BOM version, date and counts below are BOM_* placeholders that
+         scripts/build-cloudflare-pages.ps1 fills from data.json. Preview the
+         built copy in .cloudflare/pages/m3-crete, not this source file. -->
+    <meta name="description" content="Interactive reference Bill of Materials for the experimental M3-CRETE motion-system design. BOM v{{BOM_VERSION}} contains {{BOM_PARTS}} entries across {{BOM_CATEGORIES}} categories and {{BOM_OPTIONS}} approved supplier options; verify the JSON before use.">
     <link rel="canonical" href="https://bom.m3-crete.com/bom/" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://bom.m3-crete.com/bom/" />
     <meta property="og:title" content="M3-CRETE Bill of Materials — Interactive BOM Viewer" />
-    <meta property="og:description" content="Interactive reference Bill of Materials for the experimental M3-CRETE motion-system design. BOM v2.7.0 contains 65 entries across 12 categories and 189 supplier options; verify the JSON before use." />
+    <meta property="og:description" content="Interactive reference Bill of Materials for the experimental M3-CRETE motion-system design. BOM v{{BOM_VERSION}} contains {{BOM_PARTS}} entries across {{BOM_CATEGORIES}} categories and {{BOM_OPTIONS}} approved supplier options; verify the JSON before use." />
     <meta property="og:image" content="https://bom.m3-crete.com/images/M3-CRETE_render.jpg" />
 
     <!-- Structured Data: JSON-LD -->
@@ -22,7 +25,7 @@
       "@context": "https://schema.org",
       "@type": "Dataset",
       "name": "M3-CRETE Bill of Materials",
-      "description": "Reference Bill of Materials snapshot for the experimental M3-CRETE motion-system design by Sunnyday Technologies. Version 2.7.0 contains 65 entries across 12 categories and 189 supplier options, including excluded or reference-only entries; verify the JSON and qualified design requirements before use.",
+      "description": "Reference Bill of Materials snapshot for the experimental M3-CRETE motion-system design by Sunnyday Technologies. Version {{BOM_VERSION}} contains {{BOM_PARTS}} entries across {{BOM_CATEGORIES}} categories and {{BOM_OPTIONS}} approved supplier options, including excluded or reference-only entries; verify the JSON and qualified design requirements before use.",
       "url": "https://bom.m3-crete.com/bom/",
       "license": "https://ohwr.org/cern_ohl_w_v2.txt",
       "creator": {
@@ -2130,8 +2133,8 @@ function showToast(msg, type = '') {
     <h2>M3-CRETE Reference Bill of Materials</h2>
     <p>This interactive viewer requires JavaScript. Use the versioned <a href="/bom/data.json" style="color:#97D700;">machine-readable JSON</a> as the authoritative source for current part entries, quantities, exclusions, and supplier references.</p>
     <ul>
-        <li>Current repository snapshot: BOM v2.7.0, generated 2026-04-29.</li>
-        <li>Snapshot inventory: 65 reference entries across 12 categories, with 189 supplier options from 35 named suppliers.</li>
+        <li>Current repository snapshot: BOM v{{BOM_VERSION}}, generated {{BOM_GENERATED}}.</li>
+        <li>Snapshot inventory: {{BOM_PARTS}} reference entries across {{BOM_CATEGORIES}} categories, with {{BOM_OPTIONS}} approved supplier options from {{BOM_SUPPLIERS}} named suppliers.</li>
         <li>Counts include entries marked excluded from the reference kit or retained only as design context. Do not treat every entry as a purchase instruction.</li>
         <li>Prices, availability, compatibility, quantities, electrical requirements, and project suitability require independent verification before procurement or use.</li>
     </ul>

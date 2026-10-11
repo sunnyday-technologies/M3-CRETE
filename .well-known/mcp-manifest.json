@@ -28,7 +28,7 @@
   "resources": [
     {
       "name": "GetBOM",
-      "description": "Bill of Materials as JSON. Source of truth for parts, quantities, and supplier references. Current snapshot: 65 parts, 189 options, and 35 named suppliers; verify the live JSON because counts can change.",
+      "description": "Bill of Materials as JSON. Source of truth for parts, quantities, and supplier references. Current snapshot: {{BOM_PARTS}} parts, {{BOM_OPTIONS}} approved options, and {{BOM_SUPPLIERS}} named suppliers; verify the live JSON because counts can change.",
       "method": "GET",
       "url": "https://bom.m3-crete.com/bom/data.json",
       "media_type": "application/json"
