@@ -28,8 +28,8 @@ Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/
 - Frame: 4080 C-Beam primary structure (Z-posts, Y-gantry rails) plus 2040 bracing. All 1000 mm standard lengths. C opening points inward toward the cube.
 - X-axis: 2× 1000 mm 4080 spliced = 2000 mm envelope. Splice uses straight-line slot-linking kit with internal 2040 reinforcement bonded inside the C-channel.
 - Y-axis: 2× parallel 2080 rails, 1000 mm span, dual motors (anti-racking).
-- Z-axis: 4× independent belt-driven 2040 vertical posts (quad self-tramming via Klipper Z_TILT_ADJUST).
-- Motion: GT2 10 mm belt + polycarbonate V-wheels on all axes.
+- Z-axis: 4× independent posts, each with a NEMA23 on top turning a Tr8×2 lead screw (8 mm, 2 mm lead); sensorless homing down onto bottom hard-stop blocks (quad self-tramming; Klipper Z_TILT_ADJUST available).
+- Motion: GT2 belts on X (6 mm) and Y (10 mm), Tr8×2 lead screws on Z, polycarbonate V-wheels on all axes.
 - Motors: 7× NEMA23 8 mm shaft (1× X + 2× Y + 4× Z) + 1× extruder (NEMA34, owner-supplied).
 - Controller: BTT Kraken (8× TMC5160 onboard) + Raspberry Pi 5 + Klipper.
 - Homing: StallGuard4 sensorless via TMC5160 (no mechanical limit switches).

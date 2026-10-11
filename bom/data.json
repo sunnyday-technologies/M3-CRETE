@@ -1,6 +1,6 @@
 {
-  "version": "2.7.0",
-  "generated": "2026-04-29T18:00:00Z",
+  "version": "2.8.0",
+  "generated": "2026-10-11T22:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -303,9 +303,9 @@
     {
       "id": 11,
       "category": "X-Axis Motion System",
-      "name": "GT2 Pulley 20-Tooth (8mm Bore, all axes)",
-      "description": "Drive and idler pulleys — MUST match motor shaft diameter (8mm). Metal recommended for belt tooth engagement under load. Aluminum or steel.",
-      "qty": 7,
+      "name": "GT2 Pulley 20-Tooth (8mm Bore, X/Y axes)",
+      "description": "Drive pulleys for the X motor and both Y motors (3 total; the Z-axis uses lead screws as of BOM v2.8.0). MUST match motor shaft diameter (8mm). Metal recommended for belt tooth engagement under load. Aluminum or steel.",
+      "qty": 3,
       "unit": "pulleys",
       "mfg_type": "buy",
       "sort_order": 30,
@@ -601,7 +601,7 @@
       "id": 19,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "NEMA23 Stepper Motor (Z-axis, 8mm shaft)",
-      "description": "Four independent motors for auto-tramming via Klipper Z_TILT_ADJUST. 8mm shaft to match pulleys. Belt-driven Z — same motor type as X/Y for full parts commonality.",
+      "description": "Four independent motors for auto-tramming via sensorless homing and Klipper Z_TILT_ADJUST. Mounted on top of each post, 8mm shaft down, driving a Tr8x2 lead screw (id 87) through an 8mm-to-8mm coupler (id 88). Same motor type as X/Y for full parts commonality.",
       "qty": 4,
       "unit": "motors",
       "mfg_type": "buy",
@@ -652,14 +652,14 @@
       "id": 20,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "GT2 Timing Belt 10mm (Z-axis, 4x ~2.5m loops)",
-      "description": "Belt-driven Z - same GT2 10mm belt as Y-axis; X-axis remains 6mm to fit the gantry slot. ~3m per Z corner (up + down run + tensioner), 12m total for 4 independent Z drives. Belts shed concrete splatters unlike lead screw threads.",
-      "qty": 4,
+      "description": "DEPRECATED 2026-10-11 (BOM v2.8.0): the Z-axis moved from GT2 belts to Tr8x2 lead screws (id 87). Kept here for changelog continuity; do not order. Belt-driven Z - same GT2 10mm belt as Y-axis; X-axis remains 6mm to fit the gantry slot. ~3m per Z corner (up + down run + tensioner), 12m total for 4 independent Z drives. Belts shed concrete splatters unlike lead screw threads.",
+      "qty": 0,
       "unit": "meters",
       "mfg_type": "buy",
       "sort_order": 20,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 60,
@@ -694,7 +694,7 @@
       "id": 23,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Z-Axis Carriage Plates",
-      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Current design target is the same 125x125mm C-Beam gantry plate geometry used across Y/Z/X where practical; must mount V-wheels + belt clamp.",
+      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Current design target is the same 125x125mm C-Beam gantry plate geometry used across Y/Z/X where practical; must mount V-wheels and the Z lead-screw brass flange nut (id 87, 22mm flange).",
       "qty": 4,
       "unit": "plates",
       "mfg_type": "print",
@@ -745,7 +745,7 @@
       "id": 24,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Z-Axis Motor Mounts (integrated 3D-printed corner brackets)",
-      "description": "No purchased Z motor brackets in the current reference design. Z motor mounting is integrated into the printed combined corner bracket/post cap/spacer with belt clearance (see id 75). Print in PETG for prototype or CCF for production.",
+      "description": "Z motors sit on top of each post, shaft down. Mounting is integrated into the printed top plate (id 79, TOP variant), which also seats the top bearing (id 89). The top bearing and lock collars (id 90) carry the gantry load, so the motor only supplies torque through the coupler (id 88). Print in PETG for prototype or CCF for production. The lead-screw revision of the printed plate is pending the CAD update.",
       "qty": 4,
       "unit": "mounts",
       "mfg_type": "print",
@@ -762,24 +762,171 @@
           "sku": null,
           "step_url": "https://github.com/sunnyday-technologies/M3-CRETE/raw/main/CAD/Custom/Corner_Bracket_Combined.step",
           "approved": true
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "Tr8x2 Lead Screw, 1000 mm, with Brass Nut (Z-axis)",
+      "description": "One per Z post, driven from the top by the Z motor. Tr8x2 = 8mm diameter, 2mm lead, single start. Must be single-start 2mm lead: the firmware uses rotation_distance 2, and the low lead resists back-driving, so the gantry holds its height when the motors are off (verify on the machine). Many listings sold as 'Tr8 2mm pitch' are 4-start (8mm lead) and do not qualify. The brass flange nut (22mm flange) bolts to the Z carriage plate (id 23); gravity preloads it, so an anti-backlash nut is optional. Keep threads clean and lightly greased: cement slurry on the threads wears the nut.",
+      "qty": 4,
+      "unit": "screws",
+      "mfg_type": "buy",
+      "sort_order": 25,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1305,
+          "supplier_name": "VXB",
+          "product_url": "https://vxb.com/products/1000mm-tr8x2-lead-screw-with-brass-nut-acme-thread",
+          "notes": "1000mm Tr8x2, 1 start, 2mm lead, 304 stainless; brass nut and protection tube included.",
+          "sku": "VXB0FD3LQLHZ",
+          "step_url": null,
+          "approved": true
         },
         {
-          "id": 73,
+          "id": 1306,
           "supplier_name": "Amazon",
-          "product_url": "https://www.amazon.com/s?k=NEMA+23+L+bracket+stepper",
-          "notes": "Legacy reference only; current design prints the mounts.",
+          "product_url": "https://www.amazon.com/s?k=Tr8x2+lead+screw+1000mm",
+          "notes": "Search results: confirm 1 start / 2mm lead before ordering; skip 4-start 'Tr8 2mm pitch' listings.",
           "sku": null,
           "step_url": null,
-          "approved": false
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "Shaft Coupler 8mm to 8mm (Z motor to lead screw)",
+      "description": "Connects each Z motor's 8mm shaft to its lead screw. Both bores must be 8mm: the M3-CRETE NEMA23 motors have 8mm shafts, and the common NEMA23 coupler is 6.35mm x 8mm, which will not fit. Jaw or flexible type; the coupler takes misalignment, not axial load.",
+      "qty": 4,
+      "unit": "couplers",
+      "mfg_type": "buy",
+      "sort_order": 30,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1307,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/8mm-x-8mm-jaw-coupling/",
+          "notes": "8mm x 8mm jaw coupling.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
         },
         {
-          "id": 1303,
-          "supplier_name": "MakerStore USA",
-          "product_url": "https://makerstore.cc/product/nema23-bracket/",
-          "notes": "Legacy reference only; current design prints the mounts.",
+          "id": 1308,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=8mm+to+8mm+flexible+shaft+coupler",
+          "notes": "Search results: confirm both bores are 8mm.",
           "sku": null,
           "step_url": null,
-          "approved": false
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "KFL08 Flange Bearing, 8mm Bore (Z lead-screw supports)",
+      "description": "Two per Z post. TOP: holds the screw just below the coupler and, with two lock collars (id 90), carries the gantry load so the motor bearings do not. BOTTOM: keeps the lower end of the 1m screw centered to limit whip; leave its grub screws loose so the screw can float axially. Both seat in the printed top/bottom plates (id 79).",
+      "qty": 8,
+      "unit": "bearings",
+      "mfg_type": "buy",
+      "sort_order": 35,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1309,
+          "supplier_name": "3DPrintingUSA",
+          "product_url": "https://3dprintingusa.com/products/kfl08-8-mm-bore-zinc-alloy-pillow-block-bearing-flange",
+          "notes": "KFL08 8mm bore zinc alloy flange bearing.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1310,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=KFL08+flange+bearing+8mm",
+          "notes": "Search results: usually sold in packs.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "Shaft Lock Collar, 8mm (Z lead screws)",
+      "description": "Two per Z post, clamped above and below the top bearing (id 89) so the screw hangs from that bearing. 8mm ID x 14mm OD x 7mm collars.",
+      "qty": 8,
+      "unit": "collars",
+      "mfg_type": "buy",
+      "sort_order": 40,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1311,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/lock-collar/",
+          "notes": "Select the 8mm size.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1312,
+          "supplier_name": "3DPrintingUSA",
+          "product_url": "https://3dprintingusa.com/products/openbuilds-lock-collar-t8-lead-screw-8x14x7mm",
+          "notes": "8 x 14 x 7mm lock collar for T8 lead screws.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "category": "Quad Z-Axis System (Self-Tramming)",
+      "name": "Z Hard-Stop Block (3D printed)",
+      "description": "Fixed stop at the bottom of each Z post. Z homes DOWN with sensorless homing (no switches) until each carriage stalls against its block, so the four blocks set the Z reference plane: print all four from the same file and mount them at the same height on the bottom plates (id 79). Use a stiff material so repeated homing does not compress the block. Geometry is pending the CAD update.",
+      "qty": 4,
+      "unit": "blocks",
+      "mfg_type": "print",
+      "sort_order": 55,
+      "mpn": null,
+      "substitute_ok": false,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1313,
+          "supplier_name": "Self-Manufacture",
+          "product_url": null,
+          "notes": "3D print in CF-Nylon or PETG at 100% infill.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1314,
+          "supplier_name": "Local CNC Shop",
+          "product_url": "",
+          "notes": "Aluminum block, if printed blocks compress over time.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
         }
       ]
     },
@@ -2269,8 +2416,8 @@
       "id": 66,
       "category": "X-Axis Motion System",
       "name": "Idler Pulley Mounting Plate",
-      "description": "3D-printed idler plates for belt return/tension points: 4x Z-axis + 2x Y-axis = 6 total. X-axis uses the 6mm gantry belt path and does not use this common idler plate line. Printed design carries the smooth idler pulley mount and tension feature.",
-      "qty": 6,
+      "description": "3D-printed idler plates for the Y-axis belt return/tension points: 2 total (as of BOM v2.8.0 the Z-axis uses lead screws and has no idlers). X-axis uses the 6mm gantry belt path and does not use this common idler plate line. Printed design carries the smooth idler pulley mount and tension feature.",
+      "qty": 2,
       "unit": "plates",
       "mfg_type": "print",
       "sort_order": 35,
@@ -2309,7 +2456,7 @@
           "id": 216,
           "supplier_name": "Self-Manufacture",
           "product_url": null,
-          "notes": "SN 001 source of truth: print 6 total plates in PETG/CF-Nylon.",
+          "notes": "SN 001 source of truth: print 2 Y-axis plates in PETG/CF-Nylon (the 4 Z plates from the belt build are no longer used).",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2475,8 +2622,8 @@
     {
       "id": 79,
       "category": "3D-Printed Structural",
-      "name": "Bottom Spacer/Idler Mount (4mm, combined, 3D printed)",
-      "description": "Combined bottom-spacer/idler-mount printed plate (4mm). 8 total: 2 per Z-corner (top + bottom). The TOP variant doubles as the Z-motor mount in the V1.0 design, holding the NEMA23 against the C-beam top. The BOTTOM variant carries the lower idler axle for the Z-belt loop. Identical geometry, different role per position.",
+      "name": "Z Post Top/Bottom Plate (4mm, combined, 3D printed)",
+      "description": "Combined printed plate (4mm) at each end of each Z post: 8 total, 2 per corner (top + bottom). TOP variant: Z-motor mount (id 24) plus the seat for the top lead-screw bearing (id 89). BOTTOM variant: seat for the lower bearing (id 89) and mount for the Z hard-stop block (id 91). Identical base geometry, different role per position. The lead-screw revision is pending the CAD update: the STL from the current CadQuery script is still the belt-era part with an idler axle.",
       "qty": 8,
       "unit": "pieces",
       "mfg_type": "print",
@@ -2680,5 +2827,5 @@
       ]
     }
   ],
-  "notes": "v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
+  "notes": "v2.8 (2026-10-11): the Z-axis moves from GT2 belts to Tr8x2 lead screws (owner decision). Z motors stay on top of each post, shaft down, driving each screw (id 87) through an 8mm coupler (id 88); KFL08 bearings (id 89) and lock collars (id 90) carry the gantry load; Z homes sensorless DOWN onto printed hard-stop blocks (id 91), no switches. Deprecated: id 20 (Z belts). Changed: id 11 pulleys 7->3, id 66 idler plates 6->2, id 19/23/24/79 descriptions. The published CAD (STEP/STL) still shows the belt Z until the CAD update. v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
 }
