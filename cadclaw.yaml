@@ -76,7 +76,7 @@ bom_audit:
       expected_mfg_type: buy
       expected_label: motor_nema23
     - id: 20
-      expected_qty: 4
+      expected_qty: 0   # 2026-10-11 v2.8: deprecated, Z moved to Tr8x2 lead screws (id 87)
       expected_mfg_type: buy
       required_terms: ["10mm"]
       # "6mm" intentionally not forbidden: BOM description for the Z-axis
@@ -129,6 +129,24 @@ bom_audit:
     - id: 83
       expected_qty: 32
       expected_mfg_type: buy
+    # 2026-10-11 v2.8 lead-screw Z. No expected_label yet: the STEP still shows
+    # the belt Z, so these parts have no CAD geometry until the CAD update.
+    - id: 87
+      expected_qty: 4
+      expected_mfg_type: buy
+      required_terms: ["Tr8x2"]   # firmware rotation_distance 2 depends on this lead
+    - id: 88
+      expected_qty: 4
+      expected_mfg_type: buy
+    - id: 89
+      expected_qty: 8
+      expected_mfg_type: buy
+    - id: 90
+      expected_qty: 8
+      expected_mfg_type: buy
+    - id: 91
+      expected_qty: 4
+      expected_mfg_type: print
 
 claim_audit:
   scan_paths:
