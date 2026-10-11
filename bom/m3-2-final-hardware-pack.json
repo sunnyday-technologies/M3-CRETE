@@ -207,6 +207,7 @@
     "Freeze belt termination hardware; current CAD hardware notes intentionally exclude belt clamps.",
     "Resolve the NEMA23 back-side nut conflict between AGENTS.md and CAD/bom_hardware.csv.",
     "Confirm connector plate geometry for each of the 27 C-beam joints before buying all plates in one style.",
-    "Do not include leveling feet in the reference kit unless the design decision is reopened."
+    "Do not include leveling feet in the reference kit unless the design decision is reopened.",
+    "BOM v2.8.0 (2026-10-11) moved the Z-axis to Tr8x2 lead screws: re-derive the Z hardware. The idler bracket screws, M5 x 30 idler axles and idler axle nuts above were counted for the belt Z (4 Z idlers); add fasteners for the KFL08 bearings, Z nut mounts and hard-stop blocks once the CAD update fixes their geometry."
   ]
 }

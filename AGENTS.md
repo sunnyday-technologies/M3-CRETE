@@ -45,9 +45,9 @@ review.
 - **Frame (2026-04-14 update):** **4080 C-Beam** primary structure (Z-posts, Y-gantry rails) + 2040 bracing. **ALL 1000mm standard lengths** — shipping-constrained, single-SKU procurement. C opening points **inward** toward the printer cube (belt path runs inside the C). Supersedes the 2080/2040 + 1200mm plan from 2026-04-07.
 - **X-axis:** 2x 1000mm 4080 spliced = 2000mm build envelope. Splice uses the **straight-line slot-linking kit** (internal T-slot connectors, sits below wheel path) **+ 3× 1m 2040 V-slot bars staggered inside the C-channel with structural adhesive** (center bar bridges 500mm each side of splice; existing 1m stock covers this — no 2m section needed; bom/data.json id 65). Corner joints use T-plate or L-plate 5-screw connectors at every 4080 junction. **NO external reinforcement on the X-gantry beam** — the X-carriage is 2-sided (V-wheels on top AND bottom of exterior), so any protrusion past the 40mm faces blocks carriage travel.
 - **Y-axis:** 2x parallel 2080 rails, 1000mm span, dual motors (anti-racking)
-- **Z-axis:** 4x independent belt-driven 2040 vertical posts (quad self-tramming via Klipper Z_TILT_ADJUST)
+- **Z-axis (2026-10-11 update):** 4x independent posts, each with a NEMA23 on top turning a Tr8x2 lead screw (bom/data.json ids 87-91); sensorless homing DOWN onto bottom hard-stop blocks, no switches. Supersedes the belt-driven Z; the CAD still shows the belt Z until it is updated.
 - **Gantry beam:** 2080 spanning Y, carried by dual-Y carriages
-- **Motion:** GT2 10mm belt + polycarbonate V-wheels on all axes
+- **Motion:** GT2 belts on X/Y, Tr8x2 lead screws on Z, polycarbonate V-wheels on all axes
 - **Motors:** 7x NEMA23 8mm shaft (1X + 2Y + 4Z) + 1 extruder (NEMA34, owner-supplied)
 - **Controller:** BTT Kraken (8x TMC5160 onboard) + Raspberry Pi 5 + Klipper
 - **Printhead:** 1.5kg target, 1" Male NPT pipe connection, counter-weighted hose

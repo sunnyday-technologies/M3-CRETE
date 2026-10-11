@@ -23,7 +23,8 @@ Klipper configuration for the M3-CRETE concrete 3D printer motion system.
 - **Motion steppers:** 7× NEMA23 3–4.5Nm, 8mm shaft (1×X + 2×Y + 4×Z)
 - **Nozzle valve:** 1× small stepper (NEMA17/23) on Kraken DRIVER7
 - **Feed pump:** 1× NEMA34 on external driver (owner-supplied)
-- **Y/Z belts:** GT2 10mm + 20-tooth pulleys (looped)
+- **Y belts:** GT2 10mm + 20-tooth pulleys (looped)
+- **Z drive:** Tr8x2 lead screws (8 mm, 2 mm lead, single start), motors on top of each post, 8 mm couplers
 - **X belt:** GT2 6mm + 20-tooth pulley (fixed strand, pinion drive)
 - **V-wheels:** Polycarbonate, eccentric-spacer adjustable
 - **Homing:** Sensorless StallGuard on all axes — no physical endstops
@@ -54,8 +55,8 @@ Frame origin `(0, 0, 0)` is at the **front-left corner of the build surface**. L
              ← X−                                     X+ →
                 HOME
 
-  ◆ = Z motor (NEMA23) on top brace, straddling each 4080 C-beam Z-post
-      (4 motors total, each with its own StallGuard-based homing)
+  ◆ = Z motor (NEMA23) on top of each 4080 C-beam Z-post, turning a
+      Tr8x2 lead screw (4 motors total, each with its own StallGuard homing)
 ```
 
 ### Home positions (all sensorless — no physical endstops)
@@ -64,17 +65,17 @@ Frame origin `(0, 0, 0)` is at the **front-left corner of the build surface**. L
 |------|----------------|---------------|---------------------|
 | X    | toward X−      | X = 0         | left frame post     |
 | Y    | toward Y−      | Y = 0         | front Z-posts frame |
-| Z    | toward Z+      | Z = 1000      | top brace (per post)|
+| Z    | toward Z−      | Z = position_endstop (measured) | bottom hard-stop block (per post) |
 
 **Homing sequence** (set in `homing.cfg`):
 
-1. **Z first** — all 4 Z posts drive UP into the top brace in parallel. Each post's StallGuard fires independently on its own driver, giving per-corner coplanarity without a physical probe.
+1. **Z first** — all 4 Z posts drive DOWN onto their bottom hard-stop blocks in parallel, at a reduced homing current. Each post's StallGuard fires independently on its own driver (each Z stepper has its own virtual endstop), giving per-corner coplanarity without a physical probe. The gantry then lifts 10 mm.
 2. **X second** — the development sequence assumes Z reached its configured reference position before an X-axis stall-detection move; this is not a verified safe-height guarantee.
 3. **Y last** — both Y motors drive the gantry forward into the front frame until the primary stalls (the secondary follows).
 
 ### Why Z first
 
-If X or Y moves with Z at an unknown position, the printhead can contact an obstacle. The current development sequence attempts to establish a Z reference first, but stall sensing and a hard stop do not guarantee clearance, repeatability, safe force, or a clear path. A qualified commissioning plan must verify the actual envelope, obstructions, speeds, currents, stopping behavior, guarding, and recovery before any automated homing sequence is enabled.
+If X or Y moves with Z at an unknown position, the printhead can contact an obstacle. The current development sequence establishes a Z reference first by homing down toward the build surface, so the build area must be clear before `G28`. Stall sensing and a hard stop do not guarantee clearance, repeatability, safe force, or a clear path. A qualified commissioning plan must verify the actual envelope, obstructions, speeds, currents, stopping behavior, guarding, and recovery before any automated homing sequence is enabled.
 
 ### Development motion references (not validated safe limits)
 
@@ -82,8 +83,8 @@ If X or Y moves with Z at an unknown position, the printhead can contact an obst
 |-----------|-------|-------|
 | `max_velocity` | 100 mm/s | Tune up after input shaping |
 | `max_accel` | 1500 mm/s² | Concrete mass demands gentle accel |
-| `max_z_velocity` | 25 mm/s | Z belts, not leadscrews |
-| `max_z_accel` | 300 mm/s² | |
+| `max_z_velocity` | 10 mm/s | Tr8x2 lead screws: 300 rpm |
+| `max_z_accel` | 100 mm/s² | |
 | `square_corner_velocity` | 5.0 mm/s | Low to prevent belt slip on corners |
 
 ## Build from source (Klipper firmware for the Kraken)
@@ -189,7 +190,9 @@ Use the `SHOW_SG` macro to see live StallGuard values while the printer is idle.
 
 ### 6. Test quad Z homing
 
-The first `G28 Z` will drive all 4 Z posts UP into the top brace. Each post stalls independently when its corner meets the brace — you should hear 4 distinct "thunks" over about a second. If one corner doesn't stall, its `driver_SGT` is too high; lower it.
+Clear the build area first: Z homes down. The first `G28 Z` drives all 4 Z posts DOWN onto their hard-stop blocks at the reduced homing current (`Z_HOME_CURRENT` in `homing.cfg`). Each post stalls independently when its carriage meets its block, so you should hear 4 distinct stops. If one corner doesn't stall, its `driver_SGT` is too high; lower it.
+
+Then measure the nozzle height above the build surface with the carriages on the blocks and set `position_endstop` and `position_min` in `steppers.cfg` to it. Measure the carriage travel and set `position_max` below it: a lead screw does not slip if driven into the top mount.
 
 ### 7. Calibrate the nozzle valve and feed pump independently
 

@@ -188,17 +188,17 @@
       <div class="step-head"><span class="step-num">4</span><h3>Home all four corners</h3></div>
       <p>In the console, type:</p>
       <pre><code>HOME_Z</code></pre>
-      <p>All four corners drive up. You should see (and hear) <strong>four separate gentle stops</strong> as each corner meets the top, then a small back-off. Each corner sets its own zero at the point it stalled. This is how the printer levels itself without any probe.</p>
+      <p>Clear the build area first: Z homes downward. All four corners drive down. You should see (and hear) <strong>four separate gentle stops</strong> as each carriage meets its hard-stop block, then a 10 mm lift. Each corner sets its own zero at the point it stalled. This is how the printer levels itself without any probe.</p>
     </div>
 
     <div class="step">
       <div class="step-head"><span class="step-num">5</span><h3>Check the gantry is level</h3></div>
-      <p>After homing, measure the height of the gantry at each of the four corners (from the build surface, or from the base). They should all match within a couple of millimeters. If one corner is off, re-check that corner's belt tension and re-run the stall tuning for it, then <code>HOME_Z</code> again.</p>
+      <p>After homing, measure the height of the gantry at each of the four corners (from the build surface, or from the base). They should all match within a couple of millimeters. If one corner is off, check that corner's hard-stop block height and coupler, re-run the stall tuning for it, then <code>HOME_Z</code> again.</p>
     </div>
 
     <div class="step">
       <div class="step-head"><span class="step-num">6</span><h3>Dry-run the Z motion</h3></div>
-      <p>Jog the gantry up and down through its travel a few times (small moves first, then larger). Watch and listen for: smooth motion, no grinding, no slipping belts, and no corner lagging behind. The four corners should stay level as they move.</p>
+      <p>Jog the gantry up and down through its travel a few times (small moves first, then larger). Watch and listen for: smooth motion, no grinding, no binding or noisy lead screws, and no corner lagging behind. The four corners should stay level as they move.</p>
     </div>
 
     <h2>Professional safety-function verification (outside this guide)</h2>
@@ -219,7 +219,7 @@
       <li>Motor current set to working value and motors stay only warm, not hot.</li>
       <li>All four Z corners jog the correct direction.</li>
       <li>Stall sensing tuned — each corner stops cleanly and repeatably at the top.</li>
-      <li><code>HOME_Z</code> gives four clean stops and a back-off, every time.</li>
+      <li><code>HOME_Z</code> gives four clean stops and a lift, every time.</li>
       <li>Gantry measures level at all four corners after homing.</li>
       <li>Z dry-run is smooth, no slipping or lagging.</li>
       <li>Qualified professional's separate stop-function verification record is identified.</li>
