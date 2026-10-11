@@ -1,0 +1,25 @@
+name: Build check
+
+# Runs the Cloudflare publish build on every pull request, so a broken link,
+# stale claim, or unfilled BOM count fails the PR instead of the main-branch
+# deploy. Build only: no secrets, nothing is deployed.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: Build web-only publish dir (allowlist + CAD/size/secret tripwires)
+        shell: pwsh
+        run: ./scripts/build-cloudflare-pages.ps1
