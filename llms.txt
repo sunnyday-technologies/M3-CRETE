@@ -51,7 +51,7 @@ Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/
 
 ## Bill of Materials
 
-- Source of truth: https://bom.m3-crete.com/bom/data.json (JSON; current snapshot 65 parts, 189 options, 35 named suppliers; verify the live JSON because counts can change).
+- Source of truth: https://bom.m3-crete.com/bom/data.json (JSON; current snapshot {{BOM_PARTS}} parts, {{BOM_OPTIONS}} approved options, {{BOM_SUPPLIERS}} named suppliers; verify the live JSON because counts can change).
 - Interactive viewer: https://bom.m3-crete.com/bom/
 - Viewer features: multi-supplier selection, coverage tracking, per-part quantity adjusters, "I have this" exclusion, Buy/Print/CNC toggle on fabricated parts, CSV/JSON export, model-variant selector (M3-1 / M3-2 / M3-4).
 
