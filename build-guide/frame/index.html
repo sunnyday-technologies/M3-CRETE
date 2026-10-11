@@ -169,31 +169,34 @@
       <li><strong>Corner plates</strong> (5-screw T-plates or L-plates), <strong>T-nuts</strong>, and <strong>M5 screws</strong>.</li>
       <li>The <strong>X-beam splice kit</strong> (an internal slot-link connector) plus three short V-slot bars.</li>
       <li><strong>Polycarbonate V-wheels</strong>, <strong>eccentric spacers</strong>, and <strong>gantry plates</strong>.</li>
-      <li><strong>GT2 belts</strong> (a wider one for Y, a narrower one for X), idlers, and the Z <strong>hub disks</strong>.</li>
+      <li><strong>GT2 belts</strong> (a wider one for Y, a narrower one for X) and idlers.</li>
+      <li>Four <strong>Tr8×2 lead screws</strong> with brass nuts, <strong>8 mm couplers</strong>, <strong>KFL08 flange bearings</strong>, <strong>lock collars</strong>, and the printed Z <strong>hard-stop blocks</strong>.</li>
       <li>The seven motion <strong>NEMA23 motors</strong> and the <strong>3D-printed brackets / motor mounts</strong>.</li>
     </ul>
 
     <h2>Words to know</h2>
     <dl class="glossary">
       <dt>Extrusion</dt><dd>An aluminum beam with slots along its sides. "4080" and "2040" are sizes.</dd>
-      <dt>C-beam</dt><dd>An extrusion shaped like the letter C. The open channel hides and protects the belt.</dd>
+      <dt>C-beam</dt><dd>An extrusion shaped like the letter C. The open channel hides and protects the belt or lead screw.</dd>
       <dt>T-nut</dt><dd>A small nut that slides into the beam's slot so you can bolt things on anywhere.</dd>
       <dt>V-wheel</dt><dd>A wheel with a V-shaped groove that rolls along the V-edge of a beam.</dd>
       <dt>Eccentric spacer</dt><dd>A spacer with an off-center hole. Turning it pushes a wheel tighter or looser against the beam.</dd>
       <dt>Gantry</dt><dd>The bridge that carries the print head and slides along the rails.</dd>
       <dt>Z-post</dt><dd>An upright beam. The gantry moves up and down these.</dd>
       <dt>Plumb / square / tram</dt><dd>Plumb = perfectly upright. Square = corners are true 90°. Tram = everything lined up flat and even.</dd>
-      <dt>GT2 belt</dt><dd>A toothed rubber belt that the motors pull to move the axes.</dd>
-      <dt>Hub disk / idler</dt><dd>Pulleys the belt wraps around to change direction (used on the Z-axis).</dd>
+      <dt>GT2 belt</dt><dd>A toothed rubber belt that the motors pull to move the X and Y axes.</dd>
+      <dt>Idler</dt><dd>A smooth pulley the belt wraps around to change direction.</dd>
+      <dt>Lead screw</dt><dd>A threaded rod. The Z motor turns it, and a nut on the carriage climbs or descends it.</dd>
+      <dt>Hard-stop block</dt><dd>A fixed block at the bottom of each Z-post. The Z-axis homes by stalling gently against it — no switch.</dd>
     </dl>
 
     <h2>How the frame is designed (read this first)</h2>
     <p>A few design choices make M3-CRETE easier to build. Knowing them up front prevents mistakes:</p>
     <ul>
       <li><strong>One length of beam.</strong> Every main beam is cut to the same canonical length — no custom cuts. Check the BOM for the exact number.</li>
-      <li><strong>Open channels face inward.</strong> The C-beams point their open side toward the center of the printer, so the belts run inside, away from concrete spray.</li>
+      <li><strong>Open channels face inward.</strong> The C-beams point their open side toward the center of the printer, so the belts and Z lead screws run inside, away from most concrete spray.</li>
       <li><strong>The long X-beam is two beams spliced in the middle.</strong> The join uses an internal connector that sits <em>below</em> the wheel path, plus bonded V-slot bars inside the channel. Nothing sticks out to block the wheels.</li>
-      <li><strong>Four Z motors, no lead screws.</strong> Each corner has its own belt-driven Z motor, so the gantry can level itself in software later.</li>
+      <li><strong>Four Z motors, one lead screw each.</strong> Each corner has its own motor on top of its post turning a lead screw, so the gantry can level itself in software later.</li>
       <li><strong>No leveling feet.</strong> Leveling is done by measurement at the print surface, not by adjustable feet.</li>
     </ul>
 
@@ -243,12 +246,13 @@
 
     <div class="step">
       <div class="step-head"><span class="step-num">9</span><h3>Mount the motors</h3></div>
-      <p>Attach the seven NEMA23 motors with the 3D-printed mounts. The mounting holes are pass-through, so use M5 screws with M5 nuts and a drop of blue threadlocker. The four Z motors sit on the top brace (body up, shaft pointing down) with a hub disk underneath to guide the belt.</p>
+      <p>Attach the seven NEMA23 motors with the 3D-printed mounts. The mounting holes are pass-through, so use M5 screws with M5 nuts and a drop of blue threadlocker. The four Z motors sit on the printed plate on top of each post (body up, shaft pointing down).</p>
     </div>
 
     <div class="step">
-      <div class="step-head"><span class="step-num">10</span><h3>Route and lightly tension the belts</h3></div>
-      <p>Run the GT2 belts inside the C-channels — the wider belt on Y, the narrower one on X. For each Z-axis, the belt goes from the hub disk, over the brace, down the post, around an idler at the bottom, and back up to the carriage. Anchor the belt ends and take up the slack using the motor-mount slots. Leave final tensioning for the validation step; for now, just remove the slack.</p>
+      <div class="step-head"><span class="step-num">10</span><h3>Route the belts and fit the Z lead screws</h3></div>
+      <p>Run the GT2 belts inside the C-channels — the wider belt on Y, the narrower one on X. Anchor the belt ends and take up the slack using the motor-mount slots. Leave final tensioning for the validation step; for now, just remove the slack.</p>
+      <p>For each Z-post, bolt the brass nut to the Z carriage plate and thread the lead screw through it. Seat the screw in the top and bottom flange bearings, then clamp two lock collars around the top bearing so the screw hangs from it. Leave the bottom bearing's grub screws loose so the screw can float. Join the screw to the motor shaft with the 8 mm coupler, and fit the hard-stop block at the bottom of the post. All four blocks must sit at the same height.</p>
     </div>
 
     <div class="step">
@@ -266,7 +270,8 @@
       <li>Top brace fitted; posts still plumb.</li>
       <li>X-beam spliced, bonded, cured, and smooth across the join.</li>
       <li>V-wheels fitted; gantry rolls smoothly with no wobble.</li>
-      <li>Seven motors mounted (M5 + nut + threadlocker); Z hub disks in place.</li>
+      <li>Seven motors mounted (M5 + nut + threadlocker).</li>
+      <li>Z lead screws hang from the top bearings; couplers tight; hard-stop blocks at equal heights.</li>
       <li>Belts routed inside the channels and slack removed.</li>
       <li>Final square + plumb + full-travel roll re-checked.</li>
     </ul>
