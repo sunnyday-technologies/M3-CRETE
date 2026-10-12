@@ -33,7 +33,7 @@ HERE = os.path.dirname(__file__)
 OUT_STEP = os.path.join(HERE, "Custom", "Z_Bottom_Bearing_Holder_M3-2.step")
 OUT_STL = os.path.join(HERE, "Custom", "Z_Bottom_Bearing_Holder_M3-2.stl")
 
-AXIS_INSET = 6.0            # screw axis -> channel open face
+AXIS_INSET = 5.0            # screw axis -> channel open face (carriage plate runs 1 mm off it)
 CHANNEL_DEPTH = 20.0        # C-Beam 4080 channel, open face to floor
 COLUMN_W = 34.0             # 3 mm clearance to the 40 mm channel walls
 BRG_OD, BRG_H = 22.0, 7.0   # 608ZZ

@@ -16,7 +16,8 @@ Measured against the M3-2 frame, the source needs two fixes:
 
 - the axis sits 18 mm inside the C-channel's open edge, so the 8 mm screw
   cuts ~2 mm into the channel floor; the Tr8x2 nut block (34x12x20, bore
-  centred 6 mm from its face) bolted to the carriage plate needs 6 mm;
+  centred 6 mm from its face) bolted to the carriage plate, which runs 1 mm
+  off the post's open face (SN 001, Nick 2026-10-12), needs 5 mm;
 - the tab holes sit 1.47 mm above the top-rail end ports (rail Z 960-1000,
   ports at rail centre +/- 10 mm).
 
@@ -24,7 +25,7 @@ The tab stays 6 mm: it is the spacer in the post-to-top-end-beam joint,
 which Nick measured at 6 mm on SN 001 (2026-10-12).
 
 The derivation keeps the authored box (floor, coupler cavity, side window,
-NEMA23 pilot, nut traps) unchanged. It moves the tab 12 mm toward the axis
+NEMA23 pilot, nut traps) unchanged. It moves the tab 13 mm toward the axis
 and moves its six holes to the port rows. The fillet on the tab's post side
 is trimmed off, because it sat inside the post top.
 
@@ -39,11 +40,11 @@ OUT_STEP = os.path.join(HERE, "Custom", "Z_NEMA23_Leadscrew_Motor_Mount_M3-2.ste
 OUT_STL = os.path.join(HERE, "Custom", "Z_NEMA23_Leadscrew_Motor_Mount_M3-2.stl")
 
 AXIS_Y = 2.0                        # screw/motor axis in the source frame
-AXIS_INSET = 6.0                    # axis -> channel open face (nut block bore centre)
+AXIS_INSET = 5.0                    # axis -> channel open face (nut block bore centre, 1 mm plate gap)
 TAB_Y0_SRC = 20.0                   # source tab: post-side face
 TAB_T = 6.0                         # post-to-top-end-beam spacer (measured, = source)
-TAB_Y0 = AXIS_Y + AXIS_INSET        # 8: derived tab post-side face = channel open face
-TAB_SHIFT = TAB_Y0 - TAB_Y0_SRC     # -12
+TAB_Y0 = AXIS_Y + AXIS_INSET        # 7: derived tab post-side face = channel open face
+TAB_SHIFT = TAB_Y0 - TAB_Y0_SRC     # -13
 TAB_ZMIN = -38.5
 LEG_X = (13.0, 40.0)                # tab legs at |X| in [13, 40]; centre gap clears the channel
 HOLE_R = 3.1

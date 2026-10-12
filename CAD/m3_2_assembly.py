@@ -19,6 +19,9 @@ On top of the baseline this script:
     2026-10-12; V1.0 modelled 4 mm): each post moves 2 mm out along Y with
     the parts fixed to or riding on it, and the bottom plates and spreader
     shims are rebuilt 6 mm thick
+  - stands each Z carriage plate 1 mm off its post's open face, the running
+    gap on SN 001 (owner 2026-10-12; V1.0 modelled the plates flush): the 4
+    plates and their 16 V-wheels end up 1 mm nearer the frame interior
   - adds a lead-screw stack on every Z post (BOM v2.9.0, owner decisions
     2026-10-11/12):
       motor mount  id 24  CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_M3-2.step
@@ -41,8 +44,8 @@ On top of the baseline this script:
   - writes CAD/M3-2_Assembly.step (never the baseline)
 
 Screw axis: centre of the post's C-channel, AXIS_INSET mm inside the open
-face, so the nut block (bore centred 6 mm from its face) sits flush on the
-carriage plate.
+face. The nut block (bore centred 6 mm from its face) is bolted flush to the
+carriage plate, which runs Z_PLATE_GAP off the open face.
 """
 import cadquery as cq
 from cadquery import Assembly, Color, Location
@@ -61,7 +64,9 @@ NUT_STEP    = os.path.join(HERE, "Advanced", "Hardware", "8mm Acme Nut Block.ste
 # Lead-screw stack geometry (mm)
 # ============================================================
 POST_TOP      = 1000.0      # Z-post top = mount floor underside
-AXIS_INSET    = 6.0         # screw axis -> channel open face
+Z_PLATE_GAP   = 1.0         # Z carriage plate -> post open face, running gap (SN 001, 2026-10-12)
+NUT_BORE_INSET = 6.0        # nut block bore centre -> its plate-side face
+AXIS_INSET    = NUT_BORE_INSET - Z_PLATE_GAP   # 5: screw axis -> channel open face
 MOUNT_AXIS_Y  = 2.0         # screw axis in the mount STEP frame
 MOUNT_FLOOR   = 6.0         # mount floor thickness
 MOUNT_TOP     = 48.0        # mount top face (motor face) above its floor underside
@@ -249,6 +254,10 @@ n_stray_idlers = sum(1 for c in stray if c in idlers) - len(y_idlers)
 # V-wheels. The 1 m Y rails, the center spreader and the moving gantry stay,
 # so the bottom plates and the spreader shims are rebuilt 6 mm thick and the
 # Y-gantry rail ends sit POST_SHIFT further from the carriage plates.
+# The Z carriage plates and their wheels then come Z_PLATE_GAP back toward
+# the frame interior: V1.0 had the plates flush on the open face, SN 001 runs
+# them ~1 mm off it. (That also brings the V1.0 wheels, 1.8 mm deeper than
+# the side-face V-slot centre, to within 0.8 mm of it.)
 # ============================================================
 def rides_post(c, bb):
     sg = sig_of(bb)
@@ -270,8 +279,10 @@ def outward(bb):
     return -1.0 if ctr(bb)[1] < FRAME_CY else 1.0
 
 
+ZCARRIAGE_SIGS = ((3.0, 88.0, 127.0), (10.2, 23.9, 23.9))  # plate, V-wheel (only those that ride a post)
+
 assy = Assembly("M3-2_Assembly")
-n_moved = n_wheels = 0
+n_moved = n_wheels = n_zplates = 0
 for c in kept:
     bb = world_bb(c)
     sg = sig_of(bb)
@@ -293,11 +304,14 @@ for c in kept:
         continue
     loc = c.loc
     if rides_post(c, bb):
-        loc = Location((0, outward(bb) * POST_SHIFT, 0)) * c.loc
+        shift = POST_SHIFT - Z_PLATE_GAP if sg in ZCARRIAGE_SIGS else POST_SHIFT
+        loc = Location((0, outward(bb) * shift, 0)) * c.loc
         n_moved += 1
         n_wheels += sg == (10.2, 23.9, 23.9)
+        n_zplates += sg == (3.0, 88.0, 127.0)
     assy.add(c.obj, name=c.name, loc=loc, color=c.color)
 assert n_wheels == 16, f"expected 16 Z carriage wheels on the posts, moved {n_wheels}"
+assert n_zplates == 4, f"expected 4 Z carriage plates on the posts, moved {n_zplates}"
 
 # Y return idler envelopes (id 93): on the drive pulley's centreline, fully
 # inside the rail channel, IDLER_PLATE_GAP behind the carriage plate that caps
@@ -336,6 +350,8 @@ print(f"  dropped {n_stray_idlers} stray Y idlers + {n_stray_brackets} of their 
       f"one id 93 idler envelope per Y rail")
 print(f"  frame spacers {V1_SPACER:.0f} -> {FRAME_SPACER:.0f} mm: moved {n_moved} post-mounted parts "
       f"{POST_SHIFT:.0f} mm out along Y; bottom plates and spreader shims rebuilt {FRAME_SPACER:.0f} mm")
+print(f"  Z carriage: {n_zplates} plates + {n_wheels} wheels moved {POST_SHIFT - Z_PLATE_GAP:.0f} mm out, "
+      f"{Z_PLATE_GAP:.0f} mm running gap to the post open face")
 
 post_bbs = [c.obj.moved(c.loc).BoundingBox() for c in assy.children if c.name.startswith("cbeam_Zpost")]
 
@@ -365,6 +381,7 @@ nut = cq.importers.importStep(NUT_STEP).val().Solids()[0]           # X[-17,17] 
 nbb = nut.BoundingBox()
 nut = nut.translate(cq.Vector(0, 0, -(nbb.zmin + nbb.zmax) / 2))     # bore centre at Z=0
 NUT_H = nbb.zlen
+assert abs(nbb.ymax - NUT_BORE_INSET) < 0.05, "nut block bore is not NUT_BORE_INSET from its plate-side face"
 
 holder = cq.importers.importStep(HOLDER_STEP).val().Solids()[0]    # Z=0 on the bottom plate top edge
 assert abs(NUT_H - zbh.NUT_BLOCK_H) < 0.1, "holder stop height assumes a 20 mm nut block"
@@ -410,6 +427,8 @@ for pb in post_bbs:
         (b.ymin + b.ymax) / 2 - open_y))
     plate_cz = (plate.zmin + plate.zmax) / 2
     assert abs(plate.zlen - zbh.CARRIAGE_PLATE_H) < 0.1, "holder stop height assumes an 88 mm carriage plate"
+    plate_face = plate.ymin if front else plate.ymax
+    assert abs(abs(plate_face - axis[1]) - NUT_BORE_INSET) < 0.05, f"{tag}: nut block is not flush on its carriage plate"
     # The holder sits on the bottom plate's top edge; the nut block lands on its top face.
     stop_top = bplate.zmax + zbh.STOP_TOP
 

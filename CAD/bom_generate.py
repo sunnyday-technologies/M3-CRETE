@@ -54,7 +54,7 @@ def name_for_dims(dims_sorted):
     if dims_sorted[0] == 1.5 and dims_sorted[1] == 6.0: return "belt"
     # Lead-screw Z (BOM v2.9.0)
     if dims_sorted == (68.0, 80.0, 86.5):    return "zmotormount"
-    if dims_sorted == (27.1, 34.0, 45.0):    return "zholder"
+    if dims_sorted == (28.1, 34.0, 45.0):    return "zholder"
     if dims_sorted == (8.0, 8.0, 1000.0):    return "leadscrew"
     if dims_sorted == (12.0, 20.0, 34.0):    return "nutblock"
     if dims_sorted == (19.0, 19.0, 20.0):    return "coupler"

@@ -71,7 +71,7 @@ LABELS = {
     (19.0, 19.0, 20.0):   'coupler',        # id 88 envelope
     (7.0, 14.0, 14.0):    'collar',         # id 90
     (7.0, 22.0, 22.0):    'bearing-608',    # id 89 envelope
-    (27.1, 34.0, 45.0):   'z-bottom-holder',  # id 91
+    (28.1, 34.0, 45.0):   'z-bottom-holder',  # id 91 (axis 5 mm inside the open face)
 }
 
 def sig(s):
@@ -327,6 +327,31 @@ for p in posts:
         if abs(g - mod.FRAME_SPACER) > 0.1:
             problems.append(f"Z-post at ({pc[0]:.0f},{pc[1]:.0f}) is {g:.1f} mm from the Y rail end at "
                             f"Z={center(r)[2]:.0f} (want {mod.FRAME_SPACER})")
+
+# ---------- CHECK 11: Z carriage plate running gap to the post's open face ----------
+# SN 001 runs each Z carriage plate ~1 mm off its post's open face (owner,
+# 2026-10-12). The nut block is bolted flush to the plate, so the gap also
+# sets the screw axis (CHECK 6).
+Z_PLATE_GAP_TOL = 0.1
+nut_blocks = [s for s in parts if label_of(s) == 'nut-block']
+for p in posts:
+    pb, pc = p.BoundingBox(), center(p)
+    front = pc[1] < frame_cy
+    open_y = pb.ymax if front else pb.ymin
+    plate = min((z for z in zplates if abs(center(z)[0] - pc[0]) < 70),
+                key=lambda z: abs(center(z)[1] - open_y), default=None)
+    if plate is None:
+        problems.append(f"Z-post at ({pc[0]:.0f},{pc[1]:.0f}) has no carriage plate")
+        continue
+    zb = plate.BoundingBox()
+    g = (zb.ymin - open_y) if front else (open_y - zb.ymax)
+    print(f"Z plate at ({pc[0]:.0f},{pc[1]:.0f}): {g:.2f} mm running gap to the post open face")
+    if abs(g - mod.Z_PLATE_GAP) > Z_PLATE_GAP_TOL:
+        problems.append(f"Z carriage plate at ({center(plate)[0]:.0f},{center(plate)[1]:.0f}) runs {g:.2f} mm off "
+                        f"its post's open face (want {mod.Z_PLATE_GAP} +/- {Z_PLATE_GAP_TOL})")
+    nb = min(nut_blocks, key=lambda s: dist_xy(pc, center(s)), default=None)
+    if nb is None or gap(nb, plate) > 0.05:
+        problems.append(f"Z nut block at post ({pc[0]:.0f},{pc[1]:.0f}) is not flush on its carriage plate")
 
 # ---------- CHECK 8: firmware position_max inside the measured Z travel ----------
 travel = z_travel.measure(z_travel.assembly_shapes(mod.assy))
