@@ -1,7 +1,7 @@
 {
   "kit": "M3-2 Final Assembly Hardware Pick Pack",
   "sku": "M3-2-HW-PACK-V0",
-  "date": "2026-05-26",
+  "date": "2026-10-12",
   "status": "first-pass, needs physical audit",
   "scope": {
     "model": "M3-2",
@@ -25,7 +25,7 @@
     ]
   },
   "basis": [
-    "bom/data.json v2.7.0 generated 2026-04-29",
+    "bom/data.json v2.11.0 generated 2026-10-12 (lead-screw Z CAD update, 6 mm frame spacers, Y idlers)",
     "CAD/BOM_README.md hardware derivation totals",
     "CAD/bom_hardware.csv first-pass line items",
     "AGENTS.md design decisions: no leveling feet, no mechanical endstops"
@@ -44,32 +44,42 @@
     {
       "item": "M5 button-head socket cap screw",
       "spec": "M5 x 10 mm",
-      "required_qty": 171,
+      "required_qty": 151,
       "pack_qty": 200,
       "unit": "pieces",
-      "source_basis": "135 C-beam joint screws + 28 NEMA23 face screws + 8 idler bracket screws",
+      "source_basis": "135 C-beam joint screws + 12 NEMA23 face screws (X/Y motors) + 4 idler bracket screws (2 Y idlers)",
       "confidence": "medium",
       "notes": "Use stainless or zinc-plated alloy steel after corrosion/strength decision. Button-head is preferred where carriage clearance matters."
     },
     {
       "item": "M5 socket cap screw",
       "spec": "M5 x 16 mm",
-      "required_qty": 18,
-      "pack_qty": 25,
+      "required_qty": 26,
+      "pack_qty": 40,
       "unit": "pieces",
-      "source_basis": "CAD/BOM_README.md M5 fastener totals",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals: 8 Z-post bottom plate + 2 shim + 16 Z motor (motor-mount nut traps)",
       "confidence": "medium",
-      "notes": "Used on bottom spacer/idler mounts and through C-beam web locations."
+      "notes": "Z motors: through the motor flange and the printed mount's 8 mm top plate into M5 nuts in its nut traps. Also used on the Z-post bottom plates and through C-beam web locations."
+    },
+    {
+      "item": "M5 socket cap screw",
+      "spec": "M5 x 20 mm",
+      "required_qty": 16,
+      "pack_qty": 20,
+      "unit": "pieces",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals: 2 per Z bottom bearing holder + 2 per Z nut block",
+      "confidence": "medium",
+      "notes": "Z bottom bearing holder (bom/data.json id 91): into drop-in T-nuts in the C-beam channel-floor slots, heads in the holder's counterbores. Z nut block (id 87): bolted in reverse through the carriage plate's holes into the block (fit tested on SN 001), with a nut inside the C-beam opening if needed."
     },
     {
       "item": "M5 socket cap screw",
       "spec": "M5 x 30 mm",
-      "required_qty": 9,
+      "required_qty": 2,
       "pack_qty": 12,
       "unit": "pieces",
-      "source_basis": "CAD/BOM_README.md M5 fastener totals",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals: 2 Y idler axles",
       "confidence": "medium",
-      "notes": "Smooth idler axle hardware."
+      "notes": "Smooth idler axle hardware (2 Y return idlers, bom/data.json id 93)."
     },
     {
       "item": "M5 socket cap screw",
@@ -84,17 +94,17 @@
     {
       "item": "M5 drop-in T-nut",
       "spec": "20-series, 6 mm slot, spring-loaded preferred",
-      "required_qty": 161,
+      "required_qty": 157,
       "pack_qty": 300,
       "unit": "pieces",
-      "source_basis": "CAD/BOM_README.md M5 fastener totals; covered by bom/data.json id 6",
+      "source_basis": "CAD/BOM_README.md M5 fastener totals (135 joint + 4 idler bracket + 8 Z-post bottom plate + 2 shim + 8 Z bottom holder); covered by bom/data.json id 6",
       "confidence": "medium",
       "notes": "Pack quantity intentionally keeps assembly spares and field-service margin."
     },
     {
       "item": "M5 flat washer",
       "spec": "M5, stainless or zinc-plated",
-      "required_qty": 82,
+      "required_qty": 68,
       "pack_qty": 100,
       "unit": "pieces",
       "source_basis": "CAD/BOM_README.md M5 fastener totals",
@@ -104,20 +114,20 @@
     {
       "item": "M5 nyloc nut",
       "spec": "M5 nylon-insert lock nut",
-      "required_qty": 41,
+      "required_qty": 34,
       "pack_qty": 50,
       "unit": "pieces",
-      "source_basis": "32 V-wheel axle nuts + 9 idler axle nuts",
+      "source_basis": "32 V-wheel axle nuts + 2 idler axle nuts",
       "confidence": "medium",
       "notes": "Do not replace with plain nuts unless threadlocker or other locking method is specified."
     },
     {
       "item": "M5 standard nut",
       "spec": "M5 hex nut",
-      "required_qty": 28,
+      "required_qty": 36,
       "pack_qty": 40,
       "unit": "pieces",
-      "source_basis": "AGENTS.md NEMA23 pass-through mounting clarification",
+      "source_basis": "AGENTS.md NEMA23 pass-through mounting clarification (28, of which 16 sit in the Z motor-mount nut traps) + 8 for the Z nut-block bolts if needed",
       "confidence": "low",
       "notes": "CAD/bom_hardware.csv currently lists zero here, but AGENTS.md states the NEMA23 motor holes are pass-through and require back-side nuts. Verify on final motor/mount stack."
     },
@@ -209,6 +219,7 @@
     "Resolve the NEMA23 back-side nut conflict between AGENTS.md and CAD/bom_hardware.csv.",
     "Confirm connector plate geometry for each of the 27 C-beam joints before buying all plates in one style.",
     "Do not include leveling feet in the reference kit unless the design decision is reopened.",
-    "BOM v2.8.0 (2026-10-11) moved the Z-axis to Tr8x2 lead screws: re-derive the Z hardware. The idler bracket screws, M5 x 30 idler axles and idler axle nuts above were counted for the belt Z (4 Z idlers); add fasteners for the KFL08 bearings, Z nut mounts and hard-stop blocks once the CAD update fixes their geometry."
+    "Z hardware re-derived for the lead-screw CAD (BOM v2.11.0, 2026-10-12) by CAD/bom_generate.py: the belt-Z bottom idlers and the top-plate screws/T-nuts are gone; Z motor screws are M5 x 16 into the motor mount's nut traps; each Z nut block adds 2 M5 x 20 bolted in reverse through the carriage plate (plus a nut inside the C-beam opening if needed); each Z bottom holder adds 2 M5 x 20 + 2 drop-in T-nuts. Couplers and lock collars use their own set screws, the 608ZZ is a press fit, and the motor-mount tab is clamped by the existing post-to-top-rail joint screws. With 2 Y idlers the idler axle hardware is 2 M5 x 30, 2 nyloc, 4 washers and 4 bracket screws/T-nuts.",
+    "Verify that drop-in T-nuts fit the C-beam channel-floor slots used by the Z bottom holders."
   ]
 }

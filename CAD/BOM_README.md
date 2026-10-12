@@ -5,7 +5,7 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 146).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 160).
 
 See `bom_structural.csv`.
 
@@ -22,33 +22,33 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
-- cbeam_279 <-> cbeam_280
-- cbeam_279 <-> cbeam_288
-- cbeam_279 <-> cbeam_293
-- cbeam_279 <-> cbeam_295
-- cbeam_280 <-> cbeam_281
-- cbeam_280 <-> cbeam_282
-- cbeam_280 <-> cbeam_295
-- cbeam_281 <-> cbeam_282
-- cbeam_281 <-> cbeam_289
-- cbeam_281 <-> cbeam_293
-- cbeam_282 <-> cbeam_284
-- cbeam_282 <-> cbeam_287
-- cbeam_283 <-> cbeam_285
-- cbeam_283 <-> cbeam_288
-- cbeam_283 <-> cbeam_290
-- cbeam_283 <-> cbeam_291
-- cbeam_284 <-> cbeam_295
-- cbeam_285 <-> cbeam_294
-- cbeam_286 <-> cbeam_292
-- cbeam_287 <-> cbeam_295
-- cbeam_288 <-> cbeam_290
-- cbeam_288 <-> cbeam_293
-- cbeam_289 <-> cbeam_290
-- cbeam_289 <-> cbeam_293
-- cbeam_289 <-> cbeam_294
-- cbeam_290 <-> cbeam_294
-- cbeam_291 <-> cbeam_294
+- cbeam_238 <-> cbeam_239
+- cbeam_238 <-> cbeam_247
+- cbeam_238 <-> cbeam_252
+- cbeam_238 <-> cbeam_254
+- cbeam_239 <-> cbeam_240
+- cbeam_239 <-> cbeam_241
+- cbeam_239 <-> cbeam_254
+- cbeam_240 <-> cbeam_241
+- cbeam_240 <-> cbeam_248
+- cbeam_240 <-> cbeam_252
+- cbeam_241 <-> cbeam_243
+- cbeam_241 <-> cbeam_246
+- cbeam_242 <-> cbeam_244
+- cbeam_242 <-> cbeam_247
+- cbeam_242 <-> cbeam_249
+- cbeam_242 <-> cbeam_250
+- cbeam_243 <-> cbeam_254
+- cbeam_244 <-> cbeam_253
+- cbeam_245 <-> cbeam_251
+- cbeam_246 <-> cbeam_254
+- cbeam_247 <-> cbeam_249
+- cbeam_247 <-> cbeam_252
+- cbeam_248 <-> cbeam_249
+- cbeam_248 <-> cbeam_252
+- cbeam_248 <-> cbeam_253
+- cbeam_249 <-> cbeam_253
+- cbeam_250 <-> cbeam_253
 
 ### V-wheels
 
@@ -58,7 +58,8 @@ the other half (16) get standard precision spacers.
 
 ### Motors / printed mounts
 
-7 motors × 4 NEMA23 face screws (M5×10) = 28 screws.
+3 X/Y motors × 4 NEMA23 face screws (M5×10) = 12 screws.
+4 Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.
 0 brackets × 4 rail-face screws (M5×10) + T-nuts = 0 pairs.
 Note: Y-motor brackets and the rack-and-pinion X-motor mounting are
 not yet modeled — add them when the X-axis lands.
@@ -67,12 +68,13 @@ not yet modeled — add them when the X-axis lands.
 
 | Item | Qty |
 |---|---|
-| M5 T-nut | 161 |
-| M5 flat washer | 82 |
-| M5 nyloc nut | 41 |
-| M5 x 10 mm | 171 |
-| M5 x 16 mm | 18 |
-| M5 x 30 mm | 9 |
+| M5 T-nut | 157 |
+| M5 flat washer | 68 |
+| M5 nyloc nut | 34 |
+| M5 x 10 mm | 151 |
+| M5 x 16 mm | 26 |
+| M5 x 20 mm | 16 |
+| M5 x 30 mm | 2 |
 | M5 x 40 mm | 32 |
 
 ### Things NOT in this BOM (intentionally)

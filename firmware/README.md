@@ -191,7 +191,7 @@ Use the `SHOW_SG` macro to see live StallGuard values while the printer is idle.
 
 Clear the build area first: Z homes down. The first `G28 Z` drives all 4 Z posts DOWN onto their hard-stop blocks at the reduced homing current (`Z_HOME_CURRENT` in `homing.cfg`). Each post stalls independently when its carriage meets its block, so you should hear 4 distinct stops. If one corner doesn't stall, its `driver_SGT` is too high; lower it.
 
-Then measure the nozzle height above the build surface with the carriages on the blocks and set `position_endstop` and `position_min` in `steppers.cfg` to it. Measure the carriage travel and set `position_max` below it: a lead screw does not slip if driven into the top mount.
+Then measure the nozzle height above the build surface with the carriages on the blocks and set `position_endstop` and `position_min` in `steppers.cfg` to it. `position_max` starts at 718, which is position_endstop + stroke − 10 mm with the CAD-derived stroke of 728.05 mm (`CAD/z_travel.py`) and position_endstop still at its 0 placeholder. Add your measured `position_endstop` to it, and confirm the top of travel on SN 001 with slow jogs before raising it. A lead screw does not slip if driven into a hard limit; in the CAD the first one going up is the Z-carriage wheels meeting the underside of the top X rails.
 
 ### 7. Calibrate the extruder
 

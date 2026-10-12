@@ -77,8 +77,9 @@ CAD/extract_carriage.py
 CAD/diff_user_edit.py
 
 # Local CAD working copies — authoritative output is CAD/M3-2_Assembly.step
-# Everything under CAD/M3-2_* is local-only by default; the single tracked
-# file is CAD/M3-2_Assembly.step via the negation below.
+# Everything under CAD/M3-2_* is local-only by default; the tracked files are
+# CAD/M3-2_Assembly.step (via the negation below) and CAD/M3-2_V1.0_baseline.step
+# (the assembly script's input, which no pattern here matches).
 CAD/M3-2_Assembly_v2.step
 CAD/M3-2_Assembly_lite.step
 CAD/M3-2_Assembly_v20.step
