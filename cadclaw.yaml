@@ -133,6 +133,7 @@ bom_audit:
       expected_mfg_type: print
       # `ymount` has no entry under labels (no spacer signature was ever
       # authored), so its CAD count is always 0. Only the BOM qty 0 is checked.
+      # Undefined labels are not reported yet: sunnyday-technologies/CADCLAW#33.
       expected_label: ymount
     - id: 83
       expected_qty: 32
@@ -155,10 +156,19 @@ bom_audit:
     - id: 91
       expected_qty: 4
       expected_mfg_type: print
+    # 2026-10-12 v2.9: Y smooth idlers. No expected_label yet; the idler rework
+    # replaces the CAD's 9mm-belt wheel, so the smooth_idler signature changes.
+    - id: 93
+      expected_qty: 2
+      expected_mfg_type: buy
+      # Fit is set by the width between the flanges; the 22mm V-slot wheel's
+      # 9.5mm track does not fit the 10mm Y belt.
+      required_terms: ["10mm", "11.2mm"]
 
 claim_audit:
   # Entries are file globs relative to --repo; a bare directory matches no
   # files. "docs/" scanned nothing under 0.7 too, so docs are listed as a glob.
+  # CADCLAW does not report a zero-match entry yet: sunnyday-technologies/CADCLAW#32.
   scan_paths:
     - README.md
     - docs/**/*.md
