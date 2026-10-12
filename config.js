@@ -34,9 +34,15 @@ const BOM_CONFIG = {
     'Dual Y-Axis Motion System',
     'Quad Z-Axis System (Self-Tramming)',
     'Electronics & Control System',
-    'Concrete Extrusion System',
     'Fasteners & Hardware',
-    'Optional Upgrades'
+    'Optional Upgrades',
+    'Frame - Reinforcement',
+    'Frame - Extrusions',
+    'Motion - Plates',
+    '3D-Printed Structural',
+    // Last: reference only, not in the kit. Pumping and extrusion are a
+    // separate, related project.
+    'Concrete Extrusion System'
   ],
 
   // ── Model Variants ─────────────────────────────────

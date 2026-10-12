@@ -1,6 +1,6 @@
 {
-  "version": "2.9.0",
-  "generated": "2026-10-12T16:00:00Z",
+  "version": "2.11.0",
+  "generated": "2026-10-12T23:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -547,6 +547,30 @@
       ]
     },
     {
+      "id": 93,
+      "category": "Dual Y-Axis Motion System",
+      "name": "Smooth Idler Pulley, GT2 20T Toothless, 5mm Bore, for 10mm Belt (Y-axis front return)",
+      "description": "One per Y axis (2 total), at the front of the machine opposite the Y motor at the back; the Y belt (id 10) returns around it. Mounts on the printed idler plate (id 66) on an M5 axle; keep the idler and its plate clear of the Z post's C-channel, which holds the Z lead screw. Buy by the internal width, not the belt label: the SN 001 reference part (WINSINN GT2 idler, 20T toothless, 5mm bore, 10mm-belt size, aluminum) has 11.2mm between the flanges, a 12.1mm hub, 18mm flanges, 14.2mm overall width and a 5mm bore. Idlers with less room between the flanges than the 11.2mm reference do not fit the 10mm belt, including the common 22mm V-slot smooth idler wheel (9.5mm track, belts up to 9mm). The X axis (belt-pinion drive) and the Z axis (lead screws) use no smooth idlers.",
+      "qty": 2,
+      "unit": "pulleys",
+      "mfg_type": "buy",
+      "sort_order": 45,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1316,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=WINSINN+GT2+idler+pulley+20+toothless+5mm+bore+10mm+belt",
+          "notes": "WINSINN 5-pack: choose size '10mm Belt' and style '20T Toothless 5mm Bore'. Confirm 11.2mm between the flanges. One pack covers both Y idlers plus spares.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
       "id": 18,
       "category": "Dual Y-Axis Motion System",
       "name": "Y-Axis Gantry Plates",
@@ -694,7 +718,7 @@
       "id": 23,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Z-Axis Carriage Plates",
-      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Current design target is the same 125x125mm C-Beam gantry plate geometry used across Y/Z/X where practical; must mount V-wheels and the Z lead-screw nut block (id 87) on its inner face, inside the post's C-channel. The 2x M5 nut-block bolts go in from the channel side and thread into the plate (tapped or heat-set inserts), because the Y-gantry rail end covers the plate's outer face there.",
+      "description": "Connects gantry frame to V-wheel carriages on vertical posts. 4 plates (one per corner). Current design target is the same 125x125mm C-Beam gantry plate geometry used across Y/Z/X where practical; must mount V-wheels and the Z lead-screw nut block (id 87) on its inner face, inside the post's C-channel. The nut block bolts in reverse (fit tested on SN 001): 2x M5 x 20 through the plate's holes into the block, with a nut inside the C-beam opening if needed.",
       "qty": 4,
       "unit": "plates",
       "mfg_type": "print",
@@ -745,7 +769,7 @@
       "id": 24,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Z-Axis Motor Mount (3D printed, lead screw)",
-      "description": "One per Z post (4). Printed box that sits on the post top and the end of the top Y rail. The Z motor bolts shaft-down to its top (4x M5 through the motor flange into nut traps); the coupler (id 88) sits in the cavity behind a side window; a lock collar (id 90) and a thrust bearing (id 92) on each side of its 6mm floor carry the gantry weight and the homing thrust, so the motor only supplies torque. A 4mm tab hangs into the post-to-top-Y-rail joint and is clamped by that joint's screws. Derived for the V1.0 frame from a GrokBot-authored mount (CAD/derive_z_motor_mount.py). Print in PETG for prototype or CCF for production.",
+      "description": "One per Z post (4). Printed box that sits on the post top and the end of the top Y rail. The Z motor bolts shaft-down to its top (4x M5 through the motor flange into nut traps); the coupler (id 88) sits in the cavity behind a side window; a lock collar (id 90) and a thrust bearing (id 92) on each side of its 6mm floor carry the gantry weight and the homing thrust, so the motor only supplies torque. A 6mm tab hangs into the post-to-top-Y-rail joint as its spacer (measured 6mm on SN 001) and is clamped by that joint's screws. Derived for the V1.0 frame from a GrokBot-authored mount (CAD/derive_z_motor_mount.py). Print in PETG for prototype or CCF for production.",
       "qty": 4,
       "unit": "mounts",
       "mfg_type": "print",
@@ -802,7 +826,7 @@
       "id": 88,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Shaft Coupler 8mm to 8mm (Z motor to lead screw)",
-      "description": "Connects each Z motor's 8mm shaft to its lead screw inside the motor mount (id 24). Both bores must be 8mm: the M3-CRETE NEMA23 motors have 8mm shafts, and the common NEMA23 coupler is 6.35mm x 8mm, which will not fit. It must fit the mount cavity: at most about 19mm OD and 20mm long (check the listing). Jaw or flexible type; the coupler takes misalignment only, because the lock collars and thrust bearings (ids 90, 92) carry the axial load.",
+      "description": "Connects each Z motor's 8mm shaft to its lead screw inside the motor mount (id 24). Both bores must be 8mm: the M3-CRETE NEMA23 motors have 8mm shafts, and the common NEMA23 coupler is 6.35mm x 8mm, which will not fit. It must fit the mount cavity (about 19mm OD x 20mm long); the couplers bought for SN 001 are fit-tested. Jaw or flexible type; the coupler takes misalignment only, because the lock collars and thrust bearings (ids 90, 92) carry the axial load.",
       "qty": 4,
       "unit": "couplers",
       "mfg_type": "buy",
@@ -835,7 +859,7 @@
       "id": 89,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "608ZZ Ball Bearing, 8mm Bore (Z lead-screw bottom)",
-      "description": "One per Z post (4), 8 x 22 x 7mm. Pressed into the printed bottom holder (id 91) to keep the lower end of the 1m screw centred and limit whip; the screw floats axially in it. Replaces the KFL08 flange bearings of BOM v2.8.0, which cannot seat around a screw running inside the C-channel. Supplier lines pending; the KFL08 lines are kept as not-approved history.",
+      "description": "One per Z post (4), 8 x 22 x 7mm. Pressed into the printed bottom holder (id 91) to keep the lower end of the 1m screw centred and limit whip; the screw floats axially in it. Replaces the KFL08 flange bearings of BOM v2.8.0, which cannot seat around a screw running inside the C-channel. The KFL08 supplier lines are kept as not-approved history.",
       "qty": 4,
       "unit": "bearings",
       "mfg_type": "buy",
@@ -861,6 +885,42 @@
           "sku": null,
           "step_url": null,
           "approved": false
+        },
+        {
+          "id": 1340,
+          "supplier_name": "VXB",
+          "product_url": "https://vxb.com/products/608-zz-bearing-shielded-8mm-miniature",
+          "notes": "608ZZ, 8 x 22 x 7mm, double shielded, chrome steel; sold singly.",
+          "sku": "Kit8031",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1341,
+          "supplier_name": "Adafruit",
+          "product_url": "https://www.adafruit.com/product/1178",
+          "notes": "608ZZ, 8 x 22 x 7mm, set of 4.",
+          "sku": "1178",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1342,
+          "supplier_name": "3DPrintingUSA",
+          "product_url": "https://3dprintingusa.com/products/608zz-8-x-22-x-7-mm-ball-bearing",
+          "notes": "608ZZ, 8 x 22 x 7mm. Ships from Canada when US stock is out.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1343,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=608ZZ+bearing",
+          "notes": "Search results: 608ZZ skate bearings, usually sold in packs.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
         }
       ]
     },
@@ -1675,6 +1735,63 @@
       ]
     },
     {
+      "id": 94,
+      "category": "Electronics & Control System",
+      "name": "Driver-Bay Thermistor (100K NTC 3950)",
+      "description": "Measures the board / enclosure temperature at the Kraken so Klipper can run the driver cooling fans (id 95). Plugs into the Kraken's TH0 input; see firmware/cooling.cfg. 100K NTC, B = 3950, pre-terminated 2-pin lead about 1 m long. Klipper's sensor_type must match the part fitted.",
+      "qty": 1,
+      "unit": "piece",
+      "mfg_type": "buy",
+      "sort_order": 12,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1317,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com",
+          "notes": "100K NTC 3950 thermistor with a 2-pin XH2.54 lead, about 1 m (often sold in multi-packs for 3D printers)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "category": "Electronics & Control System",
+      "name": "Driver Cooling Fan (80 mm, 24 V)",
+      "description": "Moves air across the Kraken's driver heat sink. Klipper switches both fans together from the driver-bay thermistor (id 94) on the Kraken's FAN0 and FAN1 headers; see firmware/cooling.cfg. 80 x 80 x 25 mm, 24 VDC, 2-pin lead. Match each fan header's voltage jumper to the fan (BTT Kraken wiki).",
+      "qty": 2,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 14,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1318,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com",
+          "notes": "80 mm 24 V 8025 brushless fan with a 2-pin XH2.54 lead",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1319,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://www.digikey.com",
+          "notes": "80 x 80 x 25 mm 24 VDC axial fan with leads; fit a 2-pin XH2.54 plug",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
       "id": 44,
       "category": "Concrete Extrusion System",
       "name": "Progressive Cavity Pump",
@@ -1729,14 +1846,14 @@
       "id": 46,
       "category": "Concrete Extrusion System",
       "name": "External Stepper Driver - Professional/Private Scope",
-      "description": "Professional/private high-current driver placeholder for separate review. Public BOM does not provide 48 V power distribution, driver wiring, pump integration, or safety-control implementation guidance.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Professional/private high-current driver placeholder for separate review. Public BOM does not provide 48 V power distribution, driver wiring, pump integration, or safety-control implementation guidance.",
       "qty": 1,
       "unit": "driver board",
       "mfg_type": "buy",
       "sort_order": 16,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 133,
@@ -1771,14 +1888,14 @@
       "id": 47,
       "category": "Concrete Extrusion System",
       "name": "Progressive Cavity Pump Element (Rotor + Stator)",
-      "description": "Core pumping element — chrome-plated SS rotor inside elastomer stator. For mortar/concrete with aggregates up to 2-6mm. Stator: Buna Nitrile (NBR) for concrete, EPDM for alkaline. Expect stator replacement every 200-500 hours.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Core pumping element — chrome-plated SS rotor inside elastomer stator. For mortar/concrete with aggregates up to 2-6mm. Stator: Buna Nitrile (NBR) for concrete, EPDM for alkaline. Expect stator replacement every 200-500 hours.",
       "qty": 1,
       "unit": "rotor + stator set",
       "mfg_type": "buy",
       "sort_order": 17,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 136,
@@ -1822,14 +1939,14 @@
       "id": 48,
       "category": "Concrete Extrusion System",
       "name": "Pump Drive Coupling — Universal Joint + Connecting Rod",
-      "description": "Converts motor rotation to rotor orbital motion. PC pump rotors orbit eccentrically — a rigid shaft will break. Use gear-type universal joint or double-cardan joint.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Converts motor rotation to rotor orbital motion. PC pump rotors orbit eccentrically — a rigid shaft will break. Use gear-type universal joint or double-cardan joint.",
       "qty": 1,
       "unit": "coupling assembly",
       "mfg_type": "buy",
       "sort_order": 18,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 139,
@@ -1864,14 +1981,14 @@
       "id": 49,
       "category": "Concrete Extrusion System",
       "name": "Pump Housing & Bearing Assembly",
-      "description": "Encloses rotor/stator and provides bearing support. Must handle axial thrust. If using Continental CP22, housing is included. Alternate housing approaches require separate reviewer selection and are not public construction guidance.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Encloses rotor/stator and provides bearing support. Must handle axial thrust. If using Continental CP22, housing is included. Alternate housing approaches require separate reviewer selection and are not public construction guidance.",
       "qty": 1,
       "unit": "assembly",
       "mfg_type": "cnc",
       "sort_order": 19,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 142,
@@ -1906,14 +2023,14 @@
       "id": 51,
       "category": "Concrete Extrusion System",
       "name": "Professional/Private Power Supply Scope",
-      "description": "Professional/private high-current power placeholder for separate review. Public BOM does not provide 48 V power distribution, power-supply wiring, pump-driver wiring, or control-panel construction guidance.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Professional/private high-current power placeholder for separate review. Public BOM does not provide 48 V power distribution, power-supply wiring, pump-driver wiring, or control-panel construction guidance.",
       "qty": 1,
       "unit": "PSU",
       "mfg_type": "buy",
       "sort_order": 21,
       "mpn": "LRS-200-48",
       "substitute_ok": false,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 149,
@@ -1948,14 +2065,14 @@
       "id": 52,
       "category": "Concrete Extrusion System",
       "name": "Material Hopper 20-Liter",
-      "description": "Material reservoir above the pump. HDPE or stainless for concrete compatibility. Printable in PETG for testing.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Material reservoir above the pump. HDPE or stainless for concrete compatibility. Printable in PETG for testing.",
       "qty": 1,
       "unit": "hopper",
       "mfg_type": "print",
       "sort_order": 30,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 152,
@@ -1990,14 +2107,14 @@
       "id": 53,
       "category": "Concrete Extrusion System",
       "name": "Concrete Nozzle Assembly",
-      "description": "Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm).",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm).",
       "qty": 1,
       "unit": "assembly",
       "mfg_type": "cnc",
       "sort_order": 40,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 155,
@@ -2023,14 +2140,14 @@
       "id": 54,
       "category": "Concrete Extrusion System",
       "name": "Tubing & Quick Fittings",
-      "description": "Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.",
       "qty": 1,
       "unit": "kit",
       "mfg_type": "buy",
       "sort_order": 50,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 158,
@@ -2416,7 +2533,7 @@
       "id": 66,
       "category": "X-Axis Motion System",
       "name": "Idler Pulley Mounting Plate",
-      "description": "3D-printed idler plates for the Y-axis belt return/tension points: 2 total (as of BOM v2.8.0 the Z-axis uses lead screws and has no idlers). X-axis uses the 6mm gantry belt path and does not use this common idler plate line. Printed design carries the smooth idler pulley mount and tension feature.",
+      "description": "3D-printed idler plates for the Y-axis belt return/tension points: 2 total, one at the front of each Y axis, opposite the Y motor at the back (as of BOM v2.8.0 the Z-axis uses lead screws and has no idlers). X-axis uses the 6mm gantry belt path and does not use this common idler plate line. Printed design carries the smooth idler pulley (id 93) and the tension feature.",
       "qty": 2,
       "unit": "plates",
       "mfg_type": "print",
@@ -2622,8 +2739,8 @@
     {
       "id": 79,
       "category": "3D-Printed Structural",
-      "name": "Z Post Bottom Plate (4mm, 3D printed)",
-      "description": "4mm spacer at the bottom of each Z post, between the post's open face and the end of the bottom Y rail (4 total). The bottom bearing holder / hard stop (id 91) rests on its top edge. Unchanged from M3-2 V1.0; in BOM v2.9.0 the top plates of the old pair became the lead-screw motor mounts (id 24), and any idler-axle hole left from the belt-driven Z is unused.",
+      "name": "Z Post Bottom Plate (6mm, 3D printed)",
+      "description": "6mm spacer at the bottom of each Z post, between the post's open face and the end of the bottom Y rail (4 total). The bottom bearing holder / hard stop (id 91) rests on its top edge. 6mm matches the measured post-to-end-beam spacers (SN 001, 2026-10-12); the V1.0 CAD modelled 4mm. In BOM v2.9.0 the top plates of the old pair became the lead-screw motor mounts (id 24).",
       "qty": 4,
       "unit": "pieces",
       "mfg_type": "print",
@@ -2636,7 +2753,7 @@
           "id": 1279,
           "supplier_name": "Self-Manufacture",
           "product_url": null,
-          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). Geometry: the 4x80x100 plate in CAD/M3-2_V1.0_baseline.step.",
+          "notes": "3D print in PETG (8mm walls, prototype) or CCF (3-4mm, production). Geometry: the 6 x 80 x 100 plate in CAD/M3-2_Assembly.step (plain plate, rounded top corners).",
           "sku": null,
           "step_url": null,
           "approved": true
@@ -2830,7 +2947,7 @@
       "id": 92,
       "category": "Quad Z-Axis System (Self-Tramming)",
       "name": "Thrust Ball Bearing 8x16x5 (F8-16M, Z lead screws)",
-      "description": "Two per Z post (8), one on each side of the motor-mount floor (id 24), between the floor and a lock collar (id 90): together they carry the gantry weight and the homing thrust so the Z motor bearings only see torque. Proposed with the lead-screw CAD update (2026-10-12); supplier lines pending owner approval.",
+      "description": "Two per Z post (8), one on each side of the motor-mount floor (id 24), between the floor and a lock collar (id 90): together they carry the gantry weight and the homing thrust so the Z motor bearings only see torque. Common part, also sold as F8-16M.",
       "qty": 8,
       "unit": "bearings",
       "mfg_type": "buy",
@@ -2838,8 +2955,36 @@
       "mpn": null,
       "substitute_ok": true,
       "exclude_from_kit": false,
-      "suppliers": []
+      "suppliers": [
+        {
+          "id": 1344,
+          "supplier_name": "MakerStore USA",
+          "product_url": "https://makerstore.cc/product/f8-16m-thrust-bearing/",
+          "notes": "F8-16M thrust bearing, 8 x 16 x 5mm (two washers + cage).",
+          "sku": "BEAR-F8-16",
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1345,
+          "supplier_name": "3DPrintingUSA",
+          "product_url": "https://3dprintingusa.com/products/openbuilds-thrust-bearing",
+          "notes": "Thrust bearing, 8 x 16 x 5mm. Ships from Canada when US stock is out.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1346,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com/s?k=F8-16M+thrust+bearing",
+          "notes": "Search results: F8-16M 8 x 16 x 5mm thrust bearings, usually sold in packs.",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
     }
   ],
-  "notes": "v2.9 (2026-10-12): CAD update for the lead-screw Z (owner decisions). Motor mount = derived GrokBot mount (id 24, qty 4) on each post top; the top bearing is replaced by a lock collar (id 90, stays 8) and a thrust bearing (new id 92, 8x16x5, qty 8, supplier lines pending) on each side of the mount floor; bottom bearing = 608ZZ (id 89, 8->4) in a printed bottom holder that is also the hard stop (id 91); the id 87 nut is a Tr8x2 nut block on the carriage plate, screw 6mm inside the C-channel's open face; id 79 = bottom plates only (8->4). The published STEP now shows the lead-screw Z. v2.8 (2026-10-11): the Z-axis moves from GT2 belts to Tr8x2 lead screws (owner decision). Z motors stay on top of each post, shaft down, driving each screw (id 87) through an 8mm coupler (id 88); KFL08 bearings (id 89) and lock collars (id 90) carry the gantry load; Z homes sensorless DOWN onto printed hard-stop blocks (id 91), no switches. Deprecated: id 20 (Z belts). Changed: id 11 pulleys 7->3, id 66 idler plates 6->2, id 19/23/24/79 descriptions. v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
+  "notes": "v2.11 (2026-10-12): CAD update for the lead-screw Z, with owner corrections. Motor mount = derived GrokBot mount (id 24, qty 4) on each post top; the top bearing is replaced by a lock collar (id 90, stays 8) and a thrust bearing (new id 92, 8x16x5, qty 8) on each side of the mount floor; bottom bearing = 608ZZ (id 89, 8->4) in a printed bottom holder that is also the hard stop (id 91); the id 87 nut is a Tr8x2 nut block bolted through the carriage plate, screw 6mm inside the C-channel's open face; id 79 = bottom plates only (8->4), now 6mm thick to match the measured 6mm post-to-end-beam spacers; supplier lines added for ids 89 and 92. The published STEP now shows the lead-screw Z, the 6mm frame spacers and one Y return idler (id 93) inside each Y rail's channel. v2.10 (2026-10-12), owner decisions: (1) adds driver cooling to Electronics & Control System: id 94 driver-bay thermistor and id 95 driver cooling fans (qty 2), run by firmware/cooling.cfg. (2) Pumping and extrusion are a separate, related project: every Concrete Extrusion System entry (ids 44, 46-49, 51-54) is now excluded from the kit and marked reference only. v2.9 (2026-10-12): new id 93, 2 smooth idler pulleys for the 10mm Y belts, one at the front of each Y axis opposite the Y motor. The BOM had no smooth idler line before. Reference part: GT2 20T toothless, 5mm bore, 11.2mm between the flanges; the 22mm V-slot idler wheel's 9.5mm track does not fit the 10mm belt. id 66 description updated. v2.8 (2026-10-11): the Z-axis moves from GT2 belts to Tr8x2 lead screws (owner decision). Z motors stay on top of each post, shaft down, driving each screw (id 87) through an 8mm coupler (id 88); KFL08 bearings (id 89) and lock collars (id 90) carry the gantry load; Z homes sensorless DOWN onto printed hard-stop blocks (id 91), no switches. Deprecated: id 20 (Z belts). Changed: id 11 pulleys 7->3, id 66 idler plates 6->2, id 19/23/24/79 descriptions. The published CAD (STEP/STL) still shows the belt Z until the CAD update. v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
 }

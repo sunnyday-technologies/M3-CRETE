@@ -39,13 +39,13 @@ python CAD/bom_generate.py          # bom_structural.csv, bom_hardware.csv, BOM_
 
 **Requirements:** Python 3.11 + CadQuery 2.7.0 (`pip install cadquery`)
 
-**Assembly contents (165 parts):**
+**Assembly contents (160 parts):**
 - 17x C-Beam 4080 1000mm extrusions (posts, top frame, bottom Y rails, Y and X gantry beams) + 3x internal 2040 splice inserts
 - 8x gantry plates and 32x V-wheels
 - 7x NEMA23 motors (4 Z shaft-down on the post tops, 2 Y, 1 X)
 - Per Z post: printed motor mount, coupler, 2 lock collars + 2 thrust bearings, Tr8x2 lead screw, nut block, printed bottom holder with a 608 bearing
-- Printed plates: 2 Y-motor mounts, 4 Z-post bottom plates, 2 center T-gussets
-- Y belts, pulleys and idlers
+- Printed plates: 2 Y-motor mounts, 4 Z-post bottom plates (6 mm), 2 center T-gussets; 6 mm post-to-end-beam spacers throughout
+- Y belts and pulleys; one Y return idler (envelope of the 20T toothless part) inside each Y rail's channel
 
 **Open-bottom bridge frame** — no front/back bottom rails, allowing the printer
 to straddle walls for continuous printing.

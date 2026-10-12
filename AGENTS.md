@@ -45,10 +45,10 @@ review.
 - **Frame (2026-04-14 update):** **4080 C-Beam** primary structure (Z-posts, Y-gantry rails) + 2040 bracing. **ALL 1000mm standard lengths** — shipping-constrained, single-SKU procurement. C opening points **inward** toward the printer cube (belt path runs inside the C). Supersedes the 2080/2040 + 1200mm plan from 2026-04-07.
 - **X-axis:** 2x 1000mm 4080 spliced = 2000mm build envelope. Splice uses the **straight-line slot-linking kit** (internal T-slot connectors, sits below wheel path) **+ 3× 1m 2040 V-slot bars staggered inside the C-channel with structural adhesive** (center bar bridges 500mm each side of splice; existing 1m stock covers this — no 2m section needed; bom/data.json id 65). Corner joints use T-plate or L-plate 5-screw connectors at every 4080 junction. **NO external reinforcement on the X-gantry beam** — the X-carriage is 2-sided (V-wheels on top AND bottom of exterior), so any protrusion past the 40mm faces blocks carriage travel.
 - **Y-axis:** 2x parallel 2080 rails, 1000mm span, dual motors (anti-racking)
-- **Z-axis (2026-10-11 update):** 4x independent posts, each with a NEMA23 on top turning a Tr8x2 lead screw (bom/data.json ids 87-91); sensorless homing DOWN onto bottom hard-stop blocks, no switches. Supersedes the belt-driven Z. CAD (2026-10-12, BOM v2.9.0): derived GrokBot motor mount on each post top (id 24) with a lock collar + 8x16x5 thrust bearing on each side of its floor (ids 90, 92); screw on the C-channel centreline 6 mm inside the open face; Tr8x2 nut block on the carriage plate (id 87); 608ZZ (id 89) in a printed bottom holder that is also the hard stop (id 91). `CAD/z_travel.py` measures the carriage stroke (724.9 mm), which sets firmware `position_max`.
+- **Z-axis (2026-10-11 update):** 4x independent posts, each with a NEMA23 on top turning a Tr8x2 lead screw (bom/data.json ids 87-91); sensorless homing DOWN onto bottom hard-stop blocks, no switches. Supersedes the belt-driven Z. CAD (2026-10-12, BOM v2.9.0): derived GrokBot motor mount on each post top (id 24) with a lock collar + 8x16x5 thrust bearing on each side of its floor (ids 90, 92); screw on the C-channel centreline 6 mm inside the open face; Tr8x2 nut block on the carriage plate (id 87); 608ZZ (id 89) in a printed bottom holder that is also the hard stop (id 91). Frame spacers at the post-to-end-beam joints are 6 mm (measured on SN 001, 2026-10-12). `CAD/z_travel.py` measures the carriage stroke (728.05 mm), which sets firmware `position_max`.
 - **Gantry beam:** 2080 spanning Y, carried by dual-Y carriages
 - **Motion:** GT2 belts on X/Y, Tr8x2 lead screws on Z, polycarbonate V-wheels on all axes
-- **Motors:** 7x NEMA23 8mm shaft (1X + 2Y + 4Z) + 1 extruder (NEMA34, owner-supplied)
+- **Motors:** 7x NEMA23 8mm shaft (1X + 2Y + 4Z). The pumping system is a separate, related project (see Product Decisions).
 - **Controller:** BTT Kraken (8x TMC5160 onboard) + Raspberry Pi 5 + Klipper
 - **Printhead:** 1.5kg target, 1" Male NPT pipe connection, counter-weighted hose
 
@@ -61,7 +61,7 @@ review.
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `bom/data.json` | **BOM source of truth** — v2.9.0; 71 reference entries, 192 approved supplier options (197 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
+| `bom/data.json` | **BOM source of truth** — v2.11.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
 | `bom/index.html` | BOM viewer (static, loads data.json, multi-supplier selection) |
 | `config.js` | Model variants, category order, project metadata |
 | `CAD/Components/` | OpenBuilds STEP parts library (70 files, CC BY-SA 4.0) |
@@ -75,7 +75,7 @@ review.
 ## CadQuery Environment
 - **Venv:** `cad_venv/` (gitignored, Python 3.11 + CadQuery 2.7.0); any Python 3.11 environment with CadQuery 2.7 works
 - **Assembly input:** `CAD/M3-2_V1.0_baseline.step` (LFS): the 146-part V1.0 assembly. The Fusion export it came from (`M3-2_V1.0.step`) is no longer available.
-- **Assembly output:** `CAD/M3-2_Assembly.step` (LFS, 165 parts, ~24 MB)
+- **Assembly output:** `CAD/M3-2_Assembly.step` (LFS, 160 parts, ~24 MB)
 - **Probe script:** `CAD/probe_steps.py` (bounding box inspector for STEP files)
 - **Self-check harness:** `CAD/self_check.py` (inventory / interference / layout audit, lead-screw stack, firmware `position_max` vs measured Z travel — run before and after any model changes)
 
@@ -114,7 +114,7 @@ review.
 - **Pump system is OUT OF SCOPE** — M3-CRETE focuses on the motion system; the printhead connects to any commercial or community pump capable of feeding a 1" Male NPT line at the required pressure.
 - Commercial pump references kept as informational in BOM (MAI, M-Tec, StoneFlower)
 - Frame stiffener for 2m+ spans: aluminum rectangular tube recommended (not steel — galvanic corrosion)
-- Extruder/pump motor: NEMA34 recommended (owner-supplied; not in the kit)
+- **Pumping is a separate, related project** (owner decision 2026-10-12). The reference machine uses a MAI 2PUMP Pictor. Pump motors and pump drives belong to that project, not to M3-CRETE: keep M3-CRETE copy focused on the motion system.
 
 ## Out of Scope for This Build
 - No HEPA filter, carbon fiber bars, or LED lights on this build
@@ -281,7 +281,7 @@ the plastic mount is a CLEARANCE plate, not a threaded anchor.
 - Supplier sourcing pending — Makerstore USA / Bulkman3D are the expected vendors
 
 ### Assembly Refinements (2026-04-14)
-- **4mm shims** on Y-direction only (static frame side) — allow Y-gantry travel along Z-posts with proper 1mm running clearance and plate stackup
+- **4mm shims** on Y-direction only (static frame side) — allow Y-gantry travel along Z-posts with proper 1mm running clearance and plate stackup. *(Superseded 2026-10-12: the post-to-end-beam spacers measure 6 mm on SN 001, and the CAD uses 6 mm.)*
 - No shims in X-direction (2m axis) — Y-gantry shifts outward on Z-axis gantry plate carriage instead
 - Rail orientation: bottom Y rail flat-on-top, top Y rail flat-on-top (avoid debris traps; bottom channel may host 2020 leg extensions)
 - Tall C channel **always inward** (except up/down axis → down)

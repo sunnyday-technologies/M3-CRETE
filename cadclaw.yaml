@@ -18,13 +18,13 @@ labels:
   motor_nema23:     [56.4, 56.4, 76.6]
   plate:            [3.0, 88.0, 127.0]
   pulley:           [14.0, 15.0, 15.0]
-  smooth_idler:     [12.7, 22.0, 22.0]
+  smooth_idler:     [14.2, 18.0, 18.0]   # id 93 envelope (20T toothless for the 10 mm belt); was the 12.7x22 V-slot wheel
   z_motor_mount:    [4.0, 80.0, 97.0]   # id 75 plate, now at the 2 Y-motor positions only (name kept for history)
-  z_post_bottom_plate: [4.0, 80.0, 100.0]   # id 79; was bot_spacer_idler (top+bottom, belt-Z idler axle) before v2.9.0
+  z_post_bottom_plate: [6.0, 80.0, 100.0]   # id 79, 6 mm; was bot_spacer_idler (4 mm, top+bottom, belt-Z idler) before v2.9.0
   t_gusset:         [4.0, 160.0, 280.0]
   idler_bracket:    [5.0, 30.0, 30.0]
   # 2026-04-29 additions (promoted from CAD/self_check.py LABELS)
-  shim:             [4.0, 40.0, 80.0]
+  shim:             [6.0, 40.0, 80.0]   # center-spreader shims, 6 mm since 2026-10-12
   xcarr_bolt:       [5.0, 16.0, 16.0]   # M5 SHCS heads on X-carriage
   xcarr_axle:       [9.0, 9.0, 31.5]    # V-wheel axles
   xcarr_washer:     [1.0, 10.0, 10.0]
@@ -148,6 +148,7 @@ bom_audit:
       expected_mfg_type: print
       # `ymount` has no entry under labels (no spacer signature was ever
       # authored), so its CAD count is always 0. Only the BOM qty 0 is checked.
+      # Undefined labels are not reported yet: sunnyday-technologies/CADCLAW#33.
       expected_label: ymount
     - id: 83
       expected_qty: 32
@@ -179,10 +180,20 @@ bom_audit:
       expected_qty: 8
       expected_mfg_type: buy
       # No expected_label: the thrust-bearing envelope shares xcarr_bolt's signature.
+    # 2026-10-12 v2.9: Y smooth idlers. Since v2.11 the CAD models the reference
+    # part's envelope (18 OD x 14.2), one per Y rail inside its channel.
+    - id: 93
+      expected_qty: 2
+      expected_mfg_type: buy
+      expected_label: smooth_idler
+      # Fit is set by the width between the flanges; the 22mm V-slot wheel's
+      # 9.5mm track does not fit the 10mm Y belt.
+      required_terms: ["10mm", "11.2mm"]
 
 claim_audit:
   # Entries are file globs relative to --repo; a bare directory matches no
   # files. "docs/" scanned nothing under 0.7 too, so docs are listed as a glob.
+  # CADCLAW does not report a zero-match entry yet: sunnyday-technologies/CADCLAW#32.
   scan_paths:
     - README.md
     - docs/**/*.md
