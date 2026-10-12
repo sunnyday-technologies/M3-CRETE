@@ -3,17 +3,20 @@ M3-CRETE self-check — runs after m3_2_assembly.py to catch regressions
 before a visual review. Fails fast on parts at obviously wrong positions
 (cbeam-adjacency errors, corner connectors that are too thick, motors far
 from any Z-post, etc.). Also runs a bbox-overlap interference pre-filter
-and a BRepAlgoAPI_Common check on suspicious pairs.
+and a BRepAlgoAPI_Common check on suspicious pairs, and checks the lead-screw
+Z stack (BOM v2.9.0) against the measured carriage travel and the firmware.
 
 Run:
-  cad_venv/Scripts/python.exe CAD/self_check.py
+  python CAD/self_check.py        (Python 3.11 + CadQuery 2.7)
 
 Exit code 0 if clean, 1 if any issue found.
 """
-import sys, os, importlib.util
+import sys, os, re, importlib.util
 from collections import Counter
 
 HERE = os.path.dirname(__file__)
+sys.path.insert(0, HERE)
+os.makedirs(os.path.join(HERE, "_preview"), exist_ok=True)
 spec = importlib.util.spec_from_file_location("m3_asm",
                                               os.path.join(HERE, "m3_2_assembly.py"))
 mod = importlib.util.module_from_spec(spec)
@@ -21,6 +24,9 @@ _null = open(os.path.join(HERE, "_preview", "null.txt"), "w")
 sys.stdout = _null
 spec.loader.exec_module(mod)
 sys.stdout = sys.__stdout__
+
+import cadquery as cq
+import z_travel
 
 comp = mod.assy.toCompound()
 raw_parts = list(comp.Solids()) + list(comp.Shells())
@@ -47,8 +53,8 @@ LABELS = {
     (12.7, 22.0, 22.0):   'idler',
     (3.0, 88.0, 127.0):   'plate',
     (4.0, 40.0, 80.0):    'shim',
-    (4.0, 80.0, 97.0):    'zmount',     # corrected user-authored bracket (cloned to all 4 Z + 2 Y)
-    (4.0, 80.0, 100.0):   'bot-mount',
+    (4.0, 80.0, 97.0):    'zmount',     # id 75 printed plate, now at the 2 Y-motor positions only
+    (4.0, 80.0, 100.0):   'z-bottom-plate',  # id 79, post-to-bottom-rail spacer (belt era: bot_spacer_idler)
     (4.0, 160.0, 280.0):  'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
     # X-carriage authored hardware (M3-2_nudge.step)
@@ -58,6 +64,14 @@ LABELS = {
     (3.2, 10.0, 10.0):    'xcarr_spacer',   # 6mm spacer (sorted dims as 3.2x10x10 due to import)
     # 2040 V-slot reinforcement inserts (2026-04-29; B+b pattern)
     (20.0, 40.0, 1000.0): '2040_insert',    # 1m centered in each X-direction 4080 (3 total)
+    # Lead-screw Z (2026-10-12; BOM v2.9.0)
+    (68.0, 80.0, 86.5):   'z-motor-mount',  # id 24, derived GrokBot mount
+    (8.0, 8.0, 1000.0):   'leadscrew',      # id 87
+    (12.0, 20.0, 34.0):   'nut-block',      # id 87
+    (19.0, 19.0, 20.0):   'coupler',        # id 88 envelope
+    (7.0, 14.0, 14.0):    'collar',         # id 90
+    (7.0, 22.0, 22.0):    'bearing-608',    # id 89 envelope
+    (27.1, 34.0, 45.0):   'z-bottom-holder',  # id 91
 }
 
 def sig(s):
@@ -70,6 +84,10 @@ def sig(s):
 
 def label_of(s):
     d = sig(s)
+    # The 8x16x5 thrust-bearing envelope (id 92) shares its bbox with the
+    # X-carriage bolt heads; the thrust bearings are the ones on the post tops.
+    if d == (5.0, 16.0, 16.0) and s.BoundingBox().zmin > 900:
+        return 'thrust-brg'
     if d in LABELS: return LABELS[d]
     if d[0] == 1.5 and d[1] == 6.0: return 'belt'
     return 'other'
@@ -79,39 +97,48 @@ inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
     'bracket': 0,
-    'motor': 7,            # 4 Z (FL, FR cloned, RL, RR) + 2 Y + 1 X — all share sig (56.4, 56.4, 76.6)
-    'vwheel': 32,          # all authored in M3-2_V1.0.step (16 Z + 8 Y + 8 X)
-    'pulley': 7,           # 4 Z + 2 Y + 1 X
-    'idler': 9,            # V1.0: removed extras (was 10, removed 1 floating mid-frame idler)
-    'plate': 8,            # V1.0: +1 plate over previous source
+    'motor': 7,            # 4 Z (shaft down on the mounts) + 2 Y + 1 X — all share sig (56.4, 56.4, 76.6)
+    'vwheel': 32,          # all authored in M3-2_V1.0 (16 Z + 8 Y + 8 X)
+    'pulley': 3,           # 2 Y + 1 X (Z is lead-screw driven)
+    'idler': 5,            # Y-axis set at Y-rail height; the 4 bottom Z idlers are gone
+    'plate': 8,
     'shim': 2,
-    'zmount': 2,           # V1.0: 2 source-authored at Y-motor positions (cloner disabled)
+    'zmount': 2,           # 2 Y-motor mounts (id 75)
     'zcap': 0,
-    'idler-brk': 4,        # V1.0: 1 fewer idler-bracket pair (was 5, removed 1)
-    'bot-mount': 8,        # V1.0: re-authored as 8 (4 corners × top+bottom; tops also serve as Z-motor mounts)
+    'idler-brk': 4,        # Y-axis idler brackets
+    'z-bottom-plate': 4,   # id 79: bottom only; the top plates became the id 24 mounts
     'ymount': 0,           # subsumed by z_motor_mount at Y-motor positions
     'tbracket': 2,
-    'belt': 12,            # 8 Z + 2 left-Y + 2 right-Y
+    'belt': 4,             # 2 left-Y + 2 right-Y (the 8 Z runs are gone)
     'xcarr_bolt': 8,       # M5 SHCS at X-carriage
     'xcarr_axle': 4,       # V-wheel axles (one carriage side modeled)
     'xcarr_washer': 4,
     'xcarr_spacer': 4,     # 6mm wheel spacers (one side)
     '2040_insert': 3,      # 1m 2040 V-slot inserts (B+b pattern, all authored in V1.0)
-    'other': 13,           # remaining X-carriage hardware + X-belt strand (FR motor moved to 'motor')
+    'other': 12,           # remaining X-carriage hardware + X-belt strand
+    'z-motor-mount': 4,
+    'leadscrew': 4,
+    'nut-block': 4,
+    'coupler': 4,
+    'collar': 8,           # above and below each mount floor
+    'thrust-brg': 8,       # id 92, with the collars
+    'bearing-608': 4,
+    'z-bottom-holder': 4,
 }
 problems = []
+notes = []
 print(f"Total parts: {len(parts)}")
 print()
 print("Inventory:")
 for k in sorted(set(list(inv.keys()) + list(EXPECTED.keys()))):
     got, want = inv.get(k, 0), EXPECTED.get(k, 0)
     marker = ' ' if got == want else 'X'
-    print(f"  [{marker}] {k:12s} {got:4d} (expected {want})")
+    print(f"  [{marker}] {k:15s} {got:4d} (expected {want})")
     if got != want:
         problems.append(f"inventory: {k} got {got}, expected {want}")
 
 # ---------- CHECK 2: combined motor-mount/spacer sanity ----------
-# Each zmount should be ~4 x 80 x 107 mm.
+# Each zmount should be ~4 x 80 x 97 mm.
 for s in parts:
     lbl = label_of(s)
     if lbl == 'zmount':
@@ -129,39 +156,49 @@ for s in parts:
 
     # ymount dimension check disabled while user re-authors the Y-motor spacers
 
-# ---------- CHECK 3: Z-motors attached to a top-corner mount plate ----------
-motors  = [s for s in parts if label_of(s) == 'motor']
+# ---------- CHECK 3: Z-motors seated on their mounts, coaxial with a screw ----------
+from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
+from OCP.BRepExtrema import BRepExtrema_DistShapeShape
+from OCP.GProp import GProp_GProps
+from OCP.BRepGProp import BRepGProp
+
 def center(s):
     bb = s.BoundingBox()
     return ((bb.xmin + bb.xmax) / 2, (bb.ymin + bb.ymax) / 2, (bb.zmin + bb.zmax) / 2)
 def dist(a, b):
     return ((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2) ** 0.5
+def dist_xy(a, b):
+    return ((a[0]-b[0])**2 + (a[1]-b[1])**2) ** 0.5
+def common_volume(a, b):
+    c = BRepAlgoAPI_Common(a.wrapped, b.wrapped)
+    c.Build()
+    g = GProp_GProps()
+    BRepGProp.VolumeProperties_s(c.Shape(), g)
+    return g.Mass()
+def gap(a, b):
+    d = BRepExtrema_DistShapeShape(a.wrapped, b.wrapped)
+    d.Perform()
+    return d.Value()
 
-# 2026-04-29 (V1.0): Z-motors mount via bot_spacer_idler at top corners
-# (the same plate used at the bottom of each Z-post). Zmounts are now
-# only used for Y-motors. Y-motors skipped (mount directly to frame).
-top_corner_mounts = [s for s in parts
-                     if label_of(s) == 'bot-mount' and center(s)[2] > 900]
+motors  = [s for s in parts if label_of(s) == 'motor']
+mounts  = [s for s in parts if label_of(s) == 'z-motor-mount']
+screws  = [s for s in parts if label_of(s) == 'leadscrew']
 for m in motors:
     mc = center(m)
     if mc[2] < 900:
-        continue  # Y-motor, skip
-    if 1000 < mc[0] < 2000:
-        continue  # X-motor (mid-gantry, mounts directly to gantry beam)
-    nearest = min(top_corner_mounts, key=lambda b: dist(mc, center(b)), default=None)
-    if nearest is None:
-        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) has no top-corner mount")
+        continue  # Y-motors and the X-motor sit at gantry height
+    mount = min(mounts, key=lambda b: dist_xy(mc, center(b)), default=None)
+    screw = min(screws, key=lambda b: dist_xy(mc, center(b)), default=None)
+    if mount is None or screw is None:
+        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) has no mount or lead screw")
         continue
-    d = dist(mc, center(nearest))
-    if d > 100:
-        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f},{mc[2]:.0f}) "
-                        f"nearest top-corner mount is {d:.0f} mm away (> 100 mm)")
+    if dist_xy(mc, center(screw)) > 0.5:
+        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f}) is {dist_xy(mc, center(screw)):.1f} mm off its lead-screw axis")
+    if gap(m, mount) > 0.05 or common_volume(m, mount) > 1.0:
+        problems.append(f"Z-motor at ({mc[0]:.0f},{mc[1]:.0f}) is not seated on its mount "
+                        f"(gap {gap(m, mount):.2f} mm, overlap {common_volume(m, mount):.1f} mm^3)")
 
 # ---------- CHECK 4: plate vs cbeam interference (catches clipping) ----------
-from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
-from OCP.GProp import GProp_GProps
-from OCP.BRepGProp import BRepGProp
-
 def bb_overlap(a, b, tol=-0.01):
     b1, b2 = a.BoundingBox(), b.BoundingBox()
     return (b1.xmin < b2.xmax + tol and b2.xmin < b1.xmax + tol and
@@ -175,17 +212,12 @@ for i in plate_idx:
         if not bb_overlap(parts[i], parts[j]):
             continue
         try:
-            common = BRepAlgoAPI_Common(parts[i].wrapped, parts[j].wrapped)
-            common.Build()
-            if common.IsDone():
-                gp = GProp_GProps()
-                BRepGProp.VolumeProperties_s(common.Shape(), gp)
-                v = gp.Mass()
-                if v > 0.5:
-                    pc = center(parts[i])
-                    problems.append(
-                        f"plate at ({pc[0]:.0f},{pc[1]:.0f},{pc[2]:.0f}) "
-                        f"clips cbeam by {v:.0f} mm^3")
+            v = common_volume(parts[i], parts[j])
+            if v > 0.5:
+                pc = center(parts[i])
+                problems.append(
+                    f"plate at ({pc[0]:.0f},{pc[1]:.0f},{pc[2]:.0f}) "
+                    f"clips cbeam by {v:.0f} mm^3")
         except Exception:
             pass
 
@@ -204,8 +236,73 @@ for s in parts:
         if is_z_corner and bb.zmin < 900:
             problems.append(f"{lbl} at ({cx:.0f},{cy:.0f},{cz:.0f}) below Z=900")
 
+# ---------- CHECK 6: lead screw on the C-channel centreline, AXIS_INSET inside the open face ----------
+# The posts' C opens toward the frame interior: +Y on the front posts, -Y on the rear.
+posts = [s for s in parts if label_of(s) == 'cbeam' and s.BoundingBox().zlen > 900]
+frame_cy = sum(center(p)[1] for p in posts) / max(len(posts), 1)
+for p in posts:
+    pb, pc = p.BoundingBox(), center(p)
+    screw = min(screws, key=lambda s: dist_xy(pc, center(s)), default=None)
+    if screw is None or dist_xy(pc, center(screw)) > 40:
+        problems.append(f"Z-post at ({pc[0]:.0f},{pc[1]:.0f}) has no lead screw")
+        continue
+    sc = center(screw)
+    inset = (pb.ymax - sc[1]) if pc[1] < frame_cy else (sc[1] - pb.ymin)
+    if abs(sc[0] - pc[0]) > 0.1 or abs(inset - mod.AXIS_INSET) > 0.1:
+        problems.append(f"lead screw at ({sc[0]:.1f},{sc[1]:.1f}) is {sc[0]-pc[0]:+.1f} mm off the post "
+                        f"centre and {inset:.1f} mm inside the open face (want 0 and {mod.AXIS_INSET})")
+
+# ---------- CHECK 7: lead-screw stack interference (true solids) ----------
+# C-beams come through as open prism shells (no volume), so rebuild them as
+# solids from their end-profile edges before testing overlap.
+def cbeam_solid(sh):
+    bb = sh.BoundingBox(); dims = (bb.xlen, bb.ylen, bb.zlen)
+    ax = max(range(3), key=lambda i: dims[i]); lo = (bb.xmin, bb.ymin, bb.zmin)[ax]
+    edges = [e for e in sh.Edges() if all(abs(v.toTuple()[ax] - lo) < 1e-3 for v in e.Vertices())]
+    vec = [0.0, 0.0, 0.0]; vec[ax] = dims[ax]
+    return cq.Solid.extrudeLinear(cq.Face.makeFromWires(cq.Wire.assembleEdges(edges)), cq.Vector(*vec))
+
+STACK = ('z-motor-mount', 'leadscrew', 'nut-block', 'coupler', 'collar', 'thrust-brg',
+         'bearing-608', 'z-bottom-holder')
+# Known, owner-tracked overlaps that this check reports but does not fail on.
+KNOWN = {
+    'idler-brk': "V1.0 Y-axis idler bracket inside the FL Z-post channel; "
+                 "pending the Y idler rework (BOM id 93, 2 front idlers)",
+}
+solids = [(label_of(s), s if s.ShapeType() == "Solid" else cbeam_solid(s)) for s in parts]
+for i, (la, a) in enumerate(solids):
+    if la not in STACK:
+        continue
+    for j, (lb, b) in enumerate(solids):
+        if j == i or (lb in STACK and j < i) or not bb_overlap(a, b):
+            continue
+        v = common_volume(a, b)
+        if v <= 1.0:
+            continue
+        ac = center(a)
+        msg = f"{la} at ({ac[0]:.0f},{ac[1]:.0f},{ac[2]:.0f}) overlaps {lb} by {v:.0f} mm^3"
+        if lb in KNOWN:
+            notes.append(f"{msg} — {KNOWN[lb]}")
+        else:
+            problems.append(msg)
+
+# ---------- CHECK 8: firmware position_max inside the measured Z travel ----------
+travel = z_travel.measure(z_travel.assembly_shapes(mod.assy))
+print()
+z_travel.report(travel)
+cfg = open(os.path.join(HERE, "..", "firmware", "steppers.cfg"), encoding="utf-8").read()
+zsec = cfg.split("[stepper_z]", 1)[1].split("\n[", 1)[0]
+pmax = float(re.search(r"^position_max:\s*([-\d.]+)", zsec, re.M).group(1))
+pend = float(re.search(r"^position_endstop:\s*([-\d.]+)", zsec, re.M).group(1))
+if pmax - pend > travel["stroke"] - z_travel.MARGIN:
+    problems.append(f"firmware [stepper_z] position_max {pmax:g} - position_endstop {pend:g} = "
+                    f"{pmax - pend:g} mm exceeds the measured stroke {travel['stroke']:.1f} mm "
+                    f"minus the {z_travel.MARGIN:g} mm margin")
+
 # ---------- REPORT ----------
 print()
+for n in notes:
+    print(f"NOTE (known, not failing): {n}")
 if problems:
     print(f"SELF-CHECK FAILED — {len(problems)} issue(s):")
     for p in problems:

@@ -170,7 +170,7 @@
       <li>The <strong>X-beam splice kit</strong> (an internal slot-link connector) plus three short V-slot bars.</li>
       <li><strong>Polycarbonate V-wheels</strong>, <strong>eccentric spacers</strong>, and <strong>gantry plates</strong>.</li>
       <li><strong>GT2 belts</strong> (a wider one for Y, a narrower one for X) and idlers.</li>
-      <li>Four <strong>Tr8×2 lead screws</strong> with brass nuts, <strong>8 mm couplers</strong>, <strong>KFL08 flange bearings</strong>, <strong>lock collars</strong>, and the printed Z <strong>hard-stop blocks</strong>.</li>
+      <li>Four <strong>Tr8×2 lead screws</strong> with <strong>nut blocks</strong>, <strong>8 mm couplers</strong>, eight <strong>lock collars</strong> and eight <strong>thrust bearings</strong>, four <strong>608 bearings</strong>, and the printed Z <strong>motor mounts</strong> and <strong>bottom holders</strong> (the bottom holders are also the Z hard stops).</li>
       <li>The seven motion <strong>NEMA23 motors</strong> and the <strong>3D-printed brackets / motor mounts</strong>.</li>
     </ul>
 
@@ -187,7 +187,7 @@
       <dt>GT2 belt</dt><dd>A toothed rubber belt that the motors pull to move the X and Y axes.</dd>
       <dt>Idler</dt><dd>A smooth pulley the belt wraps around to change direction.</dd>
       <dt>Lead screw</dt><dd>A threaded rod. The Z motor turns it, and a nut on the carriage climbs or descends it.</dd>
-      <dt>Hard-stop block</dt><dd>A fixed block at the bottom of each Z-post. The Z-axis homes by stalling gently against it — no switch.</dd>
+      <dt>Hard stop</dt><dd>The top of the printed holder at the bottom of each Z-post. The Z-axis homes by stalling gently against it — no switch.</dd>
     </dl>
 
     <h2>How the frame is designed (read this first)</h2>
@@ -252,7 +252,7 @@
     <div class="step">
       <div class="step-head"><span class="step-num">10</span><h3>Route the belts and fit the Z lead screws</h3></div>
       <p>Run the GT2 belts inside the C-channels — the wider belt on Y, the narrower one on X. Anchor the belt ends and take up the slack using the motor-mount slots. Leave final tensioning for the validation step; for now, just remove the slack.</p>
-      <p>For each Z-post, bolt the brass nut to the Z carriage plate and thread the lead screw through it. Seat the screw in the top and bottom flange bearings, then clamp two lock collars around the top bearing so the screw hangs from it. Leave the bottom bearing's grub screws loose so the screw can float. Join the screw to the motor shaft with the 8 mm coupler, and fit the hard-stop block at the bottom of the post. All four blocks must sit at the same height.</p>
+      <p>For each Z-post, bolt the nut block to the inside of the Z carriage plate from inside the C-channel. The two bolts thread into the plate, because the end of the Y-gantry rail covers the plate's outside there. Press a 608 bearing into the bottom holder from below, rest the holder on the top edge of the bottom plate, and bolt it into the slots in the channel floor. Thread the lead screw through the nut block and into the bottom bearing, where it floats freely. At the top, one thrust bearing and lock collar go under the motor mount's floor and the other pair goes on top of it, reached through the mount's side window. Clamp both collars snug against their bearings so the screw hangs from the mount with no end play, then join the screw to the motor shaft with the 8 mm coupler. Each holder sits on its own bottom plate, so all four stops end up at the same height.</p>
     </div>
 
     <div class="step">
@@ -271,7 +271,7 @@
       <li>X-beam spliced, bonded, cured, and smooth across the join.</li>
       <li>V-wheels fitted; gantry rolls smoothly with no wobble.</li>
       <li>Seven motors mounted (M5 + nut + threadlocker).</li>
-      <li>Z lead screws hang from the top bearings; couplers tight; hard-stop blocks at equal heights.</li>
+      <li>Z lead screws hang from the motor mounts with no end play; couplers tight; bottom holders seated on their plates.</li>
       <li>Belts routed inside the channels and slack removed.</li>
       <li>Final square + plumb + full-travel roll re-checked.</li>
     </ul>

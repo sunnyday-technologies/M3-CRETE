@@ -19,8 +19,8 @@ labels:
   plate:            [3.0, 88.0, 127.0]
   pulley:           [14.0, 15.0, 15.0]
   smooth_idler:     [12.7, 22.0, 22.0]
-  z_motor_mount:    [4.0, 80.0, 97.0]   # corrected — was 107; user-authored sig is 97 (cloned to all 4 Z + 2 Y in assembly)
-  bot_spacer_idler: [4.0, 80.0, 100.0]
+  z_motor_mount:    [4.0, 80.0, 97.0]   # id 75 plate, now at the 2 Y-motor positions only (name kept for history)
+  z_post_bottom_plate: [4.0, 80.0, 100.0]   # id 79; was bot_spacer_idler (top+bottom, belt-Z idler axle) before v2.9.0
   t_gusset:         [4.0, 160.0, 280.0]
   idler_bracket:    [5.0, 30.0, 30.0]
   # 2026-04-29 additions (promoted from CAD/self_check.py LABELS)
@@ -30,6 +30,15 @@ labels:
   xcarr_washer:     [1.0, 10.0, 10.0]
   xcarr_spacer:     [3.2, 10.0, 10.0]
   2040_insert:      [20.0, 40.0, 1000.0]   # internal X-direction 4080 reinforcement (B+b)
+  # 2026-10-12 lead-screw Z (BOM v2.9.0). The 8x16x5 thrust bearings (id 92)
+  # share xcarr_bolt's [5, 16, 16] signature, so they have no label of their own.
+  z_leadscrew_mount: [68.0, 80.0, 86.5]   # id 24, derived GrokBot mount
+  lead_screw:       [8.0, 8.0, 1000.0]    # id 87
+  z_nut_block:      [12.0, 20.0, 34.0]    # id 87 nut
+  z_coupler:        [19.0, 19.0, 20.0]    # id 88 envelope
+  bearing_608:      [7.0, 22.0, 22.0]     # id 89 envelope
+  lock_collar:      [7.0, 14.0, 14.0]     # id 90
+  z_bottom_holder:  [27.1, 34.0, 45.0]    # id 91
 
 belt_heuristic: true
 
@@ -39,7 +48,8 @@ bom_audit:
   bom_path: bom/data.json
   # AGENTS.md: fastener accounting is text-based (BOM line items), not bbox-based.
   # The xcarr_* + shim labels are placement/inventory tracking only — no BOM rule needed.
-  ignore_labels: [other, belt, shim, xcarr_bolt, xcarr_axle, xcarr_washer, xcarr_spacer]
+  # z_nut_block is part of id 87, whose rule binds the screw.
+  ignore_labels: [other, belt, shim, xcarr_bolt, xcarr_axle, xcarr_washer, xcarr_spacer, z_nut_block]
   # v0.7 / LOW-6: drop noise from items that aren't expected to have CAD
   # geometry (electronics, fasteners, consumables, optional upgrades).
   # Case-insensitive substring match against each item's `category` field.
@@ -64,6 +74,10 @@ bom_audit:
       expected_mfg_type: buy
       required_terms: ["10mm"]
       forbidden_terms: ["6mm"]
+    - id: 11
+      expected_qty: 3   # 2 Y + 1 X; the Z is lead-screw driven (owner, 2026-10-12)
+      expected_mfg_type: buy
+      expected_label: pulley
     - id: 14
       expected_qty: 2
       expected_mfg_type: buy
@@ -93,6 +107,7 @@ bom_audit:
     - id: 24
       expected_qty: 4
       expected_mfg_type: print
+      expected_label: z_leadscrew_mount
       forbidden_terms:
         - "aluminum"
         - "machined"
@@ -117,7 +132,7 @@ bom_audit:
       expected_mfg_type: buy
       expected_label: cbeam
     - id: 75
-      expected_qty: 2   # 2026-04-29 V1.0: only Y-motors use this plate; Z-motors use bot_spacer_idler
+      expected_qty: 2   # only Y-motors use this plate; Z-motors use the id 24 lead-screw mount
       expected_mfg_type: print
       expected_label: z_motor_mount
     - id: 77
@@ -125,9 +140,9 @@ bom_audit:
       expected_mfg_type: print
       expected_label: t_gusset
     - id: 79
-      expected_qty: 8   # 2026-04-29 V1.0: 4 corners × top+bottom (top = Z-motor mount)
+      expected_qty: 4   # 2026-10-12 v2.9: bottom plates only; the top plates became the id 24 mounts
       expected_mfg_type: print
-      expected_label: bot_spacer_idler
+      expected_label: z_post_bottom_plate
     - id: 81
       expected_qty: 0   # 2026-04-29 V1.0: deprecated, role moved to id 75
       expected_mfg_type: print
@@ -137,24 +152,33 @@ bom_audit:
     - id: 83
       expected_qty: 32
       expected_mfg_type: buy
-    # 2026-10-11 v2.8 lead-screw Z. No expected_label yet: the STEP still shows
-    # the belt Z, so these parts have no CAD geometry until the CAD update.
+    # Lead-screw Z: v2.8 BOM (2026-10-11), CAD geometry since v2.9 (2026-10-12).
     - id: 87
       expected_qty: 4
       expected_mfg_type: buy
+      expected_label: lead_screw
       required_terms: ["Tr8x2"]   # firmware rotation_distance 2 depends on this lead
     - id: 88
       expected_qty: 4
       expected_mfg_type: buy
+      expected_label: z_coupler
     - id: 89
-      expected_qty: 8
+      expected_qty: 4
       expected_mfg_type: buy
+      expected_label: bearing_608
+      required_terms: ["608ZZ"]
     - id: 90
       expected_qty: 8
       expected_mfg_type: buy
+      expected_label: lock_collar
     - id: 91
       expected_qty: 4
       expected_mfg_type: print
+      expected_label: z_bottom_holder
+    - id: 92
+      expected_qty: 8
+      expected_mfg_type: buy
+      # No expected_label: the thrust-bearing envelope shares xcarr_bolt's signature.
 
 claim_audit:
   # Entries are file globs relative to --repo; a bare directory matches no

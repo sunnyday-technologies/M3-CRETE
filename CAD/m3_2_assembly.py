@@ -1,962 +1,276 @@
 """
-M3-CRETE M3-2 Assembly — v3 (filter-and-replace from Fusion export)
+M3-CRETE M3-2 Assembly — v4 (lead-screw Z on the V1.0 baseline)
 
-Loads all parts from M3-2_Assembly_user.v21.step, then:
-  - Replaces C-beams (40x80x1000) with solid-fill parametric versions
-  - Removes legacy metal NEMA23 L-brackets
-  - Adds simple printed motor-mount/spacer combination plates for Z corners
-    and flat printed adapter plates for the two Y motors
-  - Everything else passes through at full Fusion fidelity
+Loads CAD/M3-2_V1.0_baseline.step: the 146-part V1.0 assembly (2026-04-29
+freeze) that the v3 filter-and-replace pass built from Nick's Fusion export.
+That export (M3-2_V1.0.step) is no longer available, so the v3 fixups
+(parametric C-beams, corner fixups, bracket cloning, gusset import, FR motor
+clone) are already baked into the baseline and are not repeated here.
+
+On top of the baseline this script:
+  - drops the belt-driven Z: 8 vertical belt runs, 4 Z pulleys and the FR
+    shaft leftover, 4 bottom Z idlers, the 4 horizontal-shaft Z motors and
+    the 4 top id 79 plates that carried them
+  - drops exact duplicate placements carried over from v3 (gussets, idler
+    brackets, one Y return idler)
+  - adds a lead-screw stack on every Z post (BOM v2.9.0, owner decisions
+    2026-10-11/12):
+      motor mount  id 24  CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_M3-2.step
+                          (derived from the GrokBot mount, see
+                          derive_z_motor_mount.py)
+      motor        id 19  baseline NEMA23, turned shaft-down
+      coupler      id 88  envelope
+      collars      id 90  CAD/Components/Hardware/Lock Collar 8mm.step,
+                          above and below the mount floor
+      thrust brg   id 92  envelope, between each collar and the mount floor
+      screw        id 87  Tr8x2 x 1000, plain 8 mm rod (linear stock)
+      nut block    id 87  CAD/Advanced/Hardware/8mm Acme Nut Block.step body,
+                          bolted to the Z carriage plate (id 23)
+      bottom holder id 91 CAD/Custom/Z_Bottom_Bearing_Holder_M3-2.step
+                          (z_bottom_holder.py): 608ZZ seat + hard stop, on
+                          the bottom plate's top edge
+      608ZZ        id 89  envelope, in the bottom holder
+    Envelopes are dimensioned stand-ins for vendor parts with no local STEP
+    (owner decision 2026-10-12). They carry no holes.
+  - writes CAD/M3-2_Assembly.step (never the baseline)
+
+Screw axis: centre of the post's C-channel, AXIS_INSET mm inside the open
+face, so the nut block (bore centred 6 mm from its face) sits flush on the
+carriage plate.
 """
 import cadquery as cq
 from cadquery import Assembly, Color, Location
-from OCP.gp import gp_Trsf, gp_Ax1, gp_Pnt, gp_Dir, gp_Vec
-from OCP.BRepBuilderAPI import (BRepBuilderAPI_Transform, BRepBuilderAPI_MakeWire,
-                                 BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeFace)
-from OCP.BRepPrimAPI import BRepPrimAPI_MakePrism
-from OCP.BRepAdaptor import BRepAdaptor_Curve
-from OCP.GCPnts import GCPnts_TangentialDeflection
-import os, time, math
+import os, time
+import z_bottom_holder as zbh
 
-USER_STEP = os.path.join(os.path.dirname(__file__), "M3-2_V1.0.step")
-
-# ============================================================
-# Frame: 1000mm C-beam extrusions (shipping constraint).
-# Source M3-2_AllC.step is already in the 1000mm envelope (Nick's manual
-# corner-RR adjustments baked in), so SXY=SZ=1 — no scaling. Corner
-# fixups below mirror Nick's RR edits onto the other three corners.
-# ============================================================
-L         = 1000.0                              # extrusion length (= source)
-OLD_L     = 1000.0                              # SXY/SZ become 1.0
-SHIM_THK  = 4.0                                 # 4mm spacer between Y-rail end and Z-post
-NX_RIGHT  = 2.0 * L + 80.0                      # right Z-post X center  (2080)
-NZ_TOP    = L                                   # top of frame Z         (1000)
-# Y-direction frame rails span Y[Y_RAIL_START, Y_RAIL_END]; Z-posts and
-# top X rails are pushed OUT by SHIM_THK to leave room for end spacers.
-Y_RAIL_START = 20.0                                       # all Y rails start here
-Y_RAIL_END   = L + 20.0                                   # all Y rails end here
-Y_POST_F     = Y_RAIL_START - 20.0 - SHIM_THK             # front Z-post Y center  (-4)
-Y_POST_R     = Y_RAIL_END   + 20.0 + SHIM_THK             # rear  Z-post Y center  (1044)
-NY_REAR      = Y_POST_R                                   # alias for back-compat
-SXY       = (2.0 * L + 80.0) / (2.0 * OLD_L + 80.0)       # 2080/2080 = 1.0
-SZ        = L / OLD_L                                      # 1000/1000 = 1.0
+HERE = os.path.dirname(__file__)
+BASELINE    = os.path.join(HERE, "M3-2_V1.0_baseline.step")
+OUT         = os.path.join(HERE, "M3-2_Assembly.step")
+MOUNT_STEP  = os.path.join(HERE, "Custom", "Z_NEMA23_Leadscrew_Motor_Mount_M3-2.step")
+HOLDER_STEP = zbh.OUT_STEP
+COLLAR_STEP = os.path.join(HERE, "Components", "Hardware", "Lock Collar 8mm.step")
+NUT_STEP    = os.path.join(HERE, "Advanced", "Hardware", "8mm Acme Nut Block.step")
 
 # ============================================================
-# Helpers
+# Lead-screw stack geometry (mm)
 # ============================================================
-def _discretize_wire(wire, deflection=1.0):
-    """Convert a wire's curves to straight-line segments."""
-    pts = []
-    for edge in cq.Wire(wire).Edges():
-        adaptor = BRepAdaptor_Curve(edge.wrapped)
-        disc = GCPnts_TangentialDeflection(adaptor, deflection, 0.1)
-        for i in range(1, disc.NbPoints() + 1):
-            p = disc.Value(i)
-            pts.append((p.X(), p.Y(), p.Z()))
-    clean = [pts[0]]
-    for p in pts[1:]:
-        if any(abs(p[j] - clean[-1][j]) > 1e-6 for j in range(3)):
-            clean.append(p)
-    wb = BRepBuilderAPI_MakeWire()
-    for i in range(len(clean)):
-        p1 = gp_Pnt(*clean[i])
-        p2 = gp_Pnt(*clean[(i + 1) % len(clean)])
-        wb.Add(BRepBuilderAPI_MakeEdge(p1, p2).Edge())
-    return wb.Wire()
-
-def _solid_fill_extrude(solid, face_selector, extrude_vec):
-    """Extract outer wire from a face, discretize, fill solid, extrude."""
-    face = solid.faces(face_selector).val()
-    outer_wire = _discretize_wire(face.outerWire().wrapped)
-    solid_face = BRepBuilderAPI_MakeFace(outer_wire).Face()
-    prism = BRepPrimAPI_MakePrism(solid_face, extrude_vec)
-    return cq.Workplane().add(cq.Shape(prism.Shape()))
-
-def _extract_cbeam_profile_points(cbeam_solid):
-    """Extract 2D profile points from a Y-rail C-beam's end face.
-    Returns list of (X, Z) tuples discretized from the outer wire.
-    These are in the original C-beam's coordinate system."""
-    wp = cq.Workplane().add(cbeam_solid)
-    end_face = wp.faces("<Y").val()
-    outer_wire = end_face.outerWire()
-    pts_3d = []
-    for edge in outer_wire.Edges():
-        adaptor = BRepAdaptor_Curve(edge.wrapped)
-        disc = GCPnts_TangentialDeflection(adaptor, 1.0, 0.1)
-        for i in range(1, disc.NbPoints() + 1):
-            p = disc.Value(i)
-            pts_3d.append((p.X(), p.Z()))
-    # Dedupe consecutive near-duplicates
-    clean = [pts_3d[0]]
-    for p in pts_3d[1:]:
-        if abs(p[0] - clean[-1][0]) > 1e-4 or abs(p[1] - clean[-1][1]) > 1e-4:
-            clean.append(p)
-    return clean
-
-def _make_cbeam_post_from_profile(profile_xz, src_x_center, src_z_center,
-                                   length=1200, channel_dir="+Y"):
-    """Parametric C-beam Z-post: 80(X) × 40(Y), channel opening + V-grooves
-    on 3 outer faces. Built as a polyline profile extruded along Z."""
-    HW = 40.0      # half outer width (X)
-    HH = 20.0      # half outer height (Y)
-    CHW = 13.0     # half channel opening width (X-direction for +Y channel)
-    CHD = 36.0     # channel depth (cuts from +Y face down to Y = HH - CHD = -16)
-    VW = 4.55      # half V-groove opening (9.1mm wide)
-    VD = 5.5       # V-groove depth
-
-    # Build outline for channel_dir == "+Y" first (channel opens on +Y face)
-    # Going clockwise from bottom-left:
-    pts = [
-        # Bottom face (y = -HH), V-groove at x=0
-        (-HW, -HH),
-        (-VW, -HH), (0, -HH + VD), (VW, -HH),
-        (HW, -HH),
-        # Right face (x = +HW), V-groove at y=0
-        (HW, -VW), (HW - VD, 0), (HW, VW),
-        (HW, HH),
-        # Top edge right of channel (y = +HH, x = CHW..HW)
-        (CHW, HH),
-        # Channel right wall (x = CHW, from HH down to HH - CHD)
-        (CHW, HH - CHD),
-        # Channel bottom (y = HH - CHD)
-        (-CHW, HH - CHD),
-        # Channel left wall (x = -CHW, from HH - CHD up to HH)
-        (-CHW, HH),
-        # Top edge left of channel
-        (-HW, HH),
-        # Left face (x = -HW), V-groove at y=0
-        (-HW, VW), (-HW + VD, 0), (-HW, -VW),
-    ]
-
-    # Apply channel direction via coordinate transform
-    if channel_dir == "-Y":
-        pts = [(x, -y) for (x, y) in pts]
-    elif channel_dir == "+X":
-        pts = [(y, x) for (x, y) in pts]
-    elif channel_dir == "-X":
-        pts = [(-y, x) for (x, y) in pts]
-
-    profile = (cq.Workplane("XY")
-               .moveTo(*pts[0])
-               .polyline(pts[1:])
-               .close()
-               .extrude(length))
-    return profile
-
-def _make_generic_bracket(axle):
-    """Generic NEMA23 motor bracket (no StepperOnline IP).
-    Box shape matching original 65×69×69 dims with adjustment slots.
-    Motor face: 4× slots at NEMA23 47.14mm pattern + 38.1mm boss hole.
-    Rail face: 4× slots at 20mm T-slot spacing.
-    `axle` = the 65mm axis direction (from original bbox)."""
-    # Build with 65mm along Z, 69×69 in XY, then rotate to match axle
-    t = 69.0
-    bracket = cq.Workplane("XY").box(69, 69, 65)
-    # Motor face (-Z): NEMA23 bolt pattern as slots + boss hole
-    nema_half = 47.14 / 2
-    bracket = (bracket.faces("<Z").workplane()
-        .pushPoints([(nema_half, nema_half), (nema_half, -nema_half),
-                     (-nema_half, nema_half), (-nema_half, -nema_half)])
-        .slot2D(12, 5.5).cutBlind(-5)
-        .faces("<Z").workplane()
-        .pushPoints([(0, 0)])
-        .hole(38.1, 5))
-    # Rail face (+Z): T-slot mounting slots
-    bracket = (bracket.faces(">Z").workplane()
-        .pushPoints([(0, -15), (0, 15), (20, -15), (20, 15)])
-        .slot2D(12, 5.5).cutBlind(-5))
-    # Rotate to match the original bracket's 65mm axis
-    if axle == "X":
-        bracket = bracket.rotateAboutCenter((0, 1, 0), 90)
-    elif axle == "Y":
-        bracket = bracket.rotateAboutCenter((1, 0, 0), 90)
-    return bracket
+POST_TOP      = 1000.0      # Z-post top = mount floor underside
+AXIS_INSET    = 6.0         # screw axis -> channel open face
+MOUNT_AXIS_Y  = 2.0         # screw axis in the mount STEP frame
+MOUNT_FLOOR   = 6.0         # mount floor thickness
+MOUNT_TOP     = 48.0        # mount top face (motor face) above its floor underside
+SCREW_D       = 8.0
+SCREW_L       = 1000.0      # BOM id 87
+SHAFT_GAP     = 1.0         # screw top end below the motor shaft tip, inside the coupler
+COUPLER_D     = 19.0        # 8x8 coupler envelope; must fit the 34 mm mount cavity
+COUPLER_L     = 20.0
+THRUST_D      = 16.0        # 8x16x5 thrust bearing envelope (BOM id 92)
+THRUST_H      = 5.0
+BORE_D        = 8.0
+assert AXIS_INSET == zbh.AXIS_INSET
 
 # ============================================================
 # Colors
 # ============================================================
-ALU  = Color(0.10, 0.10, 0.12)   # Black anodized frame
-BLK  = Color(0.08, 0.08, 0.10)   # Gantry beam
-DRK  = Color(0.20, 0.20, 0.22)   # C-beam Y-rails
-BRK2 = Color(0.30, 0.50, 0.75)   # L-bracket blue
-BELT = Color(0.59, 0.84, 0.00)   # Lime green belts
-GRN  = Color(0.40, 0.85, 0.10)   # Lime green wheels
-MTR  = Color(0.15, 0.15, 0.18)   # Motor black
-PUL  = Color(0.90, 0.75, 0.10)   # Pulley gold
-IDL  = Color(0.85, 0.85, 0.88)   # Idler polished
-SHAFT= Color(0.60, 0.60, 0.62)   # Shaft steel
-PLATE= Color(0.25, 0.25, 0.28)   # Gantry plates
-CUBE = Color(0.65, 0.65, 0.68)   # Splice cubes
+MTR   = Color(0.15, 0.15, 0.18)   # Motor black
+SHAFT = Color(0.60, 0.60, 0.62)   # Shaft steel
+IDL   = Color(0.85, 0.85, 0.88)   # Polished steel (collars)
+BRASS = Color(0.80, 0.65, 0.25)   # Nut block
+ENV   = Color(0.75, 0.45, 0.20)   # Vendor-part envelopes (bronze)
+PRINT_COLOR = Color(0.59, 0.84, 0.00)   # Sunnyday trademark green (printed parts)
 
-# Signature-to-color mapping
-SIG_COLORS = {
-    (20.0, 80.0, 1200.0): ALU,    # 2080 extrusions
-    (20.0, 40.0, 1200.0): ALU,    # 2040 extrusions
-    (40.0, 80.0, 1200.0): DRK,    # C-beams (replaced)
-    (65.0, 69.0, 69.0):   BRK2,   # L-brackets (replaced)
-    (56.4, 56.4, 76.6):   MTR,    # Motors
-    (3.0, 88.0, 127.0):   PLATE,  # Gantry plates
-    (10.2, 23.9, 23.9):   GRN,    # V-wheels
-    (14.0, 15.0, 15.0):   PUL,    # Pulleys
-    (12.7, 22.0, 22.0):   IDL,    # Idlers
-    (20.0, 20.0, 20.0):   CUBE,   # Splice cubes
-}
-BELT_SIGS = {(1.5, 6.0, 1131.0), (1.5, 6.0, 1141.8), (1.5, 6.0, 1143.0)}
 
-# ============================================================
-# Load and classify
-# ============================================================
-print("M3-CRETE M3-2 Assembly v3.0 (filter-and-replace)")
-print(f"Loading {USER_STEP}...")
+def world_bb(child):
+    return child.obj.moved(child.loc).BoundingBox()
+
+
+def sig_of(bb):
+    return tuple(sorted(round(v, 1) for v in (bb.xlen, bb.ylen, bb.zlen)))
+
+
+def bb_key(bb):
+    return tuple(round(v, 1) for v in (bb.xmin, bb.ymin, bb.zmin, bb.xmax, bb.ymax, bb.zmax))
+
+
+def ring(od, idia, h):
+    """Plain annulus along +Z from Z=0 (bearing / coupler envelope)."""
+    return cq.Solid.makeCylinder(od / 2, h).cut(cq.Solid.makeCylinder(idia / 2, h))
+
+
+def place(shape, local_axis, rot_deg, axis_xy, z):
+    """Move `shape` so its local screw axis lands on the world axis at height z,
+    turned rot_deg about Z (180 for rear posts, whose channel opens -Y)."""
+    s = shape.translate(cq.Vector(-local_axis[0], -local_axis[1], 0))
+    if rot_deg:
+        s = s.rotate(cq.Vector(0, 0, 0), cq.Vector(0, 0, 1), rot_deg)
+    return s.translate(cq.Vector(axis_xy[0], axis_xy[1], z))
+
+
+print("M3-CRETE M3-2 Assembly v4.0 (lead-screw Z on V1.0 baseline)")
+print(f"Loading {os.path.basename(BASELINE)}...")
 t0 = time.time()
-
-# Load both solids AND free shells — Nick's C-beams are exported as shells,
-# not solids, so we must iterate both.
-stock = cq.importers.importStep(USER_STEP)
-_stock_compound = stock.val()
-solids = list(_stock_compound.Solids())
-
-# Collect C-beam shells (not inside any solid). These are Nick's Fusion-placed
-# C-beam Z-posts and Y-rails, which export as shells instead of solids.
-# Filter: sorted bbox dims match (40, 80, 1200) within tolerance.
-from OCP.TopAbs import TopAbs_SHELL
-from OCP.TopExp import TopExp_Explorer
-from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeSolid
-from OCP.TopoDS import TopoDS
-from OCP.BRepBndLib import BRepBndLib
-from OCP.Bnd import Bnd_Box
-
-cbeam_shells = []
-e = TopExp_Explorer(_stock_compound.wrapped, TopAbs_SHELL)
-seen_bboxes = set()
-while e.More():
-    sh = e.Current()
-    bb = Bnd_Box()
-    BRepBndLib.Add_s(sh, bb)
-    if not bb.IsVoid():
-        xmin,ymin,zmin,xmax,ymax,zmax = bb.Get()
-        dx = round(xmax-xmin, 1); dy = round(ymax-ymin, 1); dz = round(zmax-zmin, 1)
-        sorted_dims = tuple(sorted([dx,dy,dz]))
-        if sorted_dims == (40.0, 80.0, 1000.0):
-            # Dedup by bbox tuple (distinct C-beams will have different positions)
-            key = (round(xmin,1),round(ymin,1),round(zmin,1),round(xmax,1),round(ymax,1),round(zmax,1))
-            if key not in seen_bboxes:
-                seen_bboxes.add(key)
-                try:
-                    shell = TopoDS.Shell_s(sh)
-                    solid = BRepBuilderAPI_MakeSolid(shell).Solid()
-                    cbeam_shells.append(cq.Solid(solid))
-                except: pass
-    e.Next()
-
-solids = list(solids) + cbeam_shells
-print(f"  {len(solids)} total parts ({len(cbeam_shells)} C-beam shells loaded)")
-
-assy = Assembly("M3-2_Assembly")
-n = [0]
-replaced_cbeams = 0
-replaced_brackets = 0
-
-# Tracking lists for post-loop additions (corner connectors, Y-motor
-# brackets, idler axle brackets) — each entry is a world bbox tuple
-# (xmin, xmax, ymin, ymax, zmin, zmax).
-cbeam_bbs   = []   # for joint detection
-zmotor_bbs  = []   # for Z-motor bracket placement (cz > 900)
-ymotor_bbs  = []   # for Y-motor bracket placement (cz < 600, near rail X edge)
-idler_bbs   = []   # for idler axle bracket placement
-xaxle_bbs   = []   # for X-carriage V-wheel placement at authored axle positions (sig 9x9x31.5)
-_vwheel_template_shape = None  # populated from first loaded V-wheel; cloned for X-carriage
-_z_bracket_template = None     # captured from the user-authored (4,80,97) plate; cloned to all 4 Z corners + 2 Y motors
-_z_bracket_src_ctr = None      # world-frame source center of the captured bracket
-_motor_template_shape = None   # captured from first standard NEMA23; cloned to FR Z-corner to replace variant
-_motor_template_src_ctr = None # world-frame source center of the captured motor
-FRAME_CTR = (NX_RIGHT / 2.0, (Y_POST_F + Y_POST_R) / 2.0, NZ_TOP / 2.0)
-
-# Generic brackets built per-instance (each needs correct axle orientation)
-
-# Build C-beam Z-post template from the 1000mm stock STEP profile.
-# Stock: X[-20,20] (40mm) × Y[-40,40] (80mm) × Z[0,1000], channel on -X face.
-# Target: 40(X) × 80(Y) × 1200(Z). Stock natural orientation = 40(X) × 80(Y),
-# so no rotation needed — just extrude to 1200mm.
-_cbeam_left  = None   # channel on +X (for left posts: FL, RL)
-_cbeam_right = None   # channel on -X (for right posts: FR, RR) — stock natural
-
-_stock_path = os.path.join(os.path.dirname(__file__),
-                            "Advanced", "Linear Rail",
-                            "C-Beam 40x80x1000 Linear Rail.step")
-if os.path.exists(_stock_path):
-    _stock = cq.importers.importStep(_stock_path)
-    _end_face = _stock.faces("<Z").val()
-    # EXPERIMENT: feed the native wire (with CIRCLE arcs preserved) straight
-    # into MakePrism instead of discretizing to straight segments. Should
-    # produce proper cylindrical side faces for the V-grooves and drop the
-    # STEP file size dramatically (was 68 MB w/ discretization).
-    _outer_wire = _end_face.outerWire().wrapped
-    _prism = BRepPrimAPI_MakePrism(_outer_wire, gp_Vec(0, 0, L))
-    _stock_beam = cq.Workplane().add(cq.Shape(_prism.Shape()))
-    # Stock: 40(X) × 80(Y) × 1200(Z), channel on -X.
-    # Target: 80(X) × 40(Y) × 1200(Z) with channel on ±Y (long axis X per Nick).
-    # Rotate +90 around Z: X → Y, Y → -X. So 40(X) → 40(Y), 80(Y) → 80(X),
-    # and -X channel → -Y channel. Use this for rear posts (RL/RR).
-    # For front posts, rotate -90° to get +Y channel.
-    _cbeam_rear  = _stock_beam.rotate((0,0,0), (0,0,1), 90)   # channel -Y
-    _cbeam_front = _stock_beam.rotate((0,0,0), (0,0,1), -90)  # channel +Y
-    # Y-rail templates: rotate stock -90° around X so long axis Z→Y.
-    # Result: X[-20,20] (40), Y[0,1200] (1200), Z[-40,40] (80).
-    # Channel stays on -X face (suitable for RIGHT rail at high X).
-    _cbeam_yrail_R = _stock_beam.rotate((0,0,0), (1,0,0), -90)
-    # Mirror around Y for LEFT rail (channel on +X face, facing inward).
-    _cbeam_yrail_L = _cbeam_yrail_R.rotate((0,0,0), (0,1,0), 180)
-
-    # Flat-lying Y-rail: 80(X) × 1200(Y) × 40(Z), channel -Z.
-    # For top + bottom Y-direction frame members — wider stiffness, channel
-    # facing down avoids debris catch (top) and accepts leg extensions (bottom).
-    _cbeam_yrail_flat = (_stock_beam
-                         .rotate((0,0,0), (1,0,0), -90)
-                         .rotate((0,0,0), (0,1,0), 90))
-
-    # Tall X-rail: 1200(X) × 40(Y) × 80(Z), channel ±Y inward.
-    _cbeam_xrail_chanYp = (_stock_beam
-                           .rotate((0,0,0), (0,1,0), 90)
-                           .rotate((0,0,0), (1,0,0), 90))
-    _cbeam_xrail_chanYn = _cbeam_xrail_chanYp.rotate((0,0,0), (1,0,0), 180)
-
-    # Flat-lying X-rail: 1200(X) × 80(Y) × 40(Z), channel -Z.
-    # For mid-frame X-direction cross-braces (frame center, channel down).
-    _cbeam_xrail_flat = _cbeam_yrail_flat.rotate((0,0,0), (0,0,1), -90)
-
-    print(f"  Built C-beam templates: Z-posts, Y-rails (tall + flat), "
-          f"X-rails (tall + flat)")
-
-    # Place 4 Z-posts. Posts shifted outward in Y by 4mm to make room for
-    # 4mm shims between top Y-rails / bottom Y-skids and Z-post inner faces.
-    # This gives the 1200mm C-beam Y-gantry an 8mm running clearance
-    # (4mm + 3mm carriage plate + 1mm working gap on each side).
-    _POST_POSITIONS = [
-        ("FL", 0,    -4,   "+Y"),
-        ("FR", 2480, -4,   "+Y"),
-        ("RL", 0,    1244, "-Y"),
-        ("RR", 2480, 1244, "-Y"),
-    ]
-    # Nick's C-beam shells (Z-posts + Y-rails) are matched to template
-    # instances inside the main loop below — keyed by orientation + position.
-
-    # 8x 4mm Y-direction shims between flat top/bottom Y C-beams and Z-post
-    # inner faces. New flat C-beam end face is 80(X) × 40(Z), so shim is
-    # 80×4×40, anchored on Z-post X-centerline (X=0 left, X=2480 right).
-    SHIM = Color(0.85, 0.45, 0.10)   # orange — visually distinct from frame
-    # Shims sit only between STATIC frame Y-members (top, bottom, top middle)
-    # and the Z-posts they butt against — they create the 4 mm clearance
-    # the gantry needs to traverse along the Z-posts. The mid-height gantry
-    # rails carry the moving gantry; their ends don't need shims.
-    shim_4080_flat = cq.Workplane("XY").box(80, SHIM_THK, 40)
-    _SY_F = Y_RAIL_START - SHIM_THK / 2.0    # 18 — front shim Y center (Y[16,20])
-    _SY_R = Y_RAIL_END   + SHIM_THK / 2.0    # 1022 — rear  shim Y center
-    _SZ_T = NZ_TOP - 20.0                    # 980 — top   shim Z center
-    _SZ_B = 20.0                             # 20  — bot   shim Z center
-    _SX_TM = NX_RIGHT / 2.0                  # 1040 — top mid Y rail X center
-    shim_specs = [
-        # Top mid-frame Y rails: 2 shims (only the center spreader needs
-        # them). The 4 top-corner shims were removed — superseded by the
-        # combined zmount plate which integrates the Y-spacer role.
-        ("topmid_front",  _SX_TM,   _SY_F, _SZ_T, shim_4080_flat),
-        ("topmid_rear",   _SX_TM,   _SY_R, _SZ_T, shim_4080_flat),
-        # Bottom 4 corner shims removed — replaced by combined bottom
-        # spacer/idler-mount plates in post-loop section
-    ]
-    for name, sx, sy, sz, shim_shape in shim_specs:
-        assy.add(shim_shape, name=f"shim_{name}", color=SHIM,
-                 loc=Location((sx, sy, sz)))
-        n[0] += 1
-else:
-    print(f"  WARNING: C-beam stock not found at {_stock_path}")
-
-for s in solids:
-    bb = s.BoundingBox()
-    dx = round(bb.xmax - bb.xmin, 1)
-    dy = round(bb.ymax - bb.ymin, 1)
-    dz = round(bb.zmax - bb.zmin, 1)
-    dims = tuple(sorted([dx, dy, dz]))
-    cx = (bb.xmin + bb.xmax) / 2
-    cy = (bb.ymin + bb.ymax) / 2
-    cz = (bb.zmin + bb.zmax) / 2
-
-    # Skip the OLD shims baked into the source — script rebuilds shims fresh.
-    if dims == (4.0, 40.0, 80.0):
-        continue
-
-    # ============================================================
-    # CORNER FIXUPS — mirror Nick's RR edits to FL/FR/RL.
-    # Nick adjusted the rear-right Z-motor stack so the bracket / motor /
-    # belt align correctly with the corner Z-gantry plate. The same
-    # geometry applies symmetrically to the other three corners.
-    #
-    # Per-part deltas (toward frame center for Y, away for X):
-    #   Z-motor:  X ±4.25 (outward), Y ±12 (inward), Z +6.75 (up)
-    #   bracket:  X ±4.25 (outward), Y ±12 (inward)
-    #   plate:    Y ±3 (inward) — Z-corner gantry plate only
-    # ============================================================
-    fix_dx = fix_dy = fix_dz = 0.0
-
-    # M3-2_newZMM.step authors the front-right simplified Z motor stack.
-    # Mirror those motor, pulley, idler, and vertical belt positions to
-    # every Z post so all four corners share one belt path.
-    if dims == (56.4, 56.4, 76.6) and cz > 900:
-        is_left = cx < FRAME_CTR[0]
-        is_front = cy < FRAME_CTR[1]
-        target_x = 0.6 if is_left else NX_RIGHT - 0.6
-        target_y = 36.1 if is_front else (2 * FRAME_CTR[1] - 36.1)
-        target_z = 1028.2
-        fix_dx, fix_dy, fix_dz = target_x - cx, target_y - cy, target_z - cz
-    elif dims == (14.0, 15.0, 15.0) and cz > 900:
-        is_left = cx < FRAME_CTR[0]
-        is_front = cy < FRAME_CTR[1]
-        target_x = 0.6 if is_left else NX_RIGHT - 0.6
-        target_y = 7.2 if is_front else (2 * FRAME_CTR[1] - 7.2)
-        target_z = 1028.1
-        fix_dx, fix_dy, fix_dz = target_x - cx, target_y - cy, target_z - cz
-    elif dims == (12.7, 22.0, 22.0) and cz < 150 and (cx < 100 or cx > NX_RIGHT - 100):
-        is_left = cx < FRAME_CTR[0]
-        is_front = cy < FRAME_CTR[1]
-        target_x = 0.6 if is_left else NX_RIGHT - 0.6
-        target_y = 5.1 if is_front else (2 * FRAME_CTR[1] - 5.1)
-        target_z = 101.7
-        fix_dx, fix_dy, fix_dz = target_x - cx, target_y - cy, target_z - cz
-    elif dims[0] == 1.5 and dims[1] == 6.0 and dz > 900 and (cx < 100 or cx > NX_RIGHT - 100):
-        is_left = cx < FRAME_CTR[0]
-        is_front = cy < FRAME_CTR[1]
-        post_x = 0.0 if is_left else NX_RIGHT
-        if is_left:
-            rel_x = -4.9 if cx < post_x else 6.0
-        else:
-            rel_x = -6.0 if cx < post_x else 4.9
-        target_x = post_x + rel_x
-        target_y = 5.1 if is_front else (2 * FRAME_CTR[1] - 5.1)
-        target_z = 557.1
-        fix_dx, fix_dy, fix_dz = target_x - cx, target_y - cy, target_z - cz
-
-    # 1. Z-motor corner stack — motors rest on 5mm cap (zmin ≈ 1005)
-    #    Source non-RR motors already at correct Z (zmin=1005.1). No Z fixup.
-    #    Source RR motor is higher (zmin=1011.9), fix down to match.
-    #    Verified against Nick's Fusion placement: M3-2_Ass_3dbrak.step
-    if False and cz > 900 and dims in {(56.4, 56.4, 76.6), (65.0, 69.0, 69.0)}:
-        is_left  = cx < 1040
-        is_front = cy < 520
-        is_RR    = (not is_left) and (not is_front)
-        if is_RR:
-            if dims == (56.4, 56.4, 76.6):
-                fix_dz = -6.9   # 1005 - 1011.9 (match cap top)
-        else:
-            sign_x = -1.0 if is_left  else +1.0
-            sign_y = +1.0 if is_front else -1.0
-            fix_dx = 4.25 * sign_x
-            fix_dy = 12.0 * sign_y
-            # No Z fixup — source motors already at correct height
-
-    # 2. Gantry plates (mid-height, signature 3x88x127)
-    #    — Corner Z-gantry plates snap to an ABSOLUTE Y target so all 4
-    #      corners match Nick's RR position uniformly (front cy=18.52,
-    #      rear cy=1021.48). This removes the 0.65 mm clip FR had from
-    #      the relative +3 fixup because the source cy values aren't
-    #      perfectly symmetric.
-    #    — Mid X-carriage plates (at cy~520) snap to X targets so their
-    #      inner face clears the mid Y rail by 1 mm. The source has them
-    #      clipping 0.3-2.1 mm into the rail, never modeled flush.
-    elif dims == (3.0, 88.0, 127.0) and 200 < cz < 600:
-        # 1 mm gap to mid Y rail end. Plate is 3 mm thick (3/2=1.5 half);
-        # rail starts at Y=20 (front) or ends at Y=1020 (rear). Gap 1 mm
-        # -> plate inner face at Y=19 (front) or Y=1021 (rear).
-        if cy < 100:                                  # front corner plate
-            fix_dy = 17.5 - cy                        # plate Y[16, 19], 1 mm gap
-        elif cy > 940:                                # rear corner plate
-            fix_dy = 1022.5 - cy                      # plate Y[1021, 1024], 1 mm gap
-        elif 400 < cy < 600 and dx < 10:              # mid Y-gantry carrier plate
-            # Mid Y rail inner X faces: left rail ends at X=32.9, right
-            # rail starts at X=2048.9. Plate is 3 mm thick in X, want
-            # 1 mm clearance -> plate cx = rail_face ± (1 + 1.5).
-            if cx < 1040:
-                fix_dx = 35.4 - cx
-            else:
-                fix_dx = 2046.4 - cx
-
-    fcx, fcy, fcz = cx + fix_dx, cy + fix_dy, cz + fix_dz
-
-    # ============================================================
-    # C-BEAM (40x80x1000 in AllC source) → 1000mm template
-    # AllC source positions are authoritative — just substitute the
-    # geometry with our parametric template at the source bbox.min.
-    # ============================================================
-    if dims == (40.0, 80.0, 1000.0):
-        try:
-            if abs(dz - 1000) < 1:
-                template = _cbeam_rear if cy < 520 else _cbeam_front
-                kind = "Zpost"
-            elif abs(dy - 1000) < 1:
-                if 300 < cz < 600:
-                    template = _cbeam_yrail_R if cx < 1040 else _cbeam_yrail_L
-                    kind = "Yrail"
-                else:
-                    template = _cbeam_yrail_flat
-                    kind = "Yflat"
-            elif abs(dx - 1000) < 1:
-                if cz > 900:
-                    template = _cbeam_xrail_chanYp if cy < 520 else _cbeam_xrail_chanYn
-                    kind = "Xtop"
-                elif 300 < cz < 600 and 400 < cy < 640:
-                    # X-gantry beam (moving): mid-Y, mid-Z. Source is flat;
-                    # we rotate to tall (80 mm vertical) for bending
-                    # resistance — 2 m span simply-supported, 5 kg mid-load
-                    # gives δ = 0.225 mm bare vs 0.727 mm flat.
-                    template = _cbeam_xrail_chanYp
-                    kind = "Xgantry"
-                else:
-                    template = _cbeam_xrail_flat
-                    kind = "Xmid"
-            else:
-                raise RuntimeError(f"unexpected C-beam dims {dims}")
-            tbb = template.val().BoundingBox()
-            if kind == "Xgantry":
-                # Center-align because flat source bbox (80 in Y) differs
-                # from the tall template bbox (80 in Z). Corner-align would
-                # offset the beam by the mismatch.
-                tcx = (tbb.xmin + tbb.xmax) / 2.0
-                tcy = (tbb.ymin + tbb.ymax) / 2.0
-                tcz = (tbb.zmin + tbb.zmax) / 2.0
-                loc_vec = (cx - tcx, cy - tcy, cz - tcz)
-            else:
-                loc_vec = (bb.xmin - tbb.xmin,
-                           bb.ymin - tbb.ymin,
-                           bb.zmin - tbb.zmin)
-            assy.add(template, name=f"cbeam_{kind}_{replaced_cbeams}",
-                     color=DRK, loc=Location(loc_vec))
-            cbeam_bbs.append((bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
-            replaced_cbeams += 1
-            n[0] += 1
-            continue
-        except Exception as e:
-            print(f"  C-beam placement failed at ({cx:.0f},{cy:.0f},{cz:.0f}): {e}")
-            continue
-
-    # ============================================================
-    # L-BRACKET — REMOVED. Skip the legacy bracket signatures.
-    # OLD zmount geometry (4 x 80 x 107) — superseded by the user-
-    # authored (4 x 80 x 97) bracket; skip and let the post-loop
-    # cloner place the corrected bracket at all 4 corners.
-    # The new (4 x 80 x 97) bracket is captured once and skipped here;
-    # the post-loop places exactly 4 clones (Z) + 2 (Y) instances.
-    # ============================================================
-    if dims in {(65.0, 69.0, 69.0), (44.0, 80.0, 102.0), (4.0, 80.0, 107.0)}:
-        continue
-    # 2026-04-29: FR Z-motor in M3-2_V1.0 source uses a different NEMA23 STEP
-    # (sig 56 x 56.4 x 56.4 — shorter body, no encoder cup). Skip the variant
-    # here; the post-loop cloner places a standard NEMA23 (captured below) at
-    # the symmetric FR corner instead, giving 7 sig-consistent motors total.
-    if dims == (56.0, 56.4, 56.4):
-        continue
-    if dims == (4.0, 80.0, 97.0):
-        if _z_bracket_template is None:
-            _z_bracket_template = s
-            _z_bracket_src_ctr = (cx, cy, cz)
-        # 2026-04-29: do NOT skip. The authored (4,80,97) bracket sits at
-        # the FR Z-corner position in source; the source has only 3 of 4
-        # Z-motors, so the post-loop cloner places only 3 zmounts on
-        # zmotor_bbs entries. Letting the template pass through here
-        # places the bracket at its authored FR position, completing the
-        # 4-corner Z mount set. Result: 4 Z + 2 Y = 6 zmounts total.
-
-    # ============================================================
-    # DEFAULT pass-through — translate by corner fixup delta only.
-    # AllC source positions are otherwise authoritative.
-    # ============================================================
-    is_belt = dims[0] == 1.5 and dims[1] == 6.0
-    color = BELT if is_belt else SIG_COLORS.get(dims, ALU)
-    name_prefix = "belt" if is_belt else {
-        (56.4, 56.4, 76.6):   "motor",
-        (3.0, 88.0, 127.0):   "plate",
-        (10.2, 23.9, 23.9):   "vwheel",
-        (14.0, 15.0, 15.0):   "pulley",
-        (12.7, 22.0, 22.0):   "idler",
-        (20.0, 20.0, 20.0):   "splice",
-    }.get(dims, "part")
-
-    wp = cq.Workplane().add(s)
-    assy.add(wp, name=f"{name_prefix}_{n[0]}", color=color,
-             loc=Location((fcx - cx, fcy - cy, fcz - cz)))
-
-    # Capture a V-wheel shape once for post-loop X-carriage cloning so
-    # added wheels share the real V-profile instead of a plain cylinder.
-    if dims == (10.2, 23.9, 23.9) and _vwheel_template_shape is None:
-        _vwheel_template_shape = s
-    # Capture a standard NEMA23 motor shape once so the post-loop cloner
-    # can place a sig-consistent motor at the FR Z-corner (replacing the
-    # shorter-body variant skipped above).
-    if dims == (56.4, 56.4, 76.6) and _motor_template_shape is None:
-        _motor_template_shape = s
-        _motor_template_src_ctr = (cx, cy, cz)
-
-    # Track parts that need post-loop bracket additions (in WORLD coords
-    # = source coords + fixup delta, since SXY=SZ=1).
-    wbb = (bb.xmin + (fcx-cx), bb.xmax + (fcx-cx),
-           bb.ymin + (fcy-cy), bb.ymax + (fcy-cy),
-           bb.zmin + (fcz-cz), bb.zmax + (fcz-cz))
-    if dims == (56.4, 56.4, 76.6):
-        # Classify motor by Z and X position. X-motor sits near frame center
-        # in X (cx ~ 1496) and is excluded from the Y-motor list so it does
-        # not pick up Y-axis-only post-loop additions (return idlers, etc.).
-        if fcz > 900:
-            zmotor_bbs.append(wbb)
-        elif fcz < 600 and (fcx < 200 or fcx > NX_RIGHT - 200):
-            ymotor_bbs.append(wbb)
-    elif dims == (12.7, 22.0, 22.0):
-        idler_bbs.append(wbb)
-    elif dims == (9.0, 9.0, 31.5):
-        # X-carriage V-wheel axles — capture for post-loop wheel placement
-        xaxle_bbs.append(wbb)
-    n[0] += 1
+base = Assembly.importStep(BASELINE)
+print(f"  {len(base.children)} children")
 
 # ============================================================
-# POST-LOOP additions: printed mount/spacer plates, corner connectors, idler brackets
+# Classify the baseline
 # ============================================================
-CONN_COLOR  = Color(0.45, 0.45, 0.50)   # steel grey
-IDL_BRK_COLOR = Color(0.59, 0.84, 0.00)  # green (printed part)
-FRAME_CTR = (NX_RIGHT / 2.0, (Y_POST_F + Y_POST_R) / 2.0, NZ_TOP / 2.0)
+posts = [c for c in base.children if c.name.startswith("cbeam_Zpost")]
+post_bbs = [world_bb(c) for c in posts]
+FRAME_CY = sum((b.ymin + b.ymax) / 2 for b in post_bbs) / len(post_bbs)
 
-def _cbeam_axis(b):
-    if (b[5] - b[4]) > 500: return 'Z'
-    if (b[3] - b[2]) > 500: return 'Y'
-    if (b[1] - b[0]) > 500: return 'X'
+
+def near_post(bb, reach=60.0):
+    cx, cy = (bb.xmin + bb.xmax) / 2, (bb.ymin + bb.ymax) / 2
+    return any(abs(cx - (p.xmin + p.xmax) / 2) < reach and abs(cy - (p.ymin + p.ymax) / 2) < reach
+               for p in post_bbs)
+
+
+def belt_z_role(bb):
+    """Name the belt-Z role of a baseline part, or None if it stays."""
+    sg = sig_of(bb)
+    if sg[0] == 1.5 and sg[1] == 6.0 and bb.zlen > 900:
+        return "Z belt run"
+    if sg == (4.0, 80.0, 100.0) and bb.zmin > 900:
+        return "top id 79 plate (belt-era motor mount)"
+    if sg == (12.7, 22.0, 22.0) and bb.zmax < 150 and near_post(bb):
+        return "bottom Z idler"
+    if bb.zmin > 995 and near_post(bb):     # everything standing on a post top
+        if sg == (56.4, 56.4, 76.6):
+            return "Z motor (horizontal shaft)"
+        if sg == (14.0, 15.0, 15.0):
+            return "Z pulley"
+        return "Z motor shaft leftover"
     return None
 
-def _joint_normal(a, b):
-    aa, bb_ax = _cbeam_axis(a), _cbeam_axis(b)
-    if aa is None or bb_ax is None or aa == bb_ax:
-        return None
-    return ({'X', 'Y', 'Z'} - {aa, bb_ax}).pop()
 
-def _joint_center(a, b):
-    return (
-        (max(a[0], b[0]) + min(a[1], b[1])) / 2.0,
-        (max(a[2], b[2]) + min(a[3], b[3])) / 2.0,
-        (max(a[4], b[4]) + min(a[5], b[5])) / 2.0,
-    )
-
-def _bbs_touch(a, b, tol=5.0):
-    return (a[0] - tol <= b[1] and b[0] - tol <= a[1] and
-            a[2] - tol <= b[3] and b[2] - tol <= a[3] and
-            a[4] - tol <= b[5] and b[4] - tol <= a[5])
-
-# --- Z-motor + Y-motor mount placement (cloned from authored bracket) ---
-# The user-authored bracket at signature (4 x 80 x 97) carries the correct
-# hole pattern + center cutout for the NEMA23 motor. Captured during the
-# source loop and cloned here to all 4 Z corners and both Y-motor positions.
-# Pure placement — no part generation.
-import math as _math
-HERE = os.path.dirname(__file__)
-PRINT_COLOR = Color(0.59, 0.84, 0.00)    # Sunnyday trademark green
-NEMA_PCD    = 47.14
-NEMA_BOLT   = 5.5
-NEMA_CENTER = 23.0
-
-# 2026-04-29: M3-2_V1.0.step authors all needed motor mounts in source —
-# 2× z_motor_mount at Y-motor positions, 4× bot_spacer_idler at top Z-corners
-# (which serve as Z-motor mounts in the V1.0 design). Cloner disabled to
-# prevent double-placement; source is the source of truth.
-_RUN_ZMOUNT_CLONER = False  # V1.0: source has all motor mounts authored
-
-if _RUN_ZMOUNT_CLONER and _z_bracket_template is not None and _z_bracket_src_ctr is not None:
-    src_x, src_y, src_z = _z_bracket_src_ctr
-
-    # Source bracket sits at (2080, 18, 1008.5); canonical front-right
-    # Z-motor at (2079.4, 36.1, 1028.2). Bracket-relative-to-motor offset:
-    #   X: +0.6  (toward outer frame X edge — sign mirrored for left side)
-    #   Y: -18.1 (toward outer frame Y edge — sign mirrored for rear pair)
-    #   Z: -19.7 (plate center is below motor center)
-    Z_OFF_X, Z_OFF_Y, Z_OFF_Z = 0.6, 18.1, 19.7
-
-    # ---- Z-motor brackets: one per Z-motor actually present in source ----
-    n_zbrk = 0
-    for wbb in zmotor_bbs:
-        mcx = (wbb[0] + wbb[1]) / 2.0
-        mcy = (wbb[2] + wbb[3]) / 2.0
-        mcz = (wbb[4] + wbb[5]) / 2.0
-        is_front = mcy < FRAME_CTR[1]
-        is_left = mcx < FRAME_CTR[0]
-        sign_x = -1 if is_left else +1
-        sign_y = -1 if is_front else +1
-        target_x = mcx + sign_x * Z_OFF_X
-        target_y = mcy + sign_y * Z_OFF_Y
-        target_z = mcz - Z_OFF_Z
-
-        wp = cq.Workplane().add(_z_bracket_template)
-        if not is_front:
-            # 180° rotation about Z so the plate's motor-face flips to -Y
-            wp = wp.rotate((src_x, src_y, src_z),
-                           (src_x, src_y, src_z + 1.0),
-                           180)
-        dx = target_x - src_x
-        dy = target_y - src_y
-        dz = target_z - src_z
-        tag = f"{'L' if is_left else 'R'}{'F' if is_front else 'R'}"
-        assy.add(wp, name=f"zmount_{tag}", color=PRINT_COLOR,
-                 loc=Location((dx, dy, dz)))
-        n_zbrk += 1
-        n[0] += 1
-    print(f"  {n_zbrk} Z-motor brackets placed at actual Z-motor positions")
-
-    # ---- Y-motor brackets: one per Y-motor actually present (X-motor excluded) ----
-    # Bracket rotated 90° about Z; sign of rotation depends on side so that
-    # the plate's motor-face points TOWARD the motor (away from the rail).
-    n_ybrk = 0
-    for wbb in ymotor_bbs:
-        mcx = (wbb[0] + wbb[1]) / 2.0
-        mcy = (wbb[2] + wbb[3]) / 2.0
-        mcz = (wbb[4] + wbb[5]) / 2.0
-        is_left = mcx < FRAME_CTR[0]
-        sign_x = -1 if is_left else +1
-        # After 90° rotation about Z, the bracket's 4mm-thick direction is X.
-        # Use the same offset magnitude as the Z-motor case; user can refine.
-        target_x = mcx + sign_x * Z_OFF_Y   # large offset along X (formerly Y)
-        target_y = mcy + Z_OFF_X            # small offset (alignment)
-        target_z = mcz - Z_OFF_Z
-
-        wp = cq.Workplane().add(_z_bracket_template)
-        # CW rotation for left motor (motor face -> +X), CCW for right (-X)
-        rot_dir = -1 if is_left else +1
-        wp = wp.rotate((src_x, src_y, src_z),
-                       (src_x, src_y, src_z + 1.0),
-                       90 * rot_dir)
-        dx = target_x - src_x
-        dy = target_y - src_y
-        dz = target_z - src_z
-        tag = "L" if is_left else "R"
-        assy.add(wp, name=f"ymount_{tag}", color=PRINT_COLOR,
-                 loc=Location((dx, dy, dz)))
-        n_ybrk += 1
-        n[0] += 1
-    print(f"  {n_ybrk} Y-motor brackets placed at actual Y-motor positions")
-elif not _RUN_ZMOUNT_CLONER:
-    print(f"  zmount cloner disabled — source has 2 z_motor_mount + 8 bot_spacer_idler authored")
-else:
-    print(f"  WARNING: no (4,80,97) bracket template captured from source — "
-          f"Z and Y mounts will be missing")
-
-# Remaining idler brackets: only the center-frame idler (not at a corner post)
-# keeps its separate bracket. Corner idlers are now part of the bottom plates.
-n_idlerbrk = 0
-idler_brk = cq.Workplane("YZ").box(5, 30, 30)
-for wbb in idler_bbs:
-    cx = (wbb[0] + wbb[1]) / 2.0
-    cz = (wbb[4] + wbb[5]) / 2.0
-    # Skip corner idlers at bottom of Z-posts (integrated into bottom plates).
-    # Corner idlers are at Z < 150 AND at the corner post X positions.
-    # Mid-frame idler is at Z~370 (mid-height on Y-rail), keep it.
-    if cz < 150 and (cx < 100 or cx > NX_RIGHT - 100):
+dropped = {}
+motor_template = None
+groups = {}
+for c in base.children:
+    bb = world_bb(c)
+    role = belt_z_role(bb)
+    if role:
+        dropped[role] = dropped.get(role, 0) + 1
+        if role.startswith("Z motor (") and motor_template is None:
+            motor_template = c.obj.moved(c.loc)
         continue
-    cy = (wbb[2] + wbb[3]) / 2.0
-    cz = (wbb[4] + wbb[5]) / 2.0
-    nx = cx + (-15 if cx < FRAME_CTR[0] else +15)
-    assy.add(idler_brk, name=f"bracket_idler_{n_idlerbrk}", color=IDL_BRK_COLOR,
-             loc=Location((nx, cy, cz)))
-    n_idlerbrk += 1
-    n[0] += 1
-print(f"  {n_idlerbrk} remaining idler brackets (mid-frame)")
+    groups.setdefault((bb_key(bb), sig_of(bb)), []).append(c)
 
-# --- Y-motor adapter plate / 4mm spacer ---
-# Intentionally NOT generated parametrically. The user supplies the rotated
-# motor (~45° about shaft axis so bolt holes align with V-slot centerlines)
-# and the 4mm spacer plate via the authored M3-2_newZMM.step. Earlier
-# parametric generation here clipped the motor body — placement, not
-# part generation, is CADCLAW's job. Source STEP is the source of truth.
-SLOT_HOLE_D = 5.5  # M5 clearance — used by the T-bracket bolt grid below
+kept, n_dups = [], 0
+for members in groups.values():
+    # Prefer a descriptive name over the anonymous "part_N" pass-through.
+    members.sort(key=lambda c: (c.name.startswith("part_"), c.name))
+    kept.append(members[0])
+    n_dups += len(members) - 1
 
-# --- Y-axis return idlers (front of each Y-rail, opposite the Y-motors) ---
-# Each Y-belt loops from the rear motor pulley to a smooth return idler at
-# the front of the rail. The user-supplied internal-slot mount + outer
-# plate (TBD) anchors the idler axle; CADCLAW places the idler wheel so
-# the belt path endpoints are visible in the assembly.
-Y_IDLER_OD = 22.0  # mm (matches existing idler signature)
-Y_IDLER_H  = 12.7  # mm (axial height, axis along Z)
-Y_IDLER_Y  = Y_RAIL_START + 15.0  # 35 — set back from rail front edge
-_y_return_idler = (cq.Workplane("XY")
-                   .circle(Y_IDLER_OD / 2)
-                   .extrude(Y_IDLER_H)
-                   .translate((0, 0, -Y_IDLER_H / 2)))
+assy = Assembly("M3-2_Assembly")
+for c in kept:
+    assy.add(c.obj, name=c.name, loc=c.loc, color=c.color)
+print(f"  kept {len(kept)} baseline parts; dropped {n_dups} duplicate placements")
+for role, k in sorted(dropped.items()):
+    print(f"  dropped {k:2d} x {role}")
 
-n_y_idlers = 0
-for wbb in ymotor_bbs:
-    cx = (wbb[0] + wbb[1]) / 2.0
-    cz = (wbb[4] + wbb[5]) / 2.0
-    is_left = cx < FRAME_CTR[0]
-    # Pulley sits ~24mm outboard of motor cx along X (away from frame
-    # center). Mirror that offset to land on the rail centerline at the
-    # opposite belt end.
-    pulley_offset = -24.0 if is_left else +24.0
-    idler_x = cx + pulley_offset
-    assy.add(_y_return_idler, name=f"idler_y_return_{n_y_idlers}", color=IDL,
-             loc=Location((idler_x, Y_IDLER_Y, cz)))
-    n_y_idlers += 1
-    n[0] += 1
-print(f"  {n_y_idlers} Y-axis return idlers at front of rails (silver)")
+# ============================================================
+# Lead-screw stack templates
+# ============================================================
+# Motor: the baseline Z motor lies with its shaft toward -Y. Find the axis
+# (centre of the 56.4 mm body square), the shaft tip and the flange face
+# (largest planar face looking toward the shaft; the pilot boss face in front
+# of it is smaller), then stand it shaft-down with the flange face at Z=0 and
+# the axis at the origin.
+mbb = motor_template.BoundingBox()
+m_ax, m_az = (mbb.xmin + mbb.xmax) / 2, (mbb.zmin + mbb.zmax) / 2
+flange = max((f for f in motor_template.Faces()
+              if f.geomType() == "PLANE" and f.normalAt().y < -0.99), key=lambda f: f.Area())
+m_face_y = flange.Center().y
+SHAFT_LEN = m_face_y - mbb.ymin                       # shaft tip below the flange face
+motor_up = (motor_template
+            .translate(cq.Vector(-m_ax, -m_face_y, -m_az))
+            .rotate(cq.Vector(0, 0, 0), cq.Vector(1, 0, 0), 90))
 
-# --- T-brackets at center Y-spreader / X-rail T-junctions ---
-# The center Y-spreader (X=1000-1080) meets the front and rear top X-rails
-# at T-junctions. A 3D-printed T-bracket straddles the junction, bolting
-# to both the spreader end and the X-rail face.
-# Bracket: 120mm wide (along X-rail), 80mm tall (along spreader), 4mm thick
-TBRACKET_W = 280.0     # mm along X-rail (matches Fusion 280 long dim)
-TBRACKET_H = 160.0     # mm along Y-spreader (matches Fusion 160 wide dim)
-TBRACKET_T = 4.0
-# Pentagon/trapezoid approximation of the Fusion semi-triangular gusset:
-# - Long base along the X-rail (Y=0 side): full 280 mm.
-# - Narrower top at the Y-spreader side (Y=TBRACKET_H): tapers to 100 mm.
-# - Two angled corners chamfered to give the "home plate" pentagon profile.
-# Bolt pattern simplified to a 5×3 grid; real design has more holes.
-TBRACKET_TOP_W = 100.0   # narrower top edge (toward spreader)
-_SX_MID = (1000.0 + 1080.0) / 2.0  # center of spreader = X=1040
+mount  = cq.importers.importStep(MOUNT_STEP).val().Solids()[0]
+collar = cq.importers.importStep(COLLAR_STEP).val().Solids()[0]     # Z[0,7], axis at origin
+COLLAR_H = collar.BoundingBox().zlen
+nut = cq.importers.importStep(NUT_STEP).val().Solids()[0]           # X[-17,17] Y[-6,6] Z[0,20]
+# The nut block's counterbored bolt face is -Y; its +Y face goes against the plate.
+nbb = nut.BoundingBox()
+nut = nut.translate(cq.Vector(0, 0, -(nbb.zmin + nbb.zmax) / 2))     # bore centre at Z=0
+NUT_H = nbb.zlen
 
-# Pentagon gusset profile (isoceles trapezoid, CCW in XY plane):
-#   Y=-TBRACKET_H/2 is the long base along the X-rail.
-#   Y=+TBRACKET_H/2 is the short top edge along the Y-spreader.
-_tb_half_base = TBRACKET_W / 2.0      # 140
-_tb_half_top  = TBRACKET_TOP_W / 2.0  # 50
-_tb_half_h    = TBRACKET_H / 2.0      # 80
-_tb_profile = [
-    (-_tb_half_base, -_tb_half_h),
-    ( _tb_half_base, -_tb_half_h),
-    ( _tb_half_top,   _tb_half_h),
-    (-_tb_half_top,   _tb_half_h),
-]
-_tbracket = (cq.Workplane("XY")
-             .polyline(_tb_profile).close()
-             .extrude(TBRACKET_T)
-             # 5x3 bolt grid: 5 along X-rail (base), 3 rows Y-ward (base, mid, top).
-             # Rows scale their X-spread to stay inside the tapering polygon.
-             .faces(">Z").workplane()
-             .pushPoints([
-                 # base row (Y = -60)
-                 (-120, -60), (-60, -60), (0, -60), (60, -60), (120, -60),
-                 # middle row (Y = 0)
-                 (-90, 0), (-30, 0), (30, 0), (90, 0),
-                 # top row (Y = 60)
-                 (-30, 60), (0, 60), (30, 60),
-             ])
-             .hole(SLOT_HOLE_D))
+holder = cq.importers.importStep(HOLDER_STEP).val().Solids()[0]    # Z=0 on the bottom plate top edge
+assert abs(NUT_H - zbh.NUT_BLOCK_H) < 0.1, "holder stop height assumes a 20 mm nut block"
 
-# T-gussets at the top-rail / Y-spreader junctions.
-# Strategy: prefer the *authored* Fusion gussets from M3-2_Assembly.step
-# so we preserve the full polygon profile + real bolt-grid pattern that
-# CADQuery can't economically re-author parametrically. Fall back to the
-# trapezoidal approximation if the Fusion file is unavailable or missing
-# the gussets (e.g. Fusion visibility-toggle bug ate them).
-_FUSION_REF = os.path.join(os.path.dirname(__file__), "M3-2_Assembly.step")
-_authored_gussets = []
-if os.path.exists(_FUSION_REF):
-    try:
-        _ref_compound = cq.importers.importStep(_FUSION_REF).val()
-        _ref_solids = list(_ref_compound.Solids()) + list(_ref_compound.Shells())
-        _seen = set()
-        for _s in _ref_solids:
-            _bb = _s.BoundingBox()
-            _dx = round(_bb.xmax - _bb.xmin, 1)
-            _dy = round(_bb.ymax - _bb.ymin, 1)
-            _dz = round(_bb.zmax - _bb.zmin, 1)
-            _sig = tuple(sorted([_dx, _dy, _dz]))
-            # Fusion's gusset signature: 4 mm thick, 160 × 280 envelope
-            if _sig == (4.0, 160.0, 280.0):
-                _cx = round((_bb.xmin + _bb.xmax) / 2.0, 1)
-                _cy = round((_bb.ymin + _bb.ymax) / 2.0, 1)
-                _cz = round((_bb.zmin + _bb.zmax) / 2.0, 1)
-                _ckey = (_cx, _cy, _cz)
-                if _ckey not in _seen:
-                    _seen.add(_ckey)
-                    _authored_gussets.append(_s)
-    except Exception as _e:
-        print(f"  [warn] could not import authored gussets: {_e}")
+screw   = cq.Solid.makeCylinder(SCREW_D / 2, SCREW_L)
+coupler = ring(COUPLER_D, BORE_D, COUPLER_L)
+thrust  = ring(THRUST_D, BORE_D, THRUST_H)
+brg608  = ring(zbh.BRG_OD, BORE_D, zbh.BRG_H)                       # seated at the holder bottom
 
-n_tbrackets = 0
-if len(_authored_gussets) >= 2:
-    # Use the real Fusion-authored gussets — full polygon + bolt grid.
-    for _g in _authored_gussets:
-        _wp = cq.Workplane().add(_g)
-        assy.add(_wp, name=f"tbracket_{n_tbrackets}", color=PRINT_COLOR)
-        n_tbrackets += 1
-        n[0] += 1
-    print(f"  {n_tbrackets} T-gussets imported from Fusion "
-          f"(full detail, real hole pattern)")
-else:
-    # Fallback: parametric trapezoid at the design-intent positions.
-    _t_junctions = [
-        (_SX_MID, 58.0,  1002.0),
-        (_SX_MID, 982.0, 1002.0),
+# Stack heights (world Z), bottom to top at each post top.
+FLOOR_TOP      = POST_TOP + MOUNT_FLOOR
+MOTOR_FACE     = POST_TOP + MOUNT_TOP
+SHAFT_TIP      = MOTOR_FACE - SHAFT_LEN
+SCREW_TOP      = SHAFT_TIP - SHAFT_GAP
+THRUST_UP_Z    = FLOOR_TOP
+COLLAR_UP_Z    = THRUST_UP_Z + THRUST_H
+COUPLER_Z      = COLLAR_UP_Z + COLLAR_H
+THRUST_LOW_Z   = POST_TOP - THRUST_H
+COLLAR_LOW_Z   = THRUST_LOW_Z - COLLAR_H
+assert COUPLER_Z + COUPLER_L <= POST_TOP + 40.0, "coupler does not fit under the mount top plate"
+assert COUPLER_Z <= SCREW_TOP <= COUPLER_Z + COUPLER_L, "screw top end is not inside the coupler"
+assert COUPLER_Z <= SHAFT_TIP <= COUPLER_Z + COUPLER_L, "motor shaft tip is not inside the coupler"
+
+# ============================================================
+# Place one stack per Z post
+# ============================================================
+carriage_plates = [world_bb(c) for c in kept if sig_of(world_bb(c)) == (3.0, 88.0, 127.0)]
+bottom_plates = [world_bb(c) for c in kept
+                 if sig_of(world_bb(c)) == (4.0, 80.0, 100.0) and world_bb(c).zmax < 150]
+
+Z_POSTS = []
+for pc, pb in zip(posts, post_bbs):
+    pcx, pcy = (pb.xmin + pb.xmax) / 2, (pb.ymin + pb.ymax) / 2
+    front = pcy < FRAME_CY
+    open_y = pb.ymax if front else pb.ymin            # channel opens toward the frame interior
+    axis = (pcx, open_y - AXIS_INSET if front else open_y + AXIS_INSET)
+    rot = 0 if front else 180
+    tag = ("F" if front else "R") + ("L" if pcx < 1000 else "R")
+    # The Z carriage plate on this post's open face, and the bottom plate under it.
+    plate = min(carriage_plates, key=lambda b: abs((b.xmin + b.xmax) / 2 - pcx) + abs(
+        (b.ymin + b.ymax) / 2 - open_y))
+    bplate = min(bottom_plates, key=lambda b: abs((b.xmin + b.xmax) / 2 - pcx) + abs(
+        (b.ymin + b.ymax) / 2 - open_y))
+    plate_cz = (plate.zmin + plate.zmax) / 2
+    assert abs(plate.zlen - zbh.CARRIAGE_PLATE_H) < 0.1, "holder stop height assumes an 88 mm carriage plate"
+    # The holder sits on the bottom plate's top edge; the nut block lands on its top face.
+    stop_top = bplate.zmax + zbh.STOP_TOP
+
+    parts = [
+        (f"zmount_{tag}",         place(mount, (0, MOUNT_AXIS_Y), rot, axis, POST_TOP), PRINT_COLOR),
+        (f"motor_z_{tag}",        place(motor_up, (0, 0), rot, axis, MOTOR_FACE), MTR),
+        (f"coupler_envelope_{tag}", place(coupler, (0, 0), rot, axis, COUPLER_Z), ENV),
+        (f"collar_upper_{tag}",   place(collar, (0, 0), rot, axis, COLLAR_UP_Z), IDL),
+        (f"thrust_envelope_upper_{tag}", place(thrust, (0, 0), rot, axis, THRUST_UP_Z), ENV),
+        (f"thrust_envelope_lower_{tag}", place(thrust, (0, 0), rot, axis, THRUST_LOW_Z), ENV),
+        (f"collar_lower_{tag}",   place(collar, (0, 0), rot, axis, COLLAR_LOW_Z), IDL),
+        (f"leadscrew_{tag}",      place(screw, (0, 0), rot, axis, SCREW_TOP - SCREW_L), SHAFT),
+        (f"nut_block_{tag}",      place(nut, (0, 0), rot, axis, plate_cz), BRASS),
+        (f"z_bottom_holder_{tag}", place(holder, (0, 0), rot, axis, bplate.zmax), PRINT_COLOR),
+        (f"bearing_608_envelope_{tag}", place(brg608, (0, 0), rot, axis, bplate.zmax), ENV),
     ]
-    for tx, ty, tz in _t_junctions:
-        tb = _tbracket.translate((0, 0, 0))
-        assy.add(tb, name=f"tbracket_{n_tbrackets}", color=PRINT_COLOR,
-                 loc=Location((tx, ty, tz)))
-        n_tbrackets += 1
-        n[0] += 1
-    print(f"  {n_tbrackets} T-brackets at center spreader "
-          f"(parametric trapezoid fallback — authored Fusion gussets not found)")
+    for name, shape, color in parts:
+        assy.add(shape, name=name, color=color)
+    Z_POSTS.append(dict(tag=tag, post=pb, open_y=open_y, axis=axis, front=front,
+                        carriage_plate=plate, bottom_plate=bplate, stop_top=stop_top))
+    print(f"  {tag}: screw axis ({axis[0]:.1f}, {axis[1]:.1f}), {AXIS_INSET:.0f} mm inside the open face; "
+          f"hard stop top Z={stop_top:.1f}")
 
-# --- FR Z-motor: clone standard NEMA23 to replace shorter-body variant -----
-# 2026-04-29: V1.0 source has FR motor at sig (56, 56.4, 56.4) — different
-# NEMA23 STEP than the other 6 motors. The variant was skipped during the
-# source loop above; clone the standard motor template to the symmetric FR
-# Z-corner so all 7 motors share sig (56.4, 56.4, 76.6). Pure placement.
-n_fr_motors = 0
-if _motor_template_shape is not None and _motor_template_src_ctr is not None:
-    src_mx, src_my, src_mz = _motor_template_src_ctr
-    # Symmetric FR position: mirror FL Z-motor (0.6, 36.1, 1028.2) across X-frame.
-    # The 3 standard Z-motors land at (0.6, 36.1, 1028), (0.6, 1004, 1028),
-    # (2079.4, 1004, 1028). FR is the missing fourth corner.
-    fr_x, fr_y, fr_z = NX_RIGHT - 0.6, 36.1, 1028.2
-    motor_wp = cq.Workplane().add(_motor_template_shape)
-    assy.add(motor_wp, name="motor_z_FR_cloned", color=MTR,
-             loc=Location((fr_x - src_mx, fr_y - src_my, fr_z - src_mz)))
-    n_fr_motors += 1
-    n[0] += 1
-print(f"  {n_fr_motors} FR Z-motor (standard NEMA23 cloned to symmetric corner)")
+print(f"\n  {len(assy.children)} parts total")
+print(f"  Generation time: {time.time() - t0:.1f}s")
 
-# --- X-carriage V-wheels ----------------------------------------------
-# 2026-04-29: as of M3-2_V1.0.step, V-wheels at the X-carriage axle
-# positions are AUTHORED in source (32 vwheels total = 16 Z + 8 Y + 8 X).
-# Script-side placement disabled — would double-place wheels.
-# Re-enable by detecting "no wheel near axle" if a future source revision
-# drops them again.
-n_xcarr_wheels = 0
-print(f"  {n_xcarr_wheels} X-carriage V-wheels (authored in source — script placement disabled)")
-
-# --- X-carriage gantry plates (2x) ------------------------------------
-# 3 mm polycarbonate plates (88 × 127) on each ±Y face of the gantry beam
-# holding the X-carriage wheels. Dims + positions match Fusion authored
-# design at X-carriage parked location X=1496.4.
-_xcarr_plate = cq.Workplane("XZ").box(127.0, 88.0, 3.0)  # X:127 Z:88 Y:3
-n_xcarr_plates = 0
-for py in ():   # M3-2_newZMM.step already includes X-carriage plates
-    assy.add(_xcarr_plate, name=f"plate_xcarr_{n_xcarr_plates}",
-             color=PLATE, loc=Location((1496.4, py, 366.7)))
-    n_xcarr_plates += 1
-    n[0] += 1
-print(f"  {n_xcarr_plates} X-carriage gantry plates")
-
-# --- Internal 2040 V-slot reinforcement inserts ---------------------------
-# 2026-04-29: as of M3-2_V1.0.step, the 3× 1m 2040 inserts are authored in
-# source (pattern B+b: 1 centered insert per X-direction member, no 6mm
-# plate). Script-side placement disabled — would double-place.
-print(f"  0 2040 V-slot inserts script-placed (3 authored in source)")
-
-print(f"\n  {n[0]} parts total")
-print(f"  {replaced_cbeams} C-beams replaced with solid-fill parametric")
-print(f"  {replaced_brackets} legacy L-brackets retained")
-print(f"  Generation time: {time.time()-t0:.1f}s")
-
-# Write to a distinct filename so CADQuery regen never clobbers a Fusion
-# export living at CAD/M3-2_Assembly.step. Renders can point at either.
-out = os.path.join(os.path.dirname(__file__), "M3-2_Assembly_cadquery.step")
-print(f"\nExporting {n[0]} parts to STEP...")
-t1 = time.time()
-assy.save(out)
-mb = os.path.getsize(out) / 1024 / 1024
-print(f"  {mb:.1f} MB in {time.time()-t1:.1f}s")
-
-print(f"\n  v3.0 Filter-and-replace ({n[0]} parts)")
+if __name__ == "__main__":
+    assert os.path.abspath(OUT) != os.path.abspath(BASELINE)
+    print(f"\nExporting to {os.path.basename(OUT)}...")
+    t1 = time.time()
+    assy.save(OUT)
+    print(f"  {os.path.getsize(OUT) / 1024 / 1024:.1f} MB in {time.time() - t1:.1f}s")

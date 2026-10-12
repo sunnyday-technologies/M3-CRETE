@@ -51,6 +51,14 @@ def name_for_dims(dims_sorted):
     if dims_sorted == (5.0, 80.0, 80.0):     return "connector"
     if dims_sorted == (5.0, 30.0, 30.0):     return "idlerbrk"
     if dims_sorted[0] == 1.5 and dims_sorted[1] == 6.0: return "belt"
+    # Lead-screw Z (BOM v2.9.0)
+    if dims_sorted == (68.0, 80.0, 86.5):    return "zmotormount"
+    if dims_sorted == (27.1, 34.0, 45.0):    return "zholder"
+    if dims_sorted == (8.0, 8.0, 1000.0):    return "leadscrew"
+    if dims_sorted == (12.0, 20.0, 34.0):    return "nutblock"
+    if dims_sorted == (19.0, 19.0, 20.0):    return "coupler"
+    if dims_sorted == (7.0, 14.0, 14.0):     return "collar"
+    if dims_sorted == (7.0, 22.0, 22.0):     return "brg608"
     return "part"
 
 parts = []
@@ -66,10 +74,15 @@ for i, s in enumerate(top_solids):
                           round(bb.ymax - bb.ymin, 1),
                           round(bb.zmax - bb.zmin, 1)]))
     nm = f"{name_for_dims(dims)}_{i}"
+    # The 8x16x5 thrust bearings share their bbox with the X-carriage bolt
+    # heads; the thrust bearings are the ones on the Z-post tops.
+    if dims == (5.0, 16.0, 16.0) and bb.zmin > 900:
+        nm = f"thrust_{i}"
     parts.append((nm, bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
 
 def tag_of(name):
-    for p in ("cbeam","connector","idlerbrk","zmount","zcap","botmount",
+    for p in ("zmotormount","zholder","leadscrew","nutblock","coupler","collar","brg608","thrust",
+              "cbeam","connector","idlerbrk","zmount","zcap","botmount",
               "ymount","tbracket","bracket","motor","vwheel","pulley",
               "idler","plate","splice","belt","shim","part","rail"):
         if name.startswith(p): return p
@@ -97,7 +110,15 @@ STRUCTURAL = [
     # name, qty, dims_mm, material, role
     ("C-beam 4080 1m extrusion",          inv["cbeam"],       "40 x 80 x 1000", "Aluminum", "All frame members (Z-post, X-rail, Y-rail, mid braces)"),
     ("Printed Z motor mount / Y-spacer",  inv["zmount"],      "80 x 107 x 4",   "PETG / CCF", "Simplified combined Z motor mount plate and Y-rail spacer"),
-    ("Printed bottom spacer/idler mount", inv["botmount"],    "80 x 100 x 4",   "PETG / CCF", "Combined bottom spacer and idler axle plate"),
+    ("Printed Z-post bottom plate",       inv["botmount"],    "80 x 100 x 4",   "PETG / CCF", "Spacer between Z-post and bottom Y rail; the bottom holder rests on it"),
+    ("Printed Z motor mount (lead screw)", inv["zmotormount"], "80 x 68 x 86.5", "PETG / CCF", "Z motor shaft-down on the post top; collars + thrust bearings on its floor"),
+    ("Printed Z bottom holder / hard stop", inv["zholder"],   "34 x 27 x 45",   "PETG / CF-Nylon", "608ZZ seat at the screw bottom; top face is the Z hard stop"),
+    ("Tr8x2 lead screw 1000 mm",          inv["leadscrew"],   "8 x 1000",       "Stainless", "Z drive, one per post"),
+    ("Tr8x2 nut block",                   inv["nutblock"],    "34 x 20 x 12",   "POM / brass", "On each Z carriage plate, inside the post channel"),
+    ("Shaft coupler 8 x 8 mm",            inv["coupler"],     "19 x 20",        "Aluminum", "Z motor to lead screw"),
+    ("Lock collar 8 mm",                  inv["collar"],      "14 x 7",         "Aluminum / steel", "Above and below each Z motor-mount floor"),
+    ("Thrust bearing 8 x 16 x 5",         inv["thrust"],      "16 x 5",         "Steel", "Between each lock collar and the Z motor-mount floor"),
+    ("608ZZ bearing",                     inv["brg608"],      "22 x 7",         "Steel", "Z lead-screw bottom support, in the bottom holder"),
     ("Printed Y-motor 4mm spacer",        inv["ymount"],      "TBD",            "PETG / CCF", "User-supplied 4mm spacer between Y NEMA23 motor flange and C-beam (motor rotated ~45deg, bolts directly into V-slot)"),
     ("Printed center T-gusset",           inv["tbracket"],    "280 x 160 x 4",  "PETG / CCF", "Top spreader / X-rail junction reinforcement"),
     ("Legacy L-bracket NEMA23 / T-slot",  inv["bracket"],     "65 x 69 x 69",   "Aluminum / steel", "Should be zero; replaced by printed mounts"),
@@ -107,7 +128,7 @@ STRUCTURAL = [
     ("Smooth idler pulley",               inv["idler"],       "22 x 13",        "Aluminum",  "Belt return idlers"),
     ("Idler axle bracket",                inv["idlerbrk"],    "30 x 30 x 5",    "Steel",     "Support plate for each idler axle"),
     ("Z-corner gantry plate",             inv["plate"],       "127 x 88 x 3",   "Aluminum",  "Gantry carriage plates (six corners)"),
-    ("Belt clamp / belt run",             inv["belt"] + inv["part"], "GT2 6mm", "Fiber-reinforced rubber", "Z + Y belts (X TBD)"),
+    ("Belt clamp / belt run",             inv["belt"] + inv["part"], "GT2 6mm", "Fiber-reinforced rubber", "Y belts (X TBD)"),
     ("Y-rail / Z-post 4mm shim",          inv["shim"],        "80 x 4 x 40",    "Aluminum / steel", "Spacer between flat C-beam end and Z-post"),
     ("4080 corner connector plate (L/T)", inv["connector"],   "80 x 80 x 5",    "Steel",     "5-hole bracket at every perpendicular C-beam joint"),
 ]
@@ -132,6 +153,9 @@ N_ZMOUNT          = inv["zmount"]
 N_BOTMOUNT        = inv["botmount"]
 N_YMOUNT          = inv["ymount"]
 N_SHIM            = inv["shim"]
+N_ZMOTOR          = inv["zmotormount"]         # one Z motor per lead-screw mount
+N_NUTBLOCK        = inv["nutblock"]
+N_ZHOLDER         = inv["zholder"]
 
 HARDWARE = [
     # item, qty, size, notes
@@ -157,14 +181,23 @@ HARDWARE = [
     ("M5 drop-in T-nut",                               inv["idlerbrk"] * 2, "M5, 4080 series", "Mating T-nuts for idler bracket"),
 
     # --- Motors (NEMA23 face × 4 fasteners per motor) ---
-    ("M5 SHCS",                                        N_MOTOR * 4, "M5 x 10 mm",      "NEMA23 face mounting (4 per motor)"),
+    ("M5 SHCS",                                        (N_MOTOR - N_ZMOTOR) * 4, "M5 x 10 mm", "NEMA23 face mounting, X/Y motors (4 per motor)"),
+    ("M5 SHCS",                                        N_ZMOTOR * 4, "M5 x 16 mm",     "Z motor through its flange and the mount's 8 mm top plate"),
+    ("M5 nut",                                         N_ZMOTOR * 4, "M5",             "Z motor-mount nut traps"),
+
+    # --- Lead-screw Z ---
+    # The Y-gantry rail end sits ~1 mm off the carriage plate's outer face over
+    # both nut-block holes, so these thread into the plate from the channel side.
+    ("M5 SHCS",                                        N_NUTBLOCK * 2, "M5 x 16 mm",   "Z nut block into the carriage plate (tapped or insert), from the channel side"),
+    ("M5 SHCS",                                        N_ZHOLDER * 2, "M5 x 20 mm",    "Z bottom holder into the channel-floor slots"),
+    ("M5 drop-in T-nut",                               N_ZHOLDER * 2, "M5, 4080 series", "Channel-floor T-nuts for the Z bottom holders"),
 
     # --- Printed motor mount / spacer plates ---
     ("M5 nut",                                         (N_ZMOUNT + N_YMOUNT) * 4, "M5", "Back-side nuts for pass-through NEMA23 motor holes"),
     ("M5 SHCS",                                        (N_ZMOUNT + N_YMOUNT) * 4, "M5 x 16 mm", "Printed motor plate to extrusion slots"),
     ("M5 drop-in T-nut",                               (N_ZMOUNT + N_YMOUNT) * 4, "M5, 4080 series", "Mating T-nuts for printed motor plates"),
-    ("M5 SHCS",                                        N_BOTMOUNT * 2, "M5 x 16 mm", "Bottom spacer/idler mount to Z-post"),
-    ("M5 drop-in T-nut",                               N_BOTMOUNT * 2, "M5, 4080 series", "Mating T-nuts for bottom spacer/idler mounts"),
+    ("M5 SHCS",                                        N_BOTMOUNT * 2, "M5 x 16 mm", "Z-post bottom plate to Z-post"),
+    ("M5 drop-in T-nut",                               N_BOTMOUNT * 2, "M5, 4080 series", "Mating T-nuts for Z-post bottom plates"),
 
     # --- Legacy L-brackets to rail (should remain zero) ---
     ("M5 SHCS",                                        N_BRACKET * 4, "M5 x 10 mm",    "Bracket rail face"),
@@ -214,7 +247,8 @@ with open(os.path.join(HERE, "BOM_README.md"), "w") as f:
     f.write(f"Half ({N_VWHEEL_ECC}) get eccentric spacers (one side per wheel pair),\n")
     f.write(f"the other half ({N_VWHEEL_STD}) get standard precision spacers.\n\n")
     f.write("### Motors / printed mounts\n\n")
-    f.write(f"{N_MOTOR} motors × 4 NEMA23 face screws (M5×10) = {N_MOTOR*4} screws.\n")
+    f.write(f"{N_MOTOR - N_ZMOTOR} X/Y motors × 4 NEMA23 face screws (M5×10) = {(N_MOTOR - N_ZMOTOR)*4} screws.\n")
+    f.write(f"{N_ZMOTOR} Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.\n")
     f.write(f"{N_BRACKET} brackets × 4 rail-face screws (M5×10) + T-nuts = {N_BRACKET*4} pairs.\n")
     f.write("Note: Y-motor brackets and the rack-and-pinion X-motor mounting are\n")
     f.write("not yet modeled — add them when the X-axis lands.\n\n")
