@@ -185,7 +185,9 @@ publish_audit:
     - "NEMA_CRETE/**"
     - ".claude/**"
     - "conversation-summary.md"
-    - "**/*.f3d"
+    # Full-assembly Fusion natives stay local (.gitignore). Part-level .f3d
+    # files under CAD/ are published via LFS (.gitattributes, 2026-06-05).
+    - "CAD/M3-2_*.f3d"
     - "**/__pycache__/**"
   scan_globs:
     - "README.md"
