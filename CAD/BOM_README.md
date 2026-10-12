@@ -60,19 +60,21 @@ the other half (16) get standard precision spacers.
 
 3 X/Y motors × 4 NEMA23 face screws (M5×10) = 12 screws.
 4 Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.
+2 printed Y-motor plates (id 75) × 4 M5 back-side nuts + 4 M5×16 + 4 T-nuts.
 0 brackets × 4 rail-face screws (M5×10) + T-nuts = 0 pairs.
-Note: Y-motor brackets and the rack-and-pinion X-motor mounting are
-not yet modeled — add them when the X-axis lands.
+Note: the rack-and-pinion X-motor mounting is not yet modeled, so it
+gets no back-side nuts here — add them when the X-axis lands.
 
 ### M5 fastener totals (sum across all line items)
 
 | Item | Qty |
 |---|---|
-| M5 T-nut | 157 |
+| M5 T-nut | 165 |
 | M5 flat washer | 68 |
+| M5 nut | 32 |
 | M5 nyloc nut | 34 |
 | M5 x 10 mm | 151 |
-| M5 x 16 mm | 26 |
+| M5 x 16 mm | 34 |
 | M5 x 20 mm | 16 |
 | M5 x 30 mm | 2 |
 | M5 x 40 mm | 32 |
