@@ -112,7 +112,7 @@ N_JOINTS = len(joint_pairs)
 STRUCTURAL = [
     # name, qty, dims_mm, material, role
     ("C-beam 4080 1m extrusion",          inv["cbeam"],       "40 x 80 x 1000", "Aluminum", "All frame members (Z-post, X-rail, Y-rail, mid braces)"),
-    ("Printed Z motor mount / Y-spacer",  inv["zmount"],      "80 x 97 x 4",    "PETG / CCF", "id 75 plate at each Y-motor position; Z motors use the lead-screw mount"),
+    ("Printed Z motor mount / Y-spacer",  inv["zmount"],      "80 x 97 x 4",    "PETG / CCF", "id 75 plate, not needed: Y motors bolt straight to the C-beam (owner, 2026-10-12); still in the CAD"),
     ("Printed Z-post bottom plate",       inv["botmount"],    "80 x 100 x 6",   "PETG / CCF", "Spacer between Z-post and bottom Y rail; the bottom holder rests on it"),
     ("Printed Z motor mount (lead screw)", inv["zmotormount"], "80 x 68 x 86.5", "PETG / CCF", "Z motor shaft-down on the post top; collars + thrust bearings on its floor"),
     ("Printed Z bottom holder / hard stop", inv["zholder"],   "34 x 27 x 45",   "PETG / CF-Nylon", "608ZZ seat at the screw bottom; top face is the Z hard stop"),
@@ -152,11 +152,11 @@ N_VWHEEL_STD      = N_VWHEEL - N_VWHEEL_ECC
 N_IDLER           = inv["idler"]
 N_MOTOR           = inv["motor"]
 N_BRACKET         = inv["bracket"]
-N_ZMOUNT          = inv["zmount"]
 N_BOTMOUNT        = inv["botmount"]
-N_YMOUNT          = inv["ymount"]
 N_SHIM            = inv["shim"]
 N_ZMOTOR          = inv["zmotormount"]         # one Z motor per lead-screw mount
+N_XMOTOR          = 1                          # rack-and-pinion X; its mount is not modeled
+N_YMOTOR          = N_MOTOR - N_ZMOTOR - N_XMOTOR
 N_NUTBLOCK        = inv["nutblock"]
 N_ZHOLDER         = inv["zholder"]
 
@@ -184,7 +184,7 @@ HARDWARE = [
     ("M5 drop-in T-nut",                               inv["idlerbrk"] * 2, "M5, 4080 series", "Mating T-nuts for idler bracket"),
 
     # --- Motors (NEMA23 face × 4 fasteners per motor) ---
-    ("M5 SHCS",                                        (N_MOTOR - N_ZMOTOR) * 4, "M5 x 10 mm", "NEMA23 face mounting, X/Y motors (4 per motor)"),
+    ("M5 SHCS",                                        N_XMOTOR * 4, "M5 x 10 mm", "NEMA23 face mounting, X motor (4 per motor)"),
     ("M5 SHCS",                                        N_ZMOTOR * 4, "M5 x 16 mm",     "Z motor through its flange and the mount's 8 mm top plate"),
     ("M5 nut",                                         N_ZMOTOR * 4, "M5",             "Z motor-mount nut traps"),
 
@@ -197,9 +197,11 @@ HARDWARE = [
     ("M5 drop-in T-nut",                               N_ZHOLDER * 2, "M5, 4080 series", "Channel-floor T-nuts for the Z bottom holders"),
 
     # --- Printed motor mount / spacer plates ---
-    ("M5 nut",                                         (N_ZMOUNT + N_YMOUNT) * 4, "M5", "Back-side nuts for pass-through NEMA23 motor holes"),
-    ("M5 SHCS",                                        (N_ZMOUNT + N_YMOUNT) * 4, "M5 x 16 mm", "Printed motor plate to extrusion slots"),
-    ("M5 drop-in T-nut",                               (N_ZMOUNT + N_YMOUNT) * 4, "M5, 4080 series", "Mating T-nuts for printed motor plates"),
+    # Y motor turned 45 deg and bolted straight to the C-beam face slots, no
+    # plate (owner, 2026-10-12): only 2 of its 4 holes land on slot
+    # centrelines, so 2 bolts per motor into T-nuts.
+    ("M5 SHCS",                                        N_YMOTOR * 2, "M5 x 16 mm", "Y motor through its flange into the C-beam face slot"),
+    ("M5 drop-in T-nut",                               N_YMOTOR * 2, "M5, 4080 series", "Mating T-nuts for the Y-motor bolts"),
     ("M5 SHCS",                                        N_BOTMOUNT * 2, "M5 x 16 mm", "Z-post bottom plate to Z-post"),
     ("M5 drop-in T-nut",                               N_BOTMOUNT * 2, "M5, 4080 series", "Mating T-nuts for Z-post bottom plates"),
 
@@ -253,9 +255,9 @@ with open(os.path.join(HERE, "BOM_README.md"), "w") as f:
     f.write(f"Half ({N_VWHEEL_ECC}) get eccentric spacers (one side per wheel pair),\n")
     f.write(f"the other half ({N_VWHEEL_STD}) get standard precision spacers.\n\n")
     f.write("### Motors / printed mounts\n\n")
-    f.write(f"{N_MOTOR - N_ZMOTOR} X/Y motors × 4 NEMA23 face screws (M5×10) = {(N_MOTOR - N_ZMOTOR)*4} screws.\n")
+    f.write(f"{N_XMOTOR} X motor × 4 NEMA23 face screws (M5×10) = {N_XMOTOR*4} screws.\n")
     f.write(f"{N_ZMOTOR} Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.\n")
-    f.write(f"{N_ZMOUNT + N_YMOUNT} printed Y-motor plates (id 75) × 4 M5 back-side nuts + 4 M5×16 + 4 T-nuts.\n")
+    f.write(f"{N_YMOTOR} Y motors, turned 45° and bolted straight to the C-beam face slots × 2 M5×16 + 2 T-nuts.\n")
     f.write(f"{N_BRACKET} brackets × 4 rail-face screws (M5×10) + T-nuts = {N_BRACKET*4} pairs.\n")
     f.write("Note: the rack-and-pinion X-motor mounting is not yet modeled, so it\n")
     f.write("gets no back-side nuts here — add them when the X-axis lands.\n\n")

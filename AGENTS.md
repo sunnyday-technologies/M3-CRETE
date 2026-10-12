@@ -249,19 +249,26 @@ carriage rides past them.
 ### ✅ Custom plates: source from Bulkman3D or Maker Store
 ### ✅ V-Slot ecosystem: community-maintained as of May 2025 (CC BY-SA 4.0)
 
-## NEMA23 Motor Mount Fastening (2026-04-21 clarification)
+## NEMA23 Motor Mount Fastening (updated 2026-10-12)
 
 Nick's NEMA23 motors have **PASS-THROUGH mounting holes, not tapped**.
 The motor body does NOT accept bolts directly — bolts pass through the
-motor body AND through the 3D-printed mount plate, and require M5 nuts
-on the back side to secure.
+motor flange and are secured by a nut or T-nut on the far side.
 
-Per-motor hardware: 4× M5 cap screws + 4× M5 nuts (nylock or plain +
-blue Loctite). For the 7 NEMA23 motors on SN 001: 28 of each.
+Per motor role (`bom/m3-2-final-hardware-pack.json` carries the counts):
+- **Y motors (2):** turned 45° and bolted straight to the C-beam face
+  slots, **no plate**. Only 2 of the 4 flange holes land on slot
+  centrelines, so each takes **2× M5 × 16 + 2× M5 drop-in T-nuts**, and
+  nothing else. The printed id 75 plate is not needed.
+- **Z motors (4):** 4× M5 × 16 through the flange and the printed
+  lead-screw mount's top plate (bom/data.json id 24) into M5 nuts in its
+  nut traps.
+- **X motor (1):** mount not modeled yet; 4× M5 face screws plus 4×
+  back-side M5 nuts for the pass-through holes.
 
 Material: EEEEE 880pc Amazon kit covers M5 nuts. Loctite Blue 243
 (~$8/bottle) handles the thread-locking. No heat-set inserts needed —
-the plastic mount is a CLEARANCE plate, not a threaded anchor.
+the printed mounts are CLEARANCE parts, not threaded anchors.
 
 ## CAD Assembly Status (2026-04-14) — v0.3 IN PROGRESS
 

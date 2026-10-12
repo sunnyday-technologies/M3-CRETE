@@ -13,16 +13,15 @@ M5 nyloc nut,2,M5,Idler axle nut
 M5 flat washer,4,M5,Each side of idler
 M5 SHCS,4,M5 x 10 mm,Idler axle bracket to C-beam
 M5 drop-in T-nut,4,"M5, 4080 series",Mating T-nuts for idler bracket
-M5 SHCS,12,M5 x 10 mm,"NEMA23 face mounting, X/Y motors (4 per motor)"
+M5 SHCS,4,M5 x 10 mm,"NEMA23 face mounting, X motor (4 per motor)"
 M5 SHCS,16,M5 x 16 mm,Z motor through its flange and the mount's 8 mm top plate
 M5 nut,16,M5,Z motor-mount nut traps
 M5 SHCS,8,M5 x 20 mm,"Z nut block, through the carriage plate into the block"
 M5 nut,8,M5,"Z nut block bolts, inside the C-beam opening if needed"
 M5 SHCS,8,M5 x 20 mm,Z bottom holder into the channel-floor slots
 M5 drop-in T-nut,8,"M5, 4080 series",Channel-floor T-nuts for the Z bottom holders
-M5 nut,8,M5,Back-side nuts for pass-through NEMA23 motor holes
-M5 SHCS,8,M5 x 16 mm,Printed motor plate to extrusion slots
-M5 drop-in T-nut,8,"M5, 4080 series",Mating T-nuts for printed motor plates
+M5 SHCS,4,M5 x 16 mm,Y motor through its flange into the C-beam face slot
+M5 drop-in T-nut,4,"M5, 4080 series",Mating T-nuts for the Y-motor bolts
 M5 SHCS,8,M5 x 16 mm,Z-post bottom plate to Z-post
 M5 drop-in T-nut,8,"M5, 4080 series",Mating T-nuts for Z-post bottom plates
 M5 SHCS,0,M5 x 10 mm,Bracket rail face
