@@ -20,7 +20,7 @@ material pump is not modelled here (see [Pump](#pump)).
 | `steppers.cfg` | 7 motion steppers (X, 2×Y, 4×Z) + printhead extruder |
 | `tmc.cfg` | Driver settings — per-slot sense resistors, currents, StallGuard thresholds |
 | `homing.cfg` | Sensorless homing sequence (no physical endstops) |
-| `cooling.cfg` | Driver cooling — enclosure thermistor on TH0 + fan |
+| `cooling.cfg` | Driver cooling — enclosure thermistor on TH0 + two fans |
 | `z_tilt.cfg` | Quad Z self-tramming |
 | `macros.cfg` | START_PRINT, END_PRINT, CANCEL_PRINT, StallGuard readout |
 | `input_shaper.cfg` | ADXL345 + resonance tester + input shaper (optional include) |
@@ -31,8 +31,8 @@ material pump is not modelled here (see [Pump](#pump)).
 - **Host:** Raspberry Pi 5 8GB running Klipper + Moonraker + Mainsail
 - **Motion steppers:** 7× NEMA23 3–4.5Nm, 8mm shaft (1×X + 2×Y + 4×Z)
 - **Nozzle valve:** 1× small stepper (NEMA17/23) on Kraken slot S8
-- **Pump:** MAI 2PUMP Pictor (owner-supplied); not modelled here — see [Pump](#pump)
-- **Driver cooling:** 100K NTC thermistor on the Kraken's TH0 input, fan on a Kraken fan header (`cooling.cfg`)
+- **Pump:** separate, related project (the reference machine uses a MAI 2PUMP Pictor); not modelled here — see [Pump](#pump)
+- **Driver cooling:** 100K NTC thermistor on the Kraken's TH0 input and two 24 V fans on the FAN0 and FAN1 headers (`cooling.cfg`; BOM ids 92 and 93)
 - **Y belts:** GT2 10mm + 20-tooth pulleys (looped)
 - **Z drive:** Tr8x2 lead screws (8 mm, 2 mm lead, single start), motors on top of each post, 8 mm couplers
 - **X belt:** GT2 6mm + 20-tooth pulley (fixed strand, pinion drive)
@@ -214,10 +214,10 @@ Use a 10cm × 10cm single-wall square at a slow speed (30 mm/s) for the first pr
 
 ## Pump
 
-The material pump is a **MAI 2PUMP Pictor** (owner-supplied; listed as a
-reference option in the BOM). It takes a 0–10 V speed command plus a
-run/enable input and runs its own drive. It sits outside the motion system,
-so this reference does not model it. M3-CRETE-FIRMWARE's Stage 3 notes define
+Material pumping is a **separate, related project**; M3-CRETE covers the
+motion system. The reference machine uses a **MAI 2PUMP Pictor** (listed as a
+reference option in the BOM), which takes a 0–10 V speed command plus a
+run/enable input and runs its own drive. This reference does not model it. M3-CRETE-FIRMWARE's Stage 3 notes define
 how Klipper commands it, including pressure advance on the pump signal.
 
 ## Safety notes
@@ -247,7 +247,7 @@ After tuning, you can leave the ADXL345 installed or remove it — the input sha
 
 - **No physical probe** — Z_TILT_ADJUST is stubbed out until a probe is wired in. First-layer calibration is currently manual.
 - **Driver pins and sense resistors are written for the Kraken V1.0** (see [Driver slots](#driver-slots-btt-kraken-v10)). S1–S4 (Z) match the hardware-verified Stage-1 config. S5–S8 (X, Y, Y1, valve) have not run on the machine.
-- **`cooling.cfg` has placeholders:** the thermistor type, the fan header and the target temperature. Fit the thermistor before running the config: an open thermistor input reads out of range and Klipper shuts down.
+- **`cooling.cfg` has placeholders:** the thermistor type, the fan headers and the target temperature. Fit the thermistor before running the config: an open thermistor input reads out of range and Klipper shuts down.
 - **The extruder's temperature reading is the Kraken MCU's own sensor.** Klipper requires a sensor on `[extruder]`; concrete is unheated, so this is a placeholder.
 - **Extruder `rotation_distance` is a placeholder** — calibrate it with the pump (step 7).
 - **Input shaping not yet tuned.** Add an ADXL345 to the toolhead mount and run `SHAPER_CALIBRATE` after mechanical commissioning.

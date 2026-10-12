@@ -48,7 +48,7 @@ review.
 - **Z-axis (2026-10-11 update):** 4x independent posts, each with a NEMA23 on top turning a Tr8x2 lead screw (bom/data.json ids 87-91); sensorless homing DOWN onto bottom hard-stop blocks, no switches. Supersedes the belt-driven Z; the CAD still shows the belt Z until it is updated.
 - **Gantry beam:** 2080 spanning Y, carried by dual-Y carriages
 - **Motion:** GT2 belts on X/Y, Tr8x2 lead screws on Z, polycarbonate V-wheels on all axes
-- **Motors:** 7x NEMA23 8mm shaft (1X + 2Y + 4Z) + 1 extruder (NEMA34, owner-supplied)
+- **Motors:** 7x NEMA23 8mm shaft (1X + 2Y + 4Z). The pumping system is a separate, related project (see Product Decisions).
 - **Controller:** BTT Kraken (8x TMC5160 onboard) + Raspberry Pi 5 + Klipper
 - **Printhead:** 1.5kg target, 1" Male NPT pipe connection, counter-weighted hose
 
@@ -111,7 +111,7 @@ review.
 - **Pump system is OUT OF SCOPE** — M3-CRETE focuses on the motion system; the printhead connects to any commercial or community pump capable of feeding a 1" Male NPT line at the required pressure.
 - Commercial pump references kept as informational in BOM (MAI, M-Tec, StoneFlower)
 - Frame stiffener for 2m+ spans: aluminum rectangular tube recommended (not steel — galvanic corrosion)
-- Extruder/pump motor: NEMA34 recommended (owner-supplied; not in the kit)
+- **Pumping is a separate, related project** (owner decision 2026-10-12). The reference machine uses a MAI 2PUMP Pictor. Pump motors and pump drives belong to that project, not to M3-CRETE: keep M3-CRETE copy focused on the motion system.
 
 ## Out of Scope for This Build
 - No HEPA filter, carbon fiber bars, or LED lights on this build
