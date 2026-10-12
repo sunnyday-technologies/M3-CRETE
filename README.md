@@ -126,7 +126,7 @@ M3-CRETE/
 ├── bom/
 │   ├── data.json                # BOM source of truth (v2.7.0; 65 reference entries)
 │   └── index.html               # Interactive BOM viewer (bom.m3-crete.com/bom)
-├── firmware/                    # Klipper configs (kinematics, steppers)
+├── firmware/                    # Reference Klipper config (machine config: M3-CRETE-FIRMWARE)
 ├── blog/                        # Build logs and project updates
 └── config.js                    # Model variants (M3-1, M3-2, M3-4)
 ```

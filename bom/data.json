@@ -1,6 +1,6 @@
 {
-  "version": "2.9.0",
-  "generated": "2026-10-12T16:00:00Z",
+  "version": "2.10.0",
+  "generated": "2026-10-12T22:00:00Z",
   "source": "https://github.com/sunnyday-technologies/M3-CRETE",
   "parts": [
     {
@@ -1699,6 +1699,63 @@
       ]
     },
     {
+      "id": 94,
+      "category": "Electronics & Control System",
+      "name": "Driver-Bay Thermistor (100K NTC 3950)",
+      "description": "Measures the board / enclosure temperature at the Kraken so Klipper can run the driver cooling fans (id 95). Plugs into the Kraken's TH0 input; see firmware/cooling.cfg. 100K NTC, B = 3950, pre-terminated 2-pin lead about 1 m long. Klipper's sensor_type must match the part fitted.",
+      "qty": 1,
+      "unit": "piece",
+      "mfg_type": "buy",
+      "sort_order": 12,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1317,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com",
+          "notes": "100K NTC 3950 thermistor with a 2-pin XH2.54 lead, about 1 m (often sold in multi-packs for 3D printers)",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "category": "Electronics & Control System",
+      "name": "Driver Cooling Fan (80 mm, 24 V)",
+      "description": "Moves air across the Kraken's driver heat sink. Klipper switches both fans together from the driver-bay thermistor (id 94) on the Kraken's FAN0 and FAN1 headers; see firmware/cooling.cfg. 80 x 80 x 25 mm, 24 VDC, 2-pin lead. Match each fan header's voltage jumper to the fan (BTT Kraken wiki).",
+      "qty": 2,
+      "unit": "pieces",
+      "mfg_type": "buy",
+      "sort_order": 14,
+      "mpn": null,
+      "substitute_ok": true,
+      "exclude_from_kit": false,
+      "suppliers": [
+        {
+          "id": 1318,
+          "supplier_name": "Amazon",
+          "product_url": "https://www.amazon.com",
+          "notes": "80 mm 24 V 8025 brushless fan with a 2-pin XH2.54 lead",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        },
+        {
+          "id": 1319,
+          "supplier_name": "Digi-Key",
+          "product_url": "https://www.digikey.com",
+          "notes": "80 x 80 x 25 mm 24 VDC axial fan with leads; fit a 2-pin XH2.54 plug",
+          "sku": null,
+          "step_url": null,
+          "approved": true
+        }
+      ]
+    },
+    {
       "id": 44,
       "category": "Concrete Extrusion System",
       "name": "Progressive Cavity Pump",
@@ -1753,14 +1810,14 @@
       "id": 46,
       "category": "Concrete Extrusion System",
       "name": "External Stepper Driver - Professional/Private Scope",
-      "description": "Professional/private high-current driver placeholder for separate review. Public BOM does not provide 48 V power distribution, driver wiring, pump integration, or safety-control implementation guidance.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Professional/private high-current driver placeholder for separate review. Public BOM does not provide 48 V power distribution, driver wiring, pump integration, or safety-control implementation guidance.",
       "qty": 1,
       "unit": "driver board",
       "mfg_type": "buy",
       "sort_order": 16,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 133,
@@ -1795,14 +1852,14 @@
       "id": 47,
       "category": "Concrete Extrusion System",
       "name": "Progressive Cavity Pump Element (Rotor + Stator)",
-      "description": "Core pumping element — chrome-plated SS rotor inside elastomer stator. For mortar/concrete with aggregates up to 2-6mm. Stator: Buna Nitrile (NBR) for concrete, EPDM for alkaline. Expect stator replacement every 200-500 hours.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Core pumping element — chrome-plated SS rotor inside elastomer stator. For mortar/concrete with aggregates up to 2-6mm. Stator: Buna Nitrile (NBR) for concrete, EPDM for alkaline. Expect stator replacement every 200-500 hours.",
       "qty": 1,
       "unit": "rotor + stator set",
       "mfg_type": "buy",
       "sort_order": 17,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 136,
@@ -1846,14 +1903,14 @@
       "id": 48,
       "category": "Concrete Extrusion System",
       "name": "Pump Drive Coupling — Universal Joint + Connecting Rod",
-      "description": "Converts motor rotation to rotor orbital motion. PC pump rotors orbit eccentrically — a rigid shaft will break. Use gear-type universal joint or double-cardan joint.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Converts motor rotation to rotor orbital motion. PC pump rotors orbit eccentrically — a rigid shaft will break. Use gear-type universal joint or double-cardan joint.",
       "qty": 1,
       "unit": "coupling assembly",
       "mfg_type": "buy",
       "sort_order": 18,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 139,
@@ -1888,14 +1945,14 @@
       "id": 49,
       "category": "Concrete Extrusion System",
       "name": "Pump Housing & Bearing Assembly",
-      "description": "Encloses rotor/stator and provides bearing support. Must handle axial thrust. If using Continental CP22, housing is included. Alternate housing approaches require separate reviewer selection and are not public construction guidance.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Encloses rotor/stator and provides bearing support. Must handle axial thrust. If using Continental CP22, housing is included. Alternate housing approaches require separate reviewer selection and are not public construction guidance.",
       "qty": 1,
       "unit": "assembly",
       "mfg_type": "cnc",
       "sort_order": 19,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 142,
@@ -1930,14 +1987,14 @@
       "id": 51,
       "category": "Concrete Extrusion System",
       "name": "Professional/Private Power Supply Scope",
-      "description": "Professional/private high-current power placeholder for separate review. Public BOM does not provide 48 V power distribution, power-supply wiring, pump-driver wiring, or control-panel construction guidance.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Professional/private high-current power placeholder for separate review. Public BOM does not provide 48 V power distribution, power-supply wiring, pump-driver wiring, or control-panel construction guidance.",
       "qty": 1,
       "unit": "PSU",
       "mfg_type": "buy",
       "sort_order": 21,
       "mpn": "LRS-200-48",
       "substitute_ok": false,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 149,
@@ -1972,14 +2029,14 @@
       "id": 52,
       "category": "Concrete Extrusion System",
       "name": "Material Hopper 20-Liter",
-      "description": "Material reservoir above the pump. HDPE or stainless for concrete compatibility. Printable in PETG for testing.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Material reservoir above the pump. HDPE or stainless for concrete compatibility. Printable in PETG for testing.",
       "qty": 1,
       "unit": "hopper",
       "mfg_type": "print",
       "sort_order": 30,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 152,
@@ -2014,14 +2071,14 @@
       "id": 53,
       "category": "Concrete Extrusion System",
       "name": "Concrete Nozzle Assembly",
-      "description": "Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm).",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Critical for print quality. Replaceable-tip design recommended for different layer widths (20-40mm).",
       "qty": 1,
       "unit": "assembly",
       "mfg_type": "cnc",
       "sort_order": 40,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 155,
@@ -2047,14 +2104,14 @@
       "id": 54,
       "category": "Concrete Extrusion System",
       "name": "Tubing & Quick Fittings",
-      "description": "Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.",
+      "description": "REFERENCE ONLY — not in the M3-CRETE motion-system kit. Pumping and extrusion are a separate, related project. Pump to nozzle material flow. Reinforced hose rated for concrete slurry. Counter-weighted to reduce gantry loading.",
       "qty": 1,
       "unit": "kit",
       "mfg_type": "buy",
       "sort_order": 50,
       "mpn": null,
       "substitute_ok": true,
-      "exclude_from_kit": false,
+      "exclude_from_kit": true,
       "suppliers": [
         {
           "id": 158,
@@ -2851,5 +2908,5 @@
       ]
     }
   ],
-  "notes": "v2.9 (2026-10-12): new id 93, 2 smooth idler pulleys for the 10mm Y belts, one at the front of each Y axis opposite the Y motor. The BOM had no smooth idler line before. Reference part: GT2 20T toothless, 5mm bore, 11.2mm between the flanges; the 22mm V-slot idler wheel's 9.5mm track does not fit the 10mm belt. id 66 description updated. v2.8 (2026-10-11): the Z-axis moves from GT2 belts to Tr8x2 lead screws (owner decision). Z motors stay on top of each post, shaft down, driving each screw (id 87) through an 8mm coupler (id 88); KFL08 bearings (id 89) and lock collars (id 90) carry the gantry load; Z homes sensorless DOWN onto printed hard-stop blocks (id 91), no switches. Deprecated: id 20 (Z belts). Changed: id 11 pulleys 7->3, id 66 idler plates 6->2, id 19/23/24/79 descriptions. The published CAD (STEP/STL) still shows the belt Z until the CAD update. v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
+  "notes": "v2.10 (2026-10-12), owner decisions: (1) adds driver cooling to Electronics & Control System: id 94 driver-bay thermistor and id 95 driver cooling fans (qty 2), run by firmware/cooling.cfg. (2) Pumping and extrusion are a separate, related project: every Concrete Extrusion System entry (ids 44, 46-49, 51-54) is now excluded from the kit and marked reference only. v2.9 (2026-10-12): new id 93, 2 smooth idler pulleys for the 10mm Y belts, one at the front of each Y axis opposite the Y motor. The BOM had no smooth idler line before. Reference part: GT2 20T toothless, 5mm bore, 11.2mm between the flanges; the 22mm V-slot idler wheel's 9.5mm track does not fit the 10mm belt. id 66 description updated. v2.8 (2026-10-11): the Z-axis moves from GT2 belts to Tr8x2 lead screws (owner decision). Z motors stay on top of each post, shaft down, driving each screw (id 87) through an 8mm coupler (id 88); KFL08 bearings (id 89) and lock collars (id 90) carry the gantry load; Z homes sensorless DOWN onto printed hard-stop blocks (id 91), no switches. Deprecated: id 20 (Z belts). Changed: id 11 pulleys 7->3, id 66 idler plates 6->2, id 19/23/24/79 descriptions. The published CAD (STEP/STL) still shows the belt Z until the CAD update. v2.7 (M3-2 V1.0 freeze, 2026-04-29): unified mount-plate design — id 75 (qty 2) covers Y-motors only; id 79 (qty 8) bot_spacer_idler doubles as Z-motor mount at top corners; id 65 (qty 3) internal 2040 V-slot inserts replace external splice plates. Deprecated: id 81 (Y-spacer merged into id 75) and id 82 (Frame Splice Backup Plate, replaced by 2040 inserts). Earlier basis (kept for context): all primary frame members are 4080 C-Beam at 1000mm; X-direction 2m members use centered 2040 friction-fit inserts; belt width 6mm on X-axis, 10mm on Y/Z; quad-Z self-tramming; NEMA23 8mm-shaft motors with StallGuard4 sensorless homing. 2026-05-26 update: id 86 adds an explicit editable M3-2 hardware pick pack for pricing and fulfillment, and id 8 leveling feet are excluded from the reference kit per the no-leveling-feet design decision."
 }
