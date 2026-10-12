@@ -1,8 +1,14 @@
-schema_version: "0.7"
+# Rules schema 0.9 (CADCLAW 0.9.0+; checked against 0.11.0). Migrated from 0.7
+# on 2026-10-12: rule intent unchanged. 0.9 only adds the optional dict-form
+# LabelSpec under `labels:`; the legacy [dx, dy, dz] lists below still load.
+#
+# meta.step is a Git LFS object. In a clone or worktree without the LFS
+# content, pass the real STEP with --step.
+schema_version: "0.9"
 
 meta:
   project: m3-crete
-  description: "M3-CRETE — real rule file for CAD/M3-2_Assembly.step + bom/data.json (v0.7, 2026-04-26)"
+  description: "M3-CRETE — real rule file for CAD/M3-2_Assembly.step + bom/data.json (rules schema 0.9; migrated from 0.7 on 2026-10-12)"
   step: CAD/M3-2_Assembly.step
   bom: bom/data.json
 
@@ -125,6 +131,8 @@ bom_audit:
     - id: 81
       expected_qty: 0   # 2026-04-29 V1.0: deprecated, role moved to id 75
       expected_mfg_type: print
+      # `ymount` has no entry under labels (no spacer signature was ever
+      # authored), so its CAD count is always 0. Only the BOM qty 0 is checked.
       expected_label: ymount
     - id: 83
       expected_qty: 32
@@ -149,9 +157,11 @@ bom_audit:
       expected_mfg_type: print
 
 claim_audit:
+  # Entries are file globs relative to --repo; a bare directory matches no
+  # files. "docs/" scanned nothing under 0.7 too, so docs are listed as a glob.
   scan_paths:
     - README.md
-    - docs/
+    - docs/**/*.md
     - bom/index.html
   stale_terms:
     - "JB Weld"
@@ -175,7 +185,9 @@ publish_audit:
     - "NEMA_CRETE/**"
     - ".claude/**"
     - "conversation-summary.md"
-    - "**/*.f3d"
+    # Full-assembly Fusion natives stay local (.gitignore). Part-level .f3d
+    # files under CAD/ are published via LFS (.gitattributes, 2026-06-05).
+    - "CAD/M3-2_*.f3d"
     - "**/__pycache__/**"
   scan_globs:
     - "README.md"
