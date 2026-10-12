@@ -161,7 +161,9 @@ bom_audit:
     - id: 93
       expected_qty: 2
       expected_mfg_type: buy
-      required_terms: ["10mm"]   # the 22mm V-slot wheel's 9.5mm track does not fit the Y belt
+      # Fit is set by the width between the flanges; the 22mm V-slot wheel's
+      # 9.5mm track does not fit the 10mm Y belt.
+      required_terms: ["10mm", "11.2mm"]
 
 claim_audit:
   # Entries are file globs relative to --repo; a bare directory matches no
