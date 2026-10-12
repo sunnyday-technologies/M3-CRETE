@@ -1,6 +1,14 @@
-# M3-CRETE Firmware
+# M3-CRETE Firmware — development reference
 
-Klipper configuration for the M3-CRETE concrete 3D printer motion system.
+**This directory is a reference, not an install target.** The Klipper config
+the machine runs lives in [M3-CRETE-FIRMWARE](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE): `klipper/printer.cfg`,
+installed with that repo's `install.sh`. Install from there. Do not copy this
+directory onto the Pi.
+
+This directory sketches the full-machine Klipper config (all axes, the nozzle
+valve, the feed pump and the macros) ahead of the staged bring-up in
+M3-CRETE-FIRMWARE. It does not load as-is: the feed-pump signal pins are
+unassigned (see [Driver slots](#driver-slots-btt-kraken-v10)).
 
 ## What's in this directory
 
@@ -18,16 +26,51 @@ Klipper configuration for the M3-CRETE concrete 3D printer motion system.
 
 ## Hardware assumed
 
-- **Controller:** BTT Kraken v1.0 (STM32H723, 8× onboard TMC5160)
+- **Controller:** BTT Kraken V1.0 (STM32H723, 8 onboard drivers, slots S1–S8; BTT lists them as TMC2160)
 - **Host:** Raspberry Pi 5 8GB running Klipper + Moonraker + Mainsail
 - **Motion steppers:** 7× NEMA23 3–4.5Nm, 8mm shaft (1×X + 2×Y + 4×Z)
-- **Nozzle valve:** 1× small stepper (NEMA17/23) on Kraken DRIVER7
-- **Feed pump:** 1× NEMA34 on external driver (owner-supplied)
+- **Nozzle valve:** 1× small stepper (NEMA17/23) on Kraken slot S8
+- **Feed pump:** 1× NEMA34 on external driver (owner-supplied); signal pins not assigned yet
 - **Y belts:** GT2 10mm + 20-tooth pulleys (looped)
 - **Z drive:** Tr8x2 lead screws (8 mm, 2 mm lead, single start), motors on top of each post, 8 mm couplers
 - **X belt:** GT2 6mm + 20-tooth pulley (fixed strand, pinion drive)
 - **V-wheels:** Polycarbonate, eccentric-spacer adjustable
 - **Homing:** Sensorless StallGuard on all axes — no physical endstops
+
+## Driver slots (BTT Kraken V1.0)
+
+| Slot | Klipper section | step | dir | enable | cs | DIAG | sense_resistor |
+|------|-----------------|------|-----|--------|----|------|----------------|
+| S1 | `stepper_z` (Z0, front-left) | PC14 | PC13 | !PE6 | PD6 | PC15 | 0.022 |
+| S2 | `stepper_z1` (Z1, front-right) | PE5 | PE4 | !PE3 | PD5 | PF0 | 0.022 |
+| S3 | `stepper_z2` (Z2, rear-left) | PE2 | PE1 | !PE0 | PD4 | PF1 | 0.022 |
+| S4 | `stepper_z3` (Z3, rear-right) | PB9 | PB8 | !PB7 | PD3 | PF2 | 0.022 |
+| S5 | `stepper_x` | PG9 | PG10 | !PG13 | PD2 | PF3 | 0.075 |
+| S6 | `stepper_y` (left, primary) | PG11 | PD7 | !PG12 | PA15 | PF4 | 0.075 |
+| S7 | `stepper_y1` (right) | PB4 | PB3 | !PB5 | PA9 | — | 0.075 |
+| S8 | `extruder` (nozzle valve) | PG15 | PB6 | !PG14 | PA10 | — | 0.075 |
+
+- All eight drivers share a **software SPI** bus: SCK PC6, MOSI PC8, MISO PC7.
+- Sensorless homing needs the slot's DIAG jumper fitted.
+- `sense_resistor` depends on the slot **and the board revision**. On a Kraken
+  V1.0, S1–S4 are 0.022 and S5–S8 are 0.075. On a V1.1, S1–S4 are 0.050.
+  Klipper computes motor current from this value, so a wrong one silently
+  scales the real current. For example, 0.075 configured on a 0.022 slot gives
+  about 3.4× the configured `run_current`. Check the board revision before
+  using these values.
+- Z on S1–S4 is the slot allocation of the hardware-verified Stage-1 config in
+  M3-CRETE-FIRMWARE, and those four rows match it. S5–S8 have not been run on
+  the machine.
+- The feed pump's external driver needs three spare GPIO for step, dir and
+  enable, because all eight slots are in use. They are left unassigned here.
+  M3-CRETE-FIRMWARE will assign the spare-header pins in its planned Stage 3
+  config.
+
+Pin sources: BTT's official
+[`generic-bigtreetech-kraken.cfg`](https://github.com/bigtreetech/BIGTREETECH-Kraken/blob/master/Firmware/generic-bigtreetech-kraken.cfg)
+(commit `4a3303f`), cross-checked against BTT's
+[Kraken wiki](https://global.bttwiki.com/Kraken.html) (pin diagram and
+specification table) and Marlin's `pins_BTT_KRAKEN_V1_0.h`.
 
 ## Axis conventions & motor layout
 
@@ -87,62 +130,21 @@ If X or Y moves with Z at an unknown position, the printhead can contact an obst
 | `max_z_accel` | 100 mm/s² | |
 | `square_corner_velocity` | 5.0 mm/s | Low to prevent belt slip on corners |
 
-## Build from source (Klipper firmware for the Kraken)
+## Building, flashing and installing
 
-On the Raspberry Pi:
+Use M3-CRETE-FIRMWARE for all three. Its
+[`klipper/README.md`](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE/blob/main/klipper/README.md) has the tested
+`menuconfig` settings (including the "Enable extra low-level configuration
+options" checkbox), the microSD and USB DFU flashing procedures, and the
+staged commissioning notes. Its `install.sh` installs the machine config.
 
-```bash
-cd ~
-git clone https://github.com/Klipper3d/klipper.git
-cd klipper
-make menuconfig
-```
+Do not copy this directory to `~/printer_data/config/`.
 
-In `menuconfig`, set:
+## Commissioning reference
 
-```
-Micro-controller Architecture ........... STMicroelectronics STM32
-Processor model ......................... STM32H723
-Bootloader offset ....................... 128KiB bootloader
-Clock Reference ......................... 25 MHz crystal
-Communication interface ................. USB (on PA11/PA12)
-```
-
-Save and exit, then:
-
-```bash
-make
-```
-
-The compiled firmware lands at `~/klipper/out/klipper.bin`.
-
-## Flashing the Kraken
-
-1. Copy `klipper.bin` to a FAT32-formatted microSD card, renaming it to `firmware.bin`.
-2. Power off the Kraken.
-3. Insert the SD card.
-4. Power on — the bootloader will flash automatically (~10 seconds).
-5. On successful flash, `firmware.bin` will be renamed to `FIRMWARE.CUR` on the card.
-
-## Installing this config
-
-1. Copy this entire `firmware/` directory to `~/printer_data/config/` on the Pi.
-2. Rename `printer.cfg` to the name Moonraker expects (default: `printer.cfg` in that directory — leave it as-is if you copied the folder contents directly).
-3. Edit `mcu.cfg` — replace the `XXXXXXXXXXXXXXXX` placeholder with the real serial ID. Find it with:
-
-   ```bash
-   ls /dev/serial/by-id/
-   ```
-
-4. Restart Klipper via Mainsail (**Machine** → **Restart**) or:
-
-   ```bash
-   sudo systemctl restart klipper
-   ```
-
-## First-boot checklist
-
-Do these in order, one at a time, before any actual printing.
+On the machine, follow the stage notes in M3-CRETE-FIRMWARE. The steps below
+describe how this full reference config is meant to be tuned once every axis
+is wired. Do them in order, one at a time, before any actual printing.
 
 ### 1. Verify MCU connection
 
@@ -230,8 +232,8 @@ Use a 10cm × 10cm single-wall square at a slow speed (30 mm/s) for the first pr
 
 M3-CRETE uses a two-stage fluid-handling system:
 
-- **Feed pump** (`pump_feed`) — the big NEMA34 upstream of the hose. Has its own pressure advance (typical 0.5–1.5 seconds) to pressurize the hose ahead of valve commanded moves. Runs on an external driver via Kraken's MOTOR7 header.
-- **Nozzle valve** (`extruder`) — a small, fast actuator at the printhead. Pressure advance = 0. Effectively a metering valve with ~1 % retraction capability for clean corners. Runs on Kraken's DRIVER7 onboard TMC5160.
+- **Feed pump** (`pump_feed`) — the big NEMA34 upstream of the hose. Has its own pressure advance (typical 0.5–1.5 seconds) to pressurize the hose ahead of valve commanded moves. Runs on an external driver; its signal pins are not assigned yet (all eight onboard slots are in use).
+- **Nozzle valve** (`extruder`) — a small, fast actuator at the printhead. Pressure advance = 0. Effectively a metering valve with ~1 % retraction capability for clean corners. Runs on Kraken slot S8.
 
 Both steppers are synchronized: every `G1 E...` move drives both at once. The feed pump runs *ahead* of the valve in time (by the amount of its pressure advance) so material arrives at the valve exactly when it opens.
 
@@ -291,7 +293,9 @@ After tuning, you can leave the ADXL345 installed or remove it — the input sha
 ## Known limitations (v0.1)
 
 - **No physical probe** — Z_TILT_ADJUST is stubbed out until a probe is wired in. First-layer calibration is currently manual.
-- **Pin assignments for BTT Kraken are based on the upstream `example-kraken.cfg`** — verify against your board revision on first boot.
+- **Driver pins and sense resistors are written for a Kraken V1.0** (see [Driver slots](#driver-slots-btt-kraken-v10)). S1–S4 (Z) match the hardware-verified Stage-1 config. S5–S8 (X, Y, Y1, valve) have not run on the machine.
+- **The config does not load as-is.** The feed-pump signal pins are unassigned, so Klipper stops with a missing `step_pin` error for `pump_feed`.
+- **The extruder's placeholder thermistor input (T0) has nothing connected.** An open thermistor input reads out of range and Klipper shuts down, so this needs a decision before the config can run.
 - **Extruder `rotation_distance` is a placeholder** — must be calibrated against your specific pump geometry.
 - **Input shaping not yet tuned.** Add an ADXL345 to the toolhead mount and run `SHAPER_CALIBRATE` after mechanical commissioning.
 
