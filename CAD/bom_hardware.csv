@@ -20,9 +20,9 @@ M5 SHCS,8,M5 x 20 mm,"Z nut block, through the carriage plate into the block"
 M5 nut,8,M5,"Z nut block bolts, inside the C-beam opening if needed"
 M5 SHCS,8,M5 x 20 mm,Z bottom holder into the channel-floor slots
 M5 drop-in T-nut,8,"M5, 4080 series",Channel-floor T-nuts for the Z bottom holders
-M5 nut,0,M5,Back-side nuts for pass-through NEMA23 motor holes
-M5 SHCS,0,M5 x 16 mm,Printed motor plate to extrusion slots
-M5 drop-in T-nut,0,"M5, 4080 series",Mating T-nuts for printed motor plates
+M5 nut,8,M5,Back-side nuts for pass-through NEMA23 motor holes
+M5 SHCS,8,M5 x 16 mm,Printed motor plate to extrusion slots
+M5 drop-in T-nut,8,"M5, 4080 series",Mating T-nuts for printed motor plates
 M5 SHCS,8,M5 x 16 mm,Z-post bottom plate to Z-post
 M5 drop-in T-nut,8,"M5, 4080 series",Mating T-nuts for Z-post bottom plates
 M5 SHCS,0,M5 x 10 mm,Bracket rail face

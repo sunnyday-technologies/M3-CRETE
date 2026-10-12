@@ -20,6 +20,7 @@ HERE = os.path.dirname(__file__)
 spec = importlib.util.spec_from_file_location("m3_asm",
                                               os.path.join(HERE, "m3_2_assembly.py"))
 mod = importlib.util.module_from_spec(spec)
+os.makedirs(os.path.join(HERE, "_preview"), exist_ok=True)
 _devnull = open(os.path.join(HERE, "_preview", "null.txt"), "w")
 sys.stdout = _devnull
 spec.loader.exec_module(mod)
@@ -44,7 +45,7 @@ def name_for_dims(dims_sorted):
     if dims_sorted == (3.0, 88.0, 127.0):    return "plate"
     if dims_sorted == (20.0, 20.0, 20.0):    return "splice"
     if dims_sorted == (6.0, 40.0, 80.0):     return "shim"       # center-spreader shims, 6 mm
-    if dims_sorted == (4.0, 80.0, 107.0):    return "zmount"
+    if dims_sorted == (4.0, 80.0, 97.0):     return "zmount"     # id 75 printed plate, at the 2 Y-motor positions
     if dims_sorted == (6.0, 80.0, 100.0):    return "botmount"   # Z-post bottom plate, 6 mm
     # ymount: TODO add signature when user provides 4mm spacer plate STEP geometry
     if dims_sorted == (4.0, 160.0, 280.0):   return "tbracket"
@@ -111,7 +112,7 @@ N_JOINTS = len(joint_pairs)
 STRUCTURAL = [
     # name, qty, dims_mm, material, role
     ("C-beam 4080 1m extrusion",          inv["cbeam"],       "40 x 80 x 1000", "Aluminum", "All frame members (Z-post, X-rail, Y-rail, mid braces)"),
-    ("Printed Z motor mount / Y-spacer",  inv["zmount"],      "80 x 107 x 4",   "PETG / CCF", "Simplified combined Z motor mount plate and Y-rail spacer"),
+    ("Printed Z motor mount / Y-spacer",  inv["zmount"],      "80 x 97 x 4",    "PETG / CCF", "id 75 plate at each Y-motor position; Z motors use the lead-screw mount"),
     ("Printed Z-post bottom plate",       inv["botmount"],    "80 x 100 x 6",   "PETG / CCF", "Spacer between Z-post and bottom Y rail; the bottom holder rests on it"),
     ("Printed Z motor mount (lead screw)", inv["zmotormount"], "80 x 68 x 86.5", "PETG / CCF", "Z motor shaft-down on the post top; collars + thrust bearings on its floor"),
     ("Printed Z bottom holder / hard stop", inv["zholder"],   "34 x 27 x 45",   "PETG / CF-Nylon", "608ZZ seat at the screw bottom; top face is the Z hard stop"),
@@ -222,6 +223,8 @@ for item, qty, size, _ in HARDWARE:
         m5_totals[size] += qty
     elif item.startswith("M5 nyloc"):
         m5_totals["M5 nyloc nut"] += qty
+    elif item == "M5 nut":
+        m5_totals["M5 nut"] += qty
     elif item.startswith("M5 flat washer"):
         m5_totals["M5 flat washer"] += qty
     elif item.startswith("M5 drop-in T-nut"):
@@ -252,9 +255,10 @@ with open(os.path.join(HERE, "BOM_README.md"), "w") as f:
     f.write("### Motors / printed mounts\n\n")
     f.write(f"{N_MOTOR - N_ZMOTOR} X/Y motors × 4 NEMA23 face screws (M5×10) = {(N_MOTOR - N_ZMOTOR)*4} screws.\n")
     f.write(f"{N_ZMOTOR} Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.\n")
+    f.write(f"{N_ZMOUNT + N_YMOUNT} printed Y-motor plates (id 75) × 4 M5 back-side nuts + 4 M5×16 + 4 T-nuts.\n")
     f.write(f"{N_BRACKET} brackets × 4 rail-face screws (M5×10) + T-nuts = {N_BRACKET*4} pairs.\n")
-    f.write("Note: Y-motor brackets and the rack-and-pinion X-motor mounting are\n")
-    f.write("not yet modeled — add them when the X-axis lands.\n\n")
+    f.write("Note: the rack-and-pinion X-motor mounting is not yet modeled, so it\n")
+    f.write("gets no back-side nuts here — add them when the X-axis lands.\n\n")
     f.write("### M5 fastener totals (sum across all line items)\n\n")
     f.write("| Item | Qty |\n|---|---|\n")
     for k in sorted(m5_totals):

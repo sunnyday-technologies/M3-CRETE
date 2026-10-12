@@ -205,21 +205,28 @@ def bb_overlap(a, b, tol=-0.01):
             b1.ymin < b2.ymax + tol and b2.ymin < b1.ymax + tol and
             b1.zmin < b2.zmax + tol and b2.zmin < b1.zmax + tol)
 
-plate_idx = [i for i, s in enumerate(parts) if label_of(s) == 'plate']
-cbeam_idx = [i for i, s in enumerate(parts) if label_of(s) == 'cbeam']
-for i in plate_idx:
-    for j in cbeam_idx:
-        if not bb_overlap(parts[i], parts[j]):
+# C-beams come through as open prism shells (no volume), so rebuild them as
+# solids from their end-profile edges before testing overlap.
+def cbeam_solid(sh):
+    bb = sh.BoundingBox(); dims = (bb.xlen, bb.ylen, bb.zlen)
+    ax = max(range(3), key=lambda i: dims[i]); lo = (bb.xmin, bb.ymin, bb.zmin)[ax]
+    edges = [e for e in sh.Edges() if all(abs(v.toTuple()[ax] - lo) < 1e-3 for v in e.Vertices())]
+    vec = [0.0, 0.0, 0.0]; vec[ax] = dims[ax]
+    return cq.Solid.extrudeLinear(cq.Face.makeFromWires(cq.Wire.assembleEdges(edges)), cq.Vector(*vec))
+
+solids = [(label_of(s), s if s.ShapeType() == "Solid" else cbeam_solid(s)) for s in parts]
+for la, a in solids:
+    if la != 'plate':
+        continue
+    for lb, b in solids:
+        if lb != 'cbeam' or not bb_overlap(a, b):
             continue
-        try:
-            v = common_volume(parts[i], parts[j])
-            if v > 0.5:
-                pc = center(parts[i])
-                problems.append(
-                    f"plate at ({pc[0]:.0f},{pc[1]:.0f},{pc[2]:.0f}) "
-                    f"clips cbeam by {v:.0f} mm^3")
-        except Exception:
-            pass
+        v = common_volume(a, b)
+        if v > 0.5:
+            ac, bc = center(a), center(b)
+            problems.append(
+                f"plate at ({ac[0]:.0f},{ac[1]:.0f},{ac[2]:.0f}) "
+                f"clips cbeam at ({bc[0]:.0f},{bc[1]:.0f},{bc[2]:.0f}) by {v:.0f} mm^3")
 
 # ---------- CHECK 5: motor-mount plates span shim+motor zone (Z > 900) ----------
 # The authored bracket is cloned to both Z-motor corners (Z>900) AND Y-motor
@@ -253,19 +260,10 @@ for p in posts:
                         f"centre and {inset:.1f} mm inside the open face (want 0 and {mod.AXIS_INSET})")
 
 # ---------- CHECK 7: lead-screw stack interference (true solids) ----------
-# C-beams come through as open prism shells (no volume), so rebuild them as
-# solids from their end-profile edges before testing overlap.
-def cbeam_solid(sh):
-    bb = sh.BoundingBox(); dims = (bb.xlen, bb.ylen, bb.zlen)
-    ax = max(range(3), key=lambda i: dims[i]); lo = (bb.xmin, bb.ymin, bb.zmin)[ax]
-    edges = [e for e in sh.Edges() if all(abs(v.toTuple()[ax] - lo) < 1e-3 for v in e.Vertices())]
-    vec = [0.0, 0.0, 0.0]; vec[ax] = dims[ax]
-    return cq.Solid.extrudeLinear(cq.Face.makeFromWires(cq.Wire.assembleEdges(edges)), cq.Vector(*vec))
-
+# Uses the same `solids` list as CHECK 4 (C-beams rebuilt by cbeam_solid).
 STACK = ('z-motor-mount', 'leadscrew', 'nut-block', 'coupler', 'collar', 'thrust-brg',
          'bearing-608', 'z-bottom-holder')
 KNOWN = {}   # owner-tracked overlaps reported but not failed (none open)
-solids = [(label_of(s), s if s.ShapeType() == "Solid" else cbeam_solid(s)) for s in parts]
 for i, (la, a) in enumerate(solids):
     if la not in STACK:
         continue
