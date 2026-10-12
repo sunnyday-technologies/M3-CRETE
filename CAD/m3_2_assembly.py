@@ -15,6 +15,10 @@ On top of the baseline this script:
     brackets, one Y return idler)
   - keeps one Y return idler per Y-gantry rail, fully inside the rail's open
     C-channel, and drops the strays and v3-generated extras (owner 2026-10-12)
+  - drops the 2 printed id 75 Y-motor plates and bolts each Y motor straight
+    to its rail's open face, turned ~19 deg so one diagonal hole pair lands
+    on the two face slots, centred on the channel with its pulley, belt
+    strands and return idler (owner 2026-10-12)
   - moves the frame to the measured 6 mm post-to-end-beam spacers (owner
     2026-10-12; V1.0 modelled 4 mm): each post moves 2 mm out along Y with
     the parts fixed to or riding on it, and the bottom plates and spreader
@@ -49,7 +53,7 @@ carriage plate, which runs Z_PLATE_GAP off the open face.
 """
 import cadquery as cq
 from cadquery import Assembly, Color, Location
-import os, time
+import math, os, time
 import z_bottom_holder as zbh
 
 HERE = os.path.dirname(__file__)
@@ -93,6 +97,15 @@ GEN_BRACKET_OFFSET = 15.0   # v3 placed a 5x30x30 bracket 15 mm outboard of each
 IDLER_FLANGE_D, IDLER_FLANGE_T = 18.0, 1.5
 IDLER_HUB_D, IDLER_TRACK = 12.1, 11.2      # 1.5 + 11.2 + 1.5 = 14.2 overall
 IDLER_PLATE_GAP = 4.0
+# Y motors (owner 2026-10-12): no id 75 plate. Each bolts straight to its Y
+# rail's open face with 2 M5 into T-nuts in the two face slots, turned off
+# parallel so one diagonal hole pair lands on the slot centrelines; that also
+# centres it on the channel. Its shaft tip reaches 0.6 mm past the channel
+# floor, where SN 001 drills a clearance hole.
+NEMA23_HOLE_SQUARE = 47.14      # flange hole spacing
+FACE_SLOT_OFFSET = 30.0         # C-Beam open-face slot centrelines, +/- from the channel centre
+Y_MOTOR_TURN = math.degrees(math.asin(FACE_SLOT_OFFSET / (NEMA23_HOLE_SQUARE / math.sqrt(2)))) - 45.0  # 19.16
+YMOUNT_SIG = (4.0, 80.0, 97.0)  # the dropped id 75 printed plate
 
 # ============================================================
 # Colors
@@ -239,13 +252,54 @@ for rb in yrails:
         stray.append(c)
         stray += gen_bracket_of(world_bb(c), left)
     # The kept idler is re-placed below as the id 93 envelope, on the drive
-    # pulley's centreline (the belt line) at the rail's front end.
+    # pulley's belt line at the rail's front end, centred on the channel like
+    # the Y motor (see below).
     drive = min((p for p in pulleys if abs(ctr(p)[0] - rcx) < 40), key=lambda p: -ctr(p)[1])
     bracket = gen_bracket_of(world_bb(inside[0]), left)
-    y_idlers.append(dict(rail=rb, left=left, x=ctr(drive)[0], z=ctr(drive)[2],
+    y_idlers.append(dict(rail=rb, left=left, x=ctr(drive)[0], z=(rb.zmin + rb.zmax) / 2,
                          bracket=bracket[0] if bracket else None))
 kept = [c for c in kept if all(c is not s for s in stray)]
 n_stray_idlers = sum(1 for c in stray if c in idlers) - len(y_idlers)
+
+# ============================================================
+# Y motors straight on the Y-rail face (owner, 2026-10-12): the 2 id 75
+# plates go. Each motor's flange sits on its rail's open face, coaxial with
+# its drive pulley (V1.0 had the left motor 6 mm off its pulley), centred on
+# the channel and turned Y_MOTOR_TURN. The pulley and the belt strands drop
+# to the channel centre with it; the return idler is placed there above.
+# ============================================================
+ymount_plates = [c for c in kept if sig_of(world_bb(c)) == YMOUNT_SIG]
+assert len(ymount_plates) == 2, f"expected the 2 id 75 Y-motor plates, found {len(ymount_plates)}"
+kept = [c for c in kept if all(c is not p for p in ymount_plates)]
+y_drive = {}          # id(child) -> world shape (motor) or Location (pulley, belts)
+for rb in yrails:
+    left = channel_of(rb)[0]
+    rcx, rcz = (rb.xmin + rb.xmax) / 2, (rb.zmin + rb.zmax) / 2
+    face_x = rb.xmax if left else rb.xmin
+    motors_y = [c for c in kept if sig_of(world_bb(c)) == (56.4, 56.4, 76.6) and world_bb(c).zmax < 900
+                and world_bb(c).xlen > 70 and abs(ctr(world_bb(c))[0] - rcx) < 100]
+    assert len(motors_y) == 1, f"expected one Y motor at the rail X={rcx:.0f}, found {len(motors_y)}"
+    motor = motors_y[0]
+    pulley = min((c for c in kept if sig_of(world_bb(c)) == (14.0, 15.0, 15.0)
+                  and abs(ctr(world_bb(c))[0] - rcx) < 40), key=lambda c: -ctr(world_bb(c))[1])
+    pc = ctr(world_bb(pulley))
+    belts = [c for c in kept if sig_of(world_bb(c))[:2] == (1.5, 6.0) and abs(ctr(world_bb(c))[0] - pc[0]) < 10]
+    assert len(belts) == 2, f"expected 2 Y belt strands on the pulley at X={pc[0]:.0f}, found {len(belts)}"
+    m = motor.obj.moved(motor.loc)
+    flange = max((f for f in m.Faces() if f.geomType() == "PLANE" and f.normalAt().x * (-1 if left else 1) > 0.99),
+                 key=lambda f: f.Area())
+    fb = flange.BoundingBox()
+    old_axis = (flange.Center().x, (fb.ymin + fb.ymax) / 2, (fb.zmin + fb.zmax) / 2)
+    axis = (face_x, pc[1], rcz)
+    m = m.translate(cq.Vector(*(n - o for n, o in zip(axis, old_axis))))
+    m = m.rotate(cq.Vector(*axis), cq.Vector(axis[0] + 1, axis[1], axis[2]), Y_MOTOR_TURN)
+    y_drive[id(motor)] = m
+    dz = rcz - pc[2]
+    for c in [pulley] + belts:
+        y_drive[id(c)] = Location((0, 0, dz)) * c.loc
+    print(f"  Y motor {'L' if left else 'R'}: flange {axis[0] - old_axis[0]:+.2f} mm onto the rail face, axis "
+          f"{axis[1] - old_axis[1]:+.2f} along Y (onto its pulley) and {axis[2] - old_axis[2]:+.2f} in Z (channel "
+          f"centre), turned {Y_MOTOR_TURN:.2f} deg; pulley + 2 belt strands {dz:+.2f} mm in Z")
 
 # ============================================================
 # Frame: 6 mm post-to-end-beam spacers. Each post moves POST_SHIFT out along
@@ -302,6 +356,13 @@ for c in kept:
         shim = cq.Solid.makeBox(bb.xlen, FRAME_SPACER, bb.zlen, cq.Vector(bb.xmin, y0, bb.zmin))
         assy.add(shim, name=c.name, color=c.color)
         continue
+    if id(c) in y_drive:
+        placed_y = y_drive[id(c)]
+        if isinstance(placed_y, Location):
+            assy.add(c.obj, name=c.name, loc=placed_y, color=c.color)
+        else:
+            assy.add(placed_y, name=c.name, color=c.color)
+        continue
     loc = c.loc
     if rides_post(c, bb):
         shift = POST_SHIFT - Z_PLATE_GAP if sg in ZCARRIAGE_SIGS else POST_SHIFT
@@ -348,6 +409,7 @@ for role, k in sorted(dropped.items()):
 n_stray_brackets = sum(1 for c in stray if c in brackets) - sum(1 for yi in y_idlers if yi["bracket"] is not None)
 print(f"  dropped {n_stray_idlers} stray Y idlers + {n_stray_brackets} of their brackets; "
       f"one id 93 idler envelope per Y rail")
+print(f"  dropped {len(ymount_plates)} id 75 Y-motor plates; the Y motors bolt straight to the rail face")
 print(f"  frame spacers {V1_SPACER:.0f} -> {FRAME_SPACER:.0f} mm: moved {n_moved} post-mounted parts "
       f"{POST_SHIFT:.0f} mm out along Y; bottom plates and spreader shims rebuilt {FRAME_SPACER:.0f} mm")
 print(f"  Z carriage: {n_zplates} plates + {n_wheels} wheels moved {POST_SHIFT - Z_PLATE_GAP:.0f} mm out, "

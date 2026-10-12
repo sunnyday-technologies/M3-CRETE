@@ -16,10 +16,11 @@ labels:
   vwheel:           [10.2, 23.9, 23.9]
   cbeam:            [40.0, 80.0, 1000.0]
   motor_nema23:     [56.4, 56.4, 76.6]
+  motor_nema23_y:   [69.3, 69.3, 76.6]   # id 14 Y motors, turned ~19 deg on the rail face (one diagonal hole pair on the face slots)
   plate:            [3.0, 88.0, 127.0]
   pulley:           [14.0, 15.0, 15.0]
   smooth_idler:     [14.2, 18.0, 18.0]   # id 93 envelope (20T toothless for the 10 mm belt); was the 12.7x22 V-slot wheel
-  z_motor_mount:    [4.0, 80.0, 97.0]   # id 75 plate, now at the 2 Y-motor positions only (name kept for history)
+  z_motor_mount:    [4.0, 80.0, 97.0]   # id 75 plate, dropped v2.13.0; label kept so a reappearing plate fails
   z_post_bottom_plate: [6.0, 80.0, 100.0]   # id 79, 6 mm; was bot_spacer_idler (4 mm, top+bottom, belt-Z idler) before v2.9.0
   t_gusset:         [4.0, 160.0, 280.0]
   idler_bracket:    [5.0, 30.0, 30.0]
@@ -81,7 +82,7 @@ bom_audit:
     - id: 14
       expected_qty: 2
       expected_mfg_type: buy
-      expected_label: motor_nema23
+      expected_label: motor_nema23_y   # turned ~19 deg on the rail face since v2.13.0
     - id: 15
       expected_qty: 1
       expected_mfg_type: buy
@@ -132,7 +133,7 @@ bom_audit:
       expected_mfg_type: buy
       expected_label: cbeam
     - id: 75
-      expected_qty: 2   # only Y-motors use this plate; Z-motors use the id 24 lead-screw mount
+      expected_qty: 0   # v2.13.0: deprecated, Y motors bolt straight to the C-beam face (owner 2026-10-12)
       expected_mfg_type: print
       expected_label: z_motor_mount
     - id: 77
