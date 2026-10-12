@@ -5,10 +5,10 @@ the machine runs lives in [M3-CRETE-FIRMWARE](https://github.com/sunnyday-techno
 installed with that repo's `install.sh`. Install from there. Do not copy this
 directory onto the Pi.
 
-This directory sketches the full-machine Klipper config (all axes, the nozzle
-valve, the feed pump and the macros) ahead of the staged bring-up in
-M3-CRETE-FIRMWARE. It does not load as-is: the feed-pump signal pins are
-unassigned (see [Driver slots](#driver-slots-btt-kraken-v10)).
+This directory sketches the full-machine Klipper config (all axes, the
+printhead extruder, driver cooling and the macros) ahead of the staged
+bring-up in M3-CRETE-FIRMWARE. It has not been loaded on the machine. The
+material pump is not modelled here (see [Pump](#pump)).
 
 ## What's in this directory
 
@@ -17,20 +17,22 @@ unassigned (see [Driver slots](#driver-slots-btt-kraken-v10)).
 | `printer.cfg` | Top-level entry point — includes every other file |
 | `mcu.cfg` | BTT Kraken MCU connection (serial path) |
 | `kinematics.cfg` | Cartesian kinematics, build volume, motion limits |
-| `steppers.cfg` | 7 motion steppers (X, 2×Y, 4×Z) + extruder/pump |
-| `tmc.cfg` | TMC5160 driver settings — currents, StallGuard thresholds |
+| `steppers.cfg` | 7 motion steppers (X, 2×Y, 4×Z) + printhead extruder |
+| `tmc.cfg` | Driver settings — per-slot sense resistors, currents, StallGuard thresholds |
 | `homing.cfg` | Sensorless homing sequence (no physical endstops) |
+| `cooling.cfg` | Driver cooling — enclosure thermistor on TH0 + fan |
 | `z_tilt.cfg` | Quad Z self-tramming |
-| `macros.cfg` | START_PRINT, END_PRINT, pump priming, pump flush, pressure advance |
+| `macros.cfg` | START_PRINT, END_PRINT, CANCEL_PRINT, StallGuard readout |
 | `input_shaper.cfg` | ADXL345 + resonance tester + input shaper (optional include) |
 
 ## Hardware assumed
 
-- **Controller:** BTT Kraken V1.0 (STM32H723, 8 onboard drivers, slots S1–S8; BTT lists them as TMC2160)
+- **Controller:** BTT Kraken V1.0, the board M3-CRETE uses (STM32H723, 8 onboard drivers, slots S1–S8; BTT lists them as TMC2160)
 - **Host:** Raspberry Pi 5 8GB running Klipper + Moonraker + Mainsail
 - **Motion steppers:** 7× NEMA23 3–4.5Nm, 8mm shaft (1×X + 2×Y + 4×Z)
 - **Nozzle valve:** 1× small stepper (NEMA17/23) on Kraken slot S8
-- **Feed pump:** 1× NEMA34 on external driver (owner-supplied); signal pins not assigned yet
+- **Pump:** MAI 2PUMP Pictor (owner-supplied); not modelled here — see [Pump](#pump)
+- **Driver cooling:** 100K NTC thermistor on the Kraken's TH0 input, fan on a Kraken fan header (`cooling.cfg`)
 - **Y belts:** GT2 10mm + 20-tooth pulleys (looped)
 - **Z drive:** Tr8x2 lead screws (8 mm, 2 mm lead, single start), motors on top of each post, 8 mm couplers
 - **X belt:** GT2 6mm + 20-tooth pulley (fixed strand, pinion drive)
@@ -52,19 +54,14 @@ unassigned (see [Driver slots](#driver-slots-btt-kraken-v10)).
 
 - All eight drivers share a **software SPI** bus: SCK PC6, MOSI PC8, MISO PC7.
 - Sensorless homing needs the slot's DIAG jumper fitted.
-- `sense_resistor` depends on the slot **and the board revision**. On a Kraken
-  V1.0, S1–S4 are 0.022 and S5–S8 are 0.075. On a V1.1, S1–S4 are 0.050.
+- `sense_resistor` depends on the slot. On the Kraken V1.0 that M3-CRETE
+  uses, S1–S4 are 0.022 and S5–S8 are 0.075. (A V1.1 uses 0.050 on S1–S4.)
   Klipper computes motor current from this value, so a wrong one silently
   scales the real current. For example, 0.075 configured on a 0.022 slot gives
-  about 3.4× the configured `run_current`. Check the board revision before
-  using these values.
+  about 3.4× the configured `run_current`.
 - Z on S1–S4 is the slot allocation of the hardware-verified Stage-1 config in
   M3-CRETE-FIRMWARE, and those four rows match it. S5–S8 have not been run on
   the machine.
-- The feed pump's external driver needs three spare GPIO for step, dir and
-  enable, because all eight slots are in use. They are left unassigned here.
-  M3-CRETE-FIRMWARE will assign the spare-header pins in its planned Stage 3
-  config.
 
 Pin sources: BTT's official
 [`generic-bigtreetech-kraken.cfg`](https://github.com/bigtreetech/BIGTREETECH-Kraken/blob/master/Firmware/generic-bigtreetech-kraken.cfg)
@@ -196,29 +193,16 @@ Clear the build area first: Z homes down. The first `G28 Z` drives all 4 Z posts
 
 Then measure the nozzle height above the build surface with the carriages on the blocks and set `position_endstop` and `position_min` in `steppers.cfg` to it. Measure the carriage travel and set `position_max` below it: a lead screw does not slip if driven into the top mount.
 
-### 7. Calibrate the nozzle valve and feed pump independently
+### 7. Calibrate the extruder
 
-Because the two steppers are synced, you have to calibrate them one at a time.
+The extruder's output also depends on the pump, which this reference does not
+model. Calibrate the two together once M3-CRETE-FIRMWARE's Stage 3 defines the
+pump control:
 
-**Step 7a — Feed pump (`pump_feed`):**
-
-1. `PUMP_UNSYNC` (disconnect the pump from the valve)
-2. Disconnect the hose from the nozzle and route it into a measuring cup
-3. `G1 E100 F60` (runs only the pump, valve stays closed)
-4. Measure the output volume
-5. Scale: `new_rotation_distance = old × (commanded / actual)`
-6. Edit `steppers.cfg` → `[extruder_stepper pump_feed]` → `rotation_distance`
-7. `FIRMWARE_RESTART`
-8. `PUMP_RESYNC`
-
-**Step 7b — Nozzle valve (`extruder`):**
-
-1. With hose reconnected and pump running synced, command `G1 E100 F60`
-2. Measure what comes out the nozzle
-3. If pump output is already calibrated and valve output is off, scale the valve's `rotation_distance` (in `[extruder]`) using the same formula
+1. Command `G1 E100 F60`
+2. Measure what comes out of the nozzle
+3. Scale `rotation_distance` in `[extruder]`: `new_rotation_distance = old × (commanded / actual)`
 4. `FIRMWARE_RESTART`
-
-In practice the valve rarely needs precise calibration — it's a metering gate, not a volumetric pump — but doing both ensures the two are in agreement.
 
 ### 8. Test a small print
 
@@ -228,44 +212,13 @@ Use a 10cm × 10cm single-wall square at a slow speed (30 mm/s) for the first pr
 - Belt tension (no slapping or visible stretch under accel)
 - Pump flow consistency
 
-## Pump architecture — feed pump + nozzle valve
+## Pump
 
-M3-CRETE uses a two-stage fluid-handling system:
-
-- **Feed pump** (`pump_feed`) — the big NEMA34 upstream of the hose. Has its own pressure advance (typical 0.5–1.5 seconds) to pressurize the hose ahead of valve commanded moves. Runs on an external driver; its signal pins are not assigned yet (all eight onboard slots are in use).
-- **Nozzle valve** (`extruder`) — a small, fast actuator at the printhead. Pressure advance = 0. Effectively a metering valve with ~1 % retraction capability for clean corners. Runs on Kraken slot S8.
-
-Both steppers are synchronized: every `G1 E...` move drives both at once. The feed pump runs *ahead* of the valve in time (by the amount of its pressure advance) so material arrives at the valve exactly when it opens.
-
-### Why independent pressure advance matters
-
-Concrete hoses are compressible and viscous — unlike a rigid FDM filament path, the pressure in the hose lags the pump by hundreds of milliseconds. If you drove the pump and valve with the same PA, the valve would either dribble (if PA is low) or over-pressurize at corners (if PA is high). Splitting them means:
-
-- **Valve PA = 0** → opens and closes on time, clean corners
-- **Pump PA = 0.8** → hose is already pressurized when the valve opens
-
-### Tuning
-
-Use the `SET_PUMP_PA` macro during a test print:
-
-```
-SET_PUMP_PA ADVANCE=0.5    ; start here
-; print a corner-test pattern, observe
-SET_PUMP_PA ADVANCE=0.8    ; increase if corners dribble after direction change
-SET_PUMP_PA ADVANCE=0.3    ; decrease if corners bulge before direction change
-```
-
-The default in `START_PRINT` is `ADVANCE=0.8`. Edit `macros.cfg` once you've found your hose's sweet spot.
-
-### Independent pump control
-
-To run the feed pump solo (e.g. manually fill the hopper without opening the valve):
-
-```
-PUMP_UNSYNC           ; feed pump disconnects from valve
-; jog pump manually via G1 E... — only pump moves
-PUMP_RESYNC           ; feed pump reconnects for normal printing
-```
+The material pump is a **MAI 2PUMP Pictor** (owner-supplied; listed as a
+reference option in the BOM). It takes a 0–10 V speed command plus a
+run/enable input and runs its own drive. It sits outside the motion system,
+so this reference does not model it. M3-CRETE-FIRMWARE's Stage 3 notes define
+how Klipper commands it, including pressure advance on the pump signal.
 
 ## Safety notes
 
@@ -293,10 +246,10 @@ After tuning, you can leave the ADXL345 installed or remove it — the input sha
 ## Known limitations (v0.1)
 
 - **No physical probe** — Z_TILT_ADJUST is stubbed out until a probe is wired in. First-layer calibration is currently manual.
-- **Driver pins and sense resistors are written for a Kraken V1.0** (see [Driver slots](#driver-slots-btt-kraken-v10)). S1–S4 (Z) match the hardware-verified Stage-1 config. S5–S8 (X, Y, Y1, valve) have not run on the machine.
-- **The config does not load as-is.** The feed-pump signal pins are unassigned, so Klipper stops with a missing `step_pin` error for `pump_feed`.
-- **The extruder's placeholder thermistor input (T0) has nothing connected.** An open thermistor input reads out of range and Klipper shuts down, so this needs a decision before the config can run.
-- **Extruder `rotation_distance` is a placeholder** — must be calibrated against your specific pump geometry.
+- **Driver pins and sense resistors are written for the Kraken V1.0** (see [Driver slots](#driver-slots-btt-kraken-v10)). S1–S4 (Z) match the hardware-verified Stage-1 config. S5–S8 (X, Y, Y1, valve) have not run on the machine.
+- **`cooling.cfg` has placeholders:** the thermistor type, the fan header and the target temperature. Fit the thermistor before running the config: an open thermistor input reads out of range and Klipper shuts down.
+- **The extruder's temperature reading is the Kraken MCU's own sensor.** Klipper requires a sensor on `[extruder]`; concrete is unheated, so this is a placeholder.
+- **Extruder `rotation_distance` is a placeholder** — calibrate it with the pump (step 7).
 - **Input shaping not yet tuned.** Add an ADXL345 to the toolhead mount and run `SHAPER_CALIBRATE` after mechanical commissioning.
 
 ## Contributing
