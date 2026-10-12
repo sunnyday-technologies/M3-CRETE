@@ -61,7 +61,7 @@ review.
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `bom/data.json` | **BOM source of truth** — v2.11.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
+| `bom/data.json` | **BOM source of truth** — v2.12.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
 | `bom/index.html` | BOM viewer (static, loads data.json, multi-supplier selection) |
 | `config.js` | Model variants, category order, project metadata |
 | `CAD/Components/` | OpenBuilds STEP parts library (70 files, CC BY-SA 4.0) |
