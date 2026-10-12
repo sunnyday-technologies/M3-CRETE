@@ -5,7 +5,7 @@ output. Re-run any time the assembly script changes.
 
 ## Structural BOM
 
-Source: assembly traversal of `m3_2_assembly.py` (current part count: 160).
+Source: assembly traversal of `m3_2_assembly.py` (current part count: 158).
 
 See `bom_structural.csv`.
 
@@ -22,33 +22,33 @@ SHCS + 5× M5 drop-in T-nut.
 
 Joint pairs:
 
-- cbeam_238 <-> cbeam_239
-- cbeam_238 <-> cbeam_247
-- cbeam_238 <-> cbeam_252
-- cbeam_238 <-> cbeam_254
-- cbeam_239 <-> cbeam_240
-- cbeam_239 <-> cbeam_241
-- cbeam_239 <-> cbeam_254
-- cbeam_240 <-> cbeam_241
-- cbeam_240 <-> cbeam_248
-- cbeam_240 <-> cbeam_252
-- cbeam_241 <-> cbeam_243
-- cbeam_241 <-> cbeam_246
-- cbeam_242 <-> cbeam_244
-- cbeam_242 <-> cbeam_247
-- cbeam_242 <-> cbeam_249
+- cbeam_234 <-> cbeam_235
+- cbeam_234 <-> cbeam_243
+- cbeam_234 <-> cbeam_248
+- cbeam_234 <-> cbeam_250
+- cbeam_235 <-> cbeam_236
+- cbeam_235 <-> cbeam_237
+- cbeam_235 <-> cbeam_250
+- cbeam_236 <-> cbeam_237
+- cbeam_236 <-> cbeam_244
+- cbeam_236 <-> cbeam_248
+- cbeam_237 <-> cbeam_239
+- cbeam_237 <-> cbeam_242
+- cbeam_238 <-> cbeam_240
+- cbeam_238 <-> cbeam_243
+- cbeam_238 <-> cbeam_245
+- cbeam_238 <-> cbeam_246
+- cbeam_239 <-> cbeam_250
+- cbeam_240 <-> cbeam_249
+- cbeam_241 <-> cbeam_247
 - cbeam_242 <-> cbeam_250
-- cbeam_243 <-> cbeam_254
-- cbeam_244 <-> cbeam_253
-- cbeam_245 <-> cbeam_251
-- cbeam_246 <-> cbeam_254
-- cbeam_247 <-> cbeam_249
-- cbeam_247 <-> cbeam_252
-- cbeam_248 <-> cbeam_249
-- cbeam_248 <-> cbeam_252
-- cbeam_248 <-> cbeam_253
-- cbeam_249 <-> cbeam_253
-- cbeam_250 <-> cbeam_253
+- cbeam_243 <-> cbeam_245
+- cbeam_243 <-> cbeam_248
+- cbeam_244 <-> cbeam_245
+- cbeam_244 <-> cbeam_248
+- cbeam_244 <-> cbeam_249
+- cbeam_245 <-> cbeam_249
+- cbeam_246 <-> cbeam_249
 
 ### V-wheels
 
@@ -60,7 +60,7 @@ the other half (16) get standard precision spacers.
 
 1 X motor × 4 NEMA23 face screws (M5×10) = 4 screws.
 4 Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.
-2 Y motors, turned 45° and bolted straight to the C-beam face slots × 2 M5×16 + 2 T-nuts.
+2 Y motors, turned ~19° (one diagonal hole pair on the two face slots) and bolted straight to the C-beam face × 2 M5×16 + 2 T-nuts.
 0 brackets × 4 rail-face screws (M5×10) + T-nuts = 0 pairs.
 Note: the rack-and-pinion X-motor mounting is not yet modeled, so it
 gets no back-side nuts here — add them when the X-axis lands.

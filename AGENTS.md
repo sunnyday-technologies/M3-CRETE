@@ -61,7 +61,7 @@ review.
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `bom/data.json` | **BOM source of truth** — v2.12.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
+| `bom/data.json` | **BOM source of truth** — v2.13.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
 | `bom/index.html` | BOM viewer (static, loads data.json, multi-supplier selection) |
 | `config.js` | Model variants, category order, project metadata |
 | `CAD/Components/` | OpenBuilds STEP parts library (70 files, CC BY-SA 4.0) |
@@ -256,10 +256,13 @@ The motor body does NOT accept bolts directly — bolts pass through the
 motor flange and are secured by a nut or T-nut on the far side.
 
 Per motor role (`bom/m3-2-final-hardware-pack.json` carries the counts):
-- **Y motors (2):** turned 45° and bolted straight to the C-beam face
-  slots, **no plate**. Only 2 of the 4 flange holes land on slot
-  centrelines, so each takes **2× M5 × 16 + 2× M5 drop-in T-nuts**, and
-  nothing else. The printed id 75 plate is not needed.
+- **Y motors (2):** bolted straight to the Y rail's C-beam face, **no
+  plate** (id 75 deprecated in BOM v2.13.0). Each is turned about 19° off
+  parallel so one diagonal hole pair lands on the two face-slot
+  centrelines, which also centres it on the C-channel; it takes **2× M5 ×
+  16 + 2× M5 drop-in T-nuts**, and nothing else. The 20.6 mm shaft is
+  0.6 mm longer than the channel is deep, so SN 001 drills a clearance
+  hole in the channel floor (Nick, 2026-10-12).
 - **Z motors (4):** 4× M5 × 16 through the flange and the printed
   lead-screw mount's top plate (bom/data.json id 24) into M5 nuts in its
   nut traps.

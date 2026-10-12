@@ -48,6 +48,7 @@ LABELS = {
     (40.0, 80.0, 1000.0): 'cbeam',
     (65.0, 69.0, 69.0):   'bracket',
     (56.4, 56.4, 76.6):   'motor',
+    (69.3, 69.3, 76.6):   'motor',          # Y motor, turned ~19 deg on its rail face (2026-10-12)
     (10.2, 23.9, 23.9):   'vwheel',
     (14.0, 15.0, 15.0):   'pulley',
     (14.2, 18.0, 18.0):   'idler',      # id 93 Y return idler envelope (20T toothless, 10 mm belt)
@@ -97,13 +98,13 @@ inv = Counter(label_of(s) for s in parts)
 EXPECTED = {
     'cbeam': 17,
     'bracket': 0,
-    'motor': 7,            # 4 Z (shaft down on the mounts) + 2 Y + 1 X — all share sig (56.4, 56.4, 76.6)
+    'motor': 7,            # 4 Z (shaft down on the mounts) + 1 X at (56.4, 56.4, 76.6); 2 Y turned ~19 deg at (69.3, 69.3, 76.6)
     'vwheel': 32,          # all authored in M3-2_V1.0 (16 Z + 8 Y + 8 X)
     'pulley': 3,           # 2 Y + 1 X (Z is lead-screw driven)
     'idler': 2,            # one Y return idler per Y rail, inside its channel
     'plate': 8,
     'shim': 2,
-    'zmount': 2,           # 2 Y-motor mounts (id 75)
+    'zmount': 0,           # id 75 Y-motor plates dropped: Y motors bolt straight to the rail face
     'zcap': 0,
     'idler-brk': 2,        # Y-axis idler bracket placeholders, one per idler
     'z-bottom-plate': 4,   # id 79: bottom only; the top plates became the id 24 mounts
@@ -352,6 +353,58 @@ for p in posts:
     nb = min(nut_blocks, key=lambda s: dist_xy(pc, center(s)), default=None)
     if nb is None or gap(nb, plate) > 0.05:
         problems.append(f"Z nut block at post ({pc[0]:.0f},{pc[1]:.0f}) is not flush on its carriage plate")
+
+# ---------- CHECK 12: Y motors straight on the Y-rail face, no plate ----------
+# Owner, 2026-10-12: no id 75 plate. Each Y motor's flange sits on its rail's
+# open face, 2 M5 into T-nuts in the two face slots, turned so one diagonal
+# hole pair is on the slot centrelines, which centres it on the channel. Its
+# shaft tip reaches past the channel floor; SN 001 drills a clearance hole
+# there (Nick), so that overlap is a note, not a failure.
+Y_MOTOR_PLATE_CLEAR = 1.0
+SHAFT_TIP_MAX = 40.0          # mm^3: the 8 mm shaft 0.6 mm into the channel floor is ~30
+pulleys = [s for s in parts if label_of(s) == 'pulley']
+ymotors = [m for m in motors if center(m)[2] < 900 and m.BoundingBox().xlen > 70]
+if len(ymotors) != 2:
+    problems.append(f"expected 2 Y motors, found {len(ymotors)}")
+for m in ymotors:
+    mc = center(m)
+    rail, rail_solid = min(yrails, key=lambda rs: abs(center(rs[0])[0] - mc[0]))
+    rb, rc = rail.BoundingBox(), center(rail)
+    left = rc[0] < mc[0]
+    face_x = rb.xmax if left else rb.xmin
+    flange = max((f for f in m.Faces() if f.geomType() == "PLANE" and f.normalAt().x * (-1 if left else 1) > 0.99),
+                 key=lambda f: f.Area())
+    fb = flange.BoundingBox()
+    ay, az = (fb.ymin + fb.ymax) / 2, (fb.zmin + fb.zmax) / 2
+    tag = f"Y motor at X={mc[0]:.0f}"
+    if abs(flange.Center().x - face_x) > 0.05:
+        problems.append(f"{tag}: flange {abs(flange.Center().x - face_x):.2f} mm off the rail's open face")
+    if abs(az - rc[2]) > 0.1:
+        problems.append(f"{tag}: axis {az - rc[2]:+.2f} mm off the channel centre")
+    pul = min(pulleys, key=lambda s: dist_xy((mc[0], ay), (center(s)[0], center(s)[1])) + abs(center(s)[2] - az))
+    if abs(center(pul)[1] - ay) > 0.1 or abs(center(pul)[2] - az) > 0.1:
+        problems.append(f"{tag}: not coaxial with its drive pulley")
+    holes = [e.Center() for e in flange.Edges() if e.geomType() == "CIRCLE" and 2.0 < e.radius() < 3.5]
+    on_slots = [h for h in holes if abs(abs(h.z - rc[2]) - mod.FACE_SLOT_OFFSET) <= 0.1]
+    if len(on_slots) != 2 or abs(on_slots[0].z - on_slots[1].z) < 1.0:
+        problems.append(f"{tag}: {len(on_slots)} flange holes on the face-slot centrelines (want one in each slot)")
+    cap = min((z for z in zplates if abs(center(z)[0] - mc[0]) < 70), key=lambda z: abs(center(z)[1] - ay))
+    clear = gap(m, cap)
+    print(f"{tag}: on the rail face, centred, coaxial with its pulley; holes on both face slots; "
+          f"{clear:.2f} mm to the Z carriage plate")
+    if clear < Y_MOTOR_PLATE_CLEAR:
+        problems.append(f"{tag}: {clear:.2f} mm from the Z carriage plate (want >= {Y_MOTOR_PLATE_CLEAR})")
+    for s0, (lb, b) in zip(parts, solids):
+        if s0 is m or s0 is pul or not bb_overlap(m, b):
+            continue
+        v = common_volume(m, b)
+        if v <= 1.0:
+            continue
+        if b is rail_solid and v <= SHAFT_TIP_MAX:
+            notes.append(f"{tag}: shaft tip {v:.0f} mm^3 into the channel floor — SN 001 drills a clearance hole")
+        else:
+            problems.append(f"{tag} overlaps {lb} at ({center(b)[0]:.0f},{center(b)[1]:.0f},{center(b)[2]:.0f}) "
+                            f"by {v:.0f} mm^3")
 
 # ---------- CHECK 8: firmware position_max inside the measured Z travel ----------
 travel = z_travel.measure(z_travel.assembly_shapes(mod.assy))
