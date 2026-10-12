@@ -203,6 +203,7 @@
     }
   ],
   "audit_flags": [
+    "BOM v2.9.0 (2026-10-12): the Y axis uses 2 smooth idlers (BOM id 93), one per Y axis at the front; count smooth idler axle hardware for those 2 only.",
     "Physically verify whether all 32 V-wheel positions need eccentric spacers or whether 16 eccentric plus 16 plain is sufficient.",
     "Freeze belt termination hardware; current CAD hardware notes intentionally exclude belt clamps.",
     "Resolve the NEMA23 back-side nut conflict between AGENTS.md and CAD/bom_hardware.csv.",
