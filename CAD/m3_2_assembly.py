@@ -13,6 +13,12 @@ On top of the baseline this script:
     the 4 top id 79 plates that carried them
   - drops exact duplicate placements carried over from v3 (gussets, idler
     brackets, one Y return idler)
+  - keeps one Y return idler per Y-gantry rail, fully inside the rail's open
+    C-channel, and drops the strays and v3-generated extras (owner 2026-10-12)
+  - moves the frame to the measured 6 mm post-to-end-beam spacers (owner
+    2026-10-12; V1.0 modelled 4 mm): each post moves 2 mm out along Y with
+    the parts fixed to or riding on it, and the bottom plates and spreader
+    shims are rebuilt 6 mm thick
   - adds a lead-screw stack on every Z post (BOM v2.9.0, owner decisions
     2026-10-11/12):
       motor mount  id 24  CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_M3-2.step
@@ -68,6 +74,20 @@ THRUST_D      = 16.0        # 8x16x5 thrust bearing envelope (BOM id 92)
 THRUST_H      = 5.0
 BORE_D        = 8.0
 assert AXIS_INSET == zbh.AXIS_INSET
+
+# Frame and Y-rail geometry (mm)
+FRAME_SPACER  = 6.0         # post-to-end-beam spacer, measured on SN 001 (2026-10-12)
+V1_SPACER     = 4.0         # what the V1.0 baseline modelled
+POST_SHIFT    = FRAME_SPACER - V1_SPACER
+CHANNEL_DEPTH = 20.0        # C-Beam 4080 open channel: 20 deep x 40 wide
+CHANNEL_HALF_OPEN = 20.0
+GEN_BRACKET_OFFSET = 15.0   # v3 placed a 5x30x30 bracket 15 mm outboard of each idler
+# Y return idler (BOM id 93, 20T toothless for the 10 mm belt): envelope of
+# the reference part, axle along X. Owner rule: fully inside the Y rail's
+# open channel, a few mm behind the carriage plate that caps the rail end.
+IDLER_FLANGE_D, IDLER_FLANGE_T = 18.0, 1.5
+IDLER_HUB_D, IDLER_TRACK = 12.1, 11.2      # 1.5 + 11.2 + 1.5 = 14.2 overall
+IDLER_PLATE_GAP = 4.0
 
 # ============================================================
 # Colors
@@ -164,12 +184,160 @@ for members in groups.values():
     kept.append(members[0])
     n_dups += len(members) - 1
 
+# ============================================================
+# Y return idlers: one per Y-gantry rail, fully inside the rail's open
+# C-channel (owner, 2026-10-12). The baseline also carried a stray left idler
+# in front of the carriage plate, inside the FL Z-post channel where the Z
+# nut block runs, and two v3-generated idlers sticking out of the channel
+# mouths. Each dropped idler takes the bracket v3 generated for it.
+# ============================================================
+FRAME_CX = sum((b.xmin + b.xmax) / 2 for b in post_bbs) / len(post_bbs)
+
+
+def channel_of(rb):
+    """X and Z limits of a Y-gantry rail's open channel (it opens toward the frame interior)."""
+    left = (rb.xmin + rb.xmax) / 2 < FRAME_CX
+    x0, x1 = (rb.xmax - CHANNEL_DEPTH, rb.xmax) if left else (rb.xmin, rb.xmin + CHANNEL_DEPTH)
+    cz = (rb.zmin + rb.zmax) / 2
+    return left, x0, x1, cz - CHANNEL_HALF_OPEN, cz + CHANNEL_HALF_OPEN
+
+
+def in_channel(bb, rb, tol=0.05):
+    _, x0, x1, z0, z1 = channel_of(rb)
+    return (x0 - tol <= bb.xmin and bb.xmax <= x1 + tol and z0 - tol <= bb.zmin and bb.zmax <= z1 + tol
+            and rb.ymin - tol <= bb.ymin and bb.ymax <= rb.ymax + tol)
+
+
+ctr = lambda bb: ((bb.xmin + bb.xmax) / 2, (bb.ymin + bb.ymax) / 2, (bb.zmin + bb.zmax) / 2)
+yrails = [world_bb(c) for c in kept if c.name.startswith("cbeam_Yrail")]
+idlers = [c for c in kept if sig_of(world_bb(c)) == (12.7, 22.0, 22.0)]
+brackets = [c for c in kept if sig_of(world_bb(c)) == (5.0, 30.0, 30.0)]
+pulleys = [world_bb(c) for c in kept if sig_of(world_bb(c)) == (14.0, 15.0, 15.0)]
+
+
+def gen_bracket_of(idler_bb, left):
+    """The 5x30x30 bracket v3 generated for an idler (15 mm outboard, same Y/Z)."""
+    ic = ctr(idler_bb)
+    bx = ic[0] - GEN_BRACKET_OFFSET if left else ic[0] + GEN_BRACKET_OFFSET
+    return [b for b in brackets if abs(ctr(world_bb(b))[0] - bx) < 1 and abs(ctr(world_bb(b))[1] - ic[1]) < 1
+            and abs(ctr(world_bb(b))[2] - ic[2]) < 1]
+
+
+stray, y_idlers = [], []
+for rb in yrails:
+    left = channel_of(rb)[0]
+    rcx = (rb.xmin + rb.xmax) / 2
+    at_rail = [c for c in idlers if abs(ctr(world_bb(c))[0] - rcx) < 40 and rb.zmin < ctr(world_bb(c))[2] < rb.zmax]
+    inside = [c for c in at_rail if in_channel(world_bb(c), rb)]
+    assert len(inside) == 1, f"expected one Y idler inside the rail channel at X={rcx:.0f}, found {len(inside)}"
+    for c in at_rail:
+        stray.append(c)
+        stray += gen_bracket_of(world_bb(c), left)
+    # The kept idler is re-placed below as the id 93 envelope, on the drive
+    # pulley's centreline (the belt line) at the rail's front end.
+    drive = min((p for p in pulleys if abs(ctr(p)[0] - rcx) < 40), key=lambda p: -ctr(p)[1])
+    bracket = gen_bracket_of(world_bb(inside[0]), left)
+    y_idlers.append(dict(rail=rb, left=left, x=ctr(drive)[0], z=ctr(drive)[2],
+                         bracket=bracket[0] if bracket else None))
+kept = [c for c in kept if all(c is not s for s in stray)]
+n_stray_idlers = sum(1 for c in stray if c in idlers) - len(y_idlers)
+
+# ============================================================
+# Frame: 6 mm post-to-end-beam spacers. Each post moves POST_SHIFT out along
+# Y with everything fixed to it or riding on it: the 2 m top X rails, their
+# 2040 inserts, the T-gussets on them, the Z carriage plates and their
+# V-wheels. The 1 m Y rails, the center spreader and the moving gantry stay,
+# so the bottom plates and the spreader shims are rebuilt 6 mm thick and the
+# Y-gantry rail ends sit POST_SHIFT further from the carriage plates.
+# ============================================================
+def rides_post(c, bb):
+    sg = sig_of(bb)
+    if c.name.startswith(("cbeam_Zpost", "cbeam_Xtop")):
+        return True
+    if sg == (20.0, 40.0, 1000.0) and bb.zmin > 900:        # 2040 inserts inside the top X rails
+        return True
+    if sg == (4.0, 160.0, 280.0):                            # T-gussets on the top X rails
+        return True
+    if sg == (3.0, 88.0, 127.0) and bb.ylen < 3.5:           # Z carriage plate on a post's open face
+        return any(abs(bb.ymin - p.ymax) < 0.5 or abs(bb.ymax - p.ymin) < 0.5 for p in post_bbs)
+    if sg == (10.2, 23.9, 23.9):                             # Z carriage wheel riding a post
+        cx, cy, _ = ctr(bb)
+        return any(p.ymin < cy < p.ymax and abs(cx - (p.xmin + p.xmax) / 2) < 70 for p in post_bbs)
+    return False
+
+
+def outward(bb):
+    return -1.0 if ctr(bb)[1] < FRAME_CY else 1.0
+
+
 assy = Assembly("M3-2_Assembly")
+n_moved = n_wheels = 0
 for c in kept:
-    assy.add(c.obj, name=c.name, loc=c.loc, color=c.color)
+    bb = world_bb(c)
+    sg = sig_of(bb)
+    if sg == (4.0, 80.0, 100.0) and bb.zmax < 150:
+        # Bottom plate: re-extrude its rail-side face 6 mm toward the post.
+        front = outward(bb) < 0
+        rail_face = max((f for f in c.obj.moved(c.loc).Faces()
+                         if f.geomType() == "PLANE" and abs(f.normalAt().y) > 0.99),
+                        key=lambda f: f.Center().y if front else -f.Center().y)
+        plate = cq.Solid.extrudeLinear(rail_face, cq.Vector(0, -FRAME_SPACER if front else FRAME_SPACER, 0))
+        assy.add(plate, name=c.name, color=c.color)
+        continue
+    if c.name.startswith("shim_topmid"):
+        # Spreader shim: fill from the spreader end to the moved top X rail.
+        front = outward(bb) < 0
+        y0 = bb.ymax - FRAME_SPACER if front else bb.ymin
+        shim = cq.Solid.makeBox(bb.xlen, FRAME_SPACER, bb.zlen, cq.Vector(bb.xmin, y0, bb.zmin))
+        assy.add(shim, name=c.name, color=c.color)
+        continue
+    loc = c.loc
+    if rides_post(c, bb):
+        loc = Location((0, outward(bb) * POST_SHIFT, 0)) * c.loc
+        n_moved += 1
+        n_wheels += sg == (10.2, 23.9, 23.9)
+    assy.add(c.obj, name=c.name, loc=loc, color=c.color)
+assert n_wheels == 16, f"expected 16 Z carriage wheels on the posts, moved {n_wheels}"
+
+# Y return idler envelopes (id 93): on the drive pulley's centreline, fully
+# inside the rail channel, IDLER_PLATE_GAP behind the carriage plate that caps
+# the rail's front end. Each takes its v3 bracket placeholder along.
+IDLER_W = 2 * IDLER_FLANGE_T + IDLER_TRACK
+idler_env = (cq.Solid.makeCylinder(IDLER_FLANGE_D / 2, IDLER_FLANGE_T, cq.Vector(0, 0, 0), cq.Vector(1, 0, 0))
+             .fuse(cq.Solid.makeCylinder(IDLER_HUB_D / 2, IDLER_TRACK,
+                                         cq.Vector(IDLER_FLANGE_T, 0, 0), cq.Vector(1, 0, 0)))
+             .fuse(cq.Solid.makeCylinder(IDLER_FLANGE_D / 2, IDLER_FLANGE_T,
+                                         cq.Vector(IDLER_FLANGE_T + IDLER_TRACK, 0, 0), cq.Vector(1, 0, 0)))
+             .clean())
+caps = [world_bb(c) for c in assy.children if sig_of(world_bb(c)) == (3.0, 88.0, 127.0) and world_bb(c).ylen < 3.5]
+for yi in y_idlers:
+    rb = yi["rail"]
+    cap = min((p for p in caps if abs(ctr(p)[0] - yi["x"]) < 70), key=lambda p: abs(ctr(p)[1] - rb.ymin))
+    yc = cap.ymax + IDLER_PLATE_GAP + IDLER_FLANGE_D / 2
+    env = idler_env.translate(cq.Vector(yi["x"] - IDLER_W / 2, yc, yi["z"]))
+    assert in_channel(env.BoundingBox(), rb), "Y idler envelope does not fit inside the rail channel"
+    tag = "L" if yi["left"] else "R"
+    assy.add(env, name=f"idler_y_return_envelope_{tag}", color=IDL)
+    b = yi["bracket"]
+    if b is not None:
+        bc = ctr(world_bb(b))
+        bx = yi["x"] - GEN_BRACKET_OFFSET if yi["left"] else yi["x"] + GEN_BRACKET_OFFSET
+        assy.add(b.obj, name=b.name, color=b.color, loc=Location((bx - bc[0], yc - bc[1], yi["z"] - bc[2])) * b.loc)
+    _, x0, x1, _, _ = channel_of(rb)
+    eb = env.BoundingBox()
+    print(f"  Y idler {tag}: envelope {IDLER_W:.1f} x {IDLER_FLANGE_D:.0f} inside the rail channel "
+          f"({eb.xmin - x0:.1f} / {x1 - eb.xmax:.1f} mm margins), {IDLER_PLATE_GAP:.0f} mm behind the carriage plate")
+
 print(f"  kept {len(kept)} baseline parts; dropped {n_dups} duplicate placements")
 for role, k in sorted(dropped.items()):
     print(f"  dropped {k:2d} x {role}")
+n_stray_brackets = sum(1 for c in stray if c in brackets) - sum(1 for yi in y_idlers if yi["bracket"] is not None)
+print(f"  dropped {n_stray_idlers} stray Y idlers + {n_stray_brackets} of their brackets; "
+      f"one id 93 idler envelope per Y rail")
+print(f"  frame spacers {V1_SPACER:.0f} -> {FRAME_SPACER:.0f} mm: moved {n_moved} post-mounted parts "
+      f"{POST_SHIFT:.0f} mm out along Y; bottom plates and spreader shims rebuilt {FRAME_SPACER:.0f} mm")
+
+post_bbs = [c.obj.moved(c.loc).BoundingBox() for c in assy.children if c.name.startswith("cbeam_Zpost")]
 
 # ============================================================
 # Lead-screw stack templates
@@ -223,12 +391,12 @@ assert COUPLER_Z <= SHAFT_TIP <= COUPLER_Z + COUPLER_L, "motor shaft tip is not 
 # ============================================================
 # Place one stack per Z post
 # ============================================================
-carriage_plates = [world_bb(c) for c in kept if sig_of(world_bb(c)) == (3.0, 88.0, 127.0)]
-bottom_plates = [world_bb(c) for c in kept
-                 if sig_of(world_bb(c)) == (4.0, 80.0, 100.0) and world_bb(c).zmax < 150]
+placed = [world_bb(c) for c in assy.children]          # frame as moved above
+carriage_plates = [b for b in placed if sig_of(b) == (3.0, 88.0, 127.0)]
+bottom_plates = [b for b in placed if sig_of(b) == (FRAME_SPACER, 80.0, 100.0) and b.zmax < 150]
 
 Z_POSTS = []
-for pc, pb in zip(posts, post_bbs):
+for pb in post_bbs:
     pcx, pcy = (pb.xmin + pb.xmax) / 2, (pb.ymin + pb.ymax) / 2
     front = pcy < FRAME_CY
     open_y = pb.ymax if front else pb.ymin            # channel opens toward the frame interior

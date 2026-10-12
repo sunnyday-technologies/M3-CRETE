@@ -40,12 +40,12 @@ def name_for_dims(dims_sorted):
     if dims_sorted == (56.4, 56.4, 76.6):    return "motor"
     if dims_sorted == (10.2, 23.9, 23.9):    return "vwheel"
     if dims_sorted == (14.0, 15.0, 15.0):    return "pulley"
-    if dims_sorted == (12.7, 22.0, 22.0):    return "idler"
+    if dims_sorted == (14.2, 18.0, 18.0):    return "idler"      # id 93 envelope (20T toothless, 10 mm belt)
     if dims_sorted == (3.0, 88.0, 127.0):    return "plate"
     if dims_sorted == (20.0, 20.0, 20.0):    return "splice"
-    if dims_sorted == (4.0, 40.0, 80.0):     return "shim"
+    if dims_sorted == (6.0, 40.0, 80.0):     return "shim"       # center-spreader shims, 6 mm
     if dims_sorted == (4.0, 80.0, 107.0):    return "zmount"
-    if dims_sorted == (4.0, 80.0, 100.0):    return "botmount"
+    if dims_sorted == (6.0, 80.0, 100.0):    return "botmount"   # Z-post bottom plate, 6 mm
     # ymount: TODO add signature when user provides 4mm spacer plate STEP geometry
     if dims_sorted == (4.0, 160.0, 280.0):   return "tbracket"
     if dims_sorted == (5.0, 80.0, 80.0):     return "connector"
@@ -92,7 +92,9 @@ inv = Counter(tag_of(p[0]) for p in parts)
 
 # ---------- Detect C-beam joint pairs (5mm adjacency) ----------
 cbeams = [p for p in parts if p[0].startswith("cbeam")]
-def touches(a, b, tol=5.0):
+# Joints are found by bbox adjacency; frame spacers are 6 mm (2026-10-12), so
+# allow the spacer plus 1 mm (was 5 mm for the old 4 mm spacers).
+def touches(a, b, tol=7.0):
     _, ax0, ax1, ay0, ay1, az0, az1 = a
     _, bx0, bx1, by0, by1, bz0, bz1 = b
     return (ax0 - tol <= bx1 and bx0 - tol <= ax1 and
@@ -110,7 +112,7 @@ STRUCTURAL = [
     # name, qty, dims_mm, material, role
     ("C-beam 4080 1m extrusion",          inv["cbeam"],       "40 x 80 x 1000", "Aluminum", "All frame members (Z-post, X-rail, Y-rail, mid braces)"),
     ("Printed Z motor mount / Y-spacer",  inv["zmount"],      "80 x 107 x 4",   "PETG / CCF", "Simplified combined Z motor mount plate and Y-rail spacer"),
-    ("Printed Z-post bottom plate",       inv["botmount"],    "80 x 100 x 4",   "PETG / CCF", "Spacer between Z-post and bottom Y rail; the bottom holder rests on it"),
+    ("Printed Z-post bottom plate",       inv["botmount"],    "80 x 100 x 6",   "PETG / CCF", "Spacer between Z-post and bottom Y rail; the bottom holder rests on it"),
     ("Printed Z motor mount (lead screw)", inv["zmotormount"], "80 x 68 x 86.5", "PETG / CCF", "Z motor shaft-down on the post top; collars + thrust bearings on its floor"),
     ("Printed Z bottom holder / hard stop", inv["zholder"],   "34 x 27 x 45",   "PETG / CF-Nylon", "608ZZ seat at the screw bottom; top face is the Z hard stop"),
     ("Tr8x2 lead screw 1000 mm",          inv["leadscrew"],   "8 x 1000",       "Stainless", "Z drive, one per post"),
@@ -125,11 +127,11 @@ STRUCTURAL = [
     ("Stepper motor NEMA23",              inv["motor"],       "56.4 x 56.4 x 76.6", "Steel", "4 Z + 2 Y; X (rack-and-pinion) TBD"),
     ("V-wheel (XL solid polycarbonate)",  inv["vwheel"],      "24 x 11",        "Polycarbonate / steel", "Gantry running on C-beam V-grooves"),
     ("GT2 timing pulley",                 inv["pulley"],      "16T 5mm bore",   "Aluminum",  "Drive pulleys"),
-    ("Smooth idler pulley",               inv["idler"],       "22 x 13",        "Aluminum",  "Belt return idlers"),
+    ("Smooth idler pulley",               inv["idler"],       "18 x 14.2",      "Aluminum",  "Y belt return idlers, 20T toothless for the 10 mm belt"),
     ("Idler axle bracket",                inv["idlerbrk"],    "30 x 30 x 5",    "Steel",     "Support plate for each idler axle"),
     ("Z-corner gantry plate",             inv["plate"],       "127 x 88 x 3",   "Aluminum",  "Gantry carriage plates (six corners)"),
     ("Belt clamp / belt run",             inv["belt"] + inv["part"], "GT2 6mm", "Fiber-reinforced rubber", "Y belts (X TBD)"),
-    ("Y-rail / Z-post 4mm shim",          inv["shim"],        "80 x 4 x 40",    "Aluminum / steel", "Spacer between flat C-beam end and Z-post"),
+    ("Center-spreader 6mm shim",          inv["shim"],        "80 x 6 x 40",    "Aluminum / steel", "Spacer between flat C-beam end and Z-post"),
     ("4080 corner connector plate (L/T)", inv["connector"],   "80 x 80 x 5",    "Steel",     "5-hole bracket at every perpendicular C-beam joint"),
 ]
 with open(os.path.join(HERE, "bom_structural.csv"), "w", newline="") as f:
@@ -186,9 +188,10 @@ HARDWARE = [
     ("M5 nut",                                         N_ZMOTOR * 4, "M5",             "Z motor-mount nut traps"),
 
     # --- Lead-screw Z ---
-    # The Y-gantry rail end sits ~1 mm off the carriage plate's outer face over
-    # both nut-block holes, so these thread into the plate from the channel side.
-    ("M5 SHCS",                                        N_NUTBLOCK * 2, "M5 x 16 mm",   "Z nut block into the carriage plate (tapped or insert), from the channel side"),
+    # Bolted in reverse (owner, test-fitted on SN 001): through the carriage
+    # plate's holes into the nut block, with a nut inside the C-beam opening if needed.
+    ("M5 SHCS",                                        N_NUTBLOCK * 2, "M5 x 20 mm",   "Z nut block, through the carriage plate into the block"),
+    ("M5 nut",                                         N_NUTBLOCK * 2, "M5",           "Z nut block bolts, inside the C-beam opening if needed"),
     ("M5 SHCS",                                        N_ZHOLDER * 2, "M5 x 20 mm",    "Z bottom holder into the channel-floor slots"),
     ("M5 drop-in T-nut",                               N_ZHOLDER * 2, "M5, 4080 series", "Channel-floor T-nuts for the Z bottom holders"),
 

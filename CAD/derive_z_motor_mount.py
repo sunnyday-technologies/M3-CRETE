@@ -12,19 +12,21 @@ at (0, 2), the floor underside (Z=0) sits on the Z-post top, and a 6 mm tab
 hangs 38.5 mm below the floor at Y[20,26]. The tab is clamped between the
 post's open face and the top Y-rail end by the post-to-frame screws.
 
-Measured against CAD/M3-2_V1.0_baseline.step, the source needs three fixes:
+Measured against the M3-2 frame, the source needs two fixes:
 
 - the axis sits 18 mm inside the C-channel's open edge, so the 8 mm screw
   cuts ~2 mm into the channel floor; the Tr8x2 nut block (34x12x20, bore
   centred 6 mm from its face) bolted to the carriage plate needs 6 mm;
-- the tab is 6 mm, but the V1.0 post-to-top-rail joint is 4 mm;
 - the tab holes sit 1.47 mm above the top-rail end ports (rail Z 960-1000,
   ports at rail centre +/- 10 mm).
 
+The tab stays 6 mm: it is the spacer in the post-to-top-end-beam joint,
+which Nick measured at 6 mm on SN 001 (2026-10-12).
+
 The derivation keeps the authored box (floor, coupler cavity, side window,
-NEMA23 pilot, nut traps) unchanged. It moves the tab 12 mm toward the axis,
-trims it to 4 mm, and moves its six holes to the port rows. The fillet on
-the tab's post side is trimmed off, because it sat inside the post top.
+NEMA23 pilot, nut traps) unchanged. It moves the tab 12 mm toward the axis
+and moves its six holes to the port rows. The fillet on the tab's post side
+is trimmed off, because it sat inside the post top.
 
 Run:   python CAD/derive_z_motor_mount.py   (Python 3.11 + CadQuery 2.7)
 """
@@ -39,7 +41,7 @@ OUT_STL = os.path.join(HERE, "Custom", "Z_NEMA23_Leadscrew_Motor_Mount_M3-2.stl"
 AXIS_Y = 2.0                        # screw/motor axis in the source frame
 AXIS_INSET = 6.0                    # axis -> channel open face (nut block bore centre)
 TAB_Y0_SRC = 20.0                   # source tab: post-side face
-TAB_T = 4.0                         # V1.0 post-to-top-rail joint thickness
+TAB_T = 6.0                         # post-to-top-end-beam spacer (measured, = source)
 TAB_Y0 = AXIS_Y + AXIS_INSET        # 8: derived tab post-side face = channel open face
 TAB_SHIFT = TAB_Y0 - TAB_Y0_SRC     # -12
 TAB_ZMIN = -38.5

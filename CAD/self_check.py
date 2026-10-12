@@ -50,11 +50,11 @@ LABELS = {
     (56.4, 56.4, 76.6):   'motor',
     (10.2, 23.9, 23.9):   'vwheel',
     (14.0, 15.0, 15.0):   'pulley',
-    (12.7, 22.0, 22.0):   'idler',
+    (14.2, 18.0, 18.0):   'idler',      # id 93 Y return idler envelope (20T toothless, 10 mm belt)
     (3.0, 88.0, 127.0):   'plate',
-    (4.0, 40.0, 80.0):    'shim',
+    (6.0, 40.0, 80.0):    'shim',       # center-spreader shims, 6 mm since 2026-10-12
     (4.0, 80.0, 97.0):    'zmount',     # id 75 printed plate, now at the 2 Y-motor positions only
-    (4.0, 80.0, 100.0):   'z-bottom-plate',  # id 79, post-to-bottom-rail spacer (belt era: bot_spacer_idler)
+    (6.0, 80.0, 100.0):   'z-bottom-plate',  # id 79, 6 mm post-to-bottom-rail spacer (belt era: bot_spacer_idler, 4 mm)
     (4.0, 160.0, 280.0):  'tbracket',
     (5.0, 30.0, 30.0):    'idler-brk',
     # X-carriage authored hardware (M3-2_nudge.step)
@@ -100,12 +100,12 @@ EXPECTED = {
     'motor': 7,            # 4 Z (shaft down on the mounts) + 2 Y + 1 X — all share sig (56.4, 56.4, 76.6)
     'vwheel': 32,          # all authored in M3-2_V1.0 (16 Z + 8 Y + 8 X)
     'pulley': 3,           # 2 Y + 1 X (Z is lead-screw driven)
-    'idler': 5,            # Y-axis set at Y-rail height; the 4 bottom Z idlers are gone
+    'idler': 2,            # one Y return idler per Y rail, inside its channel
     'plate': 8,
     'shim': 2,
     'zmount': 2,           # 2 Y-motor mounts (id 75)
     'zcap': 0,
-    'idler-brk': 4,        # Y-axis idler brackets
+    'idler-brk': 2,        # Y-axis idler bracket placeholders, one per idler
     'z-bottom-plate': 4,   # id 79: bottom only; the top plates became the id 24 mounts
     'ymount': 0,           # subsumed by z_motor_mount at Y-motor positions
     'tbracket': 2,
@@ -264,11 +264,7 @@ def cbeam_solid(sh):
 
 STACK = ('z-motor-mount', 'leadscrew', 'nut-block', 'coupler', 'collar', 'thrust-brg',
          'bearing-608', 'z-bottom-holder')
-# Known, owner-tracked overlaps that this check reports but does not fail on.
-KNOWN = {
-    'idler-brk': "V1.0 Y-axis idler bracket inside the FL Z-post channel; "
-                 "pending the Y idler rework (BOM id 93, 2 front idlers)",
-}
+KNOWN = {}   # owner-tracked overlaps reported but not failed (none open)
 solids = [(label_of(s), s if s.ShapeType() == "Solid" else cbeam_solid(s)) for s in parts]
 for i, (la, a) in enumerate(solids):
     if la not in STACK:
@@ -285,6 +281,54 @@ for i, (la, a) in enumerate(solids):
             notes.append(f"{msg} — {KNOWN[lb]}")
         else:
             problems.append(msg)
+
+# ---------- CHECK 9: one Y return idler per Y rail, fully inside its open channel ----------
+# Owner rule (2026-10-12): the idler envelope sits fully inside the Y-gantry
+# rail's open C-channel, a few mm behind the Z carriage plate that caps the end.
+IDLER_PLATE_CLEARANCE = 2.0
+yrails = [(s, sol) for (l, sol), s in zip(solids, parts)
+          if l == 'cbeam' and s.BoundingBox().ylen > 900 and 300 < center(s)[2] < 600]
+idlers = [s for s in parts if label_of(s) == 'idler']
+zplates = [s for s in parts if label_of(s) == 'plate' and s.BoundingBox().ylen < 3.5]
+for rail, rail_solid in yrails:
+    rb = rail.BoundingBox()
+    left, x0, x1, z0, z1 = mod.channel_of(rb)
+    at_rail = [s for s in idlers if abs(center(s)[0] - (rb.xmin + rb.xmax) / 2) < 40]
+    if len(at_rail) != 1:
+        problems.append(f"Y rail at X={center(rail)[0]:.0f}: {len(at_rail)} return idlers, expected 1")
+        continue
+    ib = at_rail[0].BoundingBox()
+    if not mod.in_channel(ib, rb):
+        problems.append(f"Y idler at ({center(at_rail[0])[0]:.0f},{center(at_rail[0])[1]:.0f}) is not fully "
+                        f"inside its rail channel X[{x0:.1f},{x1:.1f}] Z[{z0:.1f},{z1:.1f}]")
+    if common_volume(at_rail[0], rail_solid) > 1.0:
+        problems.append(f"Y idler at X={center(at_rail[0])[0]:.0f} overlaps its rail")
+    cap = min((p for p in zplates if abs(center(p)[0] - center(at_rail[0])[0]) < 70),
+              key=lambda p: abs(center(p)[1] - center(at_rail[0])[1]), default=None)
+    if cap is not None:
+        cb = cap.BoundingBox()
+        clear = ib.ymin - cb.ymax if center(cap)[1] < center(at_rail[0])[1] else cb.ymin - ib.ymax
+        print(f"Y idler X={center(at_rail[0])[0]:.0f}: inside rail channel, {clear:.1f} mm behind the carriage plate")
+        if clear < IDLER_PLATE_CLEARANCE:
+            problems.append(f"Y idler at X={center(at_rail[0])[0]:.0f} is {clear:.1f} mm from the carriage plate "
+                            f"(want >= {IDLER_PLATE_CLEARANCE})")
+
+# ---------- CHECK 10: 6 mm post-to-end-beam frame joints ----------
+# Measured on SN 001 (2026-10-12). Each Z post's open face sits FRAME_SPACER
+# from the ends of the 1 m top and bottom Y rails beside it.
+yflat = [s for s in parts if label_of(s) == 'cbeam' and s.BoundingBox().ylen > 900
+         and not 300 < center(s)[2] < 600]
+for p in posts:
+    pb, pc = p.BoundingBox(), center(p)
+    front = pc[1] < frame_cy
+    for r in yflat:
+        rb = r.BoundingBox()
+        if not (rb.xmin < pc[0] < rb.xmax):
+            continue
+        g = (rb.ymin - pb.ymax) if front else (pb.ymin - rb.ymax)
+        if abs(g - mod.FRAME_SPACER) > 0.1:
+            problems.append(f"Z-post at ({pc[0]:.0f},{pc[1]:.0f}) is {g:.1f} mm from the Y rail end at "
+                            f"Z={center(r)[2]:.0f} (want {mod.FRAME_SPACER})")
 
 # ---------- CHECK 8: firmware position_max inside the measured Z travel ----------
 travel = z_travel.measure(z_travel.assembly_shapes(mod.assy))
