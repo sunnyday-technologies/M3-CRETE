@@ -23,6 +23,7 @@ material pump is not modelled here (see [Pump](#pump)).
 | `cooling.cfg` | Driver cooling — enclosure thermistor on TH0 + two fans |
 | `z_tilt.cfg` | Quad Z self-tramming |
 | `macros.cfg` | START_PRINT, END_PRINT, CANCEL_PRINT, StallGuard readout |
+| `estop.cfg` | E-stop monitoring and motor power (Kraken MIN8 and PS-ON); not loaded until the hardware is installed |
 | `input_shaper.cfg` | ADXL345 + resonance tester + input shaper (optional include) |
 
 ## Hardware assumed
@@ -219,6 +220,21 @@ motion system. The reference machine uses a **MAI 2PUMP Pictor** (listed as a
 reference option in the BOM), which takes a 0–10 V speed command plus a
 run/enable input and runs its own drive. This reference does not model it. M3-CRETE-FIRMWARE's Stage 3 notes define
 how Klipper commands it, including pressure advance on the pump signal.
+
+## E-stop monitoring and motor power (`estop.cfg`, not loaded yet)
+
+`estop.cfg` is a software layer on top of the hardware E-stop. The E-stop button
+removes motor power in hardware by itself; this file does not replace it.
+
+- It watches the E-stop button's extra contact on Kraken endstop port 8 (MIN8,
+  PC0). A press shuts Klipper down at once and is logged.
+- It drives the Kraken PS-ON output (PD10), which allows motor power. Klipper
+  starts with it off, and any Klipper shutdown switches it off.
+- `MOTOR_POWER VALUE=1` / `VALUE=0` switches motor power and refuses to switch
+  on while the E-stop reads pressed. Mainsail's power button calls it.
+
+How to enable and test it on the machine is in M3-CRETE-FIRMWARE's
+[`klipper/README.md`](https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE/blob/main/klipper/README.md).
 
 ## Safety notes
 
