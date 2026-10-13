@@ -29,7 +29,7 @@ Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/
 - X-axis: 2× 1000 mm 4080 spliced = 2000 mm envelope. Splice uses straight-line slot-linking kit with internal 2040 reinforcement bonded inside the C-channel.
 - Y-axis: 2× parallel 2080 rails, 1000 mm span, dual motors (anti-racking).
 - Z-axis: 4× independent posts, each with a NEMA23 on top turning a Tr8×2 lead screw (8 mm, 2 mm lead); sensorless homing down onto bottom hard-stop blocks (quad self-tramming; Klipper Z_TILT_ADJUST available).
-- Motion: GT2 belts on X (6 mm) and Y (10 mm), Tr8×2 lead screws on Z, polycarbonate V-wheels on all axes.
+- Motion: 10 mm GT2 belts on X and Y, Tr8×2 lead screws on Z, polycarbonate V-wheels on all axes.
 - Motors: 7× NEMA23 8 mm shaft (1× X + 2× Y + 4× Z).
 - Controller: BTT Kraken (8× TMC5160 onboard) + Raspberry Pi 5 + Klipper.
 - Homing: StallGuard4 sensorless via TMC5160 (no mechanical limit switches).
