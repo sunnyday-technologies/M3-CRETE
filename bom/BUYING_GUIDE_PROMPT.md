@@ -97,9 +97,9 @@ No verified all-in cost range is provided. Re-price the current BOM for the exac
 ## Tips
 
 - **Best results with**: Claude (web search + long context), ChatGPT with browsing, Perplexity
-- **Full BOM JSON**: ~15KB — fits within any major model's context window
+- **Full BOM JSON**: about 115 KB at BOM v2.13.0. That fits long-context models; for smaller ones, filter to the parts you still need first.
 - **Re-run monthly**: Prices change. Re-export and re-run before ordering.
-- **Consolidation**: Amazon Prime covers ~40% of items with free shipping
+- **Consolidation**: group items by supplier to cut shipping costs, and check free-shipping eligibility on each listing.
 
 ## Disclaimer
 

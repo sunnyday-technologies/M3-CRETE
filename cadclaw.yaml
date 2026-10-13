@@ -190,6 +190,52 @@ bom_audit:
       # Fit is set by the width between the flanges; the 22mm V-slot wheel's
       # 9.5mm track does not fit the 10mm Y belt.
       required_terms: ["10mm", "11.2mm"]
+    # 2026-10-13 coverage: the remaining non-exempt BOM lines, so bom-audit has
+    # no unmapped items or labels. Quantities pin BOM v2.13.0.
+    # Gantry plates: the CAD's `plate` stand-in (the 20-80 mm V-slot gantry
+    # plate) is 4 Z carriage + 2 Y gantry + 2 X pair = 8, bound by role to ids
+    # 23 + 18 + 84. id 69 is the bought alternative to ids 18/23, so it has no
+    # label (binding it would double-count those plates). id 13 is the X
+    # carriage assembly, not a separate plate.
+    - id: 6
+      expected_qty: 3
+      expected_mfg_type: buy
+    - id: 7
+      expected_qty: 32
+      expected_mfg_type: buy
+    - id: 8
+      expected_qty: 4
+      expected_mfg_type: buy
+      required_terms: ["DEPRECATED"]   # no leveling feet (owner, 2026-04-21); excluded from the kit
+    - id: 13
+      expected_qty: 1
+      expected_mfg_type: print
+    - id: 18
+      expected_qty: 2
+      expected_mfg_type: print
+      expected_label: plate
+    - id: 23
+      expected_qty: 4
+      expected_mfg_type: print
+      expected_label: plate
+    - id: 66
+      expected_qty: 2
+      expected_mfg_type: print
+      expected_label: idler_bracket   # placeholder geometry until the printed idler plate is authored
+    - id: 69
+      expected_qty: 6
+      expected_mfg_type: buy
+    - id: 82
+      expected_qty: 0
+      expected_mfg_type: buy
+      required_terms: ["DEPRECATED"]   # replaced by the id 65 internal 2040 inserts
+    - id: 84
+      expected_qty: 2
+      expected_mfg_type: buy
+      expected_label: plate
+    - id: 85
+      expected_qty: 6
+      expected_mfg_type: print
 
 claim_audit:
   # Entries are file globs relative to --repo; a bare directory matches no
