@@ -51,7 +51,8 @@ def name_for_dims(dims_sorted):
     # ymount: TODO add signature when user provides 4mm spacer plate STEP geometry
     if dims_sorted == (4.0, 160.0, 280.0):   return "tbracket"
     if dims_sorted == (5.0, 80.0, 80.0):     return "connector"
-    if dims_sorted == (5.0, 30.0, 30.0):     return "idlerbrk"
+    if dims_sorted == (5.0, 30.0, 30.0):     return "idlerbrk"    # v3 placeholder (should stay zero)
+    if dims_sorted == (3.0, 34.0, 36.0):     return "idlerbrk"    # id 66 printed Y idler plate
     if dims_sorted[0] == 1.5 and dims_sorted[1] == 6.0: return "belt"
     # Lead-screw Z (BOM v2.9.0)
     if dims_sorted == (68.0, 80.0, 86.5):    return "zmotormount"
@@ -130,7 +131,7 @@ STRUCTURAL = [
     ("V-wheel (XL solid polycarbonate)",  inv["vwheel"],      "24 x 11",        "Polycarbonate / steel", "Gantry running on C-beam V-grooves"),
     ("GT2 timing pulley",                 inv["pulley"],      "16T 5mm bore",   "Aluminum",  "Drive pulleys"),
     ("Smooth idler pulley",               inv["idler"],       "18 x 14.2",      "Aluminum",  "Y belt return idlers, 20T toothless for the 10 mm belt"),
-    ("Idler axle bracket",                inv["idlerbrk"],    "30 x 30 x 5",    "Steel",     "Support plate for each idler axle"),
+    ("Printed Y idler plate",             inv["idlerbrk"],    "36 x 34 x 3",    "PETG / CCF", "id 66, on the Y-rail channel floor under each idler: 2 M5 into floor-slot T-nuts, M5 axle hole"),
     ("Z-corner gantry plate",             inv["plate"],       "127 x 88 x 3",   "Aluminum",  "Gantry carriage plates (six corners)"),
     ("Belt clamp / belt run",             inv["belt"] + inv["part"], "GT2 6mm", "Fiber-reinforced rubber", "Y belts (X TBD)"),
     ("Center-spreader 6mm shim",          inv["shim"],        "80 x 6 x 40",    "Aluminum / steel", "Spacer between flat C-beam end and Z-post"),
@@ -156,7 +157,7 @@ N_BRACKET         = inv["bracket"]
 N_BOTMOUNT        = inv["botmount"]
 N_SHIM            = inv["shim"]
 N_ZMOTOR          = inv["zmotormount"]         # one Z motor per lead-screw mount
-N_XMOTOR          = 1                          # rack-and-pinion X; its mount is not modeled
+N_XMOTOR          = 1                          # belt-and-pinion X, bolted to the outer X-carriage gantry plate (id 84)
 N_YMOTOR          = N_MOTOR - N_ZMOTOR - N_XMOTOR
 N_NUTBLOCK        = inv["nutblock"]
 N_ZHOLDER         = inv["zholder"]
@@ -180,12 +181,15 @@ HARDWARE = [
     ("M5 SHCS",                                        N_IDLER, "M5 x 30 mm",          "Smooth idler axle"),
     ("M5 nyloc nut",                                   N_IDLER, "M5",                  "Idler axle nut"),
     ("M5 flat washer",                                 N_IDLER * 2, "M5",              "Each side of idler"),
-    # --- Idler axle brackets (1 axle bracket per idler, 2 screws into C-beam slot) ---
-    ("M5 SHCS",                                        inv["idlerbrk"] * 2, "M5 x 10 mm", "Idler axle bracket to C-beam"),
-    ("M5 drop-in T-nut",                               inv["idlerbrk"] * 2, "M5, 4080 series", "Mating T-nuts for idler bracket"),
+    # --- Y idler plates (id 66, 2 screws into the channel-floor slots each) ---
+    ("M5 SHCS",                                        inv["idlerbrk"] * 2, "M5 x 10 mm", "Y idler plate to the channel-floor slots"),
+    ("M5 drop-in T-nut",                               inv["idlerbrk"] * 2, "M5, 4080 series", "Channel-floor T-nuts for the Y idler plates"),
 
     # --- Motors (NEMA23 face × 4 fasteners per motor) ---
-    ("M5 SHCS",                                        N_XMOTOR * 4, "M5 x 10 mm", "NEMA23 face mounting, X motor (4 per motor)"),
+    # X motor bolted straight to the outer X-carriage gantry plate (owner,
+    # 2026-10-13): through the plate and the flange's pass-through holes.
+    ("M5 SHCS",                                        N_XMOTOR * 4, "M5 x 16 mm", "X motor through the X-carriage gantry plate and its flange"),
+    ("M5 nut",                                         N_XMOTOR * 4, "M5",         "X motor flange nuts (pass-through holes)"),
     ("M5 SHCS",                                        N_ZMOTOR * 4, "M5 x 16 mm",     "Z motor through its flange and the mount's 8 mm top plate"),
     ("M5 nut",                                         N_ZMOTOR * 4, "M5",             "Z motor-mount nut traps"),
 
@@ -256,12 +260,12 @@ with open(os.path.join(HERE, "BOM_README.md"), "w") as f:
     f.write(f"Half ({N_VWHEEL_ECC}) get eccentric spacers (one side per wheel pair),\n")
     f.write(f"the other half ({N_VWHEEL_STD}) get standard precision spacers.\n\n")
     f.write("### Motors / printed mounts\n\n")
-    f.write(f"{N_XMOTOR} X motor × 4 NEMA23 face screws (M5×10) = {N_XMOTOR*4} screws.\n")
+    f.write(f"{N_XMOTOR} X motor bolted straight to the outer X-carriage gantry plate (id 84) × 4 M5×16 + 4 M5 nuts.\n")
     f.write(f"{N_ZMOTOR} Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.\n")
     f.write(f"{N_YMOTOR} Y motors, turned ~19° (one diagonal hole pair on the two face slots) and bolted straight to the C-beam face × 2 M5×16 + 2 T-nuts.\n")
     f.write(f"{N_BRACKET} brackets × 4 rail-face screws (M5×10) + T-nuts = {N_BRACKET*4} pairs.\n")
-    f.write("Note: the rack-and-pinion X-motor mounting is not yet modeled, so it\n")
-    f.write("gets no back-side nuts here — add them when the X-axis lands.\n\n")
+    f.write("Note: the CAD places the X motor against that plate roughly; its hole\n")
+    f.write("pattern there is not modeled yet.\n\n")
     f.write("### M5 fastener totals (sum across all line items)\n\n")
     f.write("| Item | Qty |\n|---|---|\n")
     for k in sorted(m5_totals):
@@ -269,7 +273,7 @@ with open(os.path.join(HERE, "BOM_README.md"), "w") as f:
     f.write("\n### Things NOT in this BOM (intentionally)\n\n")
     f.write("- Belt clamps (per user: will be added inline as pin joints)\n")
     f.write("- Pulley grub screws (pre-installed from supplier)\n")
-    f.write("- X-axis rack-and-pinion drivetrain (not yet modeled)\n")
+    f.write("- X-axis belt-and-pinion drivetrain details (belt clamps, idlers on the carriage)\n")
     f.write("- Cable management (covered by drag chain + sleeving + glands in main BOM)\n")
     f.write("- Mechanical endstops / limit switches — NO endstops on this machine: "
             "StallGuard4 sensorless homing via TMC5160. See .claude/CLAUDE.md 'Design Exclusions'.\n")

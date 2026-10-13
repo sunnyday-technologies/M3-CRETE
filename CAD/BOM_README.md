@@ -58,12 +58,12 @@ the other half (16) get standard precision spacers.
 
 ### Motors / printed mounts
 
-1 X motor × 4 NEMA23 face screws (M5×10) = 4 screws.
+1 X motor bolted straight to the outer X-carriage gantry plate (id 84) × 4 M5×16 + 4 M5 nuts.
 4 Z motors × 4 M5×16 + 4 M5 nuts in the lead-screw mount's nut traps.
 2 Y motors, turned ~19° (one diagonal hole pair on the two face slots) and bolted straight to the C-beam face × 2 M5×16 + 2 T-nuts.
 0 brackets × 4 rail-face screws (M5×10) + T-nuts = 0 pairs.
-Note: the rack-and-pinion X-motor mounting is not yet modeled, so it
-gets no back-side nuts here — add them when the X-axis lands.
+Note: the CAD places the X motor against that plate roughly; its hole
+pattern there is not modeled yet.
 
 ### M5 fastener totals (sum across all line items)
 
@@ -71,10 +71,10 @@ gets no back-side nuts here — add them when the X-axis lands.
 |---|---|
 | M5 T-nut | 161 |
 | M5 flat washer | 68 |
-| M5 nut | 24 |
+| M5 nut | 28 |
 | M5 nyloc nut | 34 |
-| M5 x 10 mm | 143 |
-| M5 x 16 mm | 30 |
+| M5 x 10 mm | 139 |
+| M5 x 16 mm | 34 |
 | M5 x 20 mm | 16 |
 | M5 x 30 mm | 2 |
 | M5 x 40 mm | 32 |
@@ -83,7 +83,7 @@ gets no back-side nuts here — add them when the X-axis lands.
 
 - Belt clamps (per user: will be added inline as pin joints)
 - Pulley grub screws (pre-installed from supplier)
-- X-axis rack-and-pinion drivetrain (not yet modeled)
+- X-axis belt-and-pinion drivetrain details (belt clamps, idlers on the carriage)
 - Cable management (covered by drag chain + sleeving + glands in main BOM)
 - Mechanical endstops / limit switches — NO endstops on this machine: StallGuard4 sensorless homing via TMC5160. See .claude/CLAUDE.md 'Design Exclusions'.
 - Leveling feet — using bed-probe leveling, not mechanical M16 feet (2026-04-21)

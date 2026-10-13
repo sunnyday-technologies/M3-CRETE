@@ -57,7 +57,8 @@ LABELS = {
     (4.0, 80.0, 97.0):    'zmount',     # id 75 printed plate, now at the 2 Y-motor positions only
     (6.0, 80.0, 100.0):   'z-bottom-plate',  # id 79, 6 mm post-to-bottom-rail spacer (belt era: bot_spacer_idler, 4 mm)
     (4.0, 160.0, 280.0):  'tbracket',
-    (5.0, 30.0, 30.0):    'idler-brk',
+    (5.0, 30.0, 30.0):    'idler-brk',        # v3 placeholder idler brackets (replaced by the id 66 plate)
+    (3.0, 34.0, 36.0):    'idler-plate',      # id 66 printed Y idler plate on the channel floor (2026-10-13)
     # X-carriage authored hardware (M3-2_nudge.step)
     (5.0, 16.0, 16.0):    'xcarr_bolt',     # M5 SHCS heads (carriage hardware)
     (9.0, 9.0, 31.5):     'xcarr_axle',     # V-wheel axle / shoulder bolt
@@ -106,7 +107,8 @@ EXPECTED = {
     'shim': 2,
     'zmount': 0,           # id 75 Y-motor plates dropped: Y motors bolt straight to the rail face
     'zcap': 0,
-    'idler-brk': 2,        # Y-axis idler bracket placeholders, one per idler
+    'idler-brk': 0,        # v3 placeholders, replaced by the id 66 idler plates
+    'idler-plate': 2,      # id 66, one per Y idler on the channel floor
     'z-bottom-plate': 4,   # id 79: bottom only; the top plates became the id 24 mounts
     'ymount': 0,           # subsumed by z_motor_mount at Y-motor positions
     'tbracket': 2,
@@ -311,6 +313,39 @@ for rail, rail_solid in yrails:
         if clear < IDLER_PLATE_CLEARANCE:
             problems.append(f"Y idler at X={center(at_rail[0])[0]:.0f} is {clear:.1f} mm from the carriage plate "
                             f"(want >= {IDLER_PLATE_CLEARANCE})")
+    # Its id 66 plate (owner, 2026-10-13): flat on the channel floor under the
+    # idler, axle hole on the idler axis, the 2 T-nut holes on the floor slots,
+    # clear of the idler and touching nothing else.
+    ic = center(at_rail[0])
+    plates66 = [(s, sol) for (l, sol), s in zip(solids, parts) if l == 'idler-plate'
+                and abs(center(s)[0] - (rb.xmin + rb.xmax) / 2) < 40]
+    if len(plates66) != 1:
+        problems.append(f"Y rail at X={center(rail)[0]:.0f}: {len(plates66)} id 66 idler plates, expected 1")
+        continue
+    pl, pl_solid = plates66[0]
+    pb = pl.BoundingBox()
+    floor_x = x0 if left else x1
+    on_floor = abs((pb.xmin if left else pb.xmax) - floor_x) <= 0.05
+    gap_to_idler = (ib.xmin - pb.xmax) if left else (pb.xmin - ib.xmax)
+    hole_c = [e.Center() for e in pl.Edges() if e.geomType() == "CIRCLE" and 2.0 < e.radius() < 3.5]
+    axle = [h for h in hole_c if abs(h.y - ic[1]) <= 0.1 and abs(h.z - ic[2]) <= 0.1]
+    rail_cz = (rb.zmin + rb.zmax) / 2
+    slot_z = {round(h.z - rail_cz, 1) for h in hole_c if abs(abs(h.z - rail_cz) - mod.yip.SLOT_Z) <= 0.1}
+    print(f"Y idler plate X={center(pl)[0]:.0f}: on the channel floor {on_floor}, {gap_to_idler:.2f} mm under the "
+          f"idler, axle hole on the idler axis {bool(axle)}, slot holes at Z {sorted(slot_z)}")
+    if not on_floor or not mod.in_channel(pb, rb):
+        problems.append(f"Y idler plate at X={center(pl)[0]:.0f} is not flat on its channel floor inside the channel")
+    if gap_to_idler <= 0:
+        problems.append(f"Y idler plate at X={center(pl)[0]:.0f} touches its idler ({gap_to_idler:.2f} mm)")
+    if not axle or len(slot_z) != 2:
+        problems.append(f"Y idler plate at X={center(pl)[0]:.0f}: axle hole off the idler axis or slot holes "
+                        f"not on both floor slots ({sorted(slot_z)})")
+    for s0, (lb, b) in zip(parts, solids):
+        if s0 is pl or not bb_overlap(pl, b):
+            continue
+        v = common_volume(pl_solid, b)
+        if v > 0.5:
+            problems.append(f"Y idler plate at X={center(pl)[0]:.0f} overlaps {lb} by {v:.0f} mm^3")
 
 # ---------- CHECK 10: 6 mm post-to-end-beam frame joints ----------
 # Measured on SN 001 (2026-10-12). Each Z post's open face sits FRAME_SPACER
