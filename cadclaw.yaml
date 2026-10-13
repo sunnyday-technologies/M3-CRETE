@@ -23,7 +23,7 @@ labels:
   z_motor_mount:    [4.0, 80.0, 97.0]   # id 75 plate, dropped v2.13.0; label kept so a reappearing plate fails
   z_post_bottom_plate: [6.0, 80.0, 100.0]   # id 79, 6 mm; was bot_spacer_idler (4 mm, top+bottom, belt-Z idler) before v2.9.0
   t_gusset:         [4.0, 160.0, 280.0]
-  idler_bracket:    [5.0, 30.0, 30.0]
+  idler_bracket:    [3.0, 34.0, 36.0]   # id 66 printed Y idler plate on the channel floor (was the 5x30x30 v3 placeholder)
   # 2026-04-29 additions (promoted from CAD/self_check.py LABELS)
   shim:             [6.0, 40.0, 80.0]   # center-spreader shims, 6 mm since 2026-10-12
   xcarr_bolt:       [5.0, 16.0, 16.0]   # M5 SHCS heads on X-carriage
@@ -221,7 +221,7 @@ bom_audit:
     - id: 66
       expected_qty: 2
       expected_mfg_type: print
-      expected_label: idler_bracket   # placeholder geometry until the printed idler plate is authored
+      expected_label: idler_bracket   # authored plate, CAD/y_idler_plate.py (v2.14.0)
     - id: 69
       expected_qty: 6
       expected_mfg_type: buy

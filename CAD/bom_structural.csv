@@ -17,7 +17,7 @@ Stepper motor NEMA23,7,56.4 x 56.4 x 76.6,Steel,4 Z + 2 Y; X (rack-and-pinion) T
 V-wheel (XL solid polycarbonate),32,24 x 11,Polycarbonate / steel,Gantry running on C-beam V-grooves
 GT2 timing pulley,3,16T 5mm bore,Aluminum,Drive pulleys
 Smooth idler pulley,2,18 x 14.2,Aluminum,"Y belt return idlers, 20T toothless for the 10 mm belt"
-Idler axle bracket,2,30 x 30 x 5,Steel,Support plate for each idler axle
+Printed Y idler plate,2,36 x 34 x 3,PETG / CCF,"id 66, on the Y-rail channel floor under each idler: 2 M5 into floor-slot T-nuts, M5 axle hole"
 Z-corner gantry plate,8,127 x 88 x 3,Aluminum,Gantry carriage plates (six corners)
 Belt clamp / belt run,39,GT2 6mm,Fiber-reinforced rubber,Y belts (X TBD)
 Center-spreader 6mm shim,2,80 x 6 x 40,Aluminum / steel,Spacer between flat C-beam end and Z-post

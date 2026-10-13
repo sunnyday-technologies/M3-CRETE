@@ -14,7 +14,10 @@ On top of the baseline this script:
   - drops exact duplicate placements carried over from v3 (gussets, idler
     brackets, one Y return idler)
   - keeps one Y return idler per Y-gantry rail, fully inside the rail's open
-    C-channel, and drops the strays and v3-generated extras (owner 2026-10-12)
+    C-channel, and drops the strays and v3-generated extras (owner 2026-10-12);
+    each idler sits over a printed id 66 plate on the channel floor
+    (y_idler_plate.py, owner 2026-10-13), which replaces the v3 placeholder
+    brackets
   - drops the 2 printed id 75 Y-motor plates and bolts each Y motor straight
     to its rail's open face, turned ~19 deg so one diagonal hole pair lands
     on the two face slots, centred on the channel with its pulley, belt
@@ -55,6 +58,7 @@ import cadquery as cq
 from cadquery import Assembly, Color, Location
 import math, os, time
 import z_bottom_holder as zbh
+import y_idler_plate as yip
 
 HERE = os.path.dirname(__file__)
 BASELINE    = os.path.join(HERE, "M3-2_V1.0_baseline.step")
@@ -255,9 +259,7 @@ for rb in yrails:
     # pulley's belt line at the rail's front end, centred on the channel like
     # the Y motor (see below).
     drive = min((p for p in pulleys if abs(ctr(p)[0] - rcx) < 40), key=lambda p: -ctr(p)[1])
-    bracket = gen_bracket_of(world_bb(inside[0]), left)
-    y_idlers.append(dict(rail=rb, left=left, x=ctr(drive)[0], z=(rb.zmin + rb.zmax) / 2,
-                         bracket=bracket[0] if bracket else None))
+    y_idlers.append(dict(rail=rb, left=left, x=ctr(drive)[0], z=(rb.zmin + rb.zmax) / 2))
 kept = [c for c in kept if all(c is not s for s in stray)]
 n_stray_idlers = sum(1 for c in stray if c in idlers) - len(y_idlers)
 
@@ -376,7 +378,9 @@ assert n_zplates == 4, f"expected 4 Z carriage plates on the posts, moved {n_zpl
 
 # Y return idler envelopes (id 93): on the drive pulley's centreline, fully
 # inside the rail channel, IDLER_PLATE_GAP behind the carriage plate that caps
-# the rail's front end. Each takes its v3 bracket placeholder along.
+# the rail's front end. Each sits over its printed idler plate (id 66,
+# y_idler_plate.py) on the channel floor, which replaces the v3 5x30x30
+# placeholder brackets (they passed through the rail web).
 IDLER_W = 2 * IDLER_FLANGE_T + IDLER_TRACK
 idler_env = (cq.Solid.makeCylinder(IDLER_FLANGE_D / 2, IDLER_FLANGE_T, cq.Vector(0, 0, 0), cq.Vector(1, 0, 0))
              .fuse(cq.Solid.makeCylinder(IDLER_HUB_D / 2, IDLER_TRACK,
@@ -384,6 +388,7 @@ idler_env = (cq.Solid.makeCylinder(IDLER_FLANGE_D / 2, IDLER_FLANGE_T, cq.Vector
              .fuse(cq.Solid.makeCylinder(IDLER_FLANGE_D / 2, IDLER_FLANGE_T,
                                          cq.Vector(IDLER_FLANGE_T + IDLER_TRACK, 0, 0), cq.Vector(1, 0, 0)))
              .clean())
+idler_plate = cq.importers.importStep(yip.OUT_STEP).val().Solids()[0]   # floor at X=0, axle on X
 caps = [world_bb(c) for c in assy.children if sig_of(world_bb(c)) == (3.0, 88.0, 127.0) and world_bb(c).ylen < 3.5]
 for yi in y_idlers:
     rb = yi["rail"]
@@ -393,22 +398,25 @@ for yi in y_idlers:
     assert in_channel(env.BoundingBox(), rb), "Y idler envelope does not fit inside the rail channel"
     tag = "L" if yi["left"] else "R"
     assy.add(env, name=f"idler_y_return_envelope_{tag}", color=IDL)
-    b = yi["bracket"]
-    if b is not None:
-        bc = ctr(world_bb(b))
-        bx = yi["x"] - GEN_BRACKET_OFFSET if yi["left"] else yi["x"] + GEN_BRACKET_OFFSET
-        assy.add(b.obj, name=b.name, color=b.color, loc=Location((bx - bc[0], yc - bc[1], yi["z"] - bc[2])) * b.loc)
     _, x0, x1, _, _ = channel_of(rb)
-    eb = env.BoundingBox()
+    floor_x = x0 if yi["left"] else x1
+    plate = idler_plate if yi["left"] else idler_plate.rotate(cq.Vector(0, 0, 0), cq.Vector(0, 1, 0), 180)
+    plate = plate.translate(cq.Vector(floor_x, yc, yi["z"]))
+    pb, eb = plate.BoundingBox(), env.BoundingBox()
+    assert in_channel(pb, rb), "Y idler plate does not fit inside the rail channel"
+    clear = eb.xmin - pb.xmax if yi["left"] else pb.xmin - eb.xmax
+    assert clear > 0, "Y idler envelope overlaps its idler plate"
+    assy.add(plate, name=f"y_idler_plate_{tag}", color=PRINT_COLOR)
     print(f"  Y idler {tag}: envelope {IDLER_W:.1f} x {IDLER_FLANGE_D:.0f} inside the rail channel "
-          f"({eb.xmin - x0:.1f} / {x1 - eb.xmax:.1f} mm margins), {IDLER_PLATE_GAP:.0f} mm behind the carriage plate")
+          f"({eb.xmin - x0:.1f} / {x1 - eb.xmax:.1f} mm margins), {IDLER_PLATE_GAP:.0f} mm behind the carriage plate; "
+          f"id 66 plate on the channel floor, {clear:.2f} mm under it")
 
 print(f"  kept {len(kept)} baseline parts; dropped {n_dups} duplicate placements")
 for role, k in sorted(dropped.items()):
     print(f"  dropped {k:2d} x {role}")
-n_stray_brackets = sum(1 for c in stray if c in brackets) - sum(1 for yi in y_idlers if yi["bracket"] is not None)
-print(f"  dropped {n_stray_idlers} stray Y idlers + {n_stray_brackets} of their brackets; "
-      f"one id 93 idler envelope per Y rail")
+n_brackets = sum(1 for c in stray if c in brackets)
+print(f"  dropped {n_stray_idlers} stray Y idlers + {n_brackets} v3 placeholder brackets; "
+      f"one id 93 idler envelope + one id 66 idler plate per Y rail")
 print(f"  dropped {len(ymount_plates)} id 75 Y-motor plates; the Y motors bolt straight to the rail face")
 print(f"  frame spacers {V1_SPACER:.0f} -> {FRAME_SPACER:.0f} mm: moved {n_moved} post-mounted parts "
       f"{POST_SHIFT:.0f} mm out along Y; bottom plates and spreader shims rebuilt {FRAME_SPACER:.0f} mm")

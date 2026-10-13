@@ -61,7 +61,7 @@ review.
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `bom/data.json` | **BOM source of truth** — v2.13.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
+| `bom/data.json` | **BOM source of truth** — v2.14.0; 74 reference entries, 203 approved supplier options (208 records incl. legacy `approved: false`), 37 named suppliers, 12 categories. Public pages get these counts from the build (`{{BOM_*}}` tokens in `scripts/build-cloudflare-pages.ps1`) |
 | `bom/index.html` | BOM viewer (static, loads data.json, multi-supplier selection) |
 | `config.js` | Model variants, category order, project metadata |
 | `CAD/Components/` | OpenBuilds STEP parts library (70 files, CC BY-SA 4.0) |
@@ -266,8 +266,11 @@ Per motor role (`bom/m3-2-final-hardware-pack.json` carries the counts):
 - **Z motors (4):** 4× M5 × 16 through the flange and the printed
   lead-screw mount's top plate (bom/data.json id 24) into M5 nuts in its
   nut traps.
-- **X motor (1):** mount not modeled yet; 4× M5 face screws plus 4×
-  back-side M5 nuts for the pass-through holes.
+- **X motor (1):** no separate mount. It bolts straight to the outer
+  X-carriage gantry plate (bom/data.json id 84) with **4× M5 × 16 + 4× M5
+  nuts** through the plate and the flange's pass-through holes (Nick,
+  2026-10-13). The CAD places the motor against that plate only roughly;
+  its hole pattern there is not modeled yet.
 
 Material: EEEEE 880pc Amazon kit covers M5 nuts. Loctite Blue 243
 (~$8/bottle) handles the thread-locking. No heat-set inserts needed —
