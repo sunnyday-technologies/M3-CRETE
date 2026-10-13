@@ -71,7 +71,7 @@ bom_audit:
       expected_mfg_type: buy
       expected_label: motor_nema23
     - id: 10
-      expected_qty: 2
+      expected_qty: 4   # meters: 2 loops x 2m (owner, 2026-10-13)
       expected_mfg_type: buy
       required_terms: ["10mm"]
       forbidden_terms: ["6mm"]
@@ -84,10 +84,10 @@ bom_audit:
       expected_mfg_type: buy
       expected_label: motor_nema23_y   # turned ~19 deg on the rail face since v2.13.0
     - id: 15
-      expected_qty: 1
+      expected_qty: 2   # meters: one 2m fixed strand (owner, 2026-10-13)
       expected_mfg_type: buy
-      required_terms: ["6mm"]
-      forbidden_terms: ["10mm"]
+      required_terms: ["10mm"]   # 10mm like Y since v2.15 (owner: extra traction for faster X)
+      forbidden_terms: ["6mm"]
     - id: 17
       expected_qty: 32
       expected_mfg_type: buy
