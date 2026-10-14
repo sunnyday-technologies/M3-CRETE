@@ -19,14 +19,13 @@ Important safety and product-boundary note: M3-CRETE is intended for qualified t
 
 - M3-1 — 1000 × 1000 × 1000 mm build volume; no axis splice; all single-piece extrusions.
 - M3-2 — 2000 × 1000 × 1000 mm build volume; X-axis spliced. Default build target.
-- M3-4 — 2000 × 2000 × 1000 mm build volume; both X and Y spliced.
 
 Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/config.js under MODEL_VARIANTS.
 
 ## Architecture (M3-2 default)
 
 - Frame: 4080 C-Beam primary structure (Z-posts, Y-gantry rails) plus 2040 bracing. All 1000 mm standard lengths. C opening points inward toward the cube.
-- X-axis: 2× 1000 mm 4080 spliced = 2000 mm envelope. Splice uses straight-line slot-linking kit with internal 2040 reinforcement bonded inside the C-channel.
+- X-axis: 2× 1000 mm 4080 spliced = 2000 mm envelope. Splice: one 1 m 2040 insert centered in the C-channel (small purchased or printed L-brackets at its ends, no adhesive) plus straight-line slot connector bars, in the gantry's front and back slots.
 - Y-axis: 2× parallel 2080 rails, 1000 mm span, dual motors (anti-racking).
 - Z-axis: 4× independent posts, each with a NEMA23 on top turning a Tr8×2 lead screw (8 mm, 2 mm lead); sensorless homing down onto bottom hard-stop blocks (quad self-tramming; Klipper Z_TILT_ADJUST available).
 - Motion: GT2 belts on X (6 mm) and Y (10 mm), Tr8×2 lead screws on Z, polycarbonate V-wheels on all axes.
@@ -53,7 +52,7 @@ Variant parameters (quantity overrides) are defined in https://bom.m3-crete.com/
 
 - Source of truth: https://bom.m3-crete.com/bom/data.json (JSON; current snapshot {{BOM_PARTS}} parts, {{BOM_OPTIONS}} approved options, {{BOM_SUPPLIERS}} named suppliers; verify the live JSON because counts can change).
 - Interactive viewer: https://bom.m3-crete.com/bom/
-- Viewer features: multi-supplier selection, coverage tracking, per-part quantity adjusters, "I have this" exclusion, Buy/Print/CNC toggle on fabricated parts, CSV/JSON export, model-variant selector (M3-1 / M3-2 / M3-4).
+- Viewer features: multi-supplier selection, coverage tracking, per-part quantity adjusters, "I have this" exclusion, Buy/Print/CNC toggle on fabricated parts, CSV/JSON export, model-variant selector (M3-1 / M3-2).
 
 ## Companion projects
 

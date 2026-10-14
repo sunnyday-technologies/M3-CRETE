@@ -577,10 +577,10 @@
 </ul>
 <p>The exclusions section exists because the project has accreted many rounds of "have you considered adding..." suggestions over the last year and a half. Each rejection is an active engineering decision, documented so that contributors do not waste round-trips proposing rejected directions.</p>
 <h2 id="3-architecture-overview">3. Architecture overview</h2>
-<p>The default model variant is the <strong>M3-2</strong>, with a configured 2000 × 1000 × 1000 mm design envelope. M3-1 targets 1000 × 1000 × 1000 mm and M3-4 targets 2000 × 2000 × 1000 mm. These are configuration targets, not verified working volumes or exterior dimensions. The motion-system concept has four mechanical subsystems: a 4080 C-Beam frame, a dual-Y belt-pinion gantry, a quad-Z Z-stage, and a printhead carriage on a spliced X-beam.</p>
+<p>The default model variant is the <strong>M3-2</strong>, with a configured 2000 × 1000 × 1000 mm design envelope. M3-1 targets 1000 × 1000 × 1000 mm. These are configuration targets, not verified working volumes or exterior dimensions. The motion-system concept has four mechanical subsystems: a 4080 C-Beam frame, a dual-Y belt-pinion gantry, a quad-Z Z-stage, and a printhead carriage on a spliced X-beam.</p>
 <h3 id="frame-4080-c-beam-single-length-stock">Frame: 4080 C-Beam, single-length stock</h3>
 <p>The primary structure is <strong>4080 C-Beam aluminum extrusion</strong>, used for Z-posts and Y-gantry rails, with 2040 V-slot for cross-bracing. Every structural member is cut to a single canonical length. There are no custom cuts and no mixed lengths. Single-SKU procurement is a non-negotiable for a kit business and a meaningful gift for any solo builder. The C-channel openings face inward toward the printer cube so the belts and Z lead screws run inside the C, where they are partly shielded from concrete spray and aerosol.</p>
-<p>The X-axis is built from two stock segments spliced at center span to yield the longer build envelope. The splice uses a <strong>straight-line internal slot-linking kit</strong> that fits inside the T-slot channels and sits below the wheel path, plus three V-slot bars staggered inside the C-channel and bonded with structural adhesive. The center bar bridges the splice equally to either side; the left and right bars fill the remaining sections. No long custom-cut extrusion is required.</p>
+<p>The X-axis is built from two stock segments spliced at center span to yield the longer build envelope. The splice uses one 1 m 2040 V-slot insert centered in the C-channel across the join, anchored at each end by a small purchased or printed L-bracket, plus <strong>straight-line slot connector bars</strong> in the beam's front and back slots, clear of the top and bottom slots the wheels run in. No long custom-cut extrusion is required.</p>
 <p>Corner joints use 5-screw T-plate or L-plate connectors at every 4080-to-4080 junction.</p>
 <h3 id="motion-belt-pinion-drive-polycarbonate-v-wheels-gt2-belts">Motion: belt-pinion drive, GT2 belts, Z lead screws, polycarbonate V-wheels</h3>
 <p>Every axis rides on <strong>polycarbonate V-wheels</strong>. X and Y are driven by <strong>GT2 belts</strong>: a 10 mm loop on each Y rail, and a single fixed 6 mm strand in the X beam's top V-slot that the X carriage's pinion drive rolls along. The Z-axis is driven by <strong>Tr8×2 lead screws</strong>, one per post.</p>
@@ -597,7 +597,6 @@
 <th>Parameter</th>
 <th>M3-1</th>
 <th>M3-2 (default)</th>
-<th>M3-4</th>
 </tr>
 </thead>
 <tbody>
@@ -605,23 +604,19 @@
 <td>Configured design envelope (not physically verified)</td>
 <td>1000 × 1000 × 1000 mm</td>
 <td>2000 × 1000 × 1000 mm</td>
-<td>2000 × 2000 × 1000 mm</td>
 </tr>
 <tr>
 <td>X-axis splice</td>
 <td>None</td>
-<td>Center splice</td>
 <td>Center splice</td>
 </tr>
 <tr>
 <td>Y-axis splice</td>
 <td>None</td>
 <td>None</td>
-<td>Center splice</td>
 </tr>
 <tr>
 <td>Frame primary</td>
-<td>4080 C-Beam</td>
 <td>4080 C-Beam</td>
 <td>4080 C-Beam</td>
 </tr>
@@ -629,11 +624,9 @@
 <td>Stepper architecture</td>
 <td>Quad-Z self-tramming, dual-Y anti-racking</td>
 <td>Same</td>
-<td>Same</td>
 </tr>
 <tr>
 <td>Assembled footprint / shipping configuration</td>
-<td>Not established here</td>
 <td>Not established here</td>
 <td>Not established here</td>
 </tr>
@@ -641,11 +634,9 @@
 <td>Total build cost</td>
 <td>Not verified; price the current BOM and excluded professional scope</td>
 <td>Not verified; price the current BOM and excluded professional scope</td>
-<td>Not verified; price the current BOM and excluded professional scope</td>
 </tr>
 <tr>
 <td>License</td>
-<td>CERN-OHL-W-2.0</td>
 <td>CERN-OHL-W-2.0</td>
 <td>CERN-OHL-W-2.0</td>
 </tr>
@@ -684,7 +675,7 @@
 <h3 id="specific-design-decisions">Specific design decisions</h3>
 <p>A few CAD decisions deserve calling out because they fail in obvious ways if you do not know them:</p>
 <ul>
-<li><strong>X-gantry internal reinforcement</strong>, all reinforcement is internal to the 4080 C-channel because the X-carriage is two-sided. The slot-linking kit sits below the wheel path; V-slot bars are staggered inside the C-channel and bonded with structural adhesive, with the center bar bridging the splice equally on each side.</li>
+<li><strong>X-gantry internal reinforcement</strong>, all reinforcement is internal to the 4080 C-channel because the X-carriage is two-sided. One 2040 insert sits centered in the C-channel across the splice, anchored at each end by a small purchased or printed L-bracket; the slot connector bars go in the front and back slots, since the wheels run in the top and bottom slots and the X belt lies in the top one.</li>
 <li><strong>Slot-linking kit for splices</strong>, the long X-axis is achieved by splicing two stock segments using internal T-slot connectors, not external 5-hole 90-degree plates. External plates would protrude into the wheel zone and block carriage travel.</li>
 <li><strong>Multi-screw corner plates</strong>, every 4080-to-4080 corner uses a T-plate or L-plate. These are sourced from MakerStore USA or Bulkman3D.</li>
 <li><strong>Quad-Z lead screws</strong>, Z-motors sit on top of each post and turn a Tr8×2 lead screw through an 8 mm coupler; lock collars and thrust bearings on the printed motor mount carry the load, and each corner homes down onto the printed bottom holder that also centers the screw. This replaced the earlier belt-and-hub-disk Z in October 2026.</li>
@@ -749,7 +740,7 @@
 <h2 id="9-get-started">9. Get started</h2>
 <p>Three reader profiles, three paths.</p>
 <h3 id="path-a-i-just-want-to-read-the-bom">Path A: I just want to read the BOM</h3>
-<p>Open the <a href="https://bom.m3-crete.com/bom/">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1, M3-2, or M3-4). Export a CSV when you want to take it to a spreadsheet. No login required &mdash; the viewer is a static site that runs entirely in your browser.</p>
+<p>Open the <a href="https://bom.m3-crete.com/bom/">interactive BOM viewer</a>. Click through the parts. Toggle suppliers. Select a model variant (M3-1 or M3-2). Export a CSV when you want to take it to a spreadsheet. No login required &mdash; the viewer is a static site that runs entirely in your browser.</p>
 <p>If you want the underlying data, <code>bom/data.json</code> is the source of truth and is human-editable. The schema is documented in <code>config.js</code>.</p>
 <h3 id="path-b-i-want-to-actually-build-one">Path B: I want to actually build one</h3>
 <p>This is a planning sequence for qualified teams, not a complete construction or commissioning procedure. Stop until the mechanical, electrical, controls, guarding, material-delivery, facility, and emergency-response scope has an identified competent owner.</p>

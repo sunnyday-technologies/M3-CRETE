@@ -63,6 +63,7 @@ bom_audit:
     - id: 5
       expected_qty: 12
       expected_mfg_type: buy
+      required_terms: ["front and back"]   # gantry bars stay out of the wheel/belt slots (owner, 2026-10-13)
       forbidden_terms:
         - "maximum rigidity"
         - "primary stiffness"

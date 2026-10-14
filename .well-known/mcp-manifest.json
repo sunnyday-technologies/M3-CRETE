@@ -43,7 +43,7 @@
     },
     {
       "name": "ListVariants",
-      "description": "Model variants and their parameter overrides (M3-1, M3-2, M3-4) as a JavaScript module. The MODEL_VARIANTS export contains build volume and quantity overrides.",
+      "description": "Model variants and their parameter overrides (M3-1, M3-2) as a JavaScript module. The MODEL_VARIANTS export contains build volume and quantity overrides.",
       "method": "GET",
       "url": "https://bom.m3-crete.com/config.js",
       "media_type": "application/javascript"

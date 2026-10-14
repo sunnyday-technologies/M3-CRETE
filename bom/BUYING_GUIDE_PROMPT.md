@@ -3,7 +3,7 @@
 ## How It Works
 
 1. **Configure your build** in the [BOM Viewer](https://bom.m3-crete.com/bom/):
-   - Select your **model variant** (M3 / M3-2 / M3-4)
+   - Select your **model variant** (M3-1 / M3-2)
    - Check **I have this** on parts you already own (they'll be excluded)
    - Toggle **Buy / Print / CNC** on each fabricated part
    - Click a **supplier card** to mark it as preferred (click again to deselect)

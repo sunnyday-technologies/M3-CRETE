@@ -43,7 +43,7 @@ review.
 
 - **Build volume:** 2000 x 1000 x 1000mm
 - **Frame (2026-04-14 update):** **4080 C-Beam** primary structure (Z-posts, Y-gantry rails) + 2040 bracing. **ALL 1000mm standard lengths** — shipping-constrained, single-SKU procurement. C opening points **inward** toward the printer cube (belt path runs inside the C). Supersedes the 2080/2040 + 1200mm plan from 2026-04-07.
-- **X-axis:** 2x 1000mm 4080 spliced = 2000mm build envelope. Splice uses the **straight-line slot-linking kit** (internal T-slot connectors, sits below wheel path) **+ 3× 1m 2040 V-slot bars staggered inside the C-channel with structural adhesive** (center bar bridges 500mm each side of splice; existing 1m stock covers this — no 2m section needed; bom/data.json id 65). Corner joints use T-plate or L-plate 5-screw connectors at every 4080 junction. **NO external reinforcement on the X-gantry beam** — the X-carriage is 2-sided (V-wheels on top AND bottom of exterior), so any protrusion past the 40mm faces blocks carriage travel.
+- **X-axis:** 2x 1000mm 4080 spliced = 2000mm build envelope. Each 2 m member (on M3-2: the 2 top X frame members + the X-gantry) is spliced with **one centered 1000mm 2040 insert** filling the C-channel, 500mm each side of the joint, anchored at each end by a small purchased or printed L-bracket into the C-beam's T-slot and the drilled hole in the 2040's end (bom/data.json ids 65, 85), **+ 4 straight-line slot connector bars** (id 5). Frame members take the bars in their top and bottom V-slots; the X-gantry takes them in its front and back slots, because the wheels run in its top and bottom slots and the X belt lies in its top slot (owner, 2026-10-13). Corner joints use T-plate or L-plate 5-screw connectors at every 4080 junction. **NO external reinforcement on the X-gantry beam** — the X-carriage is 2-sided (V-wheels on top AND bottom of exterior), so any protrusion past the 40mm faces blocks carriage travel.
 - **Y-axis:** 2x parallel 2080 rails, 1000mm span, dual motors (anti-racking)
 - **Z-axis (2026-10-11 update):** 4x independent posts, each with a NEMA23 on top turning a Tr8x2 lead screw (bom/data.json ids 87-91); sensorless homing DOWN onto bottom hard-stop blocks, no switches. Supersedes the belt-driven Z. CAD (2026-10-12, BOM v2.9.0): derived GrokBot motor mount on each post top (id 24) with a lock collar + 8x16x5 thrust bearing on each side of its floor (ids 90, 92); screw on the C-channel centreline 5 mm inside the open face; Tr8x2 nut block on the carriage plate (id 87), which runs about 1 mm off the post's open face (SN 001; BOM v2.12.0); 608ZZ (id 89) in a printed bottom holder that is also the hard stop (id 91). Frame spacers at the post-to-end-beam joints are 6 mm (measured on SN 001, 2026-10-12). `CAD/z_travel.py` measures the carriage stroke (728.87 mm), which sets firmware `position_max`.
 - **Gantry beam:** 2080 spanning Y, carried by dual-Y carriages
@@ -55,7 +55,7 @@ review.
 ## Model Variants
 - **M3-1:** 1000x1000x1000mm (no splice, all single-piece extrusions)
 - **M3-2:** 2000x1000x1000mm (default, X-axis spliced)
-- **M3-4:** 2000x2000x1000mm (both X and Y spliced)
+- **M3-4 (discontinued 2026-10-13):** was 2000x2000x1000mm. Its Y-gantry rails carry the Y belt inside the C-channel, so they can't take the centered 2040 splice.
 - Variants configured in `config.js` MODEL_VARIANTS with quantity overrides
 
 ## Key Files
@@ -88,7 +88,7 @@ review.
 - Buy/Print/CNC toggle on fabricated parts
 - CSV + JSON export with supplier filter
 - "Suggest Supplier" opens GitHub Issue
-- Model variant selector (M3-1 / M3-2 / M3-4)
+- Model variant selector (M3-1 / M3-2)
 - CAD Library panel linking STEP files
 
 ## Mechanical Audit Findings (2026-03-31)
@@ -222,12 +222,15 @@ into the wheel path and blocks carriage travel. All reinforcement
 must be INTERNAL (inside the C-channel) or BELOW the wheel-contact
 zone (where the slot-linking kit fits).
 
-Primary reinforcement: **3× 1m 2040 V-slot bars staggered inside
-the 4080 C-channel, bonded with structural adhesive** (bom/data.json
-id 65). Center bar bridges 500mm each side of the splice; left and
-right bars fill the remaining sections. No 2m section needed —
-existing 1m stock (Maker Store LR-2040-B-1000, 3 allocated for
-SN 001) covers this.
+Splice (owner, 2026-10-13): **one 1000mm 2040 insert centered in
+the 4080 C-channel**, 500mm each side of the joint, friction-fit
+and anchored at each end by a small purchased or printed
+L-bracket (bom/data.json ids 65, 85; no adhesive), plus 4 slot connector bars (id 5) in the gantry's front
+and back slots. Its top and bottom slots carry the wheels and the X
+belt. Frame members get one insert each too, with their bars in the
+top and bottom V-slots. M3-2's 3 inserts (2 top X frame members +
+the X-gantry) come from existing 1m stock (Maker Store
+LR-2040-B-1000, 3 allocated for SN 001).
 
 ### ❌ NO 5-hole 90° joining plate for X-axis splice (2026-04-22 decision)
 
@@ -278,7 +281,7 @@ the printed mounts are CLEARANCE parts, not threaded anchors.
 
 ## CAD Assembly Status (2026-04-14) — v0.3 IN PROGRESS
 
-**✅ Model state (2026-04-22):** Verified current. Splice + reinforcement strategy finalized — slot-linking kit + 3× 1m 2040 bars staggered inside X-gantry C-channel (center bar bridges splice 500mm each side, existing stock covers); 6mm plate optional backup for non-gantry frame splices. No CAD edits pending for this design change.
+**✅ Model state (2026-04-22):** Verified current. Splice + reinforcement strategy finalized — slot-linking kit + 3× 1m 2040 bars staggered inside X-gantry C-channel (center bar bridges splice 500mm each side, existing stock covers); 6mm plate optional backup for non-gantry frame splices. No CAD edits pending for this design change. *(Superseded 2026-10-13: one centered 2040 insert per 2 m member; see the X-axis line under M3-2 Specifications.)*
 
 ### Extrusion Strategy (supersedes 2026-04-07)
 - **ALL 1000mm standard lengths** (not 1200mm) — driven by shipping constraints; single SKU per profile
