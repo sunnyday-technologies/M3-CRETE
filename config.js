@@ -63,8 +63,8 @@ const BOM_CONFIG = {
         // Wiring (shorter X run)
         'Cable Drag Chain (Sealed)': { qty: 3, unit: 'meters total (X: 1.5m + Y: 1.3m)', note: 'Shorter X-axis drag chain' },
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 15, unit: 'meters (1 spool)', note: 'Shorter X-axis run' },
-        // Reinforcement not needed — C-beam is stiffer than 2080 by design
-        'Frame Stiffener \u2014 Long Span Reinforcement': { qty: 0, note: 'Not required \u2014 C-beam cross-section is stiff enough without reinforcement at 1m spans' }
+        // No 2 m spans at 1m³, so no centered 2040 inserts (id 65)
+        'X-Direction Internal Reinforcement (centered 2040 insert)': { qty: 0, note: 'Not needed: M3-1 has no spliced 2 m members' }
       }
     },
     'M3-2': {
@@ -80,7 +80,6 @@ const BOM_CONFIG = {
         'C-beam 40\u00D780 \u00D7 1000 mm \u2014 Frame Member (SDT Standard)': { qty: 26, note: 'Y-axis also needs pairing: 4 Z-posts + 6 top Y (3L + 3R split at 1m) + 4 bot Y (split) + 4 mid Y + 4 top X + 2 mid X + 2 X-gantry (spliced). +2 spares.' },
         'T-Slot Drop-In Nuts M5 (20-Series)': { qty: 5, unit: 'packs of 100' },
         // X+Y motion (both double)
-        'V-Groove Delrin Wheels (Polycarbonate)': { qty: 12, note: 'More wheels for longer X-travel' },
         'V-Groove Wheels (Polycarbonate)': { qty: 24, note: 'More wheels for longer Y-travel' },
         'Eccentric Spacers (V-Slot)': { qty: 40 },
         // Belts: Y rails are 2 m, so each Y loop is 4 m; X stays one 2 m strand (as M3-2).
@@ -92,7 +91,6 @@ const BOM_CONFIG = {
         'Power Wire - Professional/Private Scope': { qty: 3, unit: 'meters each color (6m total)', note: 'Longer PSU-to-board run' },
         'Distribution Wire - Professional/Private Scope': { qty: 10, unit: 'meters total (5m each color)', note: 'Longer branch distribution' },
         'Cable Sleeving, Labels & Tie Kit': { qty: 2, unit: 'kits', note: 'More cable to manage' },
-        'Frame Stiffener — Long Span Reinforcement': { qty: 8, note: 'Both X and Y axes have 2m+ spans — 2 bars per rail' }
       }
     }
   }
