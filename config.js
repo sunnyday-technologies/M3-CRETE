@@ -57,8 +57,9 @@ const BOM_CONFIG = {
         // needed at 1m³ (X-rails don't need pairing). 12 pieces + spares.
         'C-beam 40\u00D780 \u00D7 1000 mm \u2014 Frame Member (SDT Standard)': { qty: 13, note: 'Single-SKU frame: 4 Z-posts + 1 top Y + 1 bot Y + 2 mid Y + 2 top X + 2 mid X + 1 X-gantry. +1 spare.' },
         'T-Slot Drop-In Nuts M5 (20-Series)': { qty: 2, unit: 'packs of 100', note: 'Fewer joints' },
-        // X-axis motion (shorter travel)
-        'GT2 Timing Belt 10mm (Reinforced)': { qty: 5, note: 'X-axis belt: ~3m for 1m travel' },
+        // X-axis motion (shorter travel). Belt keys must match bom/data.json names
+        // exactly. Rule (owner, 2026-10-13): Y loop = 2 x rail length; X = one beam-length strand.
+        'GT2 Timing Belt 6mm (X-axis, 1x 2m fixed strand)': { qty: 1, name: 'GT2 Timing Belt 6mm (X-axis, 1x 1m fixed strand)', note: 'X: one 1 m fixed strand for the 1 m X beam' },
         // Wiring (shorter X run)
         'Cable Drag Chain (Sealed)': { qty: 3, unit: 'meters total (X: 1.5m + Y: 1.3m)', note: 'Shorter X-axis drag chain' },
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 15, unit: 'meters (1 spool)', note: 'Shorter X-axis run' },
@@ -82,8 +83,9 @@ const BOM_CONFIG = {
         'V-Groove Delrin Wheels (Polycarbonate)': { qty: 12, note: 'More wheels for longer X-travel' },
         'V-Groove Wheels (Polycarbonate)': { qty: 24, note: 'More wheels for longer Y-travel' },
         'Eccentric Spacers (V-Slot)': { qty: 40 },
-        // Belts (both axes double)
-        'GT2 Timing Belt 10mm (Reinforced)': { qty: 12, note: 'X+Y belts: ~5m per axis side for 2m travel' },
+        // Belts: Y rails are 2 m, so each Y loop is 4 m; X stays one 2 m strand (as M3-2).
+        // Keys must match bom/data.json names exactly.
+        'GT2 Timing Belt 10mm (Y-axis, 2x 2m loops, 4m total)': { qty: 8, name: 'GT2 Timing Belt 10mm (Y-axis, 2x 4m loops, 8m total)', note: 'Y: a 4 m loop per 2 m rail' },
         // Wiring (both axes longer)
         'Cable Drag Chain (Sealed)': { qty: 5, unit: 'meters total (X: 2.5m + Y: 2.5m)', note: 'Both axes longer drag chain' },
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 25, unit: 'meters (2 spools)', note: 'Longer runs to X+Y motors' },
