@@ -23,7 +23,7 @@ const BOM_CONFIG = {
     'Controller': 'BTT Kraken + RPi 5',
     'Motors': 'NEMA23 8mm Shaft (StallGuard)',
     'Sourcing': 'Primarily US Suppliers',
-    'Variants': 'M3-1 (1m\u00B3) \u2190 M3-2 (2m\u00B3, default) \u2192 M3-4 (4m\u00B3)'
+    'Variants': 'M3-1 (1m\u00B3) \u2190 M3-2 (2m\u00B3, default)'
   },
 
   // Category display order (must match category names in the database)
@@ -46,7 +46,8 @@ const BOM_CONFIG = {
   ],
 
   // ── Model Variants ─────────────────────────────────
-  // M3-2 is the base model (DB quantities). M3-1 downgrades, M3-4 upgrades.
+  // M3-2 is the base model (DB quantities). M3-1 downgrades. M3-4 (2000 x 2000 x 1000) was discontinued
+  // 2026-10-13: its Y-gantry rails carry the Y belt inside the C-channel, so they can't take the centered 2040 splice.
   DEFAULT_MODEL: 'M3-2',
   MODEL_VARIANTS: {
     'M3-1': {
@@ -63,35 +64,16 @@ const BOM_CONFIG = {
         // Wiring (shorter X run)
         'Cable Drag Chain (Sealed)': { qty: 3, unit: 'meters total (X: 1.5m + Y: 1.3m)', note: 'Shorter X-axis drag chain' },
         'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 15, unit: 'meters (1 spool)', note: 'Shorter X-axis run' },
-        // No 2 m spans at 1m³, so no centered 2040 inserts (id 65)
-        'X-Direction Internal Reinforcement (centered 2040 insert)': { qty: 0, note: 'Not needed: M3-1 has no spliced 2 m members' }
+        // No 2 m spans at 1m³, so no centered 2040 inserts (id 65), end L-brackets (id 85) or connector bars (id 5)
+        'X-Direction Internal Reinforcement (centered 2040 insert)': { qty: 0, note: 'Not needed: M3-1 has no spliced 2 m members' },
+        '2040 Insert End L-Brackets (purchased or printed)': { qty: 0, note: 'No 2040 inserts on M3-1' },
+        'Straight Line Internal Connectors (20-Series)': { qty: 0, note: 'No splice joints on M3-1' }
       }
     },
     'M3-2': {
       label: 'M3-2 (2 m\u00B3, default)',
       volume: '2000 x 1000 x 1000mm (2 m\u00B3)',
       overrides: {}  // Base model — DB quantities are M3-2
-    },
-    'M3-4': {
-      label: 'M3-4 (4 m\u00B3)',
-      volume: '2000 x 2000 x 1000mm (4 m\u00B3)',
-      overrides: {
-        // Frame — 4 m\u00B3 variant needs spliced X AND Y at 2m span
-        'C-beam 40\u00D780 \u00D7 1000 mm \u2014 Frame Member (SDT Standard)': { qty: 26, note: 'Y-axis also needs pairing: 4 Z-posts + 6 top Y (3L + 3R split at 1m) + 4 bot Y (split) + 4 mid Y + 4 top X + 2 mid X + 2 X-gantry (spliced). +2 spares.' },
-        'T-Slot Drop-In Nuts M5 (20-Series)': { qty: 5, unit: 'packs of 100' },
-        // X+Y motion (both double)
-        'V-Groove Wheels (Polycarbonate)': { qty: 24, note: 'More wheels for longer Y-travel' },
-        'Eccentric Spacers (V-Slot)': { qty: 40 },
-        // Belts: Y rails are 2 m, so each Y loop is 4 m; X stays one 2 m strand (as M3-2).
-        // Keys must match bom/data.json names exactly.
-        'GT2 Timing Belt 10mm (Y-axis, 2x 2m loops, 4m total)': { qty: 8, name: 'GT2 Timing Belt 10mm (Y-axis, 2x 4m loops, 8m total)', note: 'Y: a 4 m loop per 2 m rail' },
-        // Wiring (both axes longer)
-        'Cable Drag Chain (Sealed)': { qty: 5, unit: 'meters total (X: 2.5m + Y: 2.5m)', note: 'Both axes longer drag chain' },
-        'Shielded Motor Cable - Flex-Rated (18AWG 4C)': { qty: 25, unit: 'meters (2 spools)', note: 'Longer runs to X+Y motors' },
-        'Power Wire - Professional/Private Scope': { qty: 3, unit: 'meters each color (6m total)', note: 'Longer PSU-to-board run' },
-        'Distribution Wire - Professional/Private Scope': { qty: 10, unit: 'meters total (5m each color)', note: 'Longer branch distribution' },
-        'Cable Sleeving, Labels & Tie Kit': { qty: 2, unit: 'kits', note: 'More cable to manage' },
-      }
     }
   }
 };

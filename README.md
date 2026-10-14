@@ -128,7 +128,7 @@ M3-CRETE/
 │   └── index.html               # Interactive BOM viewer (bom.m3-crete.com/bom)
 ├── firmware/                    # Reference Klipper config (machine config: M3-CRETE-FIRMWARE)
 ├── blog/                        # Build logs and project updates
-└── config.js                    # Model variants (M3-1, M3-2, M3-4)
+└── config.js                    # Model variants (M3-1, M3-2)
 ```
 
 ### AI-Assisted CAD Workflow
