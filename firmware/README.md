@@ -36,7 +36,7 @@ material pump is not modelled here (see [Pump](#pump)).
 - **Driver cooling:** 100K NTC thermistor on the Kraken's TH0 input and two 24 V fans on the FAN0 and FAN1 headers (`cooling.cfg`; BOM ids 94 and 95)
 - **Y belts:** GT2 10mm + 20-tooth pulleys (looped)
 - **Z drive:** Tr8x2 lead screws (8 mm, 2 mm lead, single start), motors on top of each post, 8 mm couplers
-- **X belt:** GT2 10mm + 20-tooth pulley (fixed strand, pinion drive)
+- **X belt:** GT2 6mm + 20-tooth pulley (fixed strand, pinion drive)
 - **V-wheels:** Polycarbonate, eccentric-spacer adjustable
 - **Homing:** Sensorless StallGuard on all axes — no physical endstops
 
