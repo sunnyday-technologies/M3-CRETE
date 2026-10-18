@@ -125,10 +125,11 @@ def export_candidate(source, output):
     hashes = {str(p): sha256(p) for p in (*ORIGINALS, source)}
     assembly = cq.Assembly.importStep(str(source))
     records = restore_supplier_cbeams(assembly)
-    assembly.save(str(output))  # ordinary assembly export, never fused
+    assembly.save(str(output), write_pcurves=False)  # shared definitions, never fused
     if any(sha256(p) != digest for p, digest in hashes.items()):
         raise RuntimeError("An input changed during export")
     return {"source_hashes": hashes, "candidate_sha256": sha256(output),
+            "write_pcurves": False,
             "source_bytes": source.stat().st_size, "candidate_bytes": output.stat().st_size,
             "beam_occurrences": records, "assembly_children": len(assembly.children)}
 

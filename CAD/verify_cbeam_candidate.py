@@ -58,6 +58,8 @@ def main():
     p.add_argument('--original', type=Path, required=True,
                    help='Preserved pre-correction STEP with the historical open C-beam shells')
     p.add_argument('--cadclaw', type=Path, required=True)
+    p.add_argument('--reference', type=Path,
+                   help='Previously verified solid assembly for export-only regression checks')
     p.add_argument('--receipt', type=Path, required=True)
     args = p.parse_args()
     sys.path.insert(0, str(args.cadclaw.resolve()))
@@ -69,6 +71,8 @@ def main():
     original = args.original.resolve()
     candidate = args.candidate.resolve()
     protected = {str(x): sha256(x) for x in (*ORIGINALS, original)}
+    if args.reference:
+        protected[str(args.reference.resolve())] = sha256(args.reference)
     report = {'python': sys.version, 'cadquery': cq.__version__, 'OCP': OCP.__version__,
               'original_hashes': protected, 'candidate_sha256': sha256(candidate),
               'cadclaw_code': {name: sha256(args.cadclaw/'cadclaw'/name) for name in
@@ -81,6 +85,12 @@ def main():
     new = cq.Assembly.importStep(str(candidate))
     before = {c.name: c for c in old.children}
     after = {c.name: c for c in new.children}
+    reference = None
+    if args.reference:
+        ref_assembly = cq.Assembly.importStep(str(args.reference))
+        reference = {c.name: c for c in ref_assembly.children}
+        assert len(ref_assembly.children) == len(reference) == 158
+        assert reference.keys() == after.keys(), 'Reference occurrence names changed'
     assert len(before) == len(old.children) == len(new.children) == len(after) == 158
     assert before.keys() == after.keys(), 'Occurrence names changed'
     stock = cq.importers.importStep(str(SUPPLIER)).val().Solids()[0]
@@ -95,6 +105,14 @@ def main():
         cb = b.color.toTuple() if b.color else None
         assert ca == cb, (name, 'color changed')
         row = {'name': name, 'world_bounds_max_delta_mm': delta, 'color_preserved': True}
+        if reference is not None:
+            r = reference[name]
+            rw = r.obj.moved(r.loc)
+            assert (r.color.toTuple() if r.color else None) == cb
+            assert Counter(face_signature(f) for f in rw.Faces()) == Counter(
+                face_signature(f) for f in bw.Faces()), (name, 'reference faces changed')
+            assert _compatible(_solid_metrics(rw), _solid_metrics(bw)), (name, 'reference metrics changed')
+            row['verified_reference_geometry_preserved'] = True
         old_faces = Counter(face_signature(f) for f in aw.Faces())
         new_faces = Counter(face_signature(f) for f in bw.Faces())
         if name.startswith('cbeam_'):
@@ -141,6 +159,11 @@ def main():
                       'candidate_step_bytes':candidate.stat().st_size,
                       'original_zip_bytes':zipped_bytes(original), 'candidate_zip_bytes':zipped_bytes(candidate)}
     assert report['size']['candidate_step_bytes'] < report['size']['original_step_bytes']
+    if args.reference:
+        report['size']['reference_step_bytes'] = args.reference.stat().st_size
+        report['size']['reference_zip_bytes'] = zipped_bytes(args.reference)
+        assert report['size']['candidate_step_bytes'] < report['size']['reference_step_bytes']
+        assert report['size']['candidate_zip_bytes'] < report['size']['reference_zip_bytes']
     report['source_hashes_unchanged'] = all(sha256(path) == digest for path,digest in protected.items())
     assert report['source_hashes_unchanged']
     report['status'] = 'PASS'

@@ -538,5 +538,5 @@ if __name__ == "__main__":
         raise FileExistsError("Candidate exists; preserve it and choose a new OUT path")
     print(f"\nExporting to {os.path.basename(OUT)}...")
     t1 = time.time()
-    assy.save(OUT)
+    assy.save(OUT, write_pcurves=False)
     print(f"  {os.path.getsize(OUT) / 1024 / 1024:.1f} MB in {time.time() - t1:.1f}s")

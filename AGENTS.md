@@ -66,7 +66,7 @@ review.
 | `config.js` | Model variants, category order, project metadata |
 | `CAD/Components/` | OpenBuilds STEP parts library (70 files, CC BY-SA 4.0) |
 | `CAD/Advanced/` | Extended/compatible parts (76 files) |
-| `CAD/m3_2_assembly.py` | CadQuery assembly script: loads `CAD/M3-2_V1.0_baseline.step`, writes `CAD/M3-2_Assembly.step` |
+| `CAD/m3_2_assembly.py` | CadQuery assembly script: loads `CAD/M3-2_V1.0_baseline.step`, writes a local candidate for verification before promotion to `CAD/M3-2_Assembly.step` |
 | `CAD/z_travel.py` | Measures the Z carriage stroke from the assembly; firmware `position_max` must stay inside it |
 | `CAD/derive_z_motor_mount.py`, `CAD/z_bottom_holder.py` | Generate the Z motor mount (from the GrokBot STEP) and the Z bottom bearing holder in `CAD/Custom/` |
 | `migration-005-supplier-coverage.sql` | Historical — data now in data.json |
@@ -75,7 +75,7 @@ review.
 ## CadQuery Environment
 - **Venv:** `cad_venv/` (gitignored, Python 3.11 + CadQuery 2.7.0); any Python 3.11 environment with CadQuery 2.7 works
 - **Assembly input:** `CAD/M3-2_V1.0_baseline.step` (LFS): the 146-part V1.0 assembly. The Fusion export it came from (`M3-2_V1.0.step`) is no longer available.
-- **Assembly output:** `CAD/M3-2_Assembly.step` (LFS, 160 parts, ~24 MB)
+- **Assembly output:** `CAD/M3-2_Assembly.step` (LFS, 158 occurrences, 7,794,292 bytes); shared C-beam definition, standard `write_pcurves=False` export (2026-10-18). Generator writes a local candidate first; preserve previous exports in Git LFS history.
 - **Probe script:** `CAD/probe_steps.py` (bounding box inspector for STEP files)
 - **Self-check harness:** `CAD/self_check.py` (inventory / interference / layout audit, lead-screw stack, firmware `position_max` vs measured Z travel — run before and after any model changes)
 

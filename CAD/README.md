@@ -18,15 +18,24 @@ starts from `M3-2_V1.0_baseline.step`, the 146-part V1.0 assembly (2026-04-29),
 and adds the lead-screw Z on top of it. It also restores the 17 C-beams from
 the complete supplier solid, preserving all holes, cavities and world
 placements. All 17 use one shared STEP part definition to limit file size.
+Assembly exports use the standard `write_pcurves=False` option to omit
+redundant surface-parameter curves while retaining the 3D curves, surfaces,
+topology, colors and placements. No profile simplification or custom STEP
+text processing is applied.
 The script writes `M3-2_Assembly_cbeam_candidate.step` and refuses to overwrite
 an existing candidate. The baseline is preserved. The tracked
-`M3-2_Assembly.step` contains the verified complete-solid correction promoted
-on 2026-10-17; the previous open-shell export remains in Git LFS history.
+`M3-2_Assembly.step` contains the complete-solid correction from 2026-10-17
+with the smaller standard export verified on 2026-10-18. Both previous exports
+remain in Git LFS history.
 Future regeneration still writes a local candidate for verification before
 owner-approved replacement of the tracked export.
 
-The promoted STEP is 20,663,068 bytes, down from 24,668,018 bytes (16.2%).
-Its SHA-256 is `6c41f5ee9417a362556eef24541dcb32627a9314ed751aa88a6340c7a23dbfde`.
+The current STEP is 7,794,292 bytes, down from the previous corrected export's
+20,663,068 bytes (62.3%) and the historical open-shell export's 24,668,018 bytes.
+Its SHA-256 is `97069780e56865642f1e76120c09a4829876bf00b4fb3b8a28dfbf4e517c608a`.
+Comparable ZIP packaging (Deflate level 9, one `assembly.step` member) decreased
+from 3,581,382 to 1,350,436 bytes (62.3%). The full self-check output matches the
+previous corrected export: modeled Z stroke 728.88 mm and unchanged clearances.
 All 17 supplier profiles and placements were preserved without simplifying
 slots. CADCLAW's unchanged source-group qualification reconciled 158 solids
 across flat and XCAF imports with complete coverage; the assembly self-check
@@ -70,6 +79,12 @@ corrected export to pass. Verification compares all 158 occurrences,
 requires 17 valid closed supplier solids with 11 internal loops at both ends,
 and runs CADCLAW's existing source-group qualification without changing its
 rules. The candidate is ignored; keep recovery copies outside the repository.
+For an export-only change, also pass `--reference path/to/previous-solid.step`.
+This additionally checks every occurrence's face fingerprints, physical
+properties and colors against the previous verified solid assembly and requires
+both the STEP and a comparable ZIP package to be smaller. The 2026-10-17 solid
+reference SHA-256 is
+`6c41f5ee9417a362556eef24541dcb32627a9314ed751aa88a6340c7a23dbfde`.
 Replace the tracked export after approval rather than publishing
 duplicate full assemblies; Git LFS history retains prior revisions.
 
