@@ -68,7 +68,7 @@ Build Log #2 covers this workflow — the hybrid Fusion-plus-CadQuery pattern, t
 
 ## Get the Files
 
-- Full STEP assembly: [`CAD/M3-2_Assembly.step`](https://github.com/sunnyday-technologies/M3-CRETE/blob/main/CAD/M3-2_Assembly.step) — 7.79 MB (current export, updated October 18, 2026)
+- Full STEP assembly: [`CAD/M3-2_Assembly.step`](https://github.com/sunnyday-technologies/M3-CRETE/blob/main/CAD/M3-2_Assembly.step) — 5.13 MB (current export, updated October 18, 2026)
 - Parametric source: [`CAD/m3_2_assembly.py`](https://github.com/sunnyday-technologies/M3-CRETE/blob/main/CAD/m3_2_assembly.py)
 - Invariant harness (preview — deep dive in Log #2): [`CAD/preview_assembly.py`](https://github.com/sunnyday-technologies/M3-CRETE/blob/main/CAD/preview_assembly.py)
 - Interactive BOM: [m3-crete.com/bom](https://m3-crete.com/bom)

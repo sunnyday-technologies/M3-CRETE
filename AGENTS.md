@@ -75,7 +75,7 @@ review.
 ## CadQuery Environment
 - **Venv:** `cad_venv/` (gitignored, Python 3.11 + CadQuery 2.7.0); any Python 3.11 environment with CadQuery 2.7 works
 - **Assembly input:** `CAD/M3-2_V1.0_baseline.step` (LFS): the 146-part V1.0 assembly. The Fusion export it came from (`M3-2_V1.0.step`) is no longer available.
-- **Assembly output:** `CAD/M3-2_Assembly.step` (LFS, 158 occurrences, 7,794,292 bytes); shared C-beam definition, standard `write_pcurves=False` export (2026-10-18). Generator writes a local candidate first; preserve previous exports in Git LFS history.
+- **Assembly output:** `CAD/M3-2_Assembly.step` (LFS, 158 occurrences, 5,134,884 bytes); shared C-beam definition, `write_pcurves=False`, then exact geometry-record sharing and conservative whitespace compaction through `CAD/step_compact.py` (2026-10-18). Generator writes a local candidate first; preserve previous exports in Git LFS history.
 - **Probe script:** `CAD/probe_steps.py` (bounding box inspector for STEP files)
 - **Self-check harness:** `CAD/self_check.py` (inventory / interference / layout audit, lead-screw stack, firmware `position_max` vs measured Z travel — run before and after any model changes)
 

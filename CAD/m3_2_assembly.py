@@ -62,6 +62,7 @@ import math, os, time
 import z_bottom_holder as zbh
 import y_idler_plate as yip
 from cbeam_solids import CANDIDATE, restore_supplier_cbeams
+from step_compact import export_compact_assembly
 
 HERE = os.path.dirname(__file__)
 BASELINE    = os.path.join(HERE, "M3-2_V1.0_baseline.step")
@@ -538,5 +539,5 @@ if __name__ == "__main__":
         raise FileExistsError("Candidate exists; preserve it and choose a new OUT path")
     print(f"\nExporting to {os.path.basename(OUT)}...")
     t1 = time.time()
-    assy.save(OUT, write_pcurves=False)
+    export_compact_assembly(assy, OUT)
     print(f"  {os.path.getsize(OUT) / 1024 / 1024:.1f} MB in {time.time() - t1:.1f}s")

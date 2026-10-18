@@ -20,27 +20,33 @@ the complete supplier solid, preserving all holes, cavities and world
 placements. All 17 use one shared STEP part definition to limit file size.
 Assembly exports use the standard `write_pcurves=False` option to omit
 redundant surface-parameter curves while retaining the 3D curves, surfaces,
-topology, colors and placements. No profile simplification or custom STEP
-text processing is applied.
+topology, colors and placements. `step_compact.py` then shares exact duplicate
+geometric STEP records and conservatively compacts whitespace. It does not
+round numbers, merge topological records, or simplify any profile features.
+Both assembly export entry points use this same helper.
 The script writes `M3-2_Assembly_cbeam_candidate.step` and refuses to overwrite
 an existing candidate. The baseline is preserved. The tracked
 `M3-2_Assembly.step` contains the complete-solid correction from 2026-10-17
-with the smaller standard export verified on 2026-10-18. Both previous exports
+with exact geometry-record compaction verified on 2026-10-18. Previous exports
 remain in Git LFS history.
 Future regeneration still writes a local candidate for verification before
 owner-approved replacement of the tracked export.
 
-The current STEP is 7,794,292 bytes, down from the previous corrected export's
-20,663,068 bytes (62.3%) and the historical open-shell export's 24,668,018 bytes.
-Its SHA-256 is `97069780e56865642f1e76120c09a4829876bf00b4fb3b8a28dfbf4e517c608a`.
+The current STEP is 5,134,884 bytes, down from the previous standard export's
+7,794,292 bytes (34.1%). Earlier corrected and historical open-shell exports
+were 20,663,068 and 24,668,018 bytes respectively.
+Its SHA-256 is `ccd5b87e17b2c65020dca3de9c5e2879dd25777d5a0693a8315481ca3a69b13e`.
 Comparable ZIP packaging (Deflate level 9, one `assembly.step` member) decreased
-from 3,581,382 to 1,350,436 bytes (62.3%). The full self-check output matches the
+from 1,350,436 to 1,078,160 bytes (20.2%). The full self-check output matches the
 previous corrected export: modeled Z stroke 728.88 mm and unchanged clearances.
 All 17 supplier profiles and placements were preserved without simplifying
 slots. CADCLAW's unchanged source-group qualification reconciled 158 solids
 across flat and XCAF imports with complete coverage; the assembly self-check
 also passed. These results establish numerical CAD checks, not physical
 validation.
+Compaction passed CadQuery/OCP reimport and unchanged CADCLAW checks; independent
+imports in other CAD applications have not been tested. Keep the previous
+standard export in history for compatibility comparison or recovery.
 
 To modify the design, edit parameters in `m3_2_assembly.py` and regenerate the
 candidate. Do **not** hand-edit the derived STEP and expect those edits to
@@ -57,6 +63,7 @@ python CAD/z_bottom_holder.py       # Custom/Z_Bottom_Bearing_Holder_M3-2.step +
 python CAD/m3_2_assembly.py         # Generates a new M3-2_Assembly_cbeam_candidate.step
 python CAD/self_check.py CAD/M3-2_Assembly_cbeam_candidate.step  # Check the saved candidate
 python CAD/z_travel.py              # Z carriage stroke -> firmware position_max
+python CAD/test_step_compact.py      # Units, references, literals and topology regression tests
 python CAD/bom_generate.py          # bom_structural.csv, bom_hardware.csv, BOM_README.md
 ```
 
@@ -85,6 +92,9 @@ properties and colors against the previous verified solid assembly and requires
 both the STEP and a comparable ZIP package to be smaller. The 2026-10-17 solid
 reference SHA-256 is
 `6c41f5ee9417a362556eef24541dcb32627a9314ed751aa88a6340c7a23dbfde`.
+For the latest compaction comparison, use the preceding standard export from
+commit `07345e95d1ff0459b42c230addd94f052fa8a5a6`, with SHA-256
+`97069780e56865642f1e76120c09a4829876bf00b4fb3b8a28dfbf4e517c608a`.
 Replace the tracked export after approval rather than publishing
 duplicate full assemblies; Git LFS history retains prior revisions.
 
