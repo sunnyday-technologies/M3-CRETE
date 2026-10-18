@@ -11,3 +11,5 @@ CAD/*.F3D filter=lfs diff=lfs merge=lfs -text
 # ordinary blobs so github.com/.../raw/ links in bom/data.json stay plain files.
 # This early project file predates the LFS rule and is also stored plainly.
 CAD/ZPMM_v0.1_proj.3mf !filter !diff !merge -text
+# Preserve the measured supplier STEP bytes, including its original CRLF endings.
+"CAD/Advanced/Linear Rail/C-Beam 40x80x1000 Linear Rail.step" -text
