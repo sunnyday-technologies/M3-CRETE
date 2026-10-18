@@ -142,6 +142,11 @@ generated output (see "Source of Truth" above).
 
 ## Component Parts — Sources
 
+The [optimized standalone C-beam](Components/Optimized/README.md) is available
+alongside its original supplier file: 708,294 to 251,537 bytes (64.5% smaller).
+Its download, attribution, CC BY-SA 4.0 terms, placement and numerical
+verification are documented together.
+
 The standard V-Slot components in `Components/` are based on the [OpenBuilds](https://openbuilds.com) parts ecosystem, licensed under **CC BY-SA 4.0**.
 
 ### Where to Get STEP Files
