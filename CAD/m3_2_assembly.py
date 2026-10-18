@@ -48,7 +48,9 @@ On top of the baseline this script:
       608ZZ        id 89  envelope, in the bottom holder
     Envelopes are dimensioned stand-ins for vendor parts with no local STEP
     (owner decision 2026-10-12). They carry no holes.
-  - writes CAD/M3-2_Assembly.step (never the baseline)
+  - restores all 17 C-beams from the complete supplier solid (including holes
+    and cavities), matching the baseline's exterior orientation and placement
+  - writes CAD/M3-2_Assembly_cbeam_candidate.step; preserves both originals
 
 Screw axis: centre of the post's C-channel, AXIS_INSET mm inside the open
 face. The nut block (bore centred 6 mm from its face) is bolted flush to the
@@ -59,10 +61,11 @@ from cadquery import Assembly, Color, Location
 import math, os, time
 import z_bottom_holder as zbh
 import y_idler_plate as yip
+from cbeam_solids import CANDIDATE, restore_supplier_cbeams
 
 HERE = os.path.dirname(__file__)
 BASELINE    = os.path.join(HERE, "M3-2_V1.0_baseline.step")
-OUT         = os.path.join(HERE, "M3-2_Assembly.step")
+OUT         = str(CANDIDATE)
 MOUNT_STEP  = os.path.join(HERE, "Custom", "Z_NEMA23_Leadscrew_Motor_Mount_M3-2.step")
 HOLDER_STEP = zbh.OUT_STEP
 COLLAR_STEP = os.path.join(HERE, "Components", "Hardware", "Lock Collar 8mm.step")
@@ -522,11 +525,17 @@ for pb in post_bbs:
     print(f"  {tag}: screw axis ({axis[0]:.1f}, {axis[1]:.1f}), {AXIS_INSET:.0f} mm inside the open face; "
           f"hard stop top Z={stop_top:.1f}")
 
-print(f"\n  {len(assy.children)} parts total")
+# The frozen baseline has outer-wire prism shells. Restore the full supplier
+# solid only after all existing placement adjustments; never modify baseline.
+CBEAM_RESTORATION = restore_supplier_cbeams(assy)
+print(f"\n  {len(CBEAM_RESTORATION)} complete supplier C-beam solids")
+print(f"  {len(assy.children)} parts total")
 print(f"  Generation time: {time.time() - t0:.1f}s")
 
 if __name__ == "__main__":
     assert os.path.abspath(OUT) != os.path.abspath(BASELINE)
+    if os.path.exists(OUT):
+        raise FileExistsError("Candidate exists; preserve it and choose a new OUT path")
     print(f"\nExporting to {os.path.basename(OUT)}...")
     t1 = time.time()
     assy.save(OUT)

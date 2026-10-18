@@ -7,7 +7,7 @@ and a BRepAlgoAPI_Common check on suspicious pairs, and checks the lead-screw
 Z stack (BOM v2.9.0) against the measured carriage travel and the firmware.
 
 Run:
-  python CAD/self_check.py        (Python 3.11 + CadQuery 2.7)
+  python CAD/self_check.py [candidate.step]  (Python 3.11 + CadQuery 2.7)
 
 Exit code 0 if clean, 1 if any issue found.
 """
@@ -27,6 +27,11 @@ sys.stdout = sys.__stdout__
 
 import cadquery as cq
 import z_travel
+
+# With a path, check the saved/reimported artifact using the same design
+# parameters. Without one, check the generator's in-memory candidate.
+if len(sys.argv) > 1:
+    mod.assy = cq.Assembly.importStep(sys.argv[1])
 
 comp = mod.assy.toCompound()
 raw_parts = list(comp.Solids()) + list(comp.Shells())
@@ -208,16 +213,13 @@ def bb_overlap(a, b, tol=-0.01):
             b1.ymin < b2.ymax + tol and b2.ymin < b1.ymax + tol and
             b1.zmin < b2.zmax + tol and b2.zmin < b1.zmax + tol)
 
-# C-beams come through as open prism shells (no volume), so rebuild them as
-# solids from their end-profile edges before testing overlap.
-def cbeam_solid(sh):
-    bb = sh.BoundingBox(); dims = (bb.xlen, bb.ylen, bb.zlen)
-    ax = max(range(3), key=lambda i: dims[i]); lo = (bb.xmin, bb.ymin, bb.zmin)[ax]
-    edges = [e for e in sh.Edges() if all(abs(v.toTuple()[ax] - lo) < 1e-3 for v in e.Vertices())]
-    vec = [0.0, 0.0, 0.0]; vec[ax] = dims[ax]
-    return cq.Solid.extrudeLinear(cq.Face.makeFromWires(cq.Wire.assembleEdges(edges)), cq.Vector(*vec))
-
-solids = [(label_of(s), s if s.ShapeType() == "Solid" else cbeam_solid(s)) for s in parts]
+# Check actual geometry. Rebuilding shells here used to hide missing cavity
+# walls and end faces, so reject them instead of testing a filled proxy.
+invalid = [s for s in parts if s.ShapeType() != "Solid" or not s.isValid()]
+if invalid:
+    print(f"SELF-CHECK FAILED — {len(invalid)} non-solid or invalid operands; no reconstruction")
+    sys.exit(1)
+solids = [(label_of(s), s) for s in parts]
 for la, a in solids:
     if la != 'plate':
         continue
@@ -263,7 +265,7 @@ for p in posts:
                         f"centre and {inset:.1f} mm inside the open face (want 0 and {mod.AXIS_INSET})")
 
 # ---------- CHECK 7: lead-screw stack interference (true solids) ----------
-# Uses the same `solids` list as CHECK 4 (C-beams rebuilt by cbeam_solid).
+# Uses the same actual `solids` list as CHECK 4, including supplier cavities.
 STACK = ('z-motor-mount', 'leadscrew', 'nut-block', 'coupler', 'collar', 'thrust-brg',
          'bearing-608', 'z-bottom-holder')
 KNOWN = {}   # owner-tracked overlaps reported but not failed (none open)
