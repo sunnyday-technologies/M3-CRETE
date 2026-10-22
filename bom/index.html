@@ -1058,6 +1058,18 @@
             color: #ffcc02;
         }
 
+        .reference-cad {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .reference-cad h2 { font-size: 15px; margin: 0 0 6px; }
+        .reference-cad p { color: var(--text-secondary); margin: 6px 0; }
+        .reference-cad-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
         /* ── Responsive ───────────────────────────────── */
         @media (max-width: 768px) {
             .header-inner { flex-direction: column; text-align: center; }
@@ -1096,6 +1108,8 @@
         facility connection, inspection, or code compliance work must be performed by qualified personnel,
         a licensed electrician where required, or a qualified control-panel shop.
     </div>
+
+    <section class="reference-cad" id="referenceCAD" aria-label="Reference assembly CAD" hidden></section>
 
     <div class="toolbar">
         <input type="text" id="searchInput" placeholder="Search parts or suppliers..." oninput="handleSearch()">
@@ -1211,6 +1225,9 @@
 // ────────────────────────────────────────────────────
 const App = {
     parts: [],              // from data.json
+    bomVersion: null,
+    bomGenerated: null,
+    referenceAssembly: null,
     suppliersByPart: {},    // part_id -> [options]
     searchTerm: '',
     activeSuppliers: new Set(),   // multi-supplier selection
@@ -1250,6 +1267,9 @@ async function loadBOM() {
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const bom = await resp.json();
 
+        App.bomVersion = bom.version || null;
+        App.bomGenerated = bom.generated || null;
+        App.referenceAssembly = bom.reference_assembly || null;
         App.parts = bom.parts || [];
         App.suppliersByPart = {};
         App.parts.forEach(part => {
@@ -1257,10 +1277,46 @@ async function loadBOM() {
                 App.suppliersByPart[part.id] = part.suppliers;
             }
         });
+        renderReferenceAssembly();
     } catch (err) {
         console.error('Failed to load BOM:', err);
         showToast('Failed to load BOM data — check data.json', 'error');
     }
+}
+
+function renderReferenceAssembly() {
+    const panel = document.getElementById('referenceCAD');
+    const ref = App.referenceAssembly;
+    panel.hidden = !ref;
+    if (!ref) { panel.innerHTML = ''; return; }
+    const safeLink = (value) => {
+        try {
+            const url = new URL(value);
+            return url.protocol === 'https:' &&
+                ['github.com', 'raw.githubusercontent.com', 'media.githubusercontent.com'].includes(url.hostname)
+                ? url.href : null;
+        } catch { return null; }
+    };
+    const links = [
+        ['Download full STEP', ref.step_url],
+        ['Assembly ISO', ref.isometric_url],
+        ['Lead-screw view', ref.leadscrew_view_url],
+        ['Placement review', ref.review_url],
+        ['New mount STL (separate revision)', ref.new_mount_stl_url],
+        ['Mount revision notes', ref.mount_revision_url]
+    ].map(([label, value]) => {
+        const url = safeLink(value);
+        return url ? `<a class="btn" href="${escAttr(url)}" target="_blank" rel="noopener">${label}</a>` : '';
+    }).join('');
+    const selectionNote = App.activeModel !== ref.model
+        ? `The selected BOM is ${escHtml(App.activeModel)}; this CAD reference is ${escHtml(ref.model)}.` : '';
+    panel.innerHTML = `<h2>Reference CAD · ${escHtml(ref.model)}</h2>
+        <p>BOM v${escHtml(App.bomVersion || '')} · ${escHtml(ref.revision)} ·
+        ${escHtml(String(ref.occurrences))} modeled occurrences · ${escHtml(String(ref.v_wheels))} V-wheels,
+        including ${escHtml(String(ref.x_carriage_wheels))} on the two X-carriage plates.</p>
+        <p>${escHtml(ref.scope_note || '')}</p>
+        ${selectionNote ? `<p>${selectionNote}</p>` : ''}
+        <div class="reference-cad-links">${links}</div>`;
 }
 
 // ────────────────────────────────────────────────────
@@ -1306,6 +1362,7 @@ function setModel(modelKey) {
     renderSpecs();
     renderModelSelector();
     renderBOM();
+    renderReferenceAssembly();
 }
 
 function getPartDisplay(part) {
@@ -1506,13 +1563,16 @@ function renderBOM() {
                 const highlightStyle = isSelectedSupplier && !isPreferred ? 'border-color:var(--accent);background:rgba(151,215,0,0.08);' : '';
                 const preferredClass = isPreferred ? ' preferred' : '';
                 const stepBadge = opt.step_url
-                    ? `<a class="step-badge" href="${escAttr(opt.step_url)}" target="_blank" rel="noopener" title="STEP/3D model available" onclick="event.stopPropagation()">${stepIcon()} STEP</a>`
+                    ? `<a class="step-badge" href="${escAttr(opt.step_url)}" target="_blank" rel="noopener" title="STEP/3D model available" onclick="event.stopPropagation()">${stepIcon()} ${escHtml(opt.step_label || 'STEP')}</a>`
+                    : '';
+                const stlBadge = opt.stl_url
+                    ? `<a class="step-badge" href="${escAttr(opt.stl_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(opt.stl_label || 'STL')}</a>`
                     : '';
 
                 html += `<div class="supplier-card${preferredClass}" onclick="setPreferredSupplier(${part.id},${opt.id})" style="cursor:pointer;${highlightStyle}">
                     <div class="supplier-info">
                         <span class="supplier-name">${escHtml(opt.supplier_name)}</span>
-                        ${stepBadge}
+                        ${stepBadge} ${stlBadge}
                         <span class="supplier-notes">${escHtml(opt.notes || '')}</span>
                     </div>
                     ${opt.product_url
@@ -1901,6 +1961,9 @@ function exportJSON() {
     const bomData = {
         project: BOM_CONFIG.PROJECT_TITLE,
         model: App.activeModel,
+        bom_revision: App.bomVersion,
+        bom_source_generated: App.bomGenerated,
+        reference_assembly: App.referenceAssembly,
         generated: new Date().toISOString(),
         disclaimer: 'Supplier listings are community-contributed reference information, not endorsements. Prices, availability, and specifications may change. Verify all details before purchasing.',
         instructions: 'Skip parts where exclude_from_kit=true OR user_excluded=true. For remaining parts: if user_build_method is set, use that method (buy/print/cnc). If user_preferred_supplier is set, prioritize that supplier. Use MPN and SKU for exact product matching.',
@@ -1933,6 +1996,9 @@ function exportJSON() {
                         url: o.product_url || null,
                         notes: o.notes || null,
                         step_url: o.step_url || null,
+                        stl_url: o.stl_url || null,
+                        step_label: o.step_label || null,
+                        stl_label: o.stl_label || null,
                         is_preferred: o.id === choice.preferredSupplier
                     }))
                 };
@@ -2031,7 +2097,7 @@ function renderCADLibrary() {
                     ${stepOptions.map(o =>
                         o.step_url.startsWith('/')
                             ? `<span class="cad-source-link" title="In repo: ${escAttr(o.step_url)}">Repo: ${escHtml(o.step_url)}</span>`
-                            : `<a class="cad-source-link" href="${escAttr(o.step_url)}" target="_blank" rel="noopener" title="${escAttr(o.supplier_name)}">${escHtml(normalizeSupplier(o.supplier_name))}</a>`
+                            : `<a class="cad-source-link" href="${escAttr(o.step_url)}" target="_blank" rel="noopener" title="${escAttr(o.supplier_name)}">${escHtml(o.step_label || normalizeSupplier(o.supplier_name))}</a>${o.stl_url ? `<a class="cad-source-link" href="${escAttr(o.stl_url)}" target="_blank" rel="noopener">${escHtml(o.stl_label || 'STL')}</a>` : ''}`
                     ).join('')}
                 </div>
             </div>`;
@@ -2045,6 +2111,10 @@ function renderCADLibrary() {
 function exportCADManifest() {
     const manifest = {
         project: BOM_CONFIG.PROJECT_TITLE,
+        model: App.activeModel,
+        bom_revision: App.bomVersion,
+        bom_source_generated: App.bomGenerated,
+        reference_assembly: App.referenceAssembly,
         generated: new Date().toISOString(),
         description: 'STEP file download manifest for building the digital assembly model',
         instructions: [
@@ -2062,25 +2132,29 @@ function exportCADManifest() {
     const motionParts = App.parts.filter(p => p.category !== 'Concrete Extrusion System');
 
     motionParts.forEach(p => {
+        const display = getPartDisplay(p);
         const opts = (App.suppliersByPart[p.id] || []).filter(o => o.approved && o.step_url);
         if (opts.length > 0) {
             manifest.parts_with_cad.push({
                 category: p.category,
-                name: p.name,
-                qty: p.qty,
-                unit: p.unit,
+                name: display.name,
+                qty: display.qty,
+                unit: display.unit,
                 sources: opts.map(o => ({
                     supplier: o.supplier_name,
                     step_url: o.step_url,
+                    stl_url: o.stl_url || null,
+                    step_label: o.step_label || null,
+                    stl_label: o.stl_label || null,
                     notes: o.notes || ''
                 }))
             });
         } else {
             manifest.parts_without_cad.push({
                 category: p.category,
-                name: p.name,
-                qty: p.qty,
-                unit: p.unit
+                name: display.name,
+                qty: display.qty,
+                unit: display.unit
             });
         }
     });

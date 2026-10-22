@@ -51,7 +51,9 @@ earlier 154-part removal candidates and render attempts are superseded evidence.
 
 ## Review views
 
-These views use the exact reference STEP. Lead screws are smooth rods without
+These views use the exact reference STEP, including its older boxed Z motor
+mounts. The [newer open-access STL](Z_MOTOR_MOUNT_REVISIONS.md) is separate and
+is not shown in these assembly views. Lead screws are smooth rods without
 modeled threads. Reference approval does not establish fastening fit, preload,
 motor/plate clearance, or physical validation.
 

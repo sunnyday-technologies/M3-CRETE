@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
+      - name: Check BOM model selection, customization and exports
+        run: node --test scripts/test-bom-reference.mjs
+
       - name: Build web-only publish dir (allowlist + CAD/size/secret tripwires)
         shell: pwsh
         run: ./scripts/build-cloudflare-pages.ps1

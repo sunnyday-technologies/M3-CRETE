@@ -27,6 +27,23 @@ instructions.
 
 Developed by [Sunnyday Technologies](https://sunn3d.com).
 
+## Current reference CAD — 2026-10-22
+
+The [full M3-2 STEP](https://media.githubusercontent.com/media/sunnyday-technologies/M3-CRETE/main/CAD/M3-2_Assembly.step)
+retains 158 occurrences and 32 V-wheels, with eight wheels on the dual-plate
+X carriage. The owner-approved reference placement and bounded software checks
+are documented in the [placement review](CAD/X_CARRIAGE_REFERENCE_PLACEMENT.md).
+See the [assembly ISO](CAD/renders/reference_full_assembly_iso.png) and
+[ghosted lead-screw view](CAD/renders/reference_leadscrew_ghosted_iso.png).
+
+The full STEP and renders still use the older boxed Z motor mounts. The
+[newer owner-supplied open-access STL](CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_Open_Access_2026-10-22.stl)
+is a separate revision; a matching STEP, reviewed placement and physical fit
+are still needed. Read the [mount revision notes](CAD/Z_MOTOR_MOUNT_REVISIONS.md)
+before fabrication. [Customizable BOM v2.19](https://bom.m3-crete.com/bom/)
+links both revisions while preserving purchasing quantities and model defaults.
+Reference placement approval does not establish manufacturing or physical validation.
+
 | Spec | Value |
 |------|-------|
 | **Open BOM component target** | Under $5,000 for public mechanical/low-voltage reference components where current commodity pricing and substitutions allow; professional electrical/power-control scope is excluded |
