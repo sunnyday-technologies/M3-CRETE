@@ -13,6 +13,8 @@ On top of the baseline this script:
     the 4 top id 79 plates that carried them
   - drops exact duplicate placements carried over from v3 (gussets, idler
     brackets, one Y return idler)
+  - places the second four X-carriage wheels on the opposite parallel plate
+    by rigid placement (reference placement approved by owner 2026-10-22)
   - keeps one Y return idler per Y-gantry rail, fully inside the rail's open
     C-channel, and drops the strays and v3-generated extras (owner 2026-10-12);
     each idler sits over a printed id 66 plate on the channel floor
@@ -63,6 +65,7 @@ import z_bottom_holder as zbh
 import y_idler_plate as yip
 from cbeam_solids import CANDIDATE, restore_supplier_cbeams
 from step_compact import export_compact_assembly
+from x_carriage_placement import derive_x_carriage_proposal
 
 HERE = os.path.dirname(__file__)
 BASELINE    = os.path.join(HERE, "M3-2_V1.0_baseline.step")
@@ -157,6 +160,8 @@ print(f"Loading {os.path.basename(BASELINE)}...")
 t0 = time.time()
 base = Assembly.importStep(BASELINE)
 print(f"  {len(base.children)} children")
+# Resolve the exact authored names before legacy dedup can hide ambiguity.
+x_carriage_poses, x_carriage_proposal = derive_x_carriage_proposal(base.children)
 
 # ============================================================
 # Classify the baseline
@@ -341,9 +346,13 @@ def outward(bb):
 
 ZCARRIAGE_SIGS = ((3.0, 88.0, 127.0), (10.2, 23.9, 23.9))  # plate, V-wheel (only those that ride a post)
 
-assy = Assembly("M3-2_Assembly")
+# A positional string is an object, not a name, and exports an empty container.
+assy = Assembly(name="M3-2_Assembly")
 n_moved = n_wheels = n_zplates = 0
 for c in kept:
+    if c.name in x_carriage_poses:
+        assy.add(c.obj, name=c.name, loc=x_carriage_poses[c.name], color=c.color)
+        continue
     bb = world_bb(c)
     sg = sig_of(bb)
     if sg == (4.0, 80.0, 100.0) and bb.zmax < 150:
