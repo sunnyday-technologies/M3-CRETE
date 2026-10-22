@@ -8,10 +8,10 @@ The M3-2 reference assembly places STEP components and documented vendor-part
 envelopes using CadQuery + Python.
 
 **Status:** owner-approved dual-plate X-carriage reference placement, 158
-occurrences and 32 wheels (BOM v2.19.0, 2026-10-22). The full STEP and renders
-retain the older boxed Z motor mounts. A newer owner-authored open-access STL
-is provided separately; see [mount revision notes](Z_MOTOR_MOUNT_REVISIONS.md).
-Matching STEP, placement and fit qualification remain open for that newer mount.
+occurrences and 32 wheels (BOM v2.20.0, 2026-10-22). The full STEP and assembly
+renders retain the older boxed Z motor mounts. The separate open-access R2 mount
+now has a matching STEP/STL pair; see [mount revision notes](Z_MOTOR_MOUNT_REVISIONS.md).
+Its assembly placement, physical fit and load capacity remain unqualified.
 
 ### Source of Truth: `m3_2_assembly.py`
 

@@ -1302,7 +1302,9 @@ function renderReferenceAssembly() {
         ['Assembly ISO', ref.isometric_url],
         ['Lead-screw view', ref.leadscrew_view_url],
         ['Placement review', ref.review_url],
-        ['New mount STL (separate revision)', ref.new_mount_stl_url],
+        ['Mount R2 STEP (standalone)', ref.new_mount_step_url],
+        ['Matching mount R2 STL', ref.new_mount_stl_url],
+        ['Mount R2 preview', ref.mount_preview_url],
         ['Mount revision notes', ref.mount_revision_url]
     ].map(([label, value]) => {
         const url = safeLink(value);
@@ -1855,7 +1857,7 @@ function exportCSV() {
     const supplierSuffix = hasFilter ? '_' + [...App.activeSuppliers].map(s => s.toLowerCase().replace(/[^a-z0-9]+/g, '_')).join('+') : '';
     const fileName = `bom${modelSuffix}${supplierSuffix}_order.csv`;
 
-    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Order Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Excluded', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL']];
+    const rows = [['Category', 'Part Name', 'Description', 'Qty', 'Order Qty', 'Unit', 'Mfg Type', 'MPN', 'Substitute OK', 'Exclude From Kit', 'User Excluded', 'User Build Method', 'User Preferred', 'Supplier', 'SKU', 'Product URL', 'Notes', 'STEP File URL', 'STL File URL', 'CAD Revision', 'STEP SHA256', 'STL SHA256']];
 
     const grouped = {};
     App.parts.forEach(p => {
@@ -1896,7 +1898,7 @@ function exportCSV() {
                     part.mpn || '', part.substitute_ok !== false ? 'yes' : 'no',
                     part.exclude_from_kit ? 'yes' : 'no',
                     userExcl, userMfg, '',
-                    '', '', '', '', ''
+                    '', '', '', '', '', '', '', '', ''
                 ]);
             } else {
                 options.forEach(opt => {
@@ -1908,7 +1910,8 @@ function exportCSV() {
                         part.exclude_from_kit ? 'yes' : 'no',
                         userExcl, userMfg, isPref,
                         opt.supplier_name, opt.sku || '', opt.product_url || '',
-                        opt.notes || '', opt.step_url || ''
+                        opt.notes || '', opt.step_url || '', opt.stl_url || '',
+                        opt.cad_revision || '', opt.step_sha256 || '', opt.stl_sha256 || ''
                     ]);
                 });
             }
@@ -1999,6 +2002,9 @@ function exportJSON() {
                         stl_url: o.stl_url || null,
                         step_label: o.step_label || null,
                         stl_label: o.stl_label || null,
+                        cad_revision: o.cad_revision || null,
+                        step_sha256: o.step_sha256 || null,
+                        stl_sha256: o.stl_sha256 || null,
                         is_preferred: o.id === choice.preferredSupplier
                     }))
                 };
@@ -2146,6 +2152,9 @@ function exportCADManifest() {
                     stl_url: o.stl_url || null,
                     step_label: o.step_label || null,
                     stl_label: o.stl_label || null,
+                    cad_revision: o.cad_revision || null,
+                    step_sha256: o.step_sha256 || null,
+                    stl_sha256: o.stl_sha256 || null,
                     notes: o.notes || ''
                 }))
             });

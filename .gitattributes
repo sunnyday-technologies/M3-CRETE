@@ -13,3 +13,7 @@ CAD/*.F3D filter=lfs diff=lfs merge=lfs -text
 CAD/ZPMM_v0.1_proj.3mf !filter !diff !merge -text
 # Preserve the measured supplier STEP bytes, including its original CRLF endings.
 "CAD/Advanced/Linear Rail/C-Beam 40x80x1000 Linear Rail.step" -text
+
+# Preserve the owner-approved matching component export bytes.
+CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_Open_Access_2026-10-22_R2.step -text
+CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_Open_Access_2026-10-22_R2.stl -text

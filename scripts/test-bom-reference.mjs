@@ -2,6 +2,7 @@
 // A separate local browser smoke covers actual DOM controls and downloads.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { createContext, runInContext } from 'node:vm';
 import test from 'node:test';
 
@@ -75,12 +76,12 @@ test('default BOM and separate reference CAD/mount revisions are visible', async
     assert.equal(v.run('App.parts.length'), 74);
     const panel = v.panel('referenceCAD');
     assert.equal(panel.hidden, false);
-    for (const text of ['158 modeled occurrences', '32 V-wheels', 'older boxed', 'New mount STL', data.version]) assert.ok(panel.innerHTML.includes(text), text);
+    for (const text of ['158 modeled occurrences', '32 V-wheels', 'older boxed', 'Mount R2 STEP', 'Matching mount R2 STL', data.version]) assert.ok(panel.innerHTML.includes(text), text);
     const rows = v.panel('bomContent').innerHTML;
-    assert.ok(rows.includes('Older boxed STEP'));
-    assert.ok(rows.includes('New open-access STL'));
+    assert.ok(rows.includes('Open-access R2 STEP'));
+    assert.ok(rows.includes('Matching R2 STL'));
     v.run('renderCADLibrary()');
-    assert.ok(v.panel('cadLibraryBody').innerHTML.includes('New open-access STL'));
+    assert.ok(v.panel('cadLibraryBody').innerHTML.includes('Matching R2 STL'));
 });
 
 test('both models export their actual quantities and preserve the M3-2 CAD identity', async () => {
@@ -124,6 +125,11 @@ test('quantity, exclusion and Buy/Print/CNC selections survive CSV and JSON expo
         const csv = csvRows((await v.exported('exportCSV')).text).filter(p => p['Part Name'] === mount.name);
         for (const row of csv) {
             assert.equal(row['Order Qty'], '6'); assert.equal(row['User Excluded'], 'yes'); assert.equal(row['User Build Method'], method);
+            assert.equal(row['STEP File URL'], data.reference_assembly.new_mount_step_url);
+            assert.equal(row['STL File URL'], data.reference_assembly.new_mount_stl_url);
+            assert.equal(row['CAD Revision'], data.reference_assembly.mount_revision);
+            assert.equal(row['STEP SHA256'], data.reference_assembly.new_mount_step_sha256);
+            assert.equal(row['STL SHA256'], data.reference_assembly.new_mount_stl_sha256);
         }
         assert.ok(csv.some(row => row.Notes.includes(data.reference_assembly.new_mount_stl_url)));
     }
@@ -150,9 +156,42 @@ test('missing metadata hides the panel; hostile reference links and text are not
     assert.equal((await viewer(missing)).panel('referenceCAD').hidden, true);
     const hostile = structuredClone(data);
     hostile.reference_assembly.step_url = 'javascript:alert(1)';
+    hostile.reference_assembly.new_mount_step_url = 'javascript:alert(1)';
     hostile.reference_assembly.new_mount_stl_url = 'https://untrusted.invalid/file.stl';
     hostile.reference_assembly.scope_note = '<script>alert(1)</script>';
     const panel = (await viewer(hostile)).panel('referenceCAD').innerHTML;
     assert.ok(!panel.includes('javascript:') && !panel.includes('untrusted.invalid'));
     assert.ok(panel.includes('&lt;script&gt;'));
+});
+
+test('matched R2 payloads and both model exports retain exact revision identities', async () => {
+    const ref = data.reference_assembly;
+    assert.equal(ref.new_mount_step_sha256, '07c2f9bd17dae59e7227500572d690f7756a3b0efd16de308b3ba478f2fd8471');
+    assert.equal(ref.new_mount_stl_sha256, 'b5aa4d1592a386076116c0cd03266b4adc907a0082cfc06818975c422ef3c09b');
+    assert.equal(ref.step_sha256, '5d47e7a30f8de56bfd48f221d8add15aa5c191b45dbb1ae017f6df1c7575cba7');
+    for (const ext of ['step', 'stl']) {
+        const name = `CAD/Custom/Z_NEMA23_Leadscrew_Motor_Mount_Open_Access_2026-10-22_R2.${ext}`;
+        const payload = readFileSync(new URL(name, root));
+        assert.equal(createHash('sha256').update(payload).digest('hex'), ref[`new_mount_${ext}_sha256`]);
+        assert.ok(!payload.subarray(0, 100).toString().startsWith('version https://git-lfs'));
+    }
+    const v = await viewer();
+    for (const model of ['M3-1', 'M3-2']) {
+        v.run(`App.userChoices = {}; setModel('${model}'); adjustOrderQty(24, 1); setMfgChoice(24, 'buy')`);
+        const json = JSON.parse((await v.exported('exportJSON')).text);
+        const manifest = JSON.parse((await v.exported('exportCADManifest')).text);
+        const mount = partsFromJSON(json).find(p => p.name === data.parts.find(p => p.id === 24).name);
+        const sources = manifest.parts_with_cad.find(p => p.name === mount.name).sources;
+        for (const item of [...mount.suppliers, ...sources]) {
+            assert.equal(item.step_url, ref.new_mount_step_url);
+            assert.equal(item.stl_url, ref.new_mount_stl_url);
+            assert.equal(item.cad_revision, ref.mount_revision);
+            assert.equal(item.step_sha256, ref.new_mount_step_sha256);
+            assert.equal(item.stl_sha256, ref.new_mount_stl_sha256);
+        }
+        assert.equal(json.model, model);
+        assert.equal(manifest.model, model);
+        assert.equal(mount.qty, 4);
+        assert.equal(mount.user_build_method, 'buy');
+    }
 });
