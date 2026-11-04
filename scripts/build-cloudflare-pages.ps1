@@ -75,6 +75,7 @@ Copy-PublicFile ".well-known\security.txt"
 
 $publicDirs = @(
   ".well-known",
+  "assets",
   "blog",
   "build-guide",
   "images",

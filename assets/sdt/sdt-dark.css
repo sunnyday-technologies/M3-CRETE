@@ -1,0 +1,183 @@
+/* bom.m3-crete.com dark theme (tokens and base from the m3-crete.com release, 2026-11-04).
+   Applies when <html data-sdt-theme="dark">; data-sdt-page scopes the per-page rules. Loaded after each page's own
+   <style>, so every selector carries the html[data-sdt-theme] prefix; !important only where a page sets an inline color. */
+
+html[data-sdt-theme="dark"] {
+  color-scheme: dark;
+  background-color: #061321;
+  --d-bg: #061321;
+  --d-panel: rgba(11, 28, 48, 0.88);
+  --d-panel-solid: #0b1c30;
+  --d-band: rgba(3, 10, 19, 0.62);
+  --d-line: #1d3552;
+  --d-line-2: #2a4566;
+  --d-ink: #f0f4f7;
+  --d-text: #c9d6e0;
+  --d-muted: #9fb2c2;
+  --d-link: #a8e81a;
+  --d-link-hover: #c9f56a;
+  --d-green: #97d700;
+  --d-green-dim: #8db52a;
+
+  /* The pages' own palette (home, blog, guide, press, 404), retuned to these tokens.
+     The selector outranks the pages' :root, so it also replaces the home page's light palette. */
+  --black: #061321;
+  --charcoal: #0b1c30;
+  --graphite: #0f2035;
+  --border: #1d3552;
+  --mid: #2a4566;
+  --muted: #9fb2c2;
+  --light: #c9d6e0;
+  --white: #f0f4f7;
+  --accent: #97d700;
+  --accent-dim: #8db52a;
+  --brand-blue: #013a73;
+}
+
+/* Base: navy glow over near-black navy, behind everything (replaces the paper-noise layer). */
+html[data-sdt-theme="dark"] body {
+  background: transparent;
+  color: var(--d-text);
+}
+html[data-sdt-theme="dark"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  opacity: 1;
+  background:
+    radial-gradient(1100px 560px at 80% -8%, rgba(1, 58, 115, 0.55), rgba(1, 58, 115, 0) 70%),
+    radial-gradient(900px 620px at -10% 45%, rgba(1, 58, 115, 0.26), rgba(1, 58, 115, 0) 70%),
+    linear-gradient(180deg, #061321, #040d18);
+}
+html[data-sdt-theme="dark"] ::selection { background: var(--d-green); color: #061321; }
+
+/* Footer links (dim lime) and article links */
+html[data-sdt-theme="dark"] .footer-left a { color: var(--d-green-dim); }
+html[data-sdt-theme="dark"] .footer-left a:hover { color: var(--d-green); }
+html[data-sdt-theme="dark"] main.pillar-content a { color: var(--d-link); }
+html[data-sdt-theme="dark"] main.pillar-content a:hover { color: var(--d-link-hover); }
+html[data-sdt-theme="dark"] main.pillar-content :is(th, td) { border-color: var(--d-line-2); }
+html[data-sdt-theme="dark"] .footer .sdt-netfooter,
+html[data-sdt-theme="dark"] footer .sdt-netfooter { border-top-color: var(--d-line); }
+html[data-sdt-theme="dark"] .sdt-netfooter :is(a, .sdt-netfooter__label) { opacity: 1; }
+html[data-sdt-theme="dark"] .sdt-netfooter__label { color: var(--d-muted); }
+
+/* Build-guide series rail: "soon" steps stay dimmer, but readable. */
+html[data-sdt-theme="dark"] .series-step.soon { opacity: 0.85; }
+
+/* ---------------- Home: replaces the 2026-05-07 light refresh ---------------- */
+html[data-sdt-theme="dark"][data-sdt-page="home"] header {
+  background: rgba(6, 19, 33, 0.86);
+  border-bottom-color: rgba(151, 215, 0, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+html[data-sdt-theme="dark"][data-sdt-page="home"] :is(.logo-mark, h1, .spec-value, .block-title, .cta-col-word) {
+  color: var(--d-ink);
+}
+html[data-sdt-theme="dark"][data-sdt-page="home"] :is(h1 span, .hero-label, .spec-unit, a.cta-col-word-sub) { color: var(--d-green); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] nav a { color: #dce6ee; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] nav a:is(:hover, :focus-visible) { color: var(--d-green); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] :is(.hero-desc, .block-body) { color: var(--d-text); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] footer { color: var(--d-muted); background: rgba(4, 13, 24, 0.75); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] footer a { color: var(--d-text); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] footer a:hover { color: var(--d-green); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .footer-left span { color: inherit; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] :is(.spec-strip, .content, .cta-section) {
+  background: var(--d-panel);
+  border-color: var(--d-line);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+html[data-sdt-theme="dark"][data-sdt-page="home"] :is(.spec-item, .content-block, .cta-col) { border-color: var(--d-line); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .content-block.safety-boundary { background: rgba(151, 215, 0, 0.05); }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .btn-primary { background: var(--d-green); color: #061321; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .btn-primary:hover { background: #a8e81a; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  color: var(--d-ink);
+}
+html[data-sdt-theme="dark"][data-sdt-page="home"] .btn-secondary:hover { border-color: var(--d-green); color: var(--d-green); }
+/* The render is drawn on white: shown as a framed drawing sheet on the dark page. */
+html[data-sdt-theme="dark"][data-sdt-page="home"] .hero-image { position: relative; z-index: 10; margin: 0 3rem 4rem; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .hero-image img {
+  border: 1px solid var(--d-line-2);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+@media (max-width: 768px) {
+  html[data-sdt-theme="dark"][data-sdt-page="home"] .hero-image { margin: 0 1.5rem 3rem; }
+}
+/* Closing row: five big words did not fit five columns ("Validation." ran 90 px past the edge at 1280 px).
+   Words scale with the width, and the columns wrap to a second row before they get too narrow. */
+html[data-sdt-theme="dark"][data-sdt-page="home"] .cta-columns { flex-wrap: wrap; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] .cta-col { flex: 1 1 11.5rem; min-width: 0; }
+html[data-sdt-theme="dark"][data-sdt-page="home"] :is(.cta-col-word, .cta-col-word-sub) { font-size: clamp(1.75rem, 2.3vw, 3.5rem); }
+/* Spec strip: between tablet and desktop widths the fifth item was clipped; use the phone layout there too. */
+@media (min-width: 769px) and (max-width: 1000px) {
+  html[data-sdt-theme="dark"][data-sdt-page="home"] .spec-strip { flex-wrap: wrap; }
+  html[data-sdt-theme="dark"][data-sdt-page="home"] .spec-item { flex: 1 1 45%; border-right: none; border-bottom: 1px solid var(--d-line); }
+}
+
+/* ---------------- Interactive BOM ---------------- */
+html[data-sdt-theme="dark"][data-sdt-page="bom"] {
+  --bg: #061321;
+  --surface: #0b1c30;
+  --text: #f0f4f7;
+  --text-secondary: #9fb2c2;
+}
+html[data-sdt-theme="dark"][data-sdt-page="bom"] :is(.toolbar input[type="text"], .form-group input, .form-group textarea) {
+  background: var(--d-panel-solid);
+  color: var(--d-ink);
+  border: 1px solid var(--d-line-2);
+}
+html[data-sdt-theme="dark"][data-sdt-page="bom"] :is(.toolbar input[type="text"], .form-group input, .form-group textarea)::placeholder {
+  color: var(--d-muted);
+}
+/* Text on lime is navy, as on m3-crete.com. */
+html[data-sdt-theme="dark"][data-sdt-page="bom"] :is(.btn-primary, .supplier-chip.active, .model-chip.active) { color: #061321; }
+html[data-sdt-theme="dark"][data-sdt-page="bom"] .supplier-chip.active .chip-count { background: rgba(6, 19, 33, 0.18); }
+html[data-sdt-theme="dark"][data-sdt-page="bom"] #cadCount { color: #061321 !important; }
+/* Phones: a long spec chip wraps inside the column instead of pushing the page sideways. */
+@media (max-width: 600px) {
+  html[data-sdt-theme="dark"][data-sdt-page="bom"] .spec-chip { white-space: normal; max-width: 100%; }
+}
+
+/* ---------------- Superseded control-panel post (was a light page) ---------------- */
+html[data-sdt-theme="dark"][data-sdt-page="notice"] {
+  --ink: #f0f4f7;
+  --muted: #9fb2c2;
+  --border: #1d3552;
+  --blue: #f0f4f7;
+  --bg: #061321;
+}
+html[data-sdt-theme="dark"][data-sdt-page="notice"] .notice {
+  background: var(--d-panel);
+  border-color: var(--d-line);
+  border-left-color: var(--d-green);
+  color: var(--d-text);
+}
+html[data-sdt-theme="dark"][data-sdt-page="notice"] .button {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.34);
+  color: var(--d-ink);
+}
+html[data-sdt-theme="dark"][data-sdt-page="notice"] .button:hover { border-color: var(--d-green); }
+html[data-sdt-theme="dark"][data-sdt-page="notice"] main a:not(.button) { color: var(--d-link); }
+
+/* ---- Background layer (created by sdt-bg.js) ---- */
+html[data-sdt-theme="dark"] .sdt-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+html[data-sdt-theme="dark"] .sdt-bg canvas { display: block; width: 100%; height: 100%; }
+
+/* Print keeps the pages' own print rules (white paper). */
+@media print {
+  html[data-sdt-theme="dark"] { background: #fff; }
+  html[data-sdt-theme="dark"] body::before, html[data-sdt-theme="dark"] .sdt-bg { display: none !important; }
+}
