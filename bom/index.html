@@ -1358,7 +1358,7 @@ function renderModelSelector() {
     html += Object.entries(variants).map(([key, v]) =>
         `<div class="model-chip${key === active ? ' active' : ''}" onclick="setModel('${escAttr(key)}')">${escHtml(v.label)}</div>`
     ).join('');
-    html += `<span class="model-volume"><strong>Build:</strong> ${escHtml(activeModel?.volume || '')}</span>`;
+    html += `<span class="model-volume"><strong>Nominal envelope:</strong> ${escHtml(activeModel?.volume || '')}</span>`;
     container.innerHTML = html;
 }
 

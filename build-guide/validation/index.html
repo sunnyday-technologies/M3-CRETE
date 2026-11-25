@@ -157,9 +157,9 @@
     <h2>Words to know</h2>
     <dl class="glossary">
       <dt>Run current</dt><dd>How much electrical current each motor gets. More current = more force, but more heat.</dd>
-      <dt>StallGuard</dt><dd>A feature inside the motor driver that senses when a motor pushes against a hard stop ("stalls"). We use it instead of limit switches.</dd>
-      <dt>Sensorless homing</dt><dd>Finding the "zero" position by driving an axis until it gently stalls against the frame, using StallGuard.</dd>
-      <dt>SGT</dt><dd>The StallGuard sensitivity setting. Higher = less sensitive; lower = more sensitive.</dd>
+      <dt>StallGuard</dt><dd>A motor-driver feature that estimates motor load. The M3-2 design uses this signal to detect bottom Z home.</dd>
+      <dt>Sensorless homing</dt><dd>Homing from a motor-driver signal. Controls review must establish whether StallGuard is sensitive enough on the installed machine or a separate homing probe is needed.</dd>
+      <dt>SGT</dt><dd>The StallGuard sensitivity setting.</dd>
       <dt>Coplanar / level</dt><dd>All four corners of the gantry sitting at the same height.</dd>
       <dt>Dry run</dt><dd>Moving the printer through its motions with no concrete, to check everything works.</dd>
     </dl>
