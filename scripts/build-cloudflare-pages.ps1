@@ -180,6 +180,10 @@ $unfilled = Get-ChildItem -LiteralPath $Target -Recurse -Force -File |
   Select-Object -ExpandProperty Path -Unique
 if ($unfilled) { throw "Unfilled {{BOM_*}} token(s) in: $($unfilled -join ', ')" }
 
+# Generate the editorial inventory from the same files this build publishes.
+& python (Join-Path $ScriptDir "editorial-index.py") $Target
+if ($LASTEXITCODE -ne 0) { throw "Could not generate the M3 editorial inventory" }
+
 # Parse every published JSON document. A malformed discovery or BOM resource is
 # a release failure, not a browser-only problem.
 $jsonFiles = Get-ChildItem -LiteralPath $Target -Recurse -Force -File -Filter "*.json"
