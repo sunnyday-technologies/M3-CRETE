@@ -374,19 +374,6 @@
     }
 
 
-    /* — ANIMATIONS — */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .hero-label  { animation: fadeUp 0.6s ease both; animation-delay: 0.1s; }
-    h1           { animation: fadeUp 0.7s ease both; animation-delay: 0.2s; }
-    .hero-desc   { animation: fadeUp 0.7s ease both; animation-delay: 0.35s; }
-    .spec-strip  { animation: fadeUp 0.7s ease both; animation-delay: 0.45s; }
-    .content     { animation: fadeUp 0.7s ease both; animation-delay: 0.55s; }
-    .cta-section { animation: fadeUp 0.7s ease both; animation-delay: 0.65s; }
-
     /* — RESPONSIVE — */
     @media (max-width: 768px) {
       header { padding: 1.25rem 1.5rem; }
@@ -524,6 +511,12 @@
 </script>
   <link rel="stylesheet" href="/assets/sdt/sdt-dark.css" />
   <script src="/assets/sdt/sdt-bg.js" defer></script>
+<style>
+    .hero h1 { font-size: clamp(2.75rem, 9vw, 7rem); }
+    .hero-desc a { color: inherit; text-underline-offset: 0.15em; }
+    html[data-sdt-theme="dark"][data-sdt-page="home"] :is(.spec-strip, .content, .cta-section, footer) { background: #0b1c30; }
+    .footer-left a { text-decoration: underline; }
+  </style>
 </head>
 <body>
 
@@ -534,25 +527,26 @@
       <span class="logo-sub">by Sunnyday Technologies</span>
     </div>
     <nav aria-label="Primary">
-      <a href="/bom/" aria-label="Interactive Bill of Materials viewer">BOM</a> &nbsp;&nbsp;
-      <a href="/build-guide/" aria-label="Experimental build reference">Guide</a> &nbsp;&nbsp;
+      <a href="/bom/" aria-label="BOM viewer (interactive bill of materials)">BOM</a> &nbsp;&nbsp;
+      <a href="/build-guide/" aria-label="Guide to the experimental build reference">Guide</a> &nbsp;&nbsp;
       <a href="/blog/" aria-label="M3-CRETE development blog">Blog</a> &nbsp;&nbsp;
       <a href="/press/" aria-label="M3-CRETE press and media">Press</a> &nbsp;&nbsp;
-      <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="Sunnyday Technologies parent site (opens in new tab)">sunn3d.com</a>
+      <a href="https://sunn3d.com" target="_blank" rel="noopener" aria-label="sunn3d.com · Sunnyday Technologies (opens in new tab)">sunn3d.com</a>
     </nav>
   </header>
 
+  <main>
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-label">Open-Source Hardware // Additive Construction</div>
-    <h1>Concrete.<br/><span>Printed.</span><br/>Open.</h1>
+    <div class="hero-label">Open hardware</div>
+    <h1>M3-CRETE</h1>
     <p class="hero-desc">The default M3-2 design uses four Tr8×2 lead screws to lift the gantry, one at each corner. GT2 belts drive X and Y.
       Qualified teams can inspect the <a href="/bom/">bill of materials</a> and work-in-progress build reference.
       Field suitability remains unverified. Building or operating the system requires independent engineering, electrical, safety, and commissioning review.</p>
   </section>
 
 <section class="hero-image">
-  <img src="images/M3-CRETE_render.jpg" alt="M3-Crete Printer Render" style="max-width: 100%; height: auto; display: block;" />
+  <img src="images/M3-CRETE_render.jpg" alt="CAD rendering of the M3-CRETE printer frame and gantry" style="max-width: 100%; height: auto; display: block;" />
 </section>
   <!-- SPEC STRIP -->
   <div class="spec-strip">
@@ -582,7 +576,7 @@
   <div class="content">
     <div class="content-block">
       <div class="block-num">// 01</div>
-      <div class="block-title">What It Is</div>
+      <div class="block-title">Motion system</div>
       <p class="block-body">
         A pallet-scale concrete/paste-printer development design based on a scaled
         Cartesian dual-Y belt-pinion architecture with quad-Z self-tramming.
@@ -594,17 +588,15 @@
     </div>
     <div class="content-block">
       <div class="block-num">// 02</div>
-      <div class="block-title">Why Open Source</div>
+      <div class="block-title">Design files</div>
       <p class="block-body">
-        The concrete 3D printing industry moves faster when hardware isn't a
-        barrier. M3-CRETE is released openly so researchers, universities, and
-        contractors can inspect, modify, and improve a published CAD/BOM development baseline.
+        The public CAD and BOM are available for inspection and modification.
         Any build or material selection requires the builder's own safety review and validation.
       </p>
     </div>
     <div class="content-block">
       <div class="block-num">// 03</div>
-      <div class="block-title">CEMFORGE™ Integration</div>
+      <div class="block-title">Materials research with CEMFORGE™</div>
       <p class="block-body">
         CEMFORGE can organize material evidence and identify gaps for controlled
         research planning. It does not supply a production-approved M3-CRETE mix,
@@ -642,11 +634,11 @@
   <div class="cta-section">
     <div class="cta-columns">
       <div class="cta-col">
-        <a href="https://sunn3d.com" class="cta-col-word-sub" target="_blank" rel="noopener" aria-label="Visit Sunnyday Technologies (opens in new tab)">Concrete.</a>
+        <a href="https://sunn3d.com" class="cta-col-word-sub" target="_blank" rel="noopener" aria-label="Concrete. Visit Sunnyday Technologies (opens in new tab)">Concrete.</a>
       </div>
       <div class="cta-col">
         <div class="cta-col-word">Printed.</div>
-        <a class="btn btn-primary" href="/bom/" aria-label="Open the interactive Bill of Materials">
+        <a class="btn btn-primary" href="/bom/" aria-label="Interactive BOM (bill of materials)">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
             <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
           </svg>
@@ -661,19 +653,19 @@
       </div>
       <div class="cta-col">
         <div class="cta-col-word">Data.</div>
-        <a class="btn btn-secondary" href="https://cemforge.ai" target="_blank" rel="noopener" aria-label="CEMFORGE AI mix-formulation platform (opens in new tab)">
+        <a class="btn btn-secondary" href="https://cemforge.ai" target="_blank" rel="noopener" aria-label="CEMFORGE Platform → materials research (opens in new tab)">
           CEMFORGE Platform &rarr;
         </a>
       </div>
       <div class="cta-col">
         <div class="cta-col-word">Schema.</div>
-        <a class="btn btn-secondary" href="https://open3dcp.org" target="_blank" rel="noopener" aria-label="Open3DCP public data schema (opens in new tab)">
-          Open3DCP Standard &rarr;
+        <a class="btn btn-secondary" href="https://open3dcp.org" target="_blank" rel="noopener" aria-label="Open3DCP draft schema → (opens in new tab)">
+          Open3DCP draft schema &rarr;
         </a>
       </div>
       <div class="cta-col">
         <div class="cta-col-word">Validation.</div>
-        <a class="btn btn-secondary" href="https://cadclaw.io" target="_blank" rel="noopener" aria-label="CADCLAW CAD assembly and validation framework (opens in new tab)">
+        <a class="btn btn-secondary" href="https://cadclaw.io" target="_blank" rel="noopener" aria-label="CADCLAW → CAD assembly and validation (opens in new tab)">
           CADCLAW &rarr;
         </a>
       </div>
@@ -681,6 +673,7 @@
   </div>
 
   <!-- FOOTER -->
+  </main>
   <footer>
     <div class="footer-left">
       © 2026 Sunnyday Technologies LLC &nbsp;·&nbsp;

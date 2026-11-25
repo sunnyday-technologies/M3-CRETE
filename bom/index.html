@@ -1114,7 +1114,7 @@
     <section class="reference-cad" id="referenceCAD" aria-label="Reference assembly CAD" hidden></section>
 
     <div class="toolbar">
-        <input type="text" id="searchInput" placeholder="Search parts or suppliers..." oninput="handleSearch()">
+        <input type="text" id="searchInput" aria-label="Search parts or suppliers" placeholder="Search parts or suppliers..." oninput="handleSearch()">
         <button class="btn" onclick="exportCSV()">Export CSV</button>
         <button class="btn" onclick="exportJSON()">Export JSON</button>
         <a class="btn" href="BUYING_GUIDE_PROMPT.md" target="_blank" rel="noopener" style="text-decoration:none">AI Buying Guide</a>
@@ -1134,7 +1134,7 @@
             <h3>Select Your Suppliers</h3>
             <button class="supplier-clear" id="supplierClearBtn" onclick="clearSupplierFilter()">Clear all</button>
         </div>
-        <p style="font-size:12px;color:var(--text-dim);margin:-4px 0 8px 0">Click suppliers to build your shopping list. Parts not covered will be flagged.</p>
+        <p style="font-size:12px;color:var(--text-dim);margin:-4px 0 8px 0">Select suppliers to see which parts they cover.</p>
         <div class="supplier-chips" id="supplierChips"></div>
     </div>
 
@@ -1169,11 +1169,8 @@
 
     <div class="bom-help" id="bomHelp">
         <div class="bom-help-text">
-            <span>Customize your build:</span>
-            Check <span>I have this</span> to exclude parts you own.
-            Toggle <span>Buy / Print / CNC</span> on fabricated parts.
-            Click a <span>supplier card</span> to mark it preferred.
-            Then <span>Export JSON</span> (above, next to search) → paste into your AI assistant for a priced buy list.
+            Select <span>I have this</span> for parts you own. Choose <span>Buy / Print / CNC</span> for fabricated parts.
+            Select a supplier card to save a preference. <span>Export JSON</span> includes your choices for pricing.
         </div>
         <button class="bom-help-dismiss" onclick="this.closest('.bom-help').style.display='none'" title="Dismiss">&times;</button>
     </div>
