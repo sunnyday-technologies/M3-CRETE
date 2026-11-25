@@ -131,6 +131,7 @@
     </nav>
 
     <h1>M3-CRETE Preliminary Motion Checkout</h1>
+<div class="callout warn" id="z-homing-hold"><p><strong>Z-homing commissioning hold.</strong> Do not use this guide to commission Z motion or homing. A qualified controls reviewer must first reconcile the hardware, installed firmware and commissioning plan for this machine.</p></div>
     <p class="lede">These development notes cover limited current, direction, sensorless-homing, and Z-alignment observations for qualified technical teams. They are not the last step before printing and do not replace a risk assessment, engineered controls, guarding, professional electrical review, commissioning plan, or material-process validation.</p>
 
     <div class="meta-cards">
@@ -150,7 +151,7 @@
       <li>A fully assembled frame (<a href="/build-guide/frame/">Part 1</a>), wired (Part 2), with software installed and showing <strong>Klipper: Ready</strong> (<a href="/build-guide/software/">Part 3</a>).</li>
       <li>A <strong>tape measure or calipers</strong> to check the corners are level.</li>
       <li>A browser open to <strong>Mainsail</strong> (the printer's dashboard).</li>
-      <li>Notes from Part 3 on any motor that jogged the wrong direction.</li>
+      <li>The hardware and firmware revisions for the machine under review.</li>
     </ul>
 
     <h2>Words to know</h2>
@@ -163,74 +164,31 @@
       <dt>Dry run</dt><dd>Moving the printer through its motions with no concrete, to check everything works.</dd>
     </dl>
 
-    <h2>Validate the Z axis</h2>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">1</span><h3>Set the motor current</h3></div>
-      <p>In Mainsail, open <code>printer.cfg</code>. For each Z driver section (<code>[tmc5160 stepper_z]</code>, <code>stepper_z1</code>, <code>z2</code>, <code>z3</code>), find <code>run_current</code>. Start at <code>1.2</code> to confirm nothing is wrong, then raise toward <code>1.5</code>–<code>1.8</code> so the motors can lift the gantry. <strong>Never go above about 2.0</strong> for these 2.8 A motors. Click <strong>Save &amp; Restart</strong> after changes.</p>
-      <div class="callout warn"><span class="tag">Watch the heat</span><p>After a few minutes of holding, a motor should be warm, not too hot to touch. If it is too hot, lower <code>run_current</code>.</p></div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">2</span><h3>Fix any wrong directions</h3></div>
-      <p>Using your notes from Part 3: if a corner went <em>down</em> when you sent it up, that motor's direction is reversed. In <code>printer.cfg</code>, find that motor's <code>dir_pin</code> and add or remove a <code>!</code> in front of the pin name. Save &amp; Restart, then re-test with <code>ZJOG MOTOR=n DIST=5 VEL=3</code>. All four should now raise their corner with a positive number.</p>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">3</span><h3>Tune the stall sensing (this is the careful part)</h3></div>
-      <p>Each Z motor must reliably feel when it reaches the top of the frame. Tune one driver at a time. First make sure <code>run_current</code> is already at your final value (the sensing changes if you change current later). Then adjust <code>driver_SGT</code> in that driver's section:</p>
-      <ul>
-        <li>If a motor <strong>stops too early</strong> (before reaching the top): <strong>raise</strong> <code>driver_SGT</code> by 1 (less sensitive).</li>
-        <li>If a motor <strong>crashes into the top</strong> without stopping: <strong>lower</strong> <code>driver_SGT</code> by 1 (more sensitive).</li>
-      </ul>
-      <p>Change one number, run <code>FIRMWARE_RESTART</code>, and test again. The command <code>ZSTATUS</code> shows live load numbers to help. Repeat until each corner stops cleanly and repeatably at the top.</p>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">4</span><h3>Home all four corners</h3></div>
-      <p>In the console, type:</p>
-      <pre><code>HOME_Z</code></pre>
-      <p>Clear the build area first: Z homes downward. All four corners drive down. You should see (and hear) <strong>four separate gentle stops</strong> as each carriage meets its hard-stop block, then a 10 mm lift. Each corner sets its own zero at the point it stalled. This is how the printer levels itself without any probe.</p>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">5</span><h3>Check the gantry is level</h3></div>
-      <p>After homing, measure the height of the gantry at each of the four corners (from the build surface, or from the base). They should all match within a couple of millimeters. If one corner is off, check that corner's hard-stop block height and coupler, re-run the stall tuning for it, then <code>HOME_Z</code> again.</p>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">6</span><h3>Dry-run the Z motion</h3></div>
-      <p>Jog the gantry up and down through its travel a few times (small moves first, then larger). Watch and listen for: smooth motion, no grinding, no binding or noisy lead screws, and no corner lagging behind. The four corners should stay level as they move.</p>
-    </div>
+    <h2>Z-axis commissioning on hold</h2>
+    <p>Do not set motor current or direction, tune stall detection, home or jog the Z axes using this guide. The <a href="#z-homing-hold">commissioning hold</a> applies to all four corners.</p>
 
     <h2>Professional safety-function verification (outside this guide)</h2>
 
     <div class="step">
-      <div class="step-head"><span class="step-num">7</span><h3>Record qualified stop-function verification</h3></div>
+      <div class="step-head"><h3>Record qualified stop-function verification</h3></div>
       <p>Do not design or test an emergency-stop function from this public guide. A qualified controls/electrical professional must define the required stop behavior, energy removal, reset/restart controls, fault response, test method, and acceptance evidence for the actual machine and jurisdiction.</p>
     </div>
 
     <div class="step">
-      <div class="step-head"><span class="step-num">8</span><h3>Route the system to a formal readiness review</h3></div>
+      <div class="step-head"><h3>Route the system to a formal readiness review</h3></div>
       <p>The observations below can support a review, but they are not a readiness gate. Printing remains blocked until responsible qualified owners approve the complete mechanical, electrical, controls, guarding, pump/pressure, material, facility, operating, and emergency-response scope.</p>
     </div>
 
     <h2>Preliminary motion-check evidence</h2>
     <p>Record these observations only within an approved test plan. Completion does not authorize material printing.</p>
     <ul class="checklist">
-      <li>Motor current set to working value and motors stay only warm, not hot.</li>
-      <li>All four Z corners jog the correct direction.</li>
-      <li>Stall sensing tuned — each corner stops cleanly and repeatably at the top.</li>
-      <li><code>HOME_Z</code> gives four clean stops and a lift, every time.</li>
-      <li>Gantry measures level at all four corners after homing.</li>
-      <li>Z dry-run is smooth, no slipping or lagging.</li>
       <li>Qualified professional's separate stop-function verification record is identified.</li>
       <li>Equivalent axis-specific checks are defined for X, Y, and any extruder drive; no axis is inferred from Z results.</li>
     </ul>
 
     <h2>If you get stuck</h2>
     <ul>
-      <li>See the per-stage commissioning notes in the firmware repo: <a href="https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE" target="_blank" rel="noopener">M3-CRETE-FIRMWARE</a>.</li>
+      <li>Firmware reference for the qualified controls reviewer: <a href="https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE" target="_blank" rel="noopener">M3-CRETE-FIRMWARE</a>.</li>
       <li>Ask on <a href="https://github.com/sunnyday-technologies/M3-CRETE/discussions" target="_blank" rel="noopener">M3-CRETE Discussions</a>.</li>
       <li>Klipper sensorless-homing reference: <a href="https://www.klipper3d.org/Sensorless_Homing.html" target="_blank" rel="noopener">klipper3d.org</a>.</li>
     </ul>

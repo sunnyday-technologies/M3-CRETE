@@ -1332,7 +1332,12 @@ function renderSpecs() {
     // Override Build Volume based on active model
     const model = BOM_CONFIG.MODEL_VARIANTS?.[App.activeModel];
     if (model?.volume) {
-        specs['Build Volume'] = model.volume;
+        if (App.activeModel === 'M3-2') {
+            delete specs['Build Volume'];
+            specs['Nominal design envelope'] = 'X 2 m × Y 1 m × Z 1 m (2 m³)';
+        } else {
+            specs['Build Volume'] = model.volume;
+        }
     }
     // Remove Variants from spec chips (shown in model selector instead)
     delete specs['Variants'];

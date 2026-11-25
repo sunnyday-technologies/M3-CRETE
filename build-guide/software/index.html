@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>M3-CRETE Software Setup: Install Klipper Step-by-Step (Beginner Guide)</title>
-  <meta name="description" content="Part 3 of the M3-CRETE build series. A plain-language, step-by-step guide to installing all the software for the M3-CRETE concrete 3D printer: flash the Raspberry Pi, set up Klipper, Moonraker, Mainsail, and KlipperScreen, flash the BTT Kraken board, install the M3-CRETE config, and run a first motor test." />
+  <meta name="description" content="Part 3 of the M3-CRETE build series. A plain-language, step-by-step guide to installing all the software for the M3-CRETE concrete 3D printer: flash the Raspberry Pi, set up Klipper, Moonraker, Mainsail, and KlipperScreen, flash the BTT Kraken board, install the M3-CRETE config. Z-motion commissioning is on hold." />
   <!-- Open Graph -->
   <meta property="og:title" content="M3-CRETE Software Setup: Install Klipper Step-by-Step (Beginner Guide)" />
-  <meta property="og:description" content="Plain-language guide to installing all M3-CRETE printer software: Raspberry Pi image, Klipper, Moonraker, Mainsail, KlipperScreen, flashing the BTT Kraken, and a first motor test." />
+  <meta property="og:description" content="Plain-language guide to installing all M3-CRETE printer software: Raspberry Pi image, Klipper, Moonraker, Mainsail, KlipperScreen, flashing the BTT Kraken. Z-motion commissioning is on hold." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://bom.m3-crete.com/build-guide/software/" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="M3-CRETE Software Setup: Install Klipper Step-by-Step" />
-  <meta name="twitter:description" content="Plain-language guide to installing all M3-CRETE printer software and running a first motor test." />
+  <meta name="twitter:description" content="Plain-language guide to installing all M3-CRETE printer software. Z-motion commissioning is on hold." />
   <link rel="canonical" href="https://bom.m3-crete.com/build-guide/software/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -220,7 +220,7 @@
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to install the M3-CRETE printer software (Klipper)",
-    "description": "Step-by-step beginner guide to installing all software for the M3-CRETE open-source concrete 3D printer: Raspberry Pi image, Klipper, Moonraker, Mainsail, KlipperScreen, flashing the BTT Kraken board, installing the M3-CRETE config, and a first motor test.",
+    "description": "Step-by-step beginner guide to installing all software for the M3-CRETE open-source concrete 3D printer: Raspberry Pi image, Klipper, Moonraker, Mainsail, KlipperScreen, flashing the BTT Kraken board, installing the M3-CRETE config. Z-motion commissioning is on hold.",
     "totalTime": "PT2H",
     "tool": [
       {"@type": "HowToTool", "name": "Raspberry Pi 5"},
@@ -234,8 +234,7 @@
       {"@type": "HowToStep", "name": "Turn it on and open the dashboard", "url": "https://bom.m3-crete.com/build-guide/software/#part2"},
       {"@type": "HowToStep", "name": "Put firmware on the control board", "url": "https://bom.m3-crete.com/build-guide/software/#part3"},
       {"@type": "HowToStep", "name": "Install the M3-CRETE settings", "url": "https://bom.m3-crete.com/build-guide/software/#part4"},
-      {"@type": "HowToStep", "name": "Check that everything is talking", "url": "https://bom.m3-crete.com/build-guide/software/#part5"},
-      {"@type": "HowToStep", "name": "Run a first motor test", "url": "https://bom.m3-crete.com/build-guide/software/#part6"}
+      {"@type": "HowToStep", "name": "Check that everything is talking", "url": "https://bom.m3-crete.com/build-guide/software/#part5"}
     ],
     "publisher": {"@type": "Organization", "name": "Sunnyday Technologies", "url": "https://sunn3d.com"},
     "license": "https://creativecommons.org/licenses/by/4.0/"
@@ -270,6 +269,7 @@
     </nav>
 
     <h1>M3-CRETE Software Setup</h1>
+<div class="callout warn" id="z-homing-hold"><p><strong>Z-homing commissioning hold.</strong> Do not use this guide to commission Z motion or homing. A qualified controls reviewer must first reconcile the hardware, installed firmware and commissioning plan for this machine.</p></div>
     <p class="lede">These development notes describe the current software reference and limited motion-check preparation for qualified technical teams. They are not a complete installation, controls-validation, cybersecurity, commissioning, or safety procedure.</p>
 
     <div class="meta-cards">
@@ -432,39 +432,11 @@ bash install.sh</code></pre>
       </div>
     </div>
 
-    <h2 id="part6">Part 6 — First motor test (the 4 Z motors)</h2>
-    <p>This is the moment of truth: making the four Z motors move. We test them one at a time, gently, at low power. Full tuning and the homing setup are covered in <strong>Part 4 (Validation)</strong>.</p>
-
+    <h2 id="part6">Z motion and homing on hold</h2>
+    <p>Do not use this section for commissioning. Follow the <a href="#z-homing-hold">qualified controls review requirement</a>.</p>
     <div class="callout warn">
       <span class="tag">Safety</span>
       <p>Stand clear of the machine. A motor can spin a belt or move the gantry. Keep the big motor power supply and the pump <strong>off</strong>. Have your hand near the printer's power switch so you can cut power fast if something looks wrong.</p>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">12</span><h3>Wake up the motors</h3></div>
-      <p>In Mainsail, find the <strong>Console</strong> (the box where you can type commands). Type:</p>
-      <pre><code>ZHOLD</code></pre>
-      <p>All four Z motors should now "hold" — try to turn one by hand and it should resist. To let them go free again, type <code>ZRELEASE</code>.</p>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="step-num">13</span><h3>Jog each motor, one at a time</h3></div>
-      <p>Type these, one at a time. Each one nudges a single motor a small amount:</p>
-      <pre><code>ZJOG MOTOR=0 DIST=5 VEL=3
-ZJOG MOTOR=1 DIST=5 VEL=3
-ZJOG MOTOR=2 DIST=5 VEL=3
-ZJOG MOTOR=3 DIST=5 VEL=3</code></pre>
-      <p>Watch each motor. You want to see two things:</p>
-      <ul>
-        <li><strong>It moves.</strong> If a motor does nothing, check its wiring and that its driver slot is correct.</li>
-        <li><strong>It moves the right way.</strong> A positive number (<code>DIST=5</code>) should raise that corner. If a corner goes <em>down</em> instead, that motor's direction needs to be flipped — note it down for Part 4.</li>
-      </ul>
-      <p>To send a corner back down, use a negative number, like <code>ZJOG MOTOR=0 DIST=-5 VEL=3</code>.</p>
-    </div>
-
-    <div class="callout">
-      <span class="tag">That's the software done</span>
-      <p>If all four motors wake up and move, your software is installed and working end-to-end. Setting the motor power, tuning the built-in stall sensing, and homing all four corners to the top is the next guide: <a href="/build-guide/validation/"><strong>Part 4 — Validation</strong></a>. Do not run a full <code>G28</code> yet — only the commands above.</p>
     </div>
 
     <h2>Quick checklist</h2>
@@ -479,8 +451,6 @@ ZJOG MOTOR=3 DIST=5 VEL=3</code></pre>
       <li>M3-CRETE installer run (<code>bash install.sh</code>).</li>
       <li>KlipperScreen shows on the touchscreen (if used).</li>
       <li>Mainsail says <strong>Klipper: Ready</strong>.</li>
-      <li><code>ZHOLD</code> makes all 4 Z motors hold.</li>
-      <li>Each motor jogs and moves the correct direction (note any that need flipping).</li>
     </ul>
 
     <h2>If you get stuck</h2>
@@ -492,7 +462,7 @@ ZJOG MOTOR=3 DIST=5 VEL=3</code></pre>
 
     <div class="callout">
       <span class="tag">Next</span>
-      <p><a href="/build-guide/validation/"><strong>Part 4 — Preliminary Motion Checkout.</strong></a> Review the limited current, direction, sensorless-homing, and Z-alignment observations and the professional verification work that remains. It is not safety qualification or permission to print.</p>
+      <p><a href="/build-guide/validation/"><strong>Part 4 — Preliminary Motion Checkout.</strong></a> Review the commissioning hold and the professional verification work that remains. It is not safety qualification or permission to print.</p>
     </div>
 
     <hr />

@@ -554,6 +554,7 @@
 
   <main class="pillar-content">
 <h1 id="m3-crete-experimental-build-reference">M3-CRETE Experimental Build Reference: BOM, CAD, and Checkout Limits</h1>
+<blockquote id="z-homing-hold"><p><strong>Z-homing commissioning hold.</strong> Do not use this guide to commission Z motion or homing. A qualified controls reviewer must first reconcile the hardware, installed firmware and commissioning plan for this machine.</p></blockquote>
 <blockquote>
 <p>M3-CRETE is an experimental open-hardware motion-system design. This page organizes development artifacts for qualified technical teams to inspect and adapt; it is not construction instruction, commissioning approval, or evidence that a physical machine has been validated. Covered hardware is published under <a href="https://ohwr.org/cern_ohl_w_v2.txt">CERN-OHL-W-2.0</a>, while identified V-slot CAD-library material remains under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 </blockquote>
@@ -562,7 +563,7 @@
 </blockquote>
 <h2 id="1-why-this-exists">1. Why this exists</h2>
 <p>Concrete-printing research systems vary widely in access, documentation, sourcing, licensing, and physical evidence. M3-CRETE explores whether an inspectable open-hardware reference can make motion-system research easier to review and reproduce without claiming equivalence to commercial equipment or readiness for field use.</p>
-<p><a href="https://m3-crete.com">M3-CRETE</a> by <a href="https://sunn3d.com">Sunnyday Technologies</a> publishes development CAD, a reference bill of materials, firmware references, and automated geometry checks. The current default M3-2 configuration targets a 2000 × 1000 × 1000 mm design envelope. Actual external dimensions, load capacity, accuracy, reliability, shipping configuration, electrical integration, and material-process performance remain subject to qualified physical review and testing.</p>
+<p><a href="https://m3-crete.com">M3-CRETE</a> by <a href="https://sunn3d.com">Sunnyday Technologies</a> publishes development CAD, a reference bill of materials, firmware references, and automated geometry checks. Each Z corner has its own motor and Tr8x2 lead screw (8 mm nominal diameter, 2 mm lead). X and Y use GT2 belts. The M3-2 Z home position is at the bottom by design. The <a href="#z-homing-hold">commissioning hold</a> remains in force. Ground-height mapping is a separate proposed capability intended to improve print accuracy.</p><p>The current default M3-2 configuration has a nominal design envelope of 2 m in X, 1 m in Y and 1 m in Z (2 m³). Actual external dimensions, load capacity, accuracy, reliability, shipping configuration, electrical integration, and material-process performance remain subject to qualified physical review and testing.</p>
 <p>This page documents how to do that. It walks the architecture, the BOM, the CAD workflow, the validation tooling, the licensing model, and the open issues. Concrete 3D printing is not a 280-character problem.</p>
 <h2 id="2-design-philosophy">2. Design philosophy</h2>
 <p>Three commitments shape every component decision in M3-CRETE.</p>
@@ -579,7 +580,7 @@
 </ul>
 <p>The exclusions section exists because the project has accreted many rounds of "have you considered adding..." suggestions over the last year and a half. Each rejection is an active engineering decision, documented so that contributors do not waste round-trips proposing rejected directions.</p>
 <h2 id="3-architecture-overview">3. Architecture overview</h2>
-<p>The default model variant is the <strong>M3-2</strong>, with a configured 2000 × 1000 × 1000 mm design envelope. M3-1 targets 1000 × 1000 × 1000 mm. These are configuration targets, not verified working volumes or exterior dimensions. The motion-system concept has four mechanical subsystems: a 4080 C-Beam frame, a dual-Y belt-pinion gantry, a quad-Z Z-stage, and a printhead carriage on a spliced X-beam.</p>
+<p>The default model variant is the <strong>M3-2</strong>, with a nominal design envelope of 2 m³. M3-1 targets 1000 × 1000 × 1000 mm. These are configuration targets, not verified working volumes or exterior dimensions. The motion-system concept has four mechanical subsystems: a 4080 C-Beam frame, a dual-Y belt-pinion gantry, a quad-Z Z-stage, and a printhead carriage on a spliced X-beam.</p>
 <h3 id="frame-4080-c-beam-single-length-stock">Frame: 4080 C-Beam, single-length stock</h3>
 <p>The primary structure is <strong>4080 C-Beam aluminum extrusion</strong>, used for Z-posts and Y-gantry rails, with 2040 V-slot for cross-bracing. Every structural member is cut to a single canonical length. There are no custom cuts and no mixed lengths. Single-SKU procurement is a non-negotiable for a kit business and a meaningful gift for any solo builder. The C-channel openings face inward toward the printer cube so the belts and Z lead screws run inside the C, where they are partly shielded from concrete spray and aerosol.</p>
 <p>The X-axis is built from two stock segments spliced at center span to yield the longer build envelope. The splice uses one 1 m 2040 V-slot insert centered in the C-channel across the join, anchored at each end by a small purchased or printed L-bracket, plus <strong>straight-line slot connector bars</strong> in the beam's front and back slots, clear of the top and bottom slots the wheels run in. No long custom-cut extrusion is required.</p>
@@ -589,7 +590,7 @@
 <p>V-wheels engage the V-groove on the narrow face of each extrusion at a specified engagement depth. This depth is encoded as a hard invariant in the validation harness; any geometry that drops the wheel out of engagement fails CI before the STEP file lands.</p>
 <h3 id="steppers-nema23-sensorless-homing">Steppers: NEMA23, sensorless homing</h3>
 <p>The motion system uses <strong>NEMA23 motors</strong> with heavy-duty shafts: one X, two Y for anti-racking, and four Z for self-tramming. Material pumping is a separate, related project and is not part of the motion system. The shaft sizing is required for StallGuard4 sensorless homing torque compatibility, not a comfort choice.</p>
-<p>Z-axis motors sit on top of each post, body above and shaft pointing down, and turn a Tr8×2 lead screw (8 mm diameter, 2 mm lead) through an 8 mm coupler. Each motor stands in a printed mount on the post top. A lock collar and a thrust bearing on each side of the mount's floor carry the gantry weight and the homing thrust, so the motor only supplies torque, and a 608 bearing in a printed holder centers the bottom of the screw. The screw runs inside the post's C-channel, 6 mm in from its open face, and a nut block on the carriage plate rides it. The 2 mm lead is chosen to resist back-driving, so the gantry should hold its height when the motors are off; verify this on the machine. Each corner homes down with sensorless homing until its nut block meets the top of its bottom holder, and each Z-corner can be trammed independently under Klipper's <code>Z_TILT_ADJUST</code> macro.</p>
+<p>Z-axis motors sit on top of each post, body above and shaft pointing down, and turn a Tr8×2 lead screw (8 mm diameter, 2 mm lead) through an 8 mm coupler. Each motor stands in a printed mount on the post top. A lock collar and a thrust bearing on each side of the mount's floor carry the gantry weight and the homing thrust, so the motor only supplies torque, and a 608 bearing in a printed holder centers the bottom of the screw. The screw runs inside the post's C-channel, 6 mm in from its open face, and a nut block on the carriage plate rides it. The 2 mm lead was chosen to resist back-driving. Power-off holding has not been verified for the installed gantry. See the <a href="#z-homing-hold">Z-homing commissioning hold</a>.</p>
 <h3 id="controller-btt-kraken-klipper-pi-5">Controller: BTT Kraken, Klipper, Pi 5</h3>
 <p>The mainboard is a <strong>BTT Kraken</strong> with onboard TMC5160 drivers configurable for SPI-mode StallGuard4. The host runs Klipper on a Raspberry Pi 5 with a touchscreen. The firmware repository lives at <a href="https://github.com/sunnyday-technologies/M3-CRETE-FIRMWARE">M3-CRETE-FIRMWARE</a> for kinematic profiles and stepper configuration.</p>
 <h3 id="configured-design-targets">Configured design targets and open verification</h3>
@@ -605,7 +606,7 @@
 <tr>
 <td>Configured design envelope (not physically verified)</td>
 <td>1000 × 1000 × 1000 mm</td>
-<td>2000 × 1000 × 1000 mm</td>
+<td>X 2 m × Y 1 m × Z 1 m (2 m³ nominal)</td>
 </tr>
 <tr>
 <td>X-axis splice</td>
@@ -680,7 +681,7 @@
 <li><strong>X-gantry internal reinforcement</strong>, all reinforcement is internal to the 4080 C-channel because the X-carriage is two-sided. One 2040 insert sits centered in the C-channel across the splice, anchored at each end by a small purchased or printed L-bracket; the slot connector bars go in the front and back slots, since the wheels run in the top and bottom slots and the X belt lies in the top one.</li>
 <li><strong>Slot-linking kit for splices</strong>, the long X-axis is achieved by splicing two stock segments using internal T-slot connectors, not external 5-hole 90-degree plates. External plates would protrude into the wheel zone and block carriage travel.</li>
 <li><strong>Multi-screw corner plates</strong>, every 4080-to-4080 corner uses a T-plate or L-plate. These are sourced from MakerStore USA or Bulkman3D.</li>
-<li><strong>Quad-Z lead screws</strong>, Z-motors sit on top of each post and turn a Tr8×2 lead screw through an 8 mm coupler; lock collars and thrust bearings on the printed motor mount carry the load, and each corner homes down onto the printed bottom holder that also centers the screw. This replaced the earlier belt-and-hub-disk Z in October 2026.</li>
+<li><strong>Quad-Z lead screws</strong>, Z-motors sit on top of each post and turn a Tr8×2 lead screw through an 8 mm coupler; lock collars and thrust bearings on the printed motor mount carry the load. The printed bottom holder centers the screw. This replaced the earlier belt-and-hub-disk Z in October 2026.</li>
 <li><strong>NEMA23 mount fastening</strong>, the canonical NEMA23 motors have pass-through mounting holes, not tapped holes. Each motor uses M5 cap screws with M5 nuts (nylock or plain plus blue Loctite), and the 3D-printed motor mount is a clearance plate, not a threaded anchor.</li>
 </ul>
 <h2 id="6-mix-design-and-printability">6. Mix design and printability</h2>
